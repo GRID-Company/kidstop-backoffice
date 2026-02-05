@@ -1,0 +1,13 @@
+mutation Login($loginUserInput: LoginUserInput!) {
+  login(loginUserInput: $loginUserInput) {
+    access_token
+    credentials_expired_token
+    user {
+      activated
+      emailAddress
+      guid
+      name
+      role
+    }
+  }
+}

@@ -1,0 +1,8 @@
+mutation UploadFile($uploadFileArgs: UploadFileInput!) {
+  uploadFile(uploadFileArgs: $uploadFileArgs) {
+    category
+    guid
+    name
+    path
+  }
+}

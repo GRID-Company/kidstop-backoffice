@@ -1,0 +1,68 @@
+{
+  "template": {
+    "name": "GRID Frontend Template",
+    "version": "1.0.0",
+    "based_on": "template-front-end"
+  },
+  "project": {
+    "name": "kidstop-backoffice",
+    "type": "frontend",
+    "stack": "nextjs-typescript"
+  },
+  "automation": {
+    "clickup": {
+      "enabled": true,
+      "workspace_id": "8591008",
+      "space_id": "90171056131",
+      "list_id": "901710648203",
+      "custom_fields": [
+        {
+          "name": "Feature"
+        },
+        {
+          "name": "Layer"
+        },
+        {
+          "name": "Priority"
+        },
+        {
+          "name": "Estimated Time"
+        },
+        {
+          "name": "Module"
+        },
+        {
+          "name": "Branch"
+        }
+      ],
+      "created_at": "2026-02-05T18:21:54.467Z"
+    },
+    "amplify": {
+      "enabled": true,
+      "region": "us-east-2"
+    }
+  },
+  "features": {
+    "available": [
+      "auth",
+      "inventory",
+      "windows"
+    ],
+    "structure": {
+      "adapters": [
+        "api",
+        "forms",
+        "mappers"
+      ],
+      "domain": [
+        "types",
+        "constants"
+      ],
+      "ui": [
+        "components",
+        "views",
+        "hooks"
+      ]
+    }
+  }
+}

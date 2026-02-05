@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+@plugin '../../hero.ts';
+
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* --color-primary: #0870ba; */
+  --color-brand-1: #5699dc;
+  --color-brand-2: #165b8d;
+
+  --color-content-tertiary: #7e8b99;
+  --color-content-primary: #272e35;
+  --color-neutral-subtle: #f5f7f9;
+  /* --color-secondary: #555f6d; */
+}

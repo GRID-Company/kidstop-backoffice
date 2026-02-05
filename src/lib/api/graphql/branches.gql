@@ -1,0 +1,11 @@
+query BranchOffices($findBranchOfficesArgs: FindBranchOfficesArgs!) {
+  branchOffices(findBranchOfficesArgs: $findBranchOfficesArgs) {
+    count
+    data {
+      createdDate
+      guid
+      name
+      updatedDate
+    }
+  }
+}

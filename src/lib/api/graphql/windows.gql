@@ -1,0 +1,40 @@
+query Windows($findWindowsArgs: FindWindowsArgs!) {
+  windows(findWindowsArgs: $findWindowsArgs) {
+    count
+    data {
+      categoryType
+      createdDate
+      description
+      guid
+      hasMosquitoNet
+      name
+      updatedDate
+      windowTypes
+      technicalImage {
+        guid
+        name
+        path
+      }
+      sampleImages {
+        guid
+        name
+        path
+      }
+      subWindows {
+        guid
+        horizontalProfiles {
+          quantity
+        }
+        verticalProfiles {
+          quantity
+        }
+      }
+    }
+  }
+}
+
+mutation CreateWindow($createWindowInput: CreateWindowInput!) {
+  createWindow(createWindowInput: $createWindowInput) {
+    guid
+  }
+}
