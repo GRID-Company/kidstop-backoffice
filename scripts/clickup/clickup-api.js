@@ -5,7 +5,7 @@
  * Wrapper for ClickUp API v2
  */
 
-const https = require('https');
+import https from 'https';
 
 class ClickUpAPI {
   constructor(apiKey) {
@@ -94,6 +94,13 @@ class ClickUpAPI {
   }
 
   /**
+   * Update a list
+   */
+  async updateList(listId, data) {
+    return this.request('PUT', `/list/${listId}`, data);
+  }
+
+  /**
    * Get lists in a folder
    */
   async getLists(folderId) {
@@ -129,15 +136,42 @@ class ClickUpAPI {
       name: taskData.name,
       description: taskData.description || '',
       assignees: taskData.assignees || [],
-      tags: taskData.tags || [],
-      status: taskData.status || 'to do',
-      priority: taskData.priority || null,
-      due_date: taskData.dueDate || null,
-      start_date: taskData.startDate || null,
-      custom_fields: taskData.customFields || [],
+      status: taskData.status || 'todo',
+      due_date: taskData.due_date,
+      due_date_time: taskData.due_date_time || false,
+      time_estimate: taskData.time_estimate,
+      start_date: taskData.start_date,
+      start_date_time: taskData.start_date_time || false,
+      notify_all: taskData.notify_all || true,
+      parent: taskData.parent,
+      links_to: taskData.links_to,
+      custom_task_id: taskData.custom_task_id,
+      custom_fields: taskData.custom_fields || {},
+      tags: taskData.tags || []
     };
 
     return this.request('POST', `/list/${listId}/task`, data);
+  }
+
+  /**
+   * Delete a task
+   */
+  async deleteTask(taskId) {
+    return this.request('DELETE', `/task/${taskId}`);
+  }
+
+  /**
+   * Create a dashboard
+   */
+  async createDashboard(workspaceId, dashboardData) {
+    return this.request('POST', `/workspace/${workspaceId}/dashboard`, dashboardData);
+  }
+
+  /**
+   * Get dashboards in workspace
+   */
+  async getDashboards(workspaceId) {
+    return this.request('GET', `/workspace/${workspaceId}/dashboard`);
   }
 
   /**
@@ -239,10 +273,10 @@ class ClickUpAPI {
   }
 }
 
-module.exports = ClickUpAPI;
+export default ClickUpAPI;
 
 // CLI usage
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const apiKey = process.env.CLICKUP_API_KEY;
   
   if (!apiKey) {
