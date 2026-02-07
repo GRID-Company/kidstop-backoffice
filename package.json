@@ -16,7 +16,11 @@
     "clickup:get-folder": "node scripts/clickup/get-folder-id.js",
     "clickup:create-task": "node scripts/clickup/create-task.js",
     "clickup:update-task": "node scripts/clickup/update-task.js",
-    "clickup:sync": "node scripts/clickup/update-dashboard.js"
+    "clickup:sync": "node scripts/clickup/update-dashboard.js",
+    "clickup:dashboard": "node scripts/clickup/dashboard-improved.js",
+    "clickup:emergency": "node scripts/clickup/emergency-dashboard.js",
+    "clickup:create-dashboards": "node scripts/clickup/create-visual-dashboards.js",
+    "clickup:html-dashboard": "node scripts/clickup/generate-html-dashboard.js"
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
