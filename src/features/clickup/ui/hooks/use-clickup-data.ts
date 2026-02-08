@@ -25,7 +25,15 @@ interface DashboardData {
     completedStoryPoints?: number;
     projectStartDate?: string;
     criticalMilestoneDate?: string;
-    phases?: any[];
+    phases?: Array<{
+      name: string;
+      total: number;
+      completed: number;
+      inProgress: number;
+      todo: number;
+      estimatedSP: number;
+      color: string;
+    }>;
     tags?: Record<string, number>;
     nextMilestone?: string;
     milestoneProgress?: number;

@@ -97,10 +97,6 @@ export class DashboardService {
       await this.processListForAggregation(list.id, allTasks, allMetrics);
     }
 
-    // Calculate milestone-specific metrics for folder data
-    if (allMetrics.total > 0) {
-      this.calculateMilestoneMetrics(allMetrics);
-    }
 
     logger.info(`Folder dashboard aggregated ${allTasks.length} tasks from ${lists.length} lists`);
 
@@ -158,10 +154,6 @@ export class DashboardService {
       }
     }
 
-    // Calculate milestone-specific metrics for aggregated data
-    if (allMetrics.total > 0) {
-      this.calculateMilestoneMetrics(allMetrics);
-    }
 
     return {
       tasks: allTasks,
@@ -274,28 +266,7 @@ export class DashboardService {
     return null;
   }
 
-  /**
-   * Calculates milestone-specific metrics for aggregated data
-   */
-  private calculateMilestoneMetrics(metrics: TaskMetrics): void {
-    const now = new Date();
-    const projectStartDate = new Date('2026-01-03');
-    const secondDeliveryDate = new Date('2026-03-04'); // Day 60
-    
-    // Expected completion percentage for current milestone
-    const expectedCompletionByMilestone = now.getTime() < secondDeliveryDate.getTime() ? 0.60 : 0.90;
-    const expectedTasksForMilestone = Math.ceil(metrics.total * expectedCompletionByMilestone);
-    const tasksNeededForMilestone = Math.max(0, expectedTasksForMilestone - metrics.completed);
-    
-    metrics.expectedCompletionByMilestone = expectedCompletionByMilestone;
-    metrics.expectedTasksForMilestone = expectedTasksForMilestone;
-    metrics.tasksNeededForMilestone = tasksNeededForMilestone;
-    
-    // Recalculate required velocity based on milestone targets
-    const daysToNextMilestone = metrics.daysToNextMilestone || 24;
-    metrics.requiredVelocity = daysToNextMilestone > 0 ? tasksNeededForMilestone / daysToNextMilestone : 0;
   }
-}
 
 // Export factory function
 export const createDashboardService = (clickUpService: ClickUpService): DashboardService => {

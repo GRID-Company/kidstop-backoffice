@@ -13,6 +13,7 @@ interface EmergencyBannerProps {
   daysToNextMilestone: number;
   nextMilestone?: string;
   healthStatus: string;
+  isEmergencyMode: boolean;
 }
 
 export const EmergencyBanner: React.FC<EmergencyBannerProps> = ({
@@ -20,8 +21,8 @@ export const EmergencyBanner: React.FC<EmergencyBannerProps> = ({
   daysToNextMilestone,
   nextMilestone,
   healthStatus,
+  isEmergencyMode,
 }) => {
-  const isEmergencyMode = daysBehind > 20;
   const crisisLevel = daysBehind > 30 ? 'CODE RED' : 
                      daysBehind > 20 ? 'CODE YELLOW' : 'NORMAL';
 

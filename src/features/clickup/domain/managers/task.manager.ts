@@ -9,7 +9,6 @@ import {
   CreateTaskData, 
   UpdateTaskData,
   GetTasksOptions,
-  ClickUpStatus
 } from '@/features/clickup/domain/types';
 import { TASK_PRIORITY, TASK_PRIORITY_LABELS } from '@/features/clickup/domain/constants';
 import { 

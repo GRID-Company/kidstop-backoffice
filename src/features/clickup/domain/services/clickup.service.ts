@@ -1,6 +1,11 @@
 /**
  * ClickUp Service
  * Main service that orchestrates all ClickUp operations
+ * 
+ * NOTE: This service uses a singleton pattern which has limitations in serverless environments:
+ * - In serverless functions, the singleton may persist between cold starts
+ * - State should be treated as potentially stale and refreshed when needed
+ * - Consider using factory pattern for stateless operations in high-concurrency scenarios
  */
 
 import { ClickUpClient } from '@/features/clickup/adapters/api/clickup-client';
@@ -11,6 +16,7 @@ import { DashboardsApi } from '@/features/clickup/adapters/api/endpoints/dashboa
 import { TaskManager } from '@/features/clickup/domain/managers/task.manager';
 import { ClickUpConfig } from '@/features/clickup/adapters/config/clickup.config';
 import { logger } from '@/lib/clickup/logger';
+import { WorkspaceInfo } from '../types';
 
 export interface ClickUpServiceOptions {
   config?: ClickUpConfig;
@@ -19,6 +25,9 @@ export interface ClickUpServiceOptions {
 }
 
 export class ClickUpService {
+  /**
+   * Singleton instance - see class documentation for serverless limitations
+   */
   private static instance: ClickUpService | undefined;
   
   private client: ClickUpClient;
@@ -58,6 +67,9 @@ export class ClickUpService {
 
   /**
    * Gets the singleton instance of ClickUpService
+   * 
+   * WARNING: In serverless environments, this may return stale state.
+   * Consider refreshing critical data or using factory methods for fresh instances.
    */
   static getInstance(options?: ClickUpServiceOptions): ClickUpService {
     if (!ClickUpService.instance) {
@@ -118,7 +130,7 @@ export class ClickUpService {
   /**
    * Gets workspace information with caching
    */
-  async getWorkspaceInfo(): Promise<any> {
+  async getWorkspaceInfo(): Promise<WorkspaceInfo> {
     logger.debug('Getting workspace information');
     
     try {

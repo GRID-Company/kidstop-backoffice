@@ -28,7 +28,8 @@ export const RecentTasks: React.FC<RecentTasksProps> = ({ tasks }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'complete': return 'success';
-      case 'in progress': return 'warning';
+      case 'in progress':
+      case 'inprogress': return 'warning';
       default: return 'default';
     }
   };
@@ -65,10 +66,7 @@ export const RecentTasks: React.FC<RecentTasksProps> = ({ tasks }) => {
                   )}
                   <Chip
                     size="sm"
-                    color={
-                      task.status === 'complete' ? 'success' :
-                      task.status === 'in progress' ? 'warning' : 'default'
-                    }
+                    color={getStatusColor(task.status || '')}
                     variant="flat"
                   >
                     {task.status || 'No status'}

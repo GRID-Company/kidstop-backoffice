@@ -24,11 +24,10 @@ interface ActionPlanProps {
     nextMilestone?: string;
     total?: number;
   };
+  isEmergencyMode: boolean;
 }
 
-export const ActionPlan: React.FC<ActionPlanProps> = ({ metrics }) => {
-  const isEmergencyMode = (metrics.daysBehind || 0) > 20;
-
+export const ActionPlan: React.FC<ActionPlanProps> = ({ metrics, isEmergencyMode }) => {
   if (!isEmergencyMode) {
     return null;
   }

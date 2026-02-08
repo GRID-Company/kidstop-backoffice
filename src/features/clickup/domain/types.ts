@@ -79,6 +79,12 @@ export interface ClickUpMember {
   lastActive?: string;
 }
 
+export interface WorkspaceInfo {
+  workspace: ClickUpWorkspace;
+  spaces: ClickUpSpace[];
+  folderId?: string;
+}
+
 export interface ClickUpCustomField {
   id: string;
   name: string;

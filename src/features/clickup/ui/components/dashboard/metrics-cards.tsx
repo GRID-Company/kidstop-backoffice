@@ -10,6 +10,36 @@ import { Card, CardBody } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { getDaysSinceStart } from '@/features/clickup/domain/constants/project-timeline.constants';
 
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  extra?: string;
+  extra2?: string;
+  color: string;
+  borderClass?: string;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({ 
+  title, 
+  value, 
+  subtitle, 
+  extra, 
+  extra2, 
+  color, 
+  borderClass = '' 
+}) => (
+  <Card className={`border-2 ${borderClass}`}>
+    <CardBody className="text-center">
+      <div className={`text-3xl font-bold ${color}`}>{value}</div>
+      <p className="text-gray-600 mt-1">{title}</p>
+      {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+      {extra && <div className="text-xs text-gray-400 mt-2">{extra}</div>}
+      {extra2 && <div className="text-xs text-gray-500 mt-1">{extra2}</div>}
+    </CardBody>
+  </Card>
+);
+
 interface MetricsCardsProps {
   metrics: {
     daysBehind?: number;
@@ -101,33 +131,6 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
     },
   ];
 
-  const MetricCard = ({ 
-    title, 
-    value, 
-    subtitle, 
-    extra, 
-    extra2, 
-    color, 
-    borderClass = '' 
-  }: {
-    title: string;
-    value: string | number;
-    subtitle?: string;
-    extra?: string;
-    extra2?: string;
-    color: string;
-    borderClass?: string;
-  }) => (
-    <Card className={`border-2 ${borderClass}`}>
-      <CardBody className="text-center">
-        <div className={`text-3xl font-bold ${color}`}>{value}</div>
-        <p className="text-gray-600 mt-1">{title}</p>
-        {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-        {extra && <div className="text-xs text-gray-400 mt-2">{extra}</div>}
-        {extra2 && <div className="text-xs text-gray-500 mt-1">{extra2}</div>}
-      </CardBody>
-    </Card>
-  );
 
   return (
     <>

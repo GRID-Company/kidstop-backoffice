@@ -6,25 +6,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClickUpService } from '@/features/clickup/domain/services/clickup.service';
 import { ClickUpList } from '@/features/clickup/domain/types';
+import { logger } from '@/lib/clickup/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Lists API: Starting request');
+    logger.info('Lists API: Starting request');
 
     // Check if environment variables are available
     const apiKey = process.env.CLICKUP_API_KEY;
     const workspaceId = process.env.CLICKUP_WORKSPACE_ID;
     const folderId = process.env.CLICKUP_FOLDER_ID;
     
-    console.log('🔑 Environment check:', {
+    logger.debug('Environment check', {
       hasApiKey: !!apiKey,
       hasWorkspaceId: !!workspaceId,
-      hasFolderId: !!folderId,
-      apiKeyPrefix: apiKey ? apiKey.substring(0, 8) + '***' : 'none'
+      hasFolderId: !!folderId
     });
 
     if (!apiKey || !workspaceId) {
-      console.log('❌ Missing environment variables');
+      logger.warn('Missing environment variables');
       return NextResponse.json({
         error: 'ClickUp configuration missing',
         message: 'Please set CLICKUP_API_KEY and CLICKUP_WORKSPACE_ID in environment variables',
@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Initialize ClickUp service
-    console.log('🚀 Initializing ClickUp service...');
+    logger.debug('Initializing ClickUp service');
     const clickUpService = getClickUpService();
 
     // Get workspace info
-    console.log('🏢 Getting workspace info...');
+    logger.debug('Getting workspace info');
     const workspaceInfo = await clickUpService.getWorkspaceInfo();
-    console.log('✅ Workspace info retrieved:', {
+    logger.info('Workspace info retrieved', {
       workspaceId: workspaceInfo.workspace.id,
       workspaceName: workspaceInfo.workspace.name,
       spacesCount: workspaceInfo.spaces.length,
@@ -50,27 +50,27 @@ export async function GET(request: NextRequest) {
     let listsToFetch: ClickUpList[] = [];
     
     if (folderId) {
-      console.log('📁 Getting lists from configured folder:', folderId);
+      logger.debug('Getting lists from configured folder', { folderId });
       try {
         listsToFetch = await clickUpService.listsApi.getLists(folderId);
-        console.log('📋 Found lists in folder:', listsToFetch.length);
+        logger.info('Found lists in folder', { count: listsToFetch.length });
       } catch (folderError) {
-        console.log('❌ Error accessing folder:', folderError);
+        logger.error('Error accessing folder', folderError);
       }
     }
     
     if (listsToFetch.length === 0 && workspaceInfo.spaces.length > 0) {
-      console.log('🌌 Getting folderless lists from first space...');
+      logger.debug('Getting folderless lists from first space');
       try {
         const firstSpace = workspaceInfo.spaces[0];
         listsToFetch = await clickUpService.listsApi.getFolderlessLists(firstSpace.id);
-        console.log('📋 Found folderless lists:', listsToFetch.length);
+        logger.info('Found folderless lists', { count: listsToFetch.length });
       } catch (spaceError) {
-        console.log('❌ Error accessing space:', spaceError);
+        logger.error('Error accessing space', spaceError);
       }
     }
 
-    console.log('✅ Lists retrieved:', {
+    logger.info('Lists retrieved', {
       totalLists: listsToFetch.length,
       listNames: listsToFetch.map(list => list.name)
     });
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Lists API error:', error);
+    logger.error('Lists API error', error);
     
     return NextResponse.json(
       { 

@@ -1,6 +1,11 @@
 /**
  * ClickUp Configuration Manager
  * Centralized configuration management for ClickUp integration
+ * 
+ * NOTE: This configuration uses a singleton pattern which has limitations in serverless environments:
+ * - Configuration may persist between cold starts and become stale
+ * - Environment variable changes may not be reflected until next cold start
+ * - For dynamic configuration, consider using createInstance() factory method
  */
 
 import { ClickUpServiceConfig, ClickUpEnvConfig } from '@/features/clickup/domain/types';
@@ -8,6 +13,9 @@ import { validateClickUpEnv, createServiceConfig } from './env-validator';
 import { logger } from '@/lib/clickup/logger';
 
 export class ClickUpConfig {
+  /**
+   * Singleton instance - see class documentation for serverless limitations
+   */
   private static instance: ClickUpConfig | undefined;
   private config: ClickUpServiceConfig;
   private envConfig: ClickUpEnvConfig;

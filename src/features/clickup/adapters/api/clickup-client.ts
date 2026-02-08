@@ -256,7 +256,6 @@ export class ClickUpClient {
   }
 }
 
-export const clickUpClient = new ClickUpClient();
 
 export const createClickUpClient = (config?: Partial<ClickUpConfig>): ClickUpClient => {
   return ClickUpClient.create(config);

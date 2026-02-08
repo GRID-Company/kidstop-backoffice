@@ -9,7 +9,7 @@
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { Button, Spinner } from '@heroui/react';
 import { motion } from 'framer-motion';
-import { useClickUpData } from '@/features/clickup/domain/hooks/use-clickup-data';
+import { useClickUpData } from '@/features/clickup/ui/hooks/use-clickup-data';
 
 // Import sub-components
 import { EmergencyBanner } from './emergency-banner';
@@ -86,6 +86,7 @@ export const ProjectDashboard = forwardRef<
         daysToNextMilestone={data.metrics.daysToNextMilestone || 0}
         nextMilestone={data.metrics.nextMilestone}
         healthStatus={healthStatus}
+        isEmergencyMode={isEmergencyMode}
       />
 
       {/* Project Health Indicator */}
@@ -158,6 +159,7 @@ export const ProjectDashboard = forwardRef<
       {/* Action Plan */}
       <ActionPlan
         metrics={data.metrics}
+        isEmergencyMode={isEmergencyMode}
       />
 
       {/* Recent Tasks */}
