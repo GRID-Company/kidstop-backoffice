@@ -1,6 +1,6 @@
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
-import Logo from '@/assets/img/logo-white.png';
+import Logo from '@/assets/img/logo.png';
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -20,6 +20,7 @@ import { UserRole } from '@/lib/auth/user-roles';
 import { useLogout } from '@/lib/auth/use-process-logout';
 import { useAuthStore } from '@/lib/store/auth';
 import BranchSelector from './branch-selector';
+import TcgSelector from '@/shared/base/tcg-selector';
 import UserPresenter from './user-presenter';
 
 export default function Topbar({ className }: { className?: string }) {
@@ -61,6 +62,7 @@ export default function Topbar({ className }: { className?: string }) {
         </NavbarContent>
 
         <NavbarContent justify='end' className='hidden gap-6 pr-6 xl:flex'>
+          <TcgSelector />
           <BranchSelector />
           <UserPresenter />
         </NavbarContent>
@@ -72,6 +74,10 @@ export default function Topbar({ className }: { className?: string }) {
         </NavbarContent>
 
         <NavbarMenu className='top-12 px-4 py-8 xl:hidden'>
+          <NavbarMenuItem key='tcg-selector'>
+            <TcgSelector />
+          </NavbarMenuItem>
+
           {(MENU_ROUTES?.[role as UserRole] ?? []).map((option, index) => {
             const isActive = pathname.includes(option.route);
             return (
