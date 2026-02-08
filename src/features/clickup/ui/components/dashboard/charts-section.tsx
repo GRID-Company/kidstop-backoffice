@@ -46,7 +46,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
               <div key={status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className={`w-4 h-4 rounded-full ${
-                    status === 'complete' ? 'bg-green-500' :
+                    status === 'done' ? 'bg-green-500' :
                     status === 'in progress' || status === 'inprogress' ? 'bg-orange-500' :
                     status === 'todo' ? 'bg-blue-500' : 'bg-gray-500'
                   }`} />

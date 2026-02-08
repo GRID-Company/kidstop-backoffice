@@ -314,7 +314,7 @@ export class TaskManager {
     // Validate status changes
     if (updates.status && currentTask.status !== updates.status) {
       // Business rule: Cannot move from completed to todo without reason
-      if (currentTask.status === 'complete' && updates.status === 'todo') {
+      if (currentTask.status === 'done' && updates.status === 'todo') {
         warnings.push('Moving task from completed to todo');
       }
     }
@@ -384,7 +384,7 @@ export class TaskManager {
     const processed = { ...updates };
 
     // Business rule: When marking as complete, set completion time
-    if (updates.status === 'complete' && currentTask.status !== 'complete') {
+    if (updates.status === 'done' && currentTask.status !== 'done') {
       // This would typically set a completed_at timestamp
       logger.debug('Task marked as complete', { taskId: currentTask.id });
     }
@@ -421,14 +421,14 @@ export class TaskManager {
     // Calculate basic metrics and story points
     for (const task of tasks) {
       // Status metrics
-      if (task.status === 'complete') {
+      if (task.status === 'done') {
         metrics.completed++;
       } else if (task.status === 'in progress' || task.status === 'inprogress') {
         metrics.inProgress++;
       }
 
       // Overdue tasks
-      if (task.dueDate && task.dueDate < now && task.status !== 'complete') {
+      if (task.dueDate && task.dueDate < now && task.status !== 'done') {
         metrics.overdue++;
       }
 
@@ -444,7 +444,7 @@ export class TaskManager {
       // Story points (if available in custom fields or description)
       const storyPoints = this.extractStoryPoints(task);
       totalStoryPoints += storyPoints;
-      if (task.status === 'complete') {
+      if (task.status === 'done') {
         completedStoryPoints += storyPoints;
       }
     }
@@ -476,18 +476,18 @@ export class TaskManager {
     // Calculate expected progress based on 30-day natural delivery cycles
     const totalProjectDays = PROJECT_DURATION.TOTAL_DAYS;
     const expectedProgress = daysSinceStart / totalProjectDays;
-    const actualProgress = tasks.length > 0 ? tasks.filter(t => t.status === 'complete').length / tasks.length : 0;
+    const actualProgress = tasks.length > 0 ? tasks.filter(t => t.status === 'done').length / tasks.length : 0;
     const daysBehind = Math.max(0, Math.floor((expectedProgress - actualProgress) * totalProjectDays));
     
     // Calculate velocities using natural days (as per client requirement)
-    const currentVelocity = daysSinceStart > 0 ? tasks.filter(t => t.status === 'complete').length / daysSinceStart : 0;
+    const currentVelocity = daysSinceStart > 0 ? tasks.filter(t => t.status === 'done').length / daysSinceStart : 0;
     
-    const remainingTasks = tasks.filter(t => t.status !== 'complete').length;
+    const remainingTasks = tasks.filter(t => t.status !== 'done').length;
     const currentMilestone = getCurrentMilestone(now);
     const expectedCompletionByMilestone = getExpectedCompletionByMilestone(now);
     
     const expectedTasksForMilestone = Math.ceil(tasks.length * expectedCompletionByMilestone);
-    const tasksNeededForMilestone = Math.max(0, expectedTasksForMilestone - tasks.filter(t => t.status === 'complete').length);
+    const tasksNeededForMilestone = Math.max(0, expectedTasksForMilestone - tasks.filter(t => t.status === 'done').length);
     const requiredVelocity = currentMilestone.daysRemaining > 0 ? tasksNeededForMilestone / currentMilestone.daysRemaining : 0;
     
     // Calculate phases and tags
@@ -609,7 +609,7 @@ export class TaskManager {
         return config.keywords.some(keyword => searchText.includes(keyword));
       });
 
-      const completed = phaseTasks.filter(t => t.status === 'complete').length;
+      const completed = phaseTasks.filter(t => t.status === 'done').length;
       const inProgress = phaseTasks.filter(t => t.status === 'in progress' || t.status === 'inprogress').length;
       const todo = phaseTasks.filter(t => t.status === 'todo').length;
       const estimatedSP = phaseTasks.reduce((sum, t) => sum + this.extractStoryPoints(t), 0);
@@ -729,7 +729,7 @@ export class TaskManager {
     const overdueTasks = tasks.filter(task => 
       task.dueDate && 
       task.dueDate < now && 
-      task.status !== 'complete'
+      task.status !== 'done'
     );
 
     logger.debug(`Found ${overdueTasks.length} overdue tasks`);

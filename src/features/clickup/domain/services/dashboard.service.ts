@@ -6,7 +6,7 @@
 import { ClickUpService } from './clickup.service';
 import { TaskManager, TaskMetrics } from '../managers/task.manager';
 import { ClickUpTask } from '../types';
-import { DEFAULT_METRICS, PROJECT_TIMELINE, getExpectedCompletionByMilestone } from '../constants/project-timeline.constants';
+import { DEFAULT_METRICS, PROJECT_TIMELINE, getExpectedCompletionByMilestone, getCurrentMilestone, getDaysSinceStart, PROJECT_DURATION } from '../constants/project-timeline.constants';
 import { logger } from '@/lib/clickup/logger';
 
 export interface DashboardOptions {
@@ -97,6 +97,7 @@ export class DashboardService {
       await this.processListForAggregation(list.id, allTasks, allMetrics);
     }
 
+    this.recalculateEmergencyMetrics(allMetrics);
 
     logger.info(`Folder dashboard aggregated ${allTasks.length} tasks from ${lists.length} lists`);
 
@@ -154,6 +155,7 @@ export class DashboardService {
       }
     }
 
+    this.recalculateEmergencyMetrics(allMetrics);
 
     return {
       tasks: allTasks,
@@ -226,6 +228,36 @@ export class DashboardService {
     } catch (error) {
       logger.warn(`Failed to process list ${listId} for aggregation`, error as any);
     }
+  }
+
+  private recalculateEmergencyMetrics(allMetrics: TaskMetrics): void {
+    const now = new Date();
+    const daysSinceStart = getDaysSinceStart(now);
+    const currentMilestone = getCurrentMilestone(now);
+    const expectedCompletionByMilestone = getExpectedCompletionByMilestone(now);
+
+    const totalProjectDays = PROJECT_DURATION.TOTAL_DAYS;
+    const expectedProgress = daysSinceStart / totalProjectDays;
+    const actualProgress = allMetrics.total > 0 ? allMetrics.completed / allMetrics.total : 0;
+
+    allMetrics.daysBehind = Math.max(0, Math.floor((expectedProgress - actualProgress) * totalProjectDays));
+    allMetrics.currentVelocity = daysSinceStart > 0
+      ? Math.round((allMetrics.completed / daysSinceStart) * 100) / 100
+      : 0;
+
+    allMetrics.expectedCompletionByMilestone = expectedCompletionByMilestone;
+    allMetrics.expectedTasksForMilestone = Math.ceil(allMetrics.total * expectedCompletionByMilestone);
+    allMetrics.tasksNeededForMilestone = Math.max(0, allMetrics.expectedTasksForMilestone - allMetrics.completed);
+    allMetrics.daysToNextMilestone = currentMilestone.daysRemaining;
+    allMetrics.nextMilestone = currentMilestone.name;
+    allMetrics.milestoneTargetDate = currentMilestone.date.toISOString();
+    allMetrics.milestoneProgress = ((daysSinceStart / PROJECT_DURATION.MILESTONE_CYCLE) * 100) % 100;
+    allMetrics.requiredVelocity = currentMilestone.daysRemaining > 0
+      ? Math.round((allMetrics.tasksNeededForMilestone / currentMilestone.daysRemaining) * 100) / 100
+      : 0;
+
+    allMetrics.projectStartDate = PROJECT_TIMELINE.START_DATE.toISOString();
+    allMetrics.criticalMilestoneDate = PROJECT_TIMELINE.CRITICAL_MILESTONE_DATE.toISOString();
   }
 
   /**
