@@ -5,12 +5,12 @@
  * Creates list and custom fields for project management
  */
 
-const ClickUpAPI = require('./clickup-api');
-const fs = require('fs');
-const path = require('path');
+import ClickUpAPI from './clickup-api.js';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
 
-// Load environment variables
-require('dotenv').config();
+dotenv.config();
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -294,8 +294,8 @@ async function createProjectStructure() {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   createProjectStructure();
 }
 
-module.exports = createProjectStructure;
+export default createProjectStructure;

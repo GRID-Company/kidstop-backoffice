@@ -11,19 +11,20 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "codegen": "graphql-codegen && prettier --write \"src/lib/api/schema-types.ts\" \"src/lib/api/generated/**/*.generated.ts\" && eslint \"src/lib/api/schema-types.ts\" \"src/lib/api/generated/**/*.generated.ts\" --fix",
-    "clickup:test": "node scripts/clickup/test-connection.js",
-    "clickup:setup": "./scripts/clickup/setup-clickup.sh",
-    "clickup:get-folder": "node scripts/clickup/get-folder-id.js",
-    "clickup:create-task": "node scripts/clickup/create-task.js",
-    "clickup:update-task": "node scripts/clickup/update-task.js",
-    "clickup:sync": "node scripts/clickup/update-dashboard.js"
+    "clickup:test": "tsx -r dotenv/config scripts/clickup/cli/test-connection.ts",
+    "clickup:setup": "tsx -r dotenv/config scripts/clickup/cli/setup.ts",
+    "clickup:create-task": "tsx -r dotenv/config scripts/clickup/cli/create-task.ts",
+    "clickup:sync": "node scripts/clickup/update-dashboard.js",
+    "clickup:dashboard": "node scripts/clickup/dashboard-improved.js",
+    "clickup:emergency": "node scripts/clickup/emergency-dashboard.js",
+    "clickup:create-dashboards": "node scripts/clickup/create-visual-dashboards.js",
+    "clickup:html-dashboard": "node scripts/clickup/generate-html-dashboard.js"
   },
   "dependencies": {
     "@apollo/client": "^4.0.9",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@heroui/react": "^2.8.5",
     "@hookform/resolvers": "^5.2.2",
-    "apexcharts": "^5.3.6",
     "apollo-upload-client": "^19.0.0",
     "dayjs": "^1.11.19",
     "dotenv": "^16.6.1",
@@ -31,7 +32,6 @@
     "graphql": "^16.12.0",
     "next": "16.1.6",
     "react": "19.2.4",
-    "react-apexcharts": "^1.8.0",
     "react-dom": "19.2.4",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.66.0",
@@ -61,6 +61,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "uuid": "^13.0.0"
   }
