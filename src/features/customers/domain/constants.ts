@@ -48,3 +48,27 @@ export const DEFAULT_CUSTOMERS_SORT: ITableSort = {
 export const DEFAULT_PAGE_SIZE = 20;
 
 export const DEFAULT_UNCOMPLETED_ORDERS_THRESHOLD = 3;
+
+export const ORDER_STATUSES = {
+  NEW: 'NEW',
+  IN_PROGRESS: 'IN_PROGRESS',
+  READY: 'READY',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export const ORDER_STATUS_LABELS: Record<string, string> = {
+  [ORDER_STATUSES.NEW]: 'Nuevo',
+  [ORDER_STATUSES.IN_PROGRESS]: 'En surtido',
+  [ORDER_STATUSES.READY]: 'Listo',
+  [ORDER_STATUSES.COMPLETED]: 'Completado',
+  [ORDER_STATUSES.CANCELLED]: 'Cancelado',
+};
+
+export const ORDER_STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'success' | 'danger'> = {
+  [ORDER_STATUSES.NEW]: 'default',
+  [ORDER_STATUSES.IN_PROGRESS]: 'primary',
+  [ORDER_STATUSES.READY]: 'warning',
+  [ORDER_STATUSES.COMPLETED]: 'success',
+  [ORDER_STATUSES.CANCELLED]: 'danger',
+};

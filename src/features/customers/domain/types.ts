@@ -1,4 +1,4 @@
-import { CUSTOMER_TYPES, CUSTOMER_STATUSES } from './constants';
+import { CUSTOMER_TYPES, CUSTOMER_STATUSES, ORDER_STATUSES } from './constants';
 
 export type CustomerType = (typeof CUSTOMER_TYPES)[keyof typeof CUSTOMER_TYPES];
 
@@ -23,4 +23,23 @@ export interface CustomerFilters {
   type?: CustomerType;
   status?: CustomerStatus;
   search?: string;
+}
+
+export type OrderStatus = (typeof ORDER_STATUSES)[keyof typeof ORDER_STATUSES];
+
+export interface ICustomerOrder {
+  id: string;
+  code: string;
+  status: OrderStatus;
+  totalItems: number;
+  totalAmount: number;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export interface ICustomerOrdersSummary {
+  totalOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  orders: ICustomerOrder[];
 }
