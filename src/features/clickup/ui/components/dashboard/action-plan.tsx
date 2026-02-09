@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardBody } from '@heroui/react';
+import { Card, CardBody, Tooltip } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { getDaysSinceStart } from '@/features/clickup/domain/constants/project-timeline.constants';
 
@@ -40,11 +40,15 @@ export const ActionPlan: React.FC<ActionPlanProps> = ({ metrics, isEmergencyMode
     >
       <Card className="border-2 border-red-500 bg-red-50">
         <CardBody>
-          <h2 className="text-2xl font-bold text-red-700 mb-4">PLAN DE RECUPERACIÓN</h2>
+          <Tooltip content="Plan de acción automático generado cuando el proyecto entra en modo emergencia. Define pasos concretos para recuperar el cronograma." placement="top" delay={300}>
+            <h2 className="text-2xl font-bold text-red-700 mb-4 cursor-help">PLAN DE RECUPERACIÓN</h2>
+          </Tooltip>
           
           {/* Velocity Analysis */}
           <div className="mb-6 p-4 bg-white rounded-lg border-l-4 border-red-500">
-            <div className="font-semibold text-red-700 mb-2">ANÁLISIS DE VELOCIDAD:</div>
+            <Tooltip content="Compara la velocidad actual del equipo vs la velocidad necesaria para cumplir el próximo hito. La brecha indica cuántas tareas/día adicionales se necesitan." placement="top" delay={300}>
+              <div className="font-semibold text-red-700 mb-2 cursor-help">ANÁLISIS DE VELOCIDAD:</div>
+            </Tooltip>
             <div className="grid grid-cols-2 gap-4 text-gray-700">
               <div>
                 <div className="font-medium">Velocidad actual:</div>

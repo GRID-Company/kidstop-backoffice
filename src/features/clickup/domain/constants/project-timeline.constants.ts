@@ -27,6 +27,38 @@ export const PROJECT_DURATION = {
   MILESTONE_CYCLE: 30, // 30-day natural delivery cycles
 } as const;
 
+// Project Budget Configuration
+export const PROJECT_BUDGET = {
+  TOTAL_HOURS: 320,
+  COST_PER_HOUR: 300,
+  TOTAL_COST: 96000,
+} as const;
+
+export const SP_TO_HOURS_RATIO = 1;
+
+export const LIST_HOURS_MAP: Record<string, number> = {
+  'Setup': 16,
+  'Foundation': 45,
+  'Catalog': 30,
+  'Purchases': 56,
+  'Sales': 40,
+  'Extras': 46,
+  'Customers': 20,
+  'Inventory Cards': 50,
+  'Main Tasks': 10,
+  'Análisis': 10,
+};
+
+export const getHoursForList = (listName: string): number => {
+  const normalizedName = listName.trim();
+  for (const [key, hours] of Object.entries(LIST_HOURS_MAP)) {
+    if (normalizedName.toLowerCase().includes(key.toLowerCase())) {
+      return hours;
+    }
+  }
+  return 0;
+};
+
 // Default Metrics Configuration
 export const DEFAULT_METRICS: TaskMetrics = {
   total: 0,
@@ -46,6 +78,14 @@ export const DEFAULT_METRICS: TaskMetrics = {
   criticalMilestoneDate: PROJECT_TIMELINE.CRITICAL_MILESTONE_DATE.toISOString(),
   phases: [],
   tags: {},
+  totalHours: 0,
+  completedHours: 0,
+  pendingHours: 0,
+  totalCost: 0,
+  completedCost: 0,
+  pendingCost: 0,
+  hoursPerDay: 0,
+  listProgress: [],
 };
 
 // Helper functions for date calculations

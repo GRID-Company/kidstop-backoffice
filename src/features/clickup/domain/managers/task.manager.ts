@@ -15,6 +15,8 @@ import {
   PROJECT_TIMELINE, 
   MILESTONE_TARGETS, 
   PROJECT_DURATION,
+  PROJECT_BUDGET,
+  SP_TO_HOURS_RATIO,
   getDaysSinceStart,
   getDaysToMilestone,
   getCurrentMilestone,
@@ -63,6 +65,21 @@ export interface TaskMetrics {
     color: string;
   }>;
   tags?: Record<string, number>;
+  totalHours?: number;
+  completedHours?: number;
+  pendingHours?: number;
+  totalCost?: number;
+  completedCost?: number;
+  pendingCost?: number;
+  hoursPerDay?: number;
+  listProgress?: Array<{
+    name: string;
+    estimatedHours: number;
+    completedTasks: number;
+    totalTasks: number;
+    completedHours: number;
+    pendingHours: number;
+  }>;
 }
 
 export interface BulkTaskResult {
@@ -452,11 +469,24 @@ export class TaskManager {
     // Calculate emergency metrics
     const emergencyMetrics = this.calculateEmergencyMetrics(tasks);
     
+    const totalHours = totalStoryPoints * SP_TO_HOURS_RATIO;
+    const completedHours = completedStoryPoints * SP_TO_HOURS_RATIO;
+    const pendingHours = totalHours - completedHours;
+    const daysSinceStart = getDaysSinceStart();
+    const hoursPerDay = daysSinceStart > 0 ? Math.round((completedHours / daysSinceStart) * 100) / 100 : 0;
+
     const result = {
       ...metrics,
       ...emergencyMetrics,
       totalStoryPoints,
       completedStoryPoints,
+      totalHours,
+      completedHours,
+      pendingHours,
+      totalCost: totalHours * PROJECT_BUDGET.COST_PER_HOUR,
+      completedCost: completedHours * PROJECT_BUDGET.COST_PER_HOUR,
+      pendingCost: pendingHours * PROJECT_BUDGET.COST_PER_HOUR,
+      hoursPerDay,
     };
     
     return result;
@@ -519,6 +549,10 @@ export class TaskManager {
   /**
    * Extracts story points from task (custom fields or description)
    */
+  extractHours(task: ClickUpTask): number {
+    return this.extractStoryPoints(task) * SP_TO_HOURS_RATIO;
+  }
+
   private extractStoryPoints(task: ClickUpTask): number {
     // Try to extract from custom fields first
     if (task.customFields) {

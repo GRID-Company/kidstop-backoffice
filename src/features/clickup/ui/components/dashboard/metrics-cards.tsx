@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardBody } from '@heroui/react';
+import { Card, CardBody, Tooltip } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { getDaysSinceStart } from '@/features/clickup/domain/constants/project-timeline.constants';
 
@@ -13,6 +13,7 @@ interface MetricCardProps {
   extra2?: string;
   color: string;
   borderClass?: string;
+  tooltip?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ 
@@ -22,18 +23,26 @@ const MetricCard: React.FC<MetricCardProps> = ({
   extra, 
   extra2, 
   color, 
-  borderClass = '' 
-}) => (
-  <Card className={`border-2 ${borderClass}`}>
-    <CardBody className="text-center">
-      <div className={`text-3xl font-bold ${color}`}>{value}</div>
-      <p className="text-gray-600 mt-1">{title}</p>
-      {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-      {extra && <div className="text-xs text-gray-400 mt-2">{extra}</div>}
-      {extra2 && <div className="text-xs text-gray-500 mt-1">{extra2}</div>}
-    </CardBody>
-  </Card>
-);
+  borderClass = '',
+  tooltip,
+}) => {
+  const card = (
+    <Card className={`border-2 ${borderClass} ${tooltip ? 'cursor-help' : ''}`}>
+      <CardBody className="text-center">
+        <div className={`text-3xl font-bold ${color}`}>{value}</div>
+        <p className="text-gray-600 mt-1">{title}</p>
+        {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+        {extra && <div className="text-xs text-gray-400 mt-2">{extra}</div>}
+        {extra2 && <div className="text-xs text-gray-500 mt-1">{extra2}</div>}
+      </CardBody>
+    </Card>
+  );
+
+  if (tooltip) {
+    return <Tooltip content={tooltip} placement="bottom" delay={300}>{card}</Tooltip>;
+  }
+  return card;
+};
 
 interface MetricsCardsProps {
   metrics: {
@@ -70,6 +79,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
         : undefined,
       color: isEmergencyMode ? 'text-red-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-red-500 bg-red-50' : '',
+      tooltip: 'Diferencia en días entre el progreso esperado y el real. Se calcula comparando el % esperado según el cronograma vs el % real de tareas completadas.',
     },
     {
       title: 'Días al próximo hito',
@@ -80,6 +90,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
         : undefined,
       color: isEmergencyMode ? 'text-orange-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-orange-500 bg-orange-50' : '',
+      tooltip: 'Días naturales restantes hasta la próxima entrega parcial. El proyecto tiene 3 hitos: Day 30 (30%), Day 60 (60%) y Day 90 (90%).',
     },
     {
       title: 'Velocidad requerida',
@@ -89,6 +100,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
       extra2: `Meta: ${metrics.expectedTasksForMilestone || 0} tareas (${Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}% del proyecto)`,
       color: isEmergencyMode ? 'text-yellow-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-yellow-500 bg-yellow-50' : '',
+      tooltip: 'Tareas por día que se necesitan completar para llegar al próximo hito a tiempo. Si es mayor que la velocidad actual, hay que acelerar.',
     },
     {
       title: 'Velocidad actual',
@@ -97,6 +109,7 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
       extra: `${metrics.completed} tareas ÷ ${getDaysSinceStart()} días`,
       color: isEmergencyMode ? 'text-red-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-red-500 bg-red-50' : '',
+      tooltip: 'Promedio de tareas completadas por día natural desde el inicio del proyecto. Tareas completadas ÷ días transcurridos.',
     },
   ];
 
@@ -106,23 +119,27 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
       value: metrics.total,
       subtitle: metrics.totalStoryPoints ? `${metrics.totalStoryPoints} SP estimados` : undefined,
       color: 'text-blue-600',
+      tooltip: 'Cantidad total de tareas en todas las listas del proyecto. Incluye tareas en cualquier estado.',
     },
     {
       title: 'Completadas',
       value: metrics.completed,
       subtitle: metrics.completedStoryPoints ? `${metrics.completedStoryPoints} SP completados` : undefined,
       color: 'text-green-600',
+      tooltip: 'Tareas con estado "done". Los SP completados representan las horas de trabajo ya entregadas.',
     },
     {
       title: 'En progreso',
       value: metrics.inProgress,
       color: 'text-orange-600',
+      tooltip: 'Tareas actualmente en desarrollo (estado "in progress"). Indica el trabajo en curso.',
     },
     {
       title: 'Atrasadas',
       value: metrics.overdue,
       color: 'text-red-600',
       borderClass: isEmergencyMode ? 'border-red-500 bg-red-50' : '',
+      tooltip: 'Tareas cuya fecha de vencimiento ya pasó y aún no están completadas. Requieren atención inmediata.',
     },
   ];
 

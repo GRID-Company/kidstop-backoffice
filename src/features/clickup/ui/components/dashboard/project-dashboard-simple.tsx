@@ -17,7 +17,11 @@ import { MetricsCards } from './metrics-cards';
 import { ProgressBars } from './progress-bars';
 import { ChartsSection } from './charts-section';
 import { ActionPlan } from './action-plan';
-import { RecentTasks } from './recent-tasks';
+import { HoursTracking } from './hours-tracking';
+import { TimelineVisual } from './timeline-visual';
+import { ListProgress } from './list-progress';
+import { BurndownChart } from './burndown-chart';
+import { TasksTable } from './tasks-table';
 
 interface ProjectDashboardProps {
   listId?: string;
@@ -97,28 +101,39 @@ export const ProjectDashboard = forwardRef<
         {data.metrics.projectStartDate && ` · Inicio: ${new Date(data.metrics.projectStartDate).toLocaleDateString()}`}
       </div>
 
+      <HoursTracking metrics={data.metrics} />
+
       <MetricsCards
         metrics={data.metrics}
         isEmergencyMode={isEmergencyMode}
       />
+
+      <TimelineVisual metrics={data.metrics} />
 
       <ProgressBars
         metrics={data.metrics}
         isEmergencyMode={isEmergencyMode}
       />
 
+      {data.metrics.listProgress && data.metrics.listProgress.length > 0 && (
+        <ListProgress listProgress={data.metrics.listProgress} />
+      )}
+
       <ChartsSection
         metrics={data.metrics}
         isEmergencyMode={isEmergencyMode}
       />
+
+      <BurndownChart metrics={data.metrics} />
 
       <ActionPlan
         metrics={data.metrics}
         isEmergencyMode={isEmergencyMode}
       />
 
-      <RecentTasks
+      <TasksTable
         tasks={data.tasks}
+        listProgress={data.metrics.listProgress}
       />
     </div>
   );
