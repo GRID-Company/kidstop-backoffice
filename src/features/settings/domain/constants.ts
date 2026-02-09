@@ -1,10 +1,8 @@
 import { IGeofenceConfig, IOperatingHours, IThresholdConfig, SettingsSection } from './types';
 
 export const SETTINGS_SECTIONS: Record<SettingsSection, string> = {
-  geofence: 'Geofence',
+  general: 'General',
   budgets: 'Presupuestos',
-  thresholds: 'Umbrales',
-  'operating-hours': 'Horarios de Operación',
 };
 
 export const DEFAULT_GEOFENCE_CONFIG: IGeofenceConfig = {

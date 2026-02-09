@@ -49,12 +49,6 @@ export interface ISettings {
   updatedAt: string;
 }
 
-export interface ISettingsFilters {
-  section?: SettingsSection;
-}
-
 export type SettingsSection =
-  | 'geofence'
-  | 'budgets'
-  | 'thresholds'
-  | 'operating-hours';
+  | 'general'
+  | 'budgets';
