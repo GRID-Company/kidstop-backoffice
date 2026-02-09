@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Chip, Pagination } from '@heroui/react';
+import { Button, Pagination } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
@@ -10,14 +10,12 @@ import { ITableColumn } from '@/lib/types/datatable.types';
 import { ICustomer } from '../../domain/types';
 import {
   CUSTOMER_TYPE_OPTIONS,
-  CUSTOMER_TYPE_LABELS,
-  CUSTOMER_TYPE_COLORS,
   CUSTOMER_STATUS_OPTIONS,
-  CUSTOMER_STATUS_LABELS,
-  CUSTOMER_STATUS_COLORS,
   DEFAULT_PAGE_SIZE,
 } from '../../domain/constants';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
+import CustomerTypeBadge from './customer-type-badge';
+import CustomerStatusBadge from './customer-status-badge';
 
 interface CustomersListProps {
   customers: ICustomer[];
@@ -37,20 +35,12 @@ const COLUMNS: ITableColumn[] = [
   {
     key: 'type',
     label: 'Tipo',
-    customCol: (row: ICustomer) => (
-      <Chip size="sm" variant="flat" color={CUSTOMER_TYPE_COLORS[row.type]}>
-        {CUSTOMER_TYPE_LABELS[row.type]}
-      </Chip>
-    ),
+    customCol: (row: ICustomer) => <CustomerTypeBadge type={row.type} />,
   },
   {
     key: 'status',
     label: 'Estado',
-    customCol: (row: ICustomer) => (
-      <Chip size="sm" variant="flat" color={CUSTOMER_STATUS_COLORS[row.status]}>
-        {CUSTOMER_STATUS_LABELS[row.status]}
-      </Chip>
-    ),
+    customCol: (row: ICustomer) => <CustomerStatusBadge status={row.status} />,
   },
   { key: 'totalOrders', label: 'Pedidos' },
 ];
@@ -156,18 +146,14 @@ export default function CustomersList({
               >
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold">{customer.name}</p>
-                  <Chip size="sm" variant="flat" color={CUSTOMER_TYPE_COLORS[customer.type]}>
-                    {CUSTOMER_TYPE_LABELS[customer.type]}
-                  </Chip>
+                  <CustomerTypeBadge type={customer.type} />
                 </div>
                 <p className="text-xs text-default-500">{customer.email}</p>
                 {customer.phone && (
                   <p className="text-xs text-default-400">{customer.phone}</p>
                 )}
                 <div className="flex items-center justify-between">
-                  <Chip size="sm" variant="flat" color={CUSTOMER_STATUS_COLORS[customer.status]}>
-                    {CUSTOMER_STATUS_LABELS[customer.status]}
-                  </Chip>
+                  <CustomerStatusBadge status={customer.status} />
                   <span className="text-xs text-default-400">
                     {customer.totalOrders} pedidos
                   </span>

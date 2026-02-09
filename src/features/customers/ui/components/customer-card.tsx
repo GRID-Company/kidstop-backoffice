@@ -1,16 +1,12 @@
 'use client';
 
-import { Button, CardBody, Chip, Tooltip } from '@heroui/react';
+import { Button, CardBody, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { ICustomer } from '../../domain/types';
-import {
-  CUSTOMER_TYPE_LABELS,
-  CUSTOMER_TYPE_COLORS,
-  CUSTOMER_STATUS_LABELS,
-  CUSTOMER_STATUS_COLORS,
-  CUSTOMER_STATUSES,
-} from '../../domain/constants';
+import { CUSTOMER_STATUSES } from '../../domain/constants';
+import CustomerTypeBadge from './customer-type-badge';
+import CustomerStatusBadge from './customer-status-badge';
 
 interface CustomerCardProps {
   customer: ICustomer;
@@ -42,15 +38,11 @@ export default function CustomerCard({
             <p className="truncate text-sm font-semibold">{customer.name}</p>
             <p className="truncate text-xs text-default-500">{customer.email}</p>
           </div>
-          <Chip size="sm" variant="flat" color={CUSTOMER_TYPE_COLORS[customer.type]}>
-            {CUSTOMER_TYPE_LABELS[customer.type]}
-          </Chip>
+          <CustomerTypeBadge type={customer.type} />
         </div>
 
         <div className="flex items-center gap-2">
-          <Chip size="sm" variant="dot" color={CUSTOMER_STATUS_COLORS[customer.status]}>
-            {CUSTOMER_STATUS_LABELS[customer.status]}
-          </Chip>
+          <CustomerStatusBadge status={customer.status} />
         </div>
 
         <div className="flex items-center justify-between border-t border-default-100 pt-2">
