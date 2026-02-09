@@ -39,3 +39,31 @@ export const DEFAULT_PAGE_SIZE = 20;
 
 export const MIN_PRICE = 0;
 export const DEFAULT_MARGIN_PERCENTAGE = 30;
+
+export const POKEMON_RARITIES = {
+  COMMON: 'Common',
+  UNCOMMON: 'Uncommon',
+  RARE_HOLO: 'Rare Holo',
+  RARE_HOLO_V: 'Rare Holo V',
+  ULTRA_RARE: 'Ultra Rare',
+  DOUBLE_RARE: 'Double Rare',
+  SPECIAL_ART_RARE: 'Special Art Rare',
+  SECRET_RARE: 'Secret Rare',
+} as const;
+
+export const MAGIC_RARITIES = {
+  COMMON: 'Common',
+  UNCOMMON: 'Uncommon',
+  RARE: 'Rare',
+  MYTHIC_RARE: 'Mythic Rare',
+} as const;
+
+export const POKEMON_RARITY_OPTIONS = Object.values(POKEMON_RARITIES).map((r) => ({
+  value: r,
+  label: r,
+}));
+
+export const MAGIC_RARITY_OPTIONS = Object.values(MAGIC_RARITIES).map((r) => ({
+  value: r,
+  label: r,
+}));

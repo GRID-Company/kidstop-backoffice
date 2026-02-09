@@ -33,6 +33,7 @@ export interface CardFilters {
   tcgType?: TCGType;
   setCode?: string;
   rarity?: string;
+  condition?: CardCondition;
   search?: string;
 }
 
