@@ -29,10 +29,25 @@ export interface IInventoryItem {
 export interface IInventoryMovement {
   id: string;
   inventoryItemId: string;
+  cardName: string;
+  cardImageUrl: string;
+  setName: string;
+  setCode: string;
+  cardNumber: string;
+  tcgType: TCGType;
   type: MovementType;
   quantity: number;
   reason: string;
+  userName: string;
+  reference: string | null;
   createdAt: string;
+}
+
+export interface MovementFilters {
+  tcgType?: TCGType;
+  type?: MovementType;
+  search?: string;
+  dateRange?: DateRange;
 }
 
 export type { DateRange };

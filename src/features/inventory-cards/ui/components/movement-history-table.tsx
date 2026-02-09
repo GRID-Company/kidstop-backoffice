@@ -1,0 +1,275 @@
+'use client';
+
+import Image from 'next/image';
+import {
+  Chip,
+  Pagination,
+  SortDescriptor,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  CardBody,
+} from '@heroui/react';
+import { Icon } from '@iconify/react';
+import { KidstopTable } from '@/shared/base/heorui-overrides/table';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { IInventoryMovement } from '../../domain/types';
+import {
+  MOVEMENT_TYPE_LABELS,
+  MOVEMENT_TYPE_COLORS,
+} from '../../domain/constants';
+
+interface MovementHistoryTableProps {
+  items: IInventoryMovement[];
+  totalItems: number;
+  page: number;
+  totalPages: number;
+  sortDescriptor?: SortDescriptor;
+  onPageChange: (page: number) => void;
+  onSortChange: (descriptor: SortDescriptor) => void;
+}
+
+const COLUMNS = [
+  { key: 'createdAt', label: 'Fecha', allowsSorting: true },
+  { key: 'cardName', label: 'Carta', allowsSorting: true },
+  { key: 'type', label: 'Tipo', allowsSorting: true },
+  { key: 'quantity', label: 'Cantidad', allowsSorting: true },
+  { key: 'userName', label: 'Usuario', allowsSorting: true },
+  { key: 'reference', label: 'Referencia', allowsSorting: true },
+];
+
+const MOVEMENT_TYPE_ICONS: Record<string, string> = {
+  PURCHASE_ENTRY: 'lucide:arrow-down-circle',
+  SALE_EXIT: 'lucide:arrow-up-circle',
+  MANUAL_ADJUSTMENT: 'lucide:settings-2',
+};
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function formatQuantity(movement: IInventoryMovement): {
+  text: string;
+  className: string;
+} {
+  const isPositive =
+    movement.type === 'PURCHASE_ENTRY' ||
+    (movement.type === 'MANUAL_ADJUSTMENT' && movement.quantity > 0);
+
+  return {
+    text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,
+    className: isPositive ? 'text-success' : 'text-danger',
+  };
+}
+
+function renderCell(item: IInventoryMovement, columnKey: string) {
+  switch (columnKey) {
+    case 'createdAt':
+      return (
+        <span className="text-sm text-default-500">
+          {formatDate(item.createdAt)}
+        </span>
+      );
+    case 'cardName':
+      return (
+        <div className="flex items-center gap-3">
+          <div className="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100">
+            {item.cardImageUrl ? (
+              <Image
+                src={item.cardImageUrl}
+                alt={item.cardName}
+                fill
+                sizes="32px"
+                className="object-contain"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-default-400 text-xs">
+                🃏
+              </div>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{item.cardName}</p>
+            <p className="truncate text-xs text-default-400">
+              {item.setName} ({item.setCode}) · #{item.cardNumber}
+            </p>
+          </div>
+        </div>
+      );
+    case 'type':
+      return (
+        <Chip
+          size="sm"
+          variant="flat"
+          color={MOVEMENT_TYPE_COLORS[item.type] ?? 'default'}
+          startContent={
+            <Icon
+              icon={MOVEMENT_TYPE_ICONS[item.type] ?? 'lucide:circle'}
+              className="ml-1 text-sm"
+            />
+          }
+        >
+          {MOVEMENT_TYPE_LABELS[item.type] ?? item.type}
+        </Chip>
+      );
+    case 'quantity': {
+      const { text, className } = formatQuantity(item);
+      return <span className={`text-sm font-semibold ${className}`}>{text}</span>;
+    }
+    case 'userName':
+      return <span className="text-sm">{item.userName}</span>;
+    case 'reference':
+      return (
+        <span className="text-sm text-default-500">
+          {item.reference ?? '—'}
+        </span>
+      );
+    default:
+      return null;
+  }
+}
+
+function MovementMobileCard({ item }: { item: IInventoryMovement }) {
+  const { text: qtyText, className: qtyClass } = formatQuantity(item);
+
+  return (
+    <KidstopCard>
+      <CardBody className="flex flex-row gap-3 !p-4">
+        <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100">
+          {item.cardImageUrl ? (
+            <Image
+              src={item.cardImageUrl}
+              alt={item.cardName}
+              fill
+              sizes="40px"
+              className="object-contain"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-default-400">
+              🃏
+            </div>
+          )}
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex items-start justify-between gap-2">
+            <p className="truncate text-sm font-semibold">{item.cardName}</p>
+            <span className={`flex-shrink-0 text-sm font-bold ${qtyClass}`}>
+              {qtyText}
+            </span>
+          </div>
+
+          <p className="truncate text-xs text-default-500">
+            {item.setName} ({item.setCode}) · #{item.cardNumber}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Chip
+              size="sm"
+              variant="flat"
+              color={MOVEMENT_TYPE_COLORS[item.type] ?? 'default'}
+              startContent={
+                <Icon
+                  icon={MOVEMENT_TYPE_ICONS[item.type] ?? 'lucide:circle'}
+                  className="ml-1 text-xs"
+                />
+              }
+            >
+              {MOVEMENT_TYPE_LABELS[item.type] ?? item.type}
+            </Chip>
+          </div>
+
+          <div className="flex items-center gap-3 text-[11px] text-default-400">
+            <span>{formatDate(item.createdAt)}</span>
+            <span>{item.userName}</span>
+            {item.reference && <span>{item.reference}</span>}
+          </div>
+        </div>
+      </CardBody>
+    </KidstopCard>
+  );
+}
+
+export default function MovementHistoryTable({
+  items,
+  totalItems,
+  page,
+  totalPages,
+  sortDescriptor,
+  onPageChange,
+  onSortChange,
+}: MovementHistoryTableProps) {
+  if (totalItems === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-default-400">
+        <span className="text-5xl">📋</span>
+        <p className="mt-4 text-lg font-medium">No se encontraron movimientos</p>
+        <p className="text-sm">Intenta ajustar los filtros de búsqueda</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="hidden lg:block">
+        <KidstopTable
+          aria-label="Historial de movimientos"
+          sortDescriptor={sortDescriptor}
+          onSortChange={onSortChange}
+        >
+          <TableHeader columns={COLUMNS}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                allowsSorting={column.allowsSorting}
+                className="text-center"
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={items}>
+            {(item) => (
+              <TableRow key={item.id}>
+                {COLUMNS.map((col) => (
+                  <TableCell key={col.key} className="text-center">
+                    {renderCell(item, col.key)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )}
+          </TableBody>
+        </KidstopTable>
+      </div>
+
+      <div className="flex flex-col gap-3 lg:hidden">
+        {items.map((item) => (
+          <MovementMobileCard key={item.id} item={item} />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-default-400">
+            Mostrando {items.length} de {totalItems}
+          </p>
+          <Pagination
+            total={totalPages}
+            page={page}
+            onChange={onPageChange}
+            showControls
+            size="sm"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
