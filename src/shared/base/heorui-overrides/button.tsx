@@ -1,6 +1,6 @@
 import { extendVariants, Button } from '@heroui/react';
 
-const CanalviButton = extendVariants(Button, {
+const KidstopButton = extendVariants(Button, {
   variants: {
     variant: {
       borderedWhite: 'border-1 border-white !text-white ',
@@ -12,4 +12,4 @@ const CanalviButton = extendVariants(Button, {
     size: 'md',
   },
 });
-export default CanalviButton;
+export default KidstopButton;

@@ -1,6 +1,6 @@
 import { CardBody } from '@heroui/react';
 import { User } from '@/lib/api/schema-types';
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import UserRoleBadge from './user-role-badge';
 import UserStatusBadge from './user-status-badge';
 import { UserRole } from '../../domain/types';
@@ -12,7 +12,7 @@ interface UserCardProps {
 
 export default function UserCard({ user, onPress }: UserCardProps) {
   return (
-    <CanalviCard
+    <KidstopCard
       isPressable={!!onPress}
       onPress={() => onPress?.(user.guid)}
     >
@@ -28,6 +28,6 @@ export default function UserCard({ user, onPress }: UserCardProps) {
           <UserRoleBadge role={user.role as UserRole} />
         </div>
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

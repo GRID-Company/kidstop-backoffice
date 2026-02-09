@@ -9,7 +9,7 @@ import {
   TableProps,
   TableRow,
 } from '@heroui/react';
-import { CanalviTable } from '@/shared/base/heorui-overrides/table';
+import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 
 type DataTableProps = {
@@ -31,7 +31,7 @@ export function DataTable({
   ...tableProps
 }: PropsWithChildren<DataTableProps>) {
   return (
-    <CanalviTable
+    <KidstopTable
       {...tableProps}
       aria-label='Tabla'
       className='animate-in fade-in'
@@ -83,6 +83,6 @@ export function DataTable({
           </TableRow>
         )}
       </TableBody>
-    </CanalviTable>
+    </KidstopTable>
   );
 }

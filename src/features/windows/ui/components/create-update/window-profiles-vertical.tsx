@@ -1,4 +1,4 @@
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardBody } from '@heroui/react';
 import { useFieldArray, useWatch } from 'react-hook-form';
 import { useWindowFormCtx } from './window-form.context';
@@ -24,7 +24,7 @@ export default function WindowProfilesVertical() {
   });
 
   return (
-    <CanalviCard>
+    <KidstopCard>
       <CardBody className='p-4'>
         <div className='mb-4 flex items-center justify-between'>
           <p className='text-lg'>Perfiles verticales</p>
@@ -101,6 +101,6 @@ export default function WindowProfilesVertical() {
           </div>
         ))}
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

@@ -1,4 +1,4 @@
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardBody } from '@heroui/react';
 import { useWindowFormCtx } from './window-form.context';
 import { WindowForm } from '@/features/windows/adapters/forms/window.form.schema';
@@ -11,7 +11,7 @@ export default function WindowGlasses() {
   const { control } = useWindowFormCtx();
 
   return (
-    <CanalviCard>
+    <KidstopCard>
       <CardBody className='p-4'>
         <div className='flex items-center justify-between gap-8'>
           <p className='text-lg'>Vidrio</p>
@@ -34,6 +34,6 @@ export default function WindowGlasses() {
           />
         </div>
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

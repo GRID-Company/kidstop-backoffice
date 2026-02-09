@@ -18,7 +18,7 @@ export default function NotAuthenticatedLayout({
         <div className='bg-white rounded-lg shadow-2xl border-t-4 border-blue-500 p-8'>
           <Image
             src={Logo.src}
-            alt='CANALVI'
+            alt='Kidstop'
             width={286}
             height={100}
             className='mx-auto mb-8'

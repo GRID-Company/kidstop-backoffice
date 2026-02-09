@@ -1,4 +1,4 @@
-import CanalviButton from '@/shared/base/heorui-overrides/button';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Button, ButtonProps } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
