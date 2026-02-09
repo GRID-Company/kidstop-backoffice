@@ -7,12 +7,14 @@ import {
   Button,
   Switch,
 } from '@heroui/react';
+import { useEffect } from 'react';
 import { Controller, SubmitHandler } from 'react-hook-form';
+
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import { useUserForm } from '../../adapters/forms/use-user-form';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
-import { USER_ROLES, USER_ROLE_LABELS } from '../../domain/constants';
+import { USER_ROLE_OPTIONS } from '../../domain/constants';
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -24,11 +26,6 @@ interface UserFormModalProps {
   submitLabel?: string;
 }
 
-const ROLE_OPTIONS = Object.values(USER_ROLES).map((role) => ({
-  value: role,
-  label: USER_ROLE_LABELS[role],
-}));
-
 export default function UserFormModal({
   isOpen,
   onClose,
@@ -38,7 +35,11 @@ export default function UserFormModal({
   title = 'Nuevo usuario',
   submitLabel = 'Guardar',
 }: UserFormModalProps) {
-  const { control, handleSubmit, formState } = useUserForm(defaults);
+  const { control, handleSubmit, formState, reset } = useUserForm(defaults);
+
+  useEffect(() => {
+    if (defaults) reset(defaults);
+  }, [defaults, reset]);
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose} size="xl">
@@ -67,7 +68,7 @@ export default function UserFormModal({
               label="Rol"
               placeholder="Selecciona un rol"
               controlProps={{ control, name: 'role' }}
-              items={ROLE_OPTIONS}
+              items={USER_ROLE_OPTIONS}
             />
 
             <Controller
