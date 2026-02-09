@@ -38,11 +38,11 @@ export default function Topbar({ className }: { className?: string }) {
   return (
     <>
       <Navbar
-        className={`bg-page-bg xl:!bg-transparent shadow-none ${className} sticky top-0 z-40`}
+        className={`shadow-none ${className} sticky top-0 z-40 bg-page-bg/80 backdrop-blur-lg backdrop-saturate-150 border-b border-divider`}
         isBlurred={false}
         classNames={{
           wrapper:
-            'px-4 lg:px-0 h-12 xl:h-22 max-w-full border-b border-gray-200 bg-page-bg xl:!bg-transparent',
+            'px-4 lg:px-0 h-12 xl:h-22 max-w-full',
         }}
         isMenuOpen={isMenuOpen}
         onMenuOpenChange={setIsMenuOpen}

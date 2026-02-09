@@ -89,7 +89,7 @@ export default function CardDetailModal({
     <Drawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold">{card.name}</span>
+          <span className="text-lg font-semibold text-accent">{card.name}</span>
           <span className="text-sm font-normal text-default-500">
             {card.setName} · {card.setCode} · #{card.number}
           </span>
@@ -115,7 +115,14 @@ export default function CardDetailModal({
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Chip size="sm" variant="flat" color="primary">
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  classNames={{
+                    base: 'bg-accent/10',
+                    content: 'text-accent font-medium',
+                  }}
+                >
                   {card.tcgType}
                 </Chip>
                 <Chip size="sm" variant="flat">
@@ -151,8 +158,16 @@ export default function CardDetailModal({
                   variant={
                     selectedVariant?.id === variant.id ? 'solid' : 'bordered'
                   }
-                  color={
-                    selectedVariant?.id === variant.id ? 'primary' : 'default'
+                  color="default"
+                  className={
+                    selectedVariant?.id === variant.id
+                      ? 'border-none text-white'
+                      : ''
+                  }
+                  style={
+                    selectedVariant?.id === variant.id
+                      ? { backgroundColor: 'var(--color-accent)' }
+                      : undefined
                   }
                   onPress={() => handleVariantSelect(variant)}
                 >
@@ -187,7 +202,7 @@ export default function CardDetailModal({
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-default-500">Precio venta</span>
-                    <span className="text-lg font-bold text-success">
+                    <span className="text-lg font-bold text-accent">
                       ${selectedVariant.sellPrice.toFixed(2)}
                     </span>
                   </div>
@@ -218,11 +233,12 @@ export default function CardDetailModal({
                 </div>
 
                 <Button
-                  color="primary"
                   type="submit"
                   size="sm"
                   isDisabled={!formState.isDirty || !formState.isValid}
                   startContent={<Icon icon="lucide:save" />}
+                  className="text-white"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
                 >
                   Guardar precios
                 </Button>
@@ -238,10 +254,11 @@ export default function CardDetailModal({
             isLoading={isSyncing}
             startContent={<Icon icon="lucide:refresh-cw" />}
             onPress={() => void handleSync()}
+            className="border-accent text-accent"
           >
             Sincronizar con proveedor
           </Button>
-          <Button color="primary" variant="light" onPress={onClose}>
+          <Button variant="light" onPress={onClose} className="text-accent">
             Cerrar
           </Button>
         </DrawerFooter>

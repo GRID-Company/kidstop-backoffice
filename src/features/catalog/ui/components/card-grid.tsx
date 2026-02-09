@@ -51,7 +51,7 @@ export default function CardGrid({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {paginatedCards.map((card) => (
           <CardGridItem key={card.id} card={card} onPress={onCardPress} />
         ))}
