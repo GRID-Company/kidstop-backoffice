@@ -59,3 +59,37 @@ export const isOverInventoryLimit = (
 ): boolean => {
   return item.stock >= limit;
 };
+
+export interface InventoryMetrics {
+  totalStock: number;
+  lastSoldAt: string | null;
+  avgDaysInInventory: number | null;
+}
+
+export const calculateInventoryMetrics = (
+  items: IInventoryItem[]
+): InventoryMetrics => {
+  if (items.length === 0) {
+    return { totalStock: 0, lastSoldAt: null, avgDaysInInventory: null };
+  }
+
+  const totalStock = items.reduce((sum, item) => sum + item.stock, 0);
+
+  const lastSoldAt = items.reduce<string | null>((latest, item) => {
+    if (!item.lastSoldAt) return latest;
+    if (!latest) return item.lastSoldAt;
+    return new Date(item.lastSoldAt) > new Date(latest) ? item.lastSoldAt : latest;
+  }, null);
+
+  const itemsWithDays = items.filter((i) => i.avgDaysInInventory != null);
+  const avgDaysInInventory =
+    itemsWithDays.length > 0
+      ? Math.round(
+          (itemsWithDays.reduce((sum, i) => sum + i.avgDaysInInventory!, 0) /
+            itemsWithDays.length) *
+            100
+        ) / 100
+      : null;
+
+  return { totalStock, lastSoldAt, avgDaysInInventory };
+};
