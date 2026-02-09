@@ -1,8 +1,3 @@
-/**
- * Metrics Cards Component
- * Displays emergency and standard project metrics in card grid
- */
-
 'use client';
 
 import React from 'react';
@@ -68,38 +63,38 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
 }) => {
   const emergencyCards = [
     {
-      title: 'Days Behind',
+      title: 'Días de atraso',
       value: metrics.daysBehind || 0,
       subtitle: metrics.projectStartDate 
-        ? `Since ${new Date(metrics.projectStartDate).toLocaleDateString()}`
+        ? `Desde ${new Date(metrics.projectStartDate).toLocaleDateString()}`
         : undefined,
       color: isEmergencyMode ? 'text-red-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-red-500 bg-red-50' : '',
     },
     {
-      title: 'Days to Next Milestone',
+      title: 'Días al próximo hito',
       value: metrics.daysToNextMilestone || 0,
-      subtitle: metrics.nextMilestone || 'Loading...',
+      subtitle: metrics.nextMilestone || 'Cargando...',
       extra: metrics.milestoneTargetDate 
-        ? `Target: ${new Date(metrics.milestoneTargetDate).toLocaleDateString()}`
+        ? `Meta: ${new Date(metrics.milestoneTargetDate).toLocaleDateString()}`
         : undefined,
       color: isEmergencyMode ? 'text-orange-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-orange-500 bg-orange-50' : '',
     },
     {
-      title: 'Required Velocity',
+      title: 'Velocidad requerida',
       value: metrics.requiredVelocity?.toFixed(2) || '0.00',
-      subtitle: `tasks/day to ${Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}% milestone`,
-      extra: `${metrics.tasksNeededForMilestone || 0} tasks needed ÷ ${metrics.daysToNextMilestone || 0} days`,
-      extra2: `Target: ${metrics.expectedTasksForMilestone || 0} tasks (${Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}% of project)`,
+      subtitle: `tareas/día al ${Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}% del hito`,
+      extra: `${metrics.tasksNeededForMilestone || 0} tareas necesarias ÷ ${metrics.daysToNextMilestone || 0} días`,
+      extra2: `Meta: ${metrics.expectedTasksForMilestone || 0} tareas (${Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}% del proyecto)`,
       color: isEmergencyMode ? 'text-yellow-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-yellow-500 bg-yellow-50' : '',
     },
     {
-      title: 'Current Velocity',
+      title: 'Velocidad actual',
       value: metrics.currentVelocity?.toFixed(2) || '0.00',
-      subtitle: 'tasks/day actual',
-      extra: `${metrics.completed} tasks ÷ ${getDaysSinceStart()} days`,
+      subtitle: 'tareas/día actual',
+      extra: `${metrics.completed} tareas ÷ ${getDaysSinceStart()} días`,
       color: isEmergencyMode ? 'text-red-600' : 'text-blue-600',
       borderClass: isEmergencyMode ? 'border-red-500 bg-red-50' : '',
     },
@@ -107,24 +102,24 @@ export const MetricsCards: React.FC<MetricsCardsProps> = ({
 
   const standardCards = [
     {
-      title: 'Total Tasks',
+      title: 'Total de tareas',
       value: metrics.total,
-      subtitle: metrics.totalStoryPoints ? `${metrics.totalStoryPoints} SP estimated` : undefined,
+      subtitle: metrics.totalStoryPoints ? `${metrics.totalStoryPoints} SP estimados` : undefined,
       color: 'text-blue-600',
     },
     {
-      title: 'Completed',
+      title: 'Completadas',
       value: metrics.completed,
-      subtitle: metrics.completedStoryPoints ? `${metrics.completedStoryPoints} SP done` : undefined,
+      subtitle: metrics.completedStoryPoints ? `${metrics.completedStoryPoints} SP completados` : undefined,
       color: 'text-green-600',
     },
     {
-      title: 'In Progress',
+      title: 'En progreso',
       value: metrics.inProgress,
       color: 'text-orange-600',
     },
     {
-      title: 'Overdue',
+      title: 'Atrasadas',
       value: metrics.overdue,
       color: 'text-red-600',
       borderClass: isEmergencyMode ? 'border-red-500 bg-red-50' : '',

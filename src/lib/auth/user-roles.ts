@@ -1,11 +1,13 @@
 export enum UserRole {
   SUPERUSER = 'SUPERUSER',
   ADMIN = 'ADMIN',
-  ASSISTANT = 'ASSISTANT',
+  RECEPTION = 'RECEPTION',
+  BUYER = 'BUYER',
 }
 
-export enum UserRoleLabel {
-  SUPERUSER = 'Superusuario',
-  ADMIN = 'Administrador',
-  ASSISTANT = 'Asistente',
-}
+export const USER_ROLE_LABELS: Record<UserRole, string> = {
+  [UserRole.SUPERUSER]: 'Superusuario',
+  [UserRole.ADMIN]: 'Administrador',
+  [UserRole.RECEPTION]: 'Recepción',
+  [UserRole.BUYER]: 'Comprador',
+};

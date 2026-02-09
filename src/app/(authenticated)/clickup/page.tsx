@@ -1,15 +1,10 @@
-/**
- * ClickUp Dashboard Page
- * Main page for ClickUp integration dashboard
- */
-
+'use client';
 import { ClickUpDashboardView } from '@/features/clickup/ui/views/clickup-dashboard';
+import { TITLE_SUFFIX } from '@/lib/consts/title-suffix';
+import { useTitle } from 'react-use';
 
-export default function ClickUpDashboardPage() {
+export default function Page() {
+  useTitle(`ClickUp Dashboard ${TITLE_SUFFIX}`);
+
   return <ClickUpDashboardView />;
 }
-
-export const metadata = {
-  title: 'ClickUp Dashboard',
-  description: 'Project management and task tracking dashboard',
-};

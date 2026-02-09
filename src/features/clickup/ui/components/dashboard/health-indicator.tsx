@@ -1,8 +1,3 @@
-/**
- * Health Indicator Component
- * Displays project health status with progress bar
- */
-
 'use client';
 
 import React from 'react';
@@ -37,9 +32,9 @@ export const HealthIndicator: React.FC<HealthIndicatorProps> = ({
         <CardBody>
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Project Health Status</h3>
+              <h3 className="text-lg font-semibold">Estado de salud del proyecto</h3>
               <p className="text-sm text-gray-600">
-                Based on schedule adherence and delivery milestones
+                Basado en adherencia al cronograma y entregas
               </p>
             </div>
             <div className="text-center">

@@ -1,8 +1,3 @@
-/**
- * Charts Section Component
- * Displays status distribution, priority distribution, phases, and tags
- */
-
 'use client';
 
 import React from 'react';
@@ -40,7 +35,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">📊 Task Status Distribution</h3>
+          <h3 className="text-lg font-semibold mb-4">Distribución por estado</h3>
           <div className="space-y-3">
             {metrics.byStatus && Object.entries(metrics.byStatus).map(([status, count]) => (
               <div key={status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -74,7 +69,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">📊 Task Priority Distribution</h3>
+          <h3 className="text-lg font-semibold mb-4">Distribución por prioridad</h3>
           <div className="space-y-3">
             {metrics.byPriority && Object.entries(metrics.byPriority).map(([priority, count]) => (
               <div key={priority} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -108,7 +103,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">📊 Phase Progress</h3>
+          <h3 className="text-lg font-semibold mb-4">Progreso por fase</h3>
           <div className="space-y-3">
             {metrics.phases?.map((phase) => (
               <div key={phase.name} className="p-3 bg-gray-50 rounded-lg">
@@ -118,7 +113,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
                 </div>
                 <div className="flex space-x-2">
                   <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-1">Completed</div>
+                    <div className="text-xs text-gray-500 mb-1">Completado</div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-green-500 h-2 rounded-full" 
@@ -128,7 +123,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
                     <span className="text-xs text-gray-600 mt-1">{phase.completed}/{phase.total}</span>
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-1">In Progress</div>
+                    <div className="text-xs text-gray-500 mb-1">En progreso</div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-orange-500 h-2 rounded-full" 
@@ -154,7 +149,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">⏱️ Story Points by Phase</h3>
+          <h3 className="text-lg font-semibold mb-4">Story Points por fase</h3>
           <div className="space-y-3">
             {metrics.phases?.map((phase) => (
               <div key={phase.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -190,7 +185,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
       >
         <Card>
           <CardBody>
-            <h3 className="text-lg font-semibold mb-4">🏷️ Top Tags Distribution</h3>
+            <h3 className="text-lg font-semibold mb-4">Distribución de etiquetas</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {Object.entries(metrics.tags)
                 .sort(([, a], [, b]) => b - a)

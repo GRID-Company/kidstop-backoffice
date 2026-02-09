@@ -1,8 +1,3 @@
-/**
- * Progress Bars Component
- * Displays milestone and overall progress bars
- */
-
 'use client';
 
 import React from 'react';
@@ -39,7 +34,7 @@ export const ProgressBars: React.FC<ProgressBarsProps> = ({
         <Card className={isEmergencyMode ? 'border-2 border-orange-500' : ''}>
           <CardBody>
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-semibold">Current Milestone Progress</h3>
+              <h3 className="text-lg font-semibold">Progreso del hito actual</h3>
               <span className={`text-2xl font-bold ${isEmergencyMode ? 'text-orange-600' : 'text-blue-600'}`}>
                 {Math.round(metrics.milestoneProgress || 0)}%
               </span>
@@ -52,7 +47,7 @@ export const ProgressBars: React.FC<ProgressBarsProps> = ({
               aria-label={`Milestone progress: ${Math.round(metrics.milestoneProgress || 0)}%`}
             />
             <div className="text-sm text-gray-600 mt-2">
-              {metrics.nextMilestone} • {metrics.daysToNextMilestone || 0} days remaining
+              {metrics.nextMilestone} · {metrics.daysToNextMilestone || 0} días restantes
             </div>
           </CardBody>
         </Card>
@@ -67,7 +62,7 @@ export const ProgressBars: React.FC<ProgressBarsProps> = ({
         <Card className={isEmergencyMode ? 'border-2 border-red-500' : ''}>
           <CardBody>
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-semibold">Overall Progress</h3>
+              <h3 className="text-lg font-semibold">Progreso general</h3>
               <span className={`text-2xl font-bold ${isEmergencyMode ? 'text-red-600' : 'text-blue-600'}`}>
                 {completionRate}%
               </span>
@@ -80,7 +75,7 @@ export const ProgressBars: React.FC<ProgressBarsProps> = ({
               aria-label={`Project completion progress: ${completionRate}%`}
             />
             <div className="text-sm text-gray-600 mt-2">
-              {metrics.completed}/{metrics.total} tasks completed
+              {metrics.completed}/{metrics.total} tareas completadas
             </div>
           </CardBody>
         </Card>
