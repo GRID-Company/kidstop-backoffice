@@ -38,5 +38,6 @@ export interface InventoryFilters {
   tcgType?: TCGType;
   condition?: CardCondition;
   stockStatus?: StockStatus;
+  rarity?: string;
   search?: string;
 }

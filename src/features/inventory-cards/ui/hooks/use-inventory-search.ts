@@ -52,6 +52,10 @@ export function useInventorySearch() {
       items = items.filter((i) => i.stockStatus === filters.stockStatus);
     }
 
+    if (filters.rarity) {
+      items = items.filter((i) => i.rarity === filters.rarity);
+    }
+
     return items;
   }, [selectedTCG, search, filters]);
 
