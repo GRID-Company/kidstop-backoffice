@@ -22,7 +22,6 @@ import useInventoryMutation from '../../adapters/api/use-inventory-mutation';
 import { ChapeForm } from '../../adapters/forms/chape.form.schema';
 import { GlassForm } from '../../adapters/forms/glass.form.schema';
 import { ProfileForm } from '../../adapters/forms/profile.form.schema';
-import { useSelectedBranchStore } from '@/lib/store/selected-branch';
 import { toInventoryPayload } from '../../adapters/mappers/inventory-form.mapper';
 import toast from 'react-hot-toast';
 
@@ -31,7 +30,6 @@ interface NewInventoryProps {
 }
 
 export default function NewInventory({ onClose }: NewInventoryProps) {
-  const { selectedBranch } = useSelectedBranchStore();
   const [step, setStep] = useState<InventoryStep>(null);
   const [type, setType] = useState<InventoryType>('perfil');
   const { control, handleSubmit, formState } = useInventoryForm(type);
@@ -51,7 +49,7 @@ export default function NewInventory({ onClose }: NewInventoryProps) {
         data,
         type,
         true,
-        selectedBranch?.guid ?? ''
+        ''
       );
       await mutate({
         variables: payload,

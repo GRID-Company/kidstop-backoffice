@@ -19,7 +19,6 @@ import { PROJECT_VERSION } from '@/lib/consts/version';
 import { UserRole } from '@/lib/auth/user-roles';
 import { useLogout } from '@/lib/auth/use-process-logout';
 import { useAuthStore } from '@/lib/store/auth';
-import BranchSelector from './branch-selector';
 import TcgSelector from '@/shared/base/tcg-selector';
 import UserPresenter from './user-presenter';
 
@@ -63,7 +62,6 @@ export default function Topbar({ className }: { className?: string }) {
 
         <NavbarContent justify='end' className='hidden gap-6 pr-6 xl:flex'>
           <TcgSelector />
-          <BranchSelector />
           <UserPresenter />
         </NavbarContent>
 

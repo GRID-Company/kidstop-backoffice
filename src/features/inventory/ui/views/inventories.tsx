@@ -11,7 +11,6 @@ import {
 } from '@/lib/api/generated/inventory.generated';
 import { useQuery } from '@apollo/client/react';
 import { usePaginatedDatatable } from '@/lib/utils/use-paginated-datatable';
-import { useSelectedBranchStore } from '@/lib/store/selected-branch';
 import {
   defaultSort,
   getChapesVars,
@@ -26,7 +25,6 @@ import Vidrios from '../components/lists/glasses-list';
 import { ChapeInventoryItem, GlassInventoryItem } from '@/lib/api/schema-types';
 
 export default function Inventories() {
-  const { selectedBranch } = useSelectedBranchStore();
   const [newInventory, setNewInventory] = useState(false);
 
   const {
@@ -62,21 +60,18 @@ export default function Inventories() {
   const { data: perfiles, loading: perfilesLoading } = useQuery(
     GetProfileVariantsDocument,
     {
-      variables: getProfilesVars(perfilesArgs, selectedBranch?.guid || ''),
-      skip: selectedBranch === null,
+      variables: getProfilesVars(perfilesArgs, ''),
     }
   );
 
   const { data: chapes, loading: chapesLoading } = useQuery(GetChapesDocument, {
-    variables: getChapesVars(chapesArgs, selectedBranch?.guid || ''),
-    skip: selectedBranch === null,
+    variables: getChapesVars(chapesArgs, ''),
   });
 
   const { data: glasses, loading: glassesLoading } = useQuery(
     GetGlassesDocument,
     {
-      variables: getGlassesVars(glassesArgs, selectedBranch?.guid || ''),
-      skip: selectedBranch === null,
+      variables: getGlassesVars(glassesArgs, ''),
     }
   );
 
