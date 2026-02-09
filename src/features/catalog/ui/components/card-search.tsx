@@ -6,14 +6,13 @@ import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
-import { TCG_TYPES } from '@/lib/types/tcg.types';
+import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import {
   CARD_CONDITION_OPTIONS,
   POKEMON_RARITY_OPTIONS,
   MAGIC_RARITY_OPTIONS,
 } from '../../domain/constants';
-import { useCardSearch } from '../hooks/use-card-search';
 
 interface CardSearchProps {
   onSearchChange: SearchFn;
@@ -21,7 +20,7 @@ interface CardSearchProps {
   onReset: () => void;
   hasActiveFilters: boolean;
   resultCount: number;
-  selectedTCG: string;
+  selectedTCG: TCGType;
 }
 
 export default function CardSearch({

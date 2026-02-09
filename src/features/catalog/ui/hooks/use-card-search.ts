@@ -48,6 +48,12 @@ export function useCardSearch() {
       cards = cards.filter((c) => c.rarity === filters.rarity);
     }
 
+    if (filters.condition) {
+      cards = cards.filter((c) =>
+        c.variants.some((v) => v.condition === filters.condition)
+      );
+    }
+
     if (filters.setCode) {
       cards = cards.filter((c) => c.setCode === filters.setCode);
     }
