@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Tooltip } from '@heroui/react';
 import { motion } from 'framer-motion';
 
 interface EmergencyBannerProps {
@@ -32,9 +33,11 @@ export const EmergencyBanner: React.FC<EmergencyBannerProps> = ({
       className="bg-red-600 text-white p-6 rounded-xl shadow-lg"
     >
       <div className="text-center">
-        <div className="text-2xl font-bold mb-2">
-          {crisisLevel}: MODO DE RECUPERACIÓN
-        </div>
+        <Tooltip content="Se activa cuando el proyecto tiene más de 20 días de atraso. CÓDIGO AMARILLO: 20-30 días atrás. CÓDIGO ROJO: más de 30 días atrás. Indica que se necesitan acciones correctivas urgentes." placement="bottom" delay={300}>
+          <div className="text-2xl font-bold mb-2 cursor-help">
+            {crisisLevel}: MODO DE RECUPERACIÓN
+          </div>
+        </Tooltip>
         <div className="text-lg">
           {daysBehind} DÍAS DE ATRASO • {daysToNextMilestone} DÍAS PARA {nextMilestone?.toUpperCase()} • SALUD: {healthStatus}
         </div>

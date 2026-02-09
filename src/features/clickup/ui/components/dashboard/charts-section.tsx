@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardBody } from '@heroui/react';
+import { Card, CardBody, Tooltip } from '@heroui/react';
 import { motion } from 'framer-motion';
 
 interface ChartsSectionProps {
@@ -35,7 +35,9 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">Distribución por estado</h3>
+          <Tooltip content="Cantidad de tareas agrupadas por su estado actual (todo, in progress, done, etc.). Permite ver dónde se concentra el trabajo." placement="top" delay={300}>
+            <h3 className="text-lg font-semibold mb-4 cursor-help">Distribución por estado</h3>
+          </Tooltip>
           <div className="space-y-3">
             {metrics.byStatus && Object.entries(metrics.byStatus).map(([status, count]) => (
               <div key={status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -69,7 +71,9 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">Distribución por prioridad</h3>
+          <Tooltip content="Tareas agrupadas por nivel de prioridad (Urgent, High, Normal, Low). Ayuda a identificar si hay demasiadas tareas urgentes sin resolver." placement="top" delay={300}>
+            <h3 className="text-lg font-semibold mb-4 cursor-help">Distribución por prioridad</h3>
+          </Tooltip>
           <div className="space-y-3">
             {metrics.byPriority && Object.entries(metrics.byPriority).map(([priority, count]) => (
               <div key={priority} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -103,7 +107,9 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">Progreso por fase</h3>
+          <Tooltip content="Avance de cada fase del proyecto (Foundation, Catalog, etc.) basado en keywords de las tareas. Muestra tareas completadas y en progreso por fase." placement="top" delay={300}>
+            <h3 className="text-lg font-semibold mb-4 cursor-help">Progreso por fase</h3>
+          </Tooltip>
           <div className="space-y-3">
             {metrics.phases?.map((phase) => (
               <div key={phase.name} className="p-3 bg-gray-50 rounded-lg">
@@ -149,7 +155,9 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     >
       <Card>
         <CardBody>
-          <h3 className="text-lg font-semibold mb-4">Story Points por fase</h3>
+          <Tooltip content="Story Points estimados por cada fase. 1 SP = 1 hora. Indica el peso relativo de cada fase en el proyecto." placement="top" delay={300}>
+            <h3 className="text-lg font-semibold mb-4 cursor-help">Story Points por fase</h3>
+          </Tooltip>
           <div className="space-y-3">
             {metrics.phases?.map((phase) => (
               <div key={phase.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -185,7 +193,9 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
       >
         <Card>
           <CardBody>
-            <h3 className="text-lg font-semibold mb-4">Distribución de etiquetas</h3>
+            <Tooltip content="Frecuencia de etiquetas técnicas encontradas en las tareas (UI, backend, GraphQL, etc.). Muestra en qué áreas se concentra el trabajo." placement="top" delay={300}>
+              <h3 className="text-lg font-semibold mb-4 cursor-help">Distribución de etiquetas</h3>
+            </Tooltip>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {Object.entries(metrics.tags)
                 .sort(([, a], [, b]) => b - a)

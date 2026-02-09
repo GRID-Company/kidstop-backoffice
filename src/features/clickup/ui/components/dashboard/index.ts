@@ -6,3 +6,8 @@ export { ProgressBars } from './progress-bars';
 export { ChartsSection } from './charts-section';
 export { ActionPlan } from './action-plan';
 export { RecentTasks } from './recent-tasks';
+export { HoursTracking } from './hours-tracking';
+export { ListProgress } from './list-progress';
+export { TasksTable } from './tasks-table';
+export { BurndownChart } from './burndown-chart';
+export { TimelineVisual } from './timeline-visual';

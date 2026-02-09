@@ -6,7 +6,7 @@
 import { ClickUpService } from './clickup.service';
 import { TaskManager, TaskMetrics } from '../managers/task.manager';
 import { ClickUpTask } from '../types';
-import { DEFAULT_METRICS, PROJECT_TIMELINE, getExpectedCompletionByMilestone, getCurrentMilestone, getDaysSinceStart, PROJECT_DURATION } from '../constants/project-timeline.constants';
+import { DEFAULT_METRICS, PROJECT_TIMELINE, getExpectedCompletionByMilestone, getCurrentMilestone, getDaysSinceStart, PROJECT_DURATION, getHoursForList, PROJECT_BUDGET, SP_TO_HOURS_RATIO } from '../constants/project-timeline.constants';
 import { logger } from '@/lib/clickup/logger';
 
 export interface DashboardOptions {
@@ -92,12 +92,35 @@ export class DashboardService {
       byStatus: {},
     };
 
-    // Process each list in the folder
+    const listTasksMap: Map<string, ClickUpTask[]> = new Map();
+
     for (const list of lists) {
-      await this.processListForAggregation(list.id, allTasks, allMetrics);
+      const listTasks: ClickUpTask[] = [];
+      await this.processListForAggregation(list.id, listTasks, allMetrics);
+      allTasks.push(...listTasks);
+      listTasksMap.set(list.name, listTasks);
     }
 
+    const listProgress = lists.map(list => {
+      const tasks = listTasksMap.get(list.name) || [];
+      const estimatedHours = getHoursForList(list.name);
+      const completedTasks = tasks.filter(t => t.status === 'done').length;
+      const totalTasks = tasks.length;
+      const completedHours = totalTasks > 0
+        ? Math.round((completedTasks / totalTasks) * estimatedHours * 100) / 100
+        : 0;
+      return {
+        name: list.name,
+        estimatedHours,
+        completedTasks,
+        totalTasks,
+        completedHours,
+        pendingHours: Math.round((estimatedHours - completedHours) * 100) / 100,
+      };
+    });
+
     this.recalculateEmergencyMetrics(allMetrics);
+    allMetrics.listProgress = listProgress;
 
     logger.info(`Folder dashboard aggregated ${allTasks.length} tasks from ${lists.length} lists`);
 
@@ -191,28 +214,8 @@ export class DashboardService {
         allMetrics.inProgress += metrics.inProgress || 0;
         allMetrics.overdue += metrics.overdue || 0;
         
-        // Aggregate emergency metrics (use the first list's emergency metrics as reference)
-        if (!allMetrics.daysBehind && metrics.daysBehind !== undefined) {
-          allMetrics.daysBehind = metrics.daysBehind;
-          allMetrics.daysToCriticalMilestone = metrics.daysToCriticalMilestone;
-          allMetrics.requiredVelocity = metrics.requiredVelocity;
-          allMetrics.currentVelocity = metrics.currentVelocity;
-          allMetrics.totalStoryPoints = metrics.totalStoryPoints;
-          allMetrics.completedStoryPoints = metrics.completedStoryPoints;
-          allMetrics.projectStartDate = metrics.projectStartDate;
-          allMetrics.criticalMilestoneDate = metrics.criticalMilestoneDate;
-          allMetrics.nextMilestone = metrics.nextMilestone;
-          allMetrics.milestoneProgress = metrics.milestoneProgress;
-          allMetrics.daysToNextMilestone = metrics.daysToNextMilestone;
-          allMetrics.milestoneTargetDate = metrics.milestoneTargetDate;
-          allMetrics.expectedCompletionByMilestone = metrics.expectedCompletionByMilestone;
-          allMetrics.expectedTasksForMilestone = metrics.expectedTasksForMilestone;
-          allMetrics.tasksNeededForMilestone = metrics.tasksNeededForMilestone;
-        } else if (metrics.daysBehind !== undefined) {
-          // If we already have emergency metrics, take the worst case
-          allMetrics.daysBehind = Math.max(allMetrics.daysBehind || 0, metrics.daysBehind);
-          allMetrics.requiredVelocity = Math.max(allMetrics.requiredVelocity || 0, metrics.requiredVelocity || 0);
-        }
+        allMetrics.totalStoryPoints = (allMetrics.totalStoryPoints || 0) + (metrics.totalStoryPoints || 0);
+        allMetrics.completedStoryPoints = (allMetrics.completedStoryPoints || 0) + (metrics.completedStoryPoints || 0);
         
         // Merge byPriority and byStatus
         Object.keys(metrics.byPriority || {}).forEach(priority => {
@@ -258,6 +261,19 @@ export class DashboardService {
 
     allMetrics.projectStartDate = PROJECT_TIMELINE.START_DATE.toISOString();
     allMetrics.criticalMilestoneDate = PROJECT_TIMELINE.CRITICAL_MILESTONE_DATE.toISOString();
+
+    const totalHours = (allMetrics.totalStoryPoints || 0) * SP_TO_HOURS_RATIO;
+    const completedHours = (allMetrics.completedStoryPoints || 0) * SP_TO_HOURS_RATIO;
+    const pendingHours = totalHours - completedHours;
+    allMetrics.totalHours = totalHours;
+    allMetrics.completedHours = completedHours;
+    allMetrics.pendingHours = pendingHours;
+    allMetrics.totalCost = totalHours * PROJECT_BUDGET.COST_PER_HOUR;
+    allMetrics.completedCost = completedHours * PROJECT_BUDGET.COST_PER_HOUR;
+    allMetrics.pendingCost = pendingHours * PROJECT_BUDGET.COST_PER_HOUR;
+    allMetrics.hoursPerDay = daysSinceStart > 0
+      ? Math.round((completedHours / daysSinceStart) * 100) / 100
+      : 0;
   }
 
   /**

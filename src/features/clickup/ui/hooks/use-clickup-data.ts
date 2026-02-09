@@ -41,6 +41,21 @@ interface DashboardData {
     expectedCompletionByMilestone?: number;
     expectedTasksForMilestone?: number;
     tasksNeededForMilestone?: number;
+    totalHours?: number;
+    completedHours?: number;
+    pendingHours?: number;
+    totalCost?: number;
+    completedCost?: number;
+    pendingCost?: number;
+    hoursPerDay?: number;
+    listProgress?: Array<{
+      name: string;
+      estimatedHours: number;
+      completedTasks: number;
+      totalTasks: number;
+      completedHours: number;
+      pendingHours: number;
+    }>;
   };
   lastUpdated: string;
   error?: string;
