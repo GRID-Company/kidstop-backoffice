@@ -1,23 +1,33 @@
-import { extendVariants, DateRangePicker } from '@heroui/react';
+import { DateRangePicker, DateRangePickerProps } from '@heroui/react';
+import type { DateValue } from '@internationalized/date';
 
-const BaseDateRangePicker = extendVariants(DateRangePicker, {
-  variants: {
-    color: {
-      default: {
-        inputWrapper: '!border-[1px] bg-white',
-      },
-    },
-  },
-  defaultVariants: {
-    variant: 'bordered',
-    size: 'md',
-    color: 'default',
-  },
-});
+type OverrideDateRangePickerProps = Omit<DateRangePickerProps<DateValue>, 'classNames'> & {
+  classNames?: DateRangePickerProps<DateValue>['classNames'];
+};
 
-type OverrideDateRangePickerProps = React.ComponentProps<typeof BaseDateRangePicker>;
-const OverrideDateRangePicker = (props: OverrideDateRangePickerProps) => (
-  <BaseDateRangePicker {...props} />
-);
-
-export default OverrideDateRangePicker;
+export default function OverrideDateRangePicker(props: OverrideDateRangePickerProps) {
+  return (
+    <DateRangePicker
+      variant="bordered"
+      size="md"
+      {...props}
+      classNames={{
+        ...props.classNames,
+        inputWrapper: `!border-[1px] bg-white ${props.classNames?.inputWrapper ?? ''}`,
+      }}
+      calendarProps={{
+        ...props.calendarProps,
+        classNames: {
+          ...props.calendarProps?.classNames,
+          cellButton: [
+            'data-[selected=true]:bg-accent data-[selected=true]:text-white',
+            'data-[hover=true]:bg-accent/20',
+            'data-[selection-start=true]:bg-accent data-[selection-end=true]:bg-accent',
+            props.calendarProps?.classNames?.cellButton ?? '',
+          ].join(' '),
+          title: `text-accent ${props.calendarProps?.classNames?.title ?? ''}`,
+        },
+      }}
+    />
+  );
+}
