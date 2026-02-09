@@ -49,10 +49,6 @@ export interface ISettings {
   updatedAt: string;
 }
 
-export interface ISettingsFilters {
-  section?: SettingsSection;
-}
-
 export type SettingsSection =
   | 'general'
   | 'budgets';

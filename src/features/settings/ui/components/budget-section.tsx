@@ -1,9 +1,10 @@
 import { Button, Divider } from '@heroui/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
 import OverrideInput from '@/shared/base/heorui-overrides/input';
 import { IBudgetConfig } from '../../domain/types';
+import { budgetSettingsSchema } from '../../adapters/forms/budget-settings.schema';
 import SettingsSection from './settings-section';
 
 interface BudgetSectionProps {
@@ -14,6 +15,13 @@ interface BudgetSectionProps {
 export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
   const [localBudgets, setLocalBudgets] = useState<IBudgetConfig[]>(budgets);
   const [isDirty, setIsDirty] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setLocalBudgets(budgets);
+    setIsDirty(false);
+    setErrors({});
+  }, [budgets]);
 
   const handleFieldChange = useCallback(
     (index: number, field: keyof IBudgetConfig, value: string | number) => {
@@ -45,6 +53,16 @@ export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
   }, []);
 
   const handleSave = useCallback(() => {
+    const result = budgetSettingsSchema.safeParse({ budgets: localBudgets });
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        fieldErrors[issue.path.join('.')] = issue.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
     onSave(localBudgets);
     setIsDirty(false);
   }, [localBudgets, onSave]);
@@ -61,6 +79,8 @@ export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
                   label="Comprador"
                   placeholder="Nombre del comprador"
                   value={budget.buyerName}
+                  isInvalid={!!errors[`budgets.${index}.buyerName`]}
+                  errorMessage={errors[`budgets.${index}.buyerName`]}
                   onChange={(e) =>
                     handleFieldChange(index, 'buyerName', e.target.value)
                   }
@@ -70,6 +90,8 @@ export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
                   placeholder="0"
                   type="number"
                   value={String(budget.dailyLimit)}
+                  isInvalid={!!errors[`budgets.${index}.dailyLimit`]}
+                  errorMessage={errors[`budgets.${index}.dailyLimit`]}
                   onChange={(e) =>
                     handleFieldChange(index, 'dailyLimit', Number(e.target.value))
                   }
@@ -79,6 +101,8 @@ export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
                   placeholder="0"
                   type="number"
                   value={String(budget.weeklyLimit)}
+                  isInvalid={!!errors[`budgets.${index}.weeklyLimit`]}
+                  errorMessage={errors[`budgets.${index}.weeklyLimit`]}
                   onChange={(e) =>
                     handleFieldChange(index, 'weeklyLimit', Number(e.target.value))
                   }
@@ -88,6 +112,8 @@ export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
                   placeholder="0"
                   type="number"
                   value={String(budget.monthlyLimit)}
+                  isInvalid={!!errors[`budgets.${index}.monthlyLimit`]}
+                  errorMessage={errors[`budgets.${index}.monthlyLimit`]}
                   onChange={(e) =>
                     handleFieldChange(index, 'monthlyLimit', Number(e.target.value))
                   }
