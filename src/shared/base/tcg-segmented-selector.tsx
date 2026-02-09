@@ -3,22 +3,7 @@
 import { memo } from 'react';
 import { Icon } from '@iconify/react';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
-
-type TCGOption = { key: TCGType; label: string; icon: string };
-
-const TCG_OPTIONS: TCGOption[] = [
-  {
-    key: TCG_TYPES.POKEMON,
-    label: 'Pokémon',
-    icon: 'simple-icons:pokemon',
-  },
-  {
-    key: TCG_TYPES.MAGIC,
-    label: 'Magic',
-    icon: 'mdi:cards-playing',
-  },
-];
+import { TCG_OPTIONS } from '@/lib/consts/tcg-options';
 
 export default memo(function TcgSegmentedSelector() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);

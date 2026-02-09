@@ -6,7 +6,6 @@ const KidstopButton = extendVariants(Button, {
       borderedWhite: 'border-1 border-white !text-white ',
       light: '!text-white ',
       lightDark: '!text-content-primary ',
-      borderedDark: 'border-1 border-content-primary !text-content-primary ',
       accent: 'bg-accent !text-white hover:opacity-90 ',
     },
   },

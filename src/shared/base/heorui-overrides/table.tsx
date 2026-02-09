@@ -4,11 +4,11 @@ export const KidstopTable: any = extendVariants(Table, {
   variants: {
     color: {
       default: {
-        base: ['h-full', 'bg-transarent'],
-        wrapper: ['p-0', 'bg-transarent', 'rounded-none'],
+        base: ['h-full', 'bg-transparent'],
+        wrapper: ['p-0', 'bg-transparent', 'rounded-none'],
         thead: ['h-[55px]', 'uppercase', 'rounded-t-lg'],
         th: ['!text-white', '!font-semibold', '!bg-accent'],
-        tbody: [, 'rounded-xl', 'overflow-hidden'],
+        tbody: ['rounded-xl', 'overflow-hidden'],
         tr: [
           'border-b-2',
           'border-[#F5F6F8]',
