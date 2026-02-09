@@ -1,6 +1,6 @@
 import { Resolver, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CARD_CONDITIONS } from '@/features/catalog/domain/constants';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { MOVEMENT_TYPES } from '../../domain/constants';
 import {
   InventoryAdjustmentFormData,

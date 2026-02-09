@@ -5,9 +5,9 @@ import {
   FilterFn,
 } from '@/lib/types/paginated-datatable.types';
 import { TCGType } from '@/lib/types/tcg.types';
-import { CARD_CONDITIONS } from './constants';
+import { CardCondition } from '@/lib/types/card.types';
 
-export type CardCondition = (typeof CARD_CONDITIONS)[keyof typeof CARD_CONDITIONS];
+export type { CardCondition };
 
 export interface ICardVariant {
   id: string;

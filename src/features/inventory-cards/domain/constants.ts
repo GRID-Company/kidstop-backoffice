@@ -30,6 +30,11 @@ export const STOCK_STATUS_COLORS: Record<string, 'success' | 'warning' | 'danger
   [STOCK_STATUSES.UNAVAILABLE]: 'danger',
 };
 
+export const STOCK_STATUS_OPTIONS = Object.values(STOCK_STATUSES).map((status) => ({
+  value: status,
+  label: STOCK_STATUS_LABELS[status],
+}));
+
 export const DEFAULT_INVENTORY_SORT: ITableSort = {
   column: 'name',
   order: 'ASC',

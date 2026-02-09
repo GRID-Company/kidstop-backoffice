@@ -1,5 +1,6 @@
 import { TCGType } from '@/lib/types/tcg.types';
-import { CardCondition } from '@/features/catalog/domain/types';
+import { CardCondition } from '@/lib/types/card.types';
+import { DateRange } from '@/lib/types/date.types';
 import { MOVEMENT_TYPES, STOCK_STATUSES } from './constants';
 
 export type MovementType = (typeof MOVEMENT_TYPES)[keyof typeof MOVEMENT_TYPES];
@@ -34,9 +35,13 @@ export interface IInventoryMovement {
   createdAt: string;
 }
 
+export type { DateRange };
+
 export interface InventoryFilters {
   tcgType?: TCGType;
   condition?: CardCondition;
   stockStatus?: StockStatus;
+  rarity?: string;
   search?: string;
+  dateRange?: DateRange;
 }
