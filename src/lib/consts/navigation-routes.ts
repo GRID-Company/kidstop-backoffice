@@ -10,13 +10,18 @@ const Settings = {
   route: '/configuracion',
   icon: 'lucide:settings',
 };
+const Catalog = {
+  label: 'Catálogo',
+  route: '/catalogo',
+  icon: 'lucide:library',
+};
 const ClickUp = {
   label: 'ClickUp',
   route: '/clickup',
   icon: 'simple-icons:clickup',
 };
 
-const ADMIN_ROUTES = [Users, Settings, ClickUp];
+const ADMIN_ROUTES = [Catalog, Users, Settings, ClickUp];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
