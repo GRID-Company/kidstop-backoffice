@@ -5,7 +5,6 @@ import {
   Chip,
   Button,
   Tooltip,
-  Pagination,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -14,14 +13,12 @@ import { ICustomerOrder, ICustomerOrdersSummary } from '../../domain/types';
 import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_COLORS,
-  DEFAULT_PAGE_SIZE,
 } from '../../domain/constants';
 
 interface CustomerOrdersSummaryProps {
   summary: ICustomerOrdersSummary;
   loading?: boolean;
   onViewOrder?: (orderId: string) => void;
-  pageSize?: number;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -100,7 +97,6 @@ export default function CustomerOrdersSummary({
   summary,
   loading = false,
   onViewOrder,
-  pageSize = DEFAULT_PAGE_SIZE,
 }: CustomerOrdersSummaryProps) {
   const columns = useMemo(() => buildColumns(onViewOrder), [onViewOrder]);
 
