@@ -5,15 +5,15 @@ import {
 } from '../../domain/constants';
 
 const coordinateSchema = z.object({
-  lat: z.number().min(-90).max(90),
-  lng: z.number().min(-180).max(180),
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
 });
 
 export const geofenceSettingsSchema = z.object({
   enabled: z.boolean(),
   center: coordinateSchema,
   radiusKm: z
-    .number()
+    .coerce.number()
     .min(MIN_GEOFENCE_RADIUS_KM, `Mínimo ${MIN_GEOFENCE_RADIUS_KM} km`)
     .max(MAX_GEOFENCE_RADIUS_KM, `Máximo ${MAX_GEOFENCE_RADIUS_KM} km`),
 });

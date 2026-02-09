@@ -3,10 +3,10 @@ import { MIN_THRESHOLD_VALUE } from '../../domain/constants';
 
 export const thresholdSettingsSchema = z.object({
   uncompletedOrdersLimit: z
-    .number()
+    .coerce.number()
     .min(MIN_THRESHOLD_VALUE, `Mínimo ${MIN_THRESHOLD_VALUE}`),
   inventoryLimitPerCard: z
-    .number()
+    .coerce.number()
     .min(MIN_THRESHOLD_VALUE, `Mínimo ${MIN_THRESHOLD_VALUE}`),
 });
 
