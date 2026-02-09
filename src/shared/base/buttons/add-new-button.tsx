@@ -8,6 +8,7 @@ export default function AddNewButton({
 }: Partial<ButtonProps> & { label: string }) {
   return (
     <KidstopButton
+      variant='accent'
       startContent={<Icon icon='solar:add-circle-linear' className='text-lg' />}
       {...buttonProps}
     >

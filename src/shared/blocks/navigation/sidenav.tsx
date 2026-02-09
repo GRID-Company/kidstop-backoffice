@@ -16,7 +16,10 @@ export default function Sidenav() {
 
   return (
     <div className='min-h-screen p-8'>
-      <div className='bg-brand-1 flex h-full w-20 flex-col overflow-hidden rounded-2xl'>
+      <div
+        className='flex h-full w-20 flex-col overflow-hidden rounded-2xl transition-all duration-500'
+        style={{ background: 'var(--tcg-sidebar-bg)' }}
+      >
         <div className='mt-6 flex h-full flex-col justify-between px-4'>
           <div className='flex flex-col gap-2 pt-6'>
             {(MENU_ROUTES?.[role as UserRole] ?? []).map((option) => {
@@ -27,7 +30,8 @@ export default function Sidenav() {
                   as={NextLink}
                   key={option.label}
                   isBlock
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${isActive ? 'bg-[#0870BA]' : ''}`}
+                  className='flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300'
+                  style={isActive ? { background: 'var(--tcg-sidebar-active)' } : undefined}
                 >
                   <Icon
                     icon={`${option.icon}`}
