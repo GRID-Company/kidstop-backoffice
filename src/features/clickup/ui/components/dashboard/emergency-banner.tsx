@@ -1,8 +1,3 @@
-/**
- * Emergency Banner Component
- * Displays critical project status and recovery mode information
- */
-
 'use client';
 
 import React from 'react';
@@ -23,8 +18,8 @@ export const EmergencyBanner: React.FC<EmergencyBannerProps> = ({
   healthStatus,
   isEmergencyMode,
 }) => {
-  const crisisLevel = daysBehind > 30 ? 'CODE RED' : 
-                     daysBehind > 20 ? 'CODE YELLOW' : 'NORMAL';
+  const crisisLevel = daysBehind > 30 ? 'CÓDIGO ROJO' : 
+                     daysBehind > 20 ? 'CÓDIGO AMARILLO' : 'NORMAL';
 
   if (!isEmergencyMode) {
     return null;
@@ -38,10 +33,10 @@ export const EmergencyBanner: React.FC<EmergencyBannerProps> = ({
     >
       <div className="text-center">
         <div className="text-2xl font-bold mb-2">
-          ⚠️ {crisisLevel}: PROJECT RECOVERY MODE
+          {crisisLevel}: MODO DE RECUPERACIÓN
         </div>
         <div className="text-lg">
-          {daysBehind} DAYS BEHIND • {daysToNextMilestone} DAYS TO {nextMilestone?.toUpperCase()} • HEALTH: {healthStatus}
+          {daysBehind} DÍAS DE ATRASO • {daysToNextMilestone} DÍAS PARA {nextMilestone?.toUpperCase()} • SALUD: {healthStatus}
         </div>
       </div>
     </motion.div>

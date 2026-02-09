@@ -1,8 +1,3 @@
-/**
- * Action Plan Component
- * Displays project recovery plan with velocity analysis and timeline
- */
-
 'use client';
 
 import React from 'react';
@@ -45,65 +40,65 @@ export const ActionPlan: React.FC<ActionPlanProps> = ({ metrics, isEmergencyMode
     >
       <Card className="border-2 border-red-500 bg-red-50">
         <CardBody>
-          <h2 className="text-2xl font-bold text-red-700 mb-4">⚡ PROJECT RECOVERY PLAN</h2>
+          <h2 className="text-2xl font-bold text-red-700 mb-4">PLAN DE RECUPERACIÓN</h2>
           
           {/* Velocity Analysis */}
           <div className="mb-6 p-4 bg-white rounded-lg border-l-4 border-red-500">
-            <div className="font-semibold text-red-700 mb-2">VELOCITY ANALYSIS:</div>
+            <div className="font-semibold text-red-700 mb-2">ANÁLISIS DE VELOCIDAD:</div>
             <div className="grid grid-cols-2 gap-4 text-gray-700">
               <div>
-                <div className="font-medium">Current Velocity:</div>
+                <div className="font-medium">Velocidad actual:</div>
                 <div className="text-2xl font-bold text-red-600">
-                  {metrics.currentVelocity?.toFixed(2)} tasks/day
+                  {metrics.currentVelocity?.toFixed(2)} tareas/día
                 </div>
                 <div className="text-xs text-gray-500">
-                  {metrics.completed} completed ÷ {daysSinceStart} days since start
+                  {metrics.completed} completadas ÷ {daysSinceStart} días desde inicio
                 </div>
               </div>
               <div>
-                <div className="font-medium">Required Velocity:</div>
+                <div className="font-medium">Velocidad requerida:</div>
                 <div className="text-2xl font-bold text-orange-600">
-                  {metrics.requiredVelocity?.toFixed(2)} tasks/day
+                  {metrics.requiredVelocity?.toFixed(2)} tareas/día
                 </div>
                 <div className="text-xs text-gray-500">
-                  {metrics.tasksNeededForMilestone || 0} tasks needed ÷ {metrics.daysToNextMilestone || 0} days
+                  {metrics.tasksNeededForMilestone || 0} tareas necesarias ÷ {metrics.daysToNextMilestone || 0} días
                 </div>
                 <div className="text-xs text-gray-400">
-                  For {Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}% milestone: {metrics.expectedTasksForMilestone || 0} tasks total
+                  Para hito del {Math.round((metrics.expectedCompletionByMilestone || 0) * 100)}%: {metrics.expectedTasksForMilestone || 0} tareas totales
                 </div>
               </div>
             </div>
             <div className="mt-3 text-sm text-gray-600">
-              Velocity Gap: {velocityGap.toFixed(2)} tasks/day needed
+              Brecha de velocidad: {velocityGap.toFixed(2)} tareas/día necesarias
             </div>
           </div>
           
           <div className="space-y-3">
             <div className="p-4 bg-white rounded-lg border-l-4 border-red-500">
-              <div className="font-semibold text-red-700">IMMEDIATE (TODAY):</div>
+              <div className="font-semibold text-red-700">INMEDIATO (HOY):</div>
               <div className="text-gray-700">
-                Emergency team meeting • Review recovery dashboard • Identify blockers • Set daily targets
+                Reunión de emergencia • Revisar dashboard • Identificar bloqueos • Definir metas diarias
               </div>
             </div>
             <div className="p-4 bg-white rounded-lg border-l-4 border-orange-500">
-              <div className="font-semibold text-orange-700">SHORT TERM (THIS WEEK):</div>
+              <div className="font-semibold text-orange-700">CORTO PLAZO (ESTA SEMANA):</div>
               <div className="text-gray-700">
-                Daily standups at 9 AM • Complete {Math.ceil((metrics.requiredVelocity || 0) * 7)} tasks • 
-                Achieve {metrics.requiredVelocity?.toFixed(2)}+ tasks/day • First client demo
+                Standups diarios a las 9 AM • Completar {Math.ceil((metrics.requiredVelocity || 0) * 7)} tareas • 
+                Alcanzar {metrics.requiredVelocity?.toFixed(2)}+ tareas/día • Primera demo al cliente
               </div>
             </div>
             <div className="p-4 bg-white rounded-lg border-l-4 border-yellow-500">
-              <div className="font-semibold text-yellow-700">MEDIUM TERM ({metrics.daysToNextMilestone} DAYS):</div>
+              <div className="font-semibold text-yellow-700">MEDIANO PLAZO ({metrics.daysToNextMilestone} DÍAS):</div>
               <div className="text-gray-700">
-                Complete {Math.ceil((metrics.requiredVelocity || 0) * (metrics.daysToNextMilestone || 0))} tasks • 
-                Reach {metrics.nextMilestone} • Restore client confidence
+                Completar {Math.ceil((metrics.requiredVelocity || 0) * (metrics.daysToNextMilestone || 0))} tareas • 
+                Alcanzar {metrics.nextMilestone} • Restaurar confianza del cliente
               </div>
             </div>
             <div className="p-4 bg-white rounded-lg border-l-4 border-green-500">
-              <div className="font-semibold text-green-700">RECOVERY TARGET:</div>
+              <div className="font-semibold text-green-700">META DE RECUPERACIÓN:</div>
               <div className="text-gray-700">
-                Increase velocity by {velocityIncreasePercent.toFixed(0)}% • 
-                Complete {tasksToCompleteByDay60} tasks by Day 60 • Get back on schedule
+                Incrementar velocidad en {velocityIncreasePercent.toFixed(0)}% • 
+                Completar {tasksToCompleteByDay60} tareas para el Día 60 • Volver al cronograma
               </div>
             </div>
           </div>

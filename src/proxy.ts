@@ -15,9 +15,9 @@ export function proxy(request: NextRequest) {
   if (startsWithAny(pathname, PUBLIC_PAGES) && token) {
     const url = request.nextUrl.clone();
     if (role === 'ADMIN' || role === 'SUPERUSER') {
-      url.pathname = '/inventario';
+      url.pathname = '/usuarios';
     } else {
-      url.pathname = '/inventario';
+      url.pathname = '/usuarios';
     }
     return NextResponse.redirect(url);
   }

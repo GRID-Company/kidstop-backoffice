@@ -1,8 +1,3 @@
-/**
- * Recent Tasks Component
- * Displays list of recent tasks with status and priority chips
- */
-
 'use client';
 
 import React from 'react';
@@ -42,7 +37,7 @@ export const RecentTasks: React.FC<RecentTasksProps> = ({ tasks }) => {
     >
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Recent Tasks</h3>
+          <h3 className="text-lg font-semibold">Tareas recientes</h3>
         </CardHeader>
         <CardBody>
           <div className="space-y-3">
@@ -51,7 +46,7 @@ export const RecentTasks: React.FC<RecentTasksProps> = ({ tasks }) => {
                 <div className="flex-1">
                   <h4 className="font-medium text-gray-900">{task.name}</h4>
                   <p className="text-sm text-gray-600">
-                    {task.status || 'No status'} • {task.assignees?.length || 0} assignees
+                    {task.status || 'Sin estado'} · {task.assignees?.length || 0} asignados
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">

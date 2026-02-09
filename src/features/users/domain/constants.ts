@@ -1,14 +1,12 @@
-export const USER_ROLES = {
-  ADMIN: 'ADMIN',
-  RECEPTION: 'RECEPTION',
-  BUYER: 'BUYER',
-} as const;
+import { UserRole, USER_ROLE_LABELS } from '@/lib/auth/user-roles';
 
-export const USER_ROLE_LABELS: Record<string, string> = {
-  [USER_ROLES.ADMIN]: 'Administrador',
-  [USER_ROLES.RECEPTION]: 'Recepción',
-  [USER_ROLES.BUYER]: 'Comprador',
-};
+export { USER_ROLE_LABELS };
+
+export const USER_ROLES = {
+  ADMIN: UserRole.ADMIN,
+  RECEPTION: UserRole.RECEPTION,
+  BUYER: UserRole.BUYER,
+} as const;
 
 export const USER_STATUS = {
   ACTIVE: 'ACTIVE',
