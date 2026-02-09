@@ -24,7 +24,7 @@ export const calculatePriceMargin = (
   marginPercentage: number = DEFAULT_MARGIN_PERCENTAGE
 ): number => {
   if (buyPrice < MIN_PRICE) return MIN_PRICE;
-  if (marginPercentage < 0) return buyPrice;
+  if (marginPercentage < 0) throw new Error('Margin percentage cannot be negative');
 
   return Math.round(buyPrice * (1 + marginPercentage / 100) * 100) / 100;
 };

@@ -1,3 +1,6 @@
+import { ITableSort } from '@/lib/types/datatable.types';
+import { CardCondition } from './types';
+
 export const CARD_CONDITIONS = {
   NEAR_MINT: 'NEAR_MINT',
   LIGHTLY_PLAYED: 'LIGHTLY_PLAYED',
@@ -6,9 +9,7 @@ export const CARD_CONDITIONS = {
   DAMAGED: 'DAMAGED',
 } as const;
 
-type CardConditionValue = (typeof CARD_CONDITIONS)[keyof typeof CARD_CONDITIONS];
-
-export const CARD_CONDITION_LABELS: Record<CardConditionValue, string> = {
+export const CARD_CONDITION_LABELS: Record<CardCondition, string> = {
   [CARD_CONDITIONS.NEAR_MINT]: 'Near Mint',
   [CARD_CONDITIONS.LIGHTLY_PLAYED]: 'Lightly Played',
   [CARD_CONDITIONS.MODERATELY_PLAYED]: 'Moderately Played',
@@ -16,7 +17,7 @@ export const CARD_CONDITION_LABELS: Record<CardConditionValue, string> = {
   [CARD_CONDITIONS.DAMAGED]: 'Damaged',
 };
 
-export const CARD_CONDITION_SHORT_LABELS: Record<CardConditionValue, string> = {
+export const CARD_CONDITION_SHORT_LABELS: Record<CardCondition, string> = {
   [CARD_CONDITIONS.NEAR_MINT]: 'NM',
   [CARD_CONDITIONS.LIGHTLY_PLAYED]: 'LP',
   [CARD_CONDITIONS.MODERATELY_PLAYED]: 'MP',
@@ -29,7 +30,7 @@ export const CARD_CONDITION_OPTIONS = Object.values(CARD_CONDITIONS).map((condit
   label: CARD_CONDITION_LABELS[condition],
 }));
 
-export const DEFAULT_CARDS_SORT = {
+export const DEFAULT_CARDS_SORT: ITableSort = {
   column: 'name',
   order: 'ASC',
 };
