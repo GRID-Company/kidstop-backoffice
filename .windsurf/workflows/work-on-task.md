@@ -67,6 +67,7 @@ console.log('Status:', result.status?.status);
 - Create PR towards `dev` using GH CLI with:
   - Title matching the commit message
   - Description with: summary, ClickUp task link, list of changes, and testing notes
+  - Add PR url to ClickUp task as comment
 
 ### Notes
 - No testing framework is configured yet - omit unit tests unless explicitly requested
