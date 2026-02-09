@@ -1,5 +1,5 @@
 import { ICardVariant } from '../../domain/types';
-import { CardPriceFormData } from '../forms/card-price.schema';
+import { CardPriceFormData } from '../forms/card-price.form.schema';
 
 export function toUpdateCardPricePayload(data: CardPriceFormData, variantId: string) {
   return {
@@ -12,7 +12,7 @@ export function toUpdateCardPricePayload(data: CardPriceFormData, variantId: str
   };
 }
 
-export function toCardPriceFormDefaults(variant: ICardVariant): Partial<CardPriceFormData> {
+export function toCardPriceFormDefaults(variant: ICardVariant): CardPriceFormData {
   return {
     condition: variant.condition,
     buyPrice: variant.buyPrice,
