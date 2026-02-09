@@ -1,10 +1,18 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import {
+  parseDate,
+  today,
+  getLocalTimeZone,
+} from '@internationalized/date';
+import type { RangeValue } from '@react-types/shared';
+import type { DateValue } from '@internationalized/date';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
+import DateRangePicker from '@/shared/base/heorui-overrides/date-range-picker';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
@@ -14,23 +22,28 @@ import {
   MAGIC_RARITY_OPTIONS,
 } from '@/features/catalog/domain/constants';
 import { STOCK_STATUS_OPTIONS } from '../../domain/constants';
+import { DateRange } from '../../domain/types';
 
 interface InventoryFiltersProps {
   onSearchChange: SearchFn;
   onFilterChange: FilterFn;
+  onDateRangeChange: (range: DateRange | undefined) => void;
   onReset: () => void;
   hasActiveFilters: boolean;
   resultCount: number;
   selectedTCG: TCGType;
+  dateRange?: DateRange;
 }
 
 export default function InventoryFilters({
   onSearchChange,
   onFilterChange,
+  onDateRangeChange,
   onReset,
   hasActiveFilters,
   resultCount,
   selectedTCG,
+  dateRange,
 }: InventoryFiltersProps) {
   const rarityOptions = useMemo(
     () =>
@@ -38,6 +51,28 @@ export default function InventoryFilters({
         ? POKEMON_RARITY_OPTIONS
         : MAGIC_RARITY_OPTIONS,
     [selectedTCG]
+  );
+
+  const dateRangeValue = useMemo(() => {
+    if (!dateRange) return null;
+    return {
+      start: parseDate(dateRange.start),
+      end: parseDate(dateRange.end),
+    };
+  }, [dateRange]);
+
+  const handleDateChange = useCallback(
+    (value: RangeValue<DateValue> | null) => {
+      if (!value) {
+        onDateRangeChange(undefined);
+        return;
+      }
+      onDateRangeChange({
+        start: value.start.toString(),
+        end: value.end.toString(),
+      });
+    },
+    [onDateRangeChange]
   );
 
   return (
@@ -51,7 +86,7 @@ export default function InventoryFilters({
         aria-label="Buscar en inventario por nombre, set o identificador"
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Select
           placeholder="Todas las condiciones"
           label="Condición"
@@ -72,6 +107,13 @@ export default function InventoryFilters({
           items={STOCK_STATUS_OPTIONS}
           onChange={(e) => onFilterChange('stockStatus', e.target.value)}
           aria-label="Filtrar por estado de stock"
+        />
+        <DateRangePicker
+          label="Última venta"
+          value={dateRangeValue}
+          onChange={handleDateChange}
+          maxValue={today(getLocalTimeZone())}
+          aria-label="Filtrar por rango de fecha de última venta"
         />
       </div>
 

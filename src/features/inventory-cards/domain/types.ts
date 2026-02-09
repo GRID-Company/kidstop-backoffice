@@ -34,10 +34,16 @@ export interface IInventoryMovement {
   createdAt: string;
 }
 
+export interface DateRange {
+  start: string;
+  end: string;
+}
+
 export interface InventoryFilters {
   tcgType?: TCGType;
   condition?: CardCondition;
   stockStatus?: StockStatus;
   rarity?: string;
   search?: string;
+  dateRange?: DateRange;
 }
