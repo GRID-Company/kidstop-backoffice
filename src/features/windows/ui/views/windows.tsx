@@ -8,7 +8,7 @@ import { useQuery } from '@apollo/client/react';
 import { WindowsDocument } from '@/lib/api/generated/windows.generated';
 import { WindowTemplate } from '@/lib/api/schema-types';
 import Link from 'next/link';
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import GridSkeleton from '@/shared/base/skeletons/grid-skeleton';
 import {
   MosquitoNetOptions,
@@ -95,9 +95,9 @@ export default function WindowsView() {
       {loading && <GridSkeleton />}
 
       {!loading && res?.windows?.data?.length === 0 && (
-        <CanalviCard className='col-span-4 flex h-full items-center justify-center px-12 py-24'>
+        <KidstopCard className='col-span-4 flex h-full items-center justify-center px-12 py-24'>
           <p className='text-center'>No se encontraron resultados</p>
-        </CanalviCard>
+        </KidstopCard>
       )}
     </EntitiesPage>
   );

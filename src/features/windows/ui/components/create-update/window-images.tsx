@@ -1,7 +1,7 @@
 import { WindowForm } from '@/features/windows/adapters/forms/window.form.schema';
 import { FileCategory, FileType } from '@/lib/types/file.types';
-import CanalviButton from '@/shared/base/heorui-overrides/button';
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import UploadImageButton from '@/shared/blocks/files/upload-file';
 import { CardBody, Image } from '@heroui/react';
 import { UseFormSetValue, useWatch } from 'react-hook-form';
@@ -46,7 +46,7 @@ export default function WindowImages({ setValue }: WindowImagesProps) {
   };
 
   return (
-    <CanalviCard>
+    <KidstopCard>
       <CardBody className='p-4'>
         <div className=''>
           <div className='flex items-center justify-between'>
@@ -118,6 +118,6 @@ export default function WindowImages({ setValue }: WindowImagesProps) {
           </div>
         </div>
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

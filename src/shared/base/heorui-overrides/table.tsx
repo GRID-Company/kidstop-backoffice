@@ -1,6 +1,6 @@
 import { extendVariants, Table } from '@heroui/react';
 
-export const CanalviTable: any = extendVariants(Table, {
+export const KidstopTable: any = extendVariants(Table, {
   variants: {
     color: {
       default: {

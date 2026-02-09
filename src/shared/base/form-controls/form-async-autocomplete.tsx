@@ -9,7 +9,7 @@ import {
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { ISelectOption } from '../heorui-overrides/select';
 import { AutocompleteProps } from '@heroui/react';
-import CanalviAutocomplete from '../heorui-overrides/autocomplete';
+import KidstopAutocomplete from '../heorui-overrides/autocomplete';
 import { ControlWithFormProps } from '@/lib/types/controller.types';
 import { useQuery } from '@apollo/client/react';
 import { DocumentNode } from 'graphql';
@@ -125,7 +125,7 @@ function BaseFormAsyncAutocomplete<
   };
 
   return (
-    <CanalviAutocomplete
+    <KidstopAutocomplete
       {...autocompleteProps}
       items={items}
       isLoading={loading}

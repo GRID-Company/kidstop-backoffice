@@ -1,4 +1,4 @@
-import CanalviButton from '@/shared/base/heorui-overrides/button';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Button, Link } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
@@ -16,7 +16,7 @@ export default function WindowFormToolbar({ loading }: { loading: boolean }) {
         <p>Nueva ventana</p>
       </div>
 
-      <CanalviButton
+      <KidstopButton
         startContent={
           <Icon icon='solar:check-circle-linear' className='text-lg' />
         }
@@ -25,7 +25,7 @@ export default function WindowFormToolbar({ loading }: { loading: boolean }) {
         isLoading={loading}
       >
         Guardar ventana
-      </CanalviButton>
+      </KidstopButton>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { Button, CardBody } from '@heroui/react';
 import { useFieldArray } from 'react-hook-form';
 import { useWindowFormCtx } from './window-form.context';
@@ -24,7 +24,7 @@ export default function WindowChapes() {
   });
 
   return (
-    <CanalviCard>
+    <KidstopCard>
       <CardBody className='p-4'>
         <div className='mb-4 flex items-center justify-between'>
           <p className='text-lg'>Herrajes</p>
@@ -98,6 +98,6 @@ export default function WindowChapes() {
           </div>
         ))}
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

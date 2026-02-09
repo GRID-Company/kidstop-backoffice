@@ -51,7 +51,7 @@ export default function Topbar({ className }: { className?: string }) {
             <h1 className=''>
               <Image
                 src={Logo.src}
-                alt='CANALVI'
+                alt='Kidstop'
                 width={220}
                 height={77}
                 decoding='sync'

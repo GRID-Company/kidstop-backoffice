@@ -1,6 +1,6 @@
 import InputForm from '@/shared/base/form-controls/input-form';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardBody, Divider, Radio } from '@heroui/react';
 import { useWindowFormCtx } from './window-form.context';
 import RadioForm from '@/shared/base/form-controls/radio-form';
@@ -21,7 +21,7 @@ export default function WindowInformation() {
   });
 
   return (
-    <CanalviCard>
+    <KidstopCard>
       <CardBody className='p-4'>
         <p className='mb-4 text-lg'>Información general</p>
 
@@ -139,6 +139,6 @@ export default function WindowInformation() {
           </>
         )}
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

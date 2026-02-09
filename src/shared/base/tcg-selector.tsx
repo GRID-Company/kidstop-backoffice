@@ -8,7 +8,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from '@heroui/react';
-import CanalviButton from '@/shared/base/heorui-overrides/button';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 
@@ -36,7 +36,7 @@ export default memo(function TcgSelector() {
   return (
     <Dropdown>
       <DropdownTrigger>
-        <CanalviButton
+        <KidstopButton
           variant='light'
           startContent={
             currentOption && (
@@ -48,7 +48,7 @@ export default memo(function TcgSelector() {
           }
         >
           {currentOption?.label ?? 'Selecciona TCG'}
-        </CanalviButton>
+        </KidstopButton>
       </DropdownTrigger>
 
       <DropdownMenu

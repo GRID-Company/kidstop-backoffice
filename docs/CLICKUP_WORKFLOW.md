@@ -11,7 +11,7 @@ DEV GRID (Workspace)
 └── Producción (Space)
     └── Folders (Proyectos)
         ├── Template - Frontend
-        ├── CANALVI v7.0.0
+        ├── Kidstop v1.0.0
         ├── Iguanas Ranas 1.0.0
         └── otros proyectos...
 ```
@@ -45,7 +45,7 @@ Esto mostrará algo como:
      ID: 90123456789
      Lists: 5
 
-  📂 CANALVI v7.0.0
+  📂 Kidstop v1.0.0
      ID: 90123456790
      Lists: 4
 ```

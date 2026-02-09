@@ -1,5 +1,5 @@
 import { WindowTemplate } from '@/lib/api/schema-types';
-import CanalviCard from '@/shared/base/heorui-overrides/card';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import MosquitoNetPill from '@/features/windows/ui/components/grid/mosquito-net-pill';
 import { Card, CardBody, CardFooter, CardHeader, Image } from '@heroui/react';
 
@@ -9,7 +9,7 @@ export default function WindowGridItem({
   window: Partial<WindowTemplate>;
 }) {
   return (
-    <CanalviCard>
+    <KidstopCard>
       <CardHeader className='relative aspect-video h-auto w-full overflow-visible bg-gray-200 p-0'>
         <Image
           alt={window?.name || 'Ventana'}
@@ -54,6 +54,6 @@ export default function WindowGridItem({
           </p>
         </div>
       </CardBody>
-    </CanalviCard>
+    </KidstopCard>
   );
 }

@@ -10,7 +10,7 @@ export interface IAutocompleteOption {
   label: string;
 }
 
-export default function CanalviAutocomplete({
+export default function KidstopAutocomplete({
   ...autocompleteProps
 }: {} & Partial<AutocompleteProps>) {
   return (
