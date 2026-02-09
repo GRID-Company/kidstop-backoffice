@@ -1,6 +1,6 @@
 import { IInventoryItem } from '../../domain/types';
 import { STOCK_STATUSES } from '../../domain/constants';
-import { CARD_CONDITIONS } from '@/features/catalog/domain/constants';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 export const MOCK_INVENTORY_ITEMS: IInventoryItem[] = [

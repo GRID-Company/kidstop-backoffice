@@ -20,9 +20,9 @@ import {
   CARD_CONDITION_OPTIONS,
   POKEMON_RARITY_OPTIONS,
   MAGIC_RARITY_OPTIONS,
-} from '@/features/catalog/domain/constants';
+} from '@/lib/types/card.types';
+import { DateRange } from '@/lib/types/date.types';
 import { STOCK_STATUS_OPTIONS } from '../../domain/constants';
-import { DateRange } from '../../domain/types';
 
 interface InventoryFiltersProps {
   onSearchChange: SearchFn;

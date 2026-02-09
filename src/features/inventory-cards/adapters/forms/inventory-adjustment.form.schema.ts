@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CARD_CONDITIONS } from '@/features/catalog/domain/constants';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { MOVEMENT_TYPES } from '../../domain/constants';
 
 const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string[]];
