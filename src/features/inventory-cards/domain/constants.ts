@@ -35,6 +35,11 @@ export const STOCK_STATUS_OPTIONS = Object.values(STOCK_STATUSES).map((status) =
   label: STOCK_STATUS_LABELS[status],
 }));
 
+export const ADJUSTMENT_TYPE_OPTIONS = Object.values(MOVEMENT_TYPES).map((type) => ({
+  value: type,
+  label: MOVEMENT_TYPE_LABELS[type],
+}));
+
 export const DEFAULT_INVENTORY_SORT: ITableSort = {
   column: 'name',
   order: 'ASC',
