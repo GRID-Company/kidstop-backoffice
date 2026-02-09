@@ -13,6 +13,7 @@ export interface ICustomer {
   status: CustomerStatus;
   notes: string | null;
   totalOrders: number;
+  lastOrderDate: string | null;
   uncompletedOrders: number;
   blockedAt: string | null;
   createdAt: string;
