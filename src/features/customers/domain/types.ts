@@ -11,6 +11,7 @@ export interface ICustomer {
   phone: string | null;
   type: CustomerType;
   status: CustomerStatus;
+  notes: string | null;
   totalOrders: number;
   uncompletedOrders: number;
   blockedAt: string | null;
