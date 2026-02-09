@@ -64,7 +64,6 @@ export function useUsers(
 
   return {
     users: filteredUsers,
-    count: filteredUsers.length,
     loading,
     toggleUserStatus,
     createUser,

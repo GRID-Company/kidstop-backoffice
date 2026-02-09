@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   Button,
   Dropdown,
@@ -14,18 +14,18 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import AddNewButton from '@/shared/base/buttons/add-new-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 
-import UserFilters from '../components/user-filters';
+import UserFiltersPanel from '../components/user-filters';
 import UserFormModal from '../components/user-form-modal';
 import UserRoleBadge from '../components/user-role-badge';
 import UserStatusBadge from '../components/user-status-badge';
 import { useUsers } from '../hooks/use-users';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
 import { toUserFormDefaults } from '../../adapters/mappers/user.mapper';
-import { UserFilters as UserFiltersType, UserRole } from '../../domain/types';
+import { UserFilters, UserRole } from '../../domain/types';
 
 export default function Users() {
   const [search, setSearch] = useState<string | undefined>();
-  const [filters, setFilters] = useState<UserFiltersType>({});
+  const [filters, setFilters] = useState<UserFilters>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
@@ -37,7 +37,7 @@ export default function Users() {
       if (value === '') {
         setFilters((prev) => {
           const next = { ...prev };
-          delete next[key as keyof UserFiltersType];
+          delete next[key as keyof UserFilters];
           return next;
         });
         return;
@@ -90,7 +90,7 @@ export default function Users() {
     [editingUser, createUser, updateUser, handleCloseModal]
   );
 
-  const COLS: ITableColumn[] = [
+  const COLS: ITableColumn[] = useMemo(() => [
     {
       key: 'name',
       label: 'Nombre',
@@ -151,7 +151,7 @@ export default function Users() {
         </Dropdown>
       ),
     },
-  ];
+  ], [handleOpenEdit, toggleUserStatus]);
 
   return (
     <>
@@ -164,7 +164,7 @@ export default function Users() {
 
         <EntitiesPage.CardContainer>
           <div className="mb-4 flex items-center gap-4">
-            <UserFilters
+            <UserFiltersPanel
               onSearchChange={setSearch}
               onFilterChange={handleFilterChange}
             />
