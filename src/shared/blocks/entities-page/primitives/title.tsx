@@ -8,6 +8,6 @@ export type TitleBaseProps = {
 export type TitleProps = PropsWithChildren<TitleBaseProps>;
 
 export function Title({ className, label }: TitleProps) {
-  return <p className={`text-lg text-white ${className}`}>{label}</p>;
+  return <p className={`text-lg font-semibold text-accent ${className}`}>{label}</p>;
 }
 Title.displayName = 'EntitiesPage.Title';

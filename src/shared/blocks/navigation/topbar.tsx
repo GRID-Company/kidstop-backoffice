@@ -20,6 +20,7 @@ import { UserRole } from '@/lib/auth/user-roles';
 import { useLogout } from '@/lib/auth/use-process-logout';
 import { useAuthStore } from '@/lib/store/auth';
 import TcgSelector from '@/shared/base/tcg-selector';
+import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import UserPresenter from './user-presenter';
 
 export default function Topbar({ className }: { className?: string }) {
@@ -37,11 +38,11 @@ export default function Topbar({ className }: { className?: string }) {
   return (
     <>
       <Navbar
-        className={`shadow-none ${className} bg-brand-2 sticky top-0`}
+        className={`bg-page-bg xl:!bg-transparent shadow-none ${className} sticky top-0 z-40`}
         isBlurred={false}
         classNames={{
           wrapper:
-            'px-4 lg:px-0 h-12 xl:h-22 max-w-full border-b border-white/60',
+            'px-4 lg:px-0 h-12 xl:h-22 max-w-full border-b border-gray-200 bg-page-bg xl:!bg-transparent',
         }}
         isMenuOpen={isMenuOpen}
         onMenuOpenChange={setIsMenuOpen}
@@ -55,6 +56,7 @@ export default function Topbar({ className }: { className?: string }) {
                 width={220}
                 height={77}
                 decoding='sync'
+                className='h-8 w-auto xl:h-auto xl:w-[220px]'
               />
             </h1>
           </div>
@@ -71,9 +73,9 @@ export default function Topbar({ className }: { className?: string }) {
           />
         </NavbarContent>
 
-        <NavbarMenu className='top-12 px-4 py-8 xl:hidden'>
-          <NavbarMenuItem key='tcg-selector'>
-            <TcgSelector />
+        <NavbarMenu className='top-12 !bg-page-bg px-4 py-8 xl:hidden'>
+          <NavbarMenuItem key='tcg-selector' className='mb-2'>
+            <TcgSegmentedSelector />
           </NavbarMenuItem>
 
           {(MENU_ROUTES?.[role as UserRole] ?? []).map((option, index) => {

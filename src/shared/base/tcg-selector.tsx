@@ -37,10 +37,10 @@ export default memo(function TcgSelector() {
     <Dropdown>
       <DropdownTrigger>
         <KidstopButton
-          variant='light'
+          variant='lightDark'
           startContent={
             currentOption && (
-              <Icon icon={currentOption.icon} className='text-lg' />
+              <Icon icon={currentOption.icon} className='text-lg text-accent' />
             )
           }
           endContent={

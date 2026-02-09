@@ -6,8 +6,8 @@ export const KidstopTable: any = extendVariants(Table, {
       default: {
         base: ['h-full', 'bg-transarent'],
         wrapper: ['p-0', 'bg-transarent', 'rounded-none'],
-        thead: ['h-[55px] uppercase'],
-        th: [],
+        thead: ['h-[55px]', 'uppercase', 'rounded-t-lg'],
+        th: ['!text-white', '!font-semibold', '!bg-accent'],
         tbody: [, 'rounded-xl', 'overflow-hidden'],
         tr: [
           'border-b-2',

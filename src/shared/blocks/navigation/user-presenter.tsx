@@ -9,8 +9,8 @@ export default function UserPresenter() {
 
   return (
     <div className='flex items-center gap-2'>
-      <Icon icon='solar:user-circle-linear' className='text-xl text-white' />
-      <p className='text-white'>{user?.name}</p>
+      <Icon icon='solar:user-circle-linear' className='text-xl text-content-primary' />
+      <p className='text-content-primary'>{user?.name}</p>
     </div>
   );
 }
