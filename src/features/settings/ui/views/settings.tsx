@@ -4,13 +4,11 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { useSettings } from '../hooks/use-settings';
 import { SETTINGS_SECTIONS } from '../../domain/constants';
 import { SettingsSection } from '../../domain/types';
-import GeofenceSection from '../components/geofence-section';
+import GeneralSection from '../components/general-section';
 import BudgetSection from '../components/budget-section';
-import ThresholdSection from '../components/threshold-section';
-import OperatingHoursSection from '../components/operating-hours-section';
 
 export default function Settings() {
-  const [activeSection, setActiveSection] = useState<SettingsSection>('geofence');
+  const [activeSection, setActiveSection] = useState<SettingsSection>('general');
   const {
     settings,
     loading,
@@ -39,28 +37,20 @@ export default function Settings() {
         >
           {Object.entries(SETTINGS_SECTIONS).map(([key, label]) => (
             <Tab key={key} title={label}>
-              {key === 'geofence' && (
-                <GeofenceSection
+              {key === 'general' && (
+                <GeneralSection
                   geofence={settings.geofence}
-                  onSave={updateGeofence}
+                  thresholds={settings.thresholds}
+                  operatingHours={settings.operatingHours}
+                  onSaveGeofence={updateGeofence}
+                  onSaveThresholds={updateThresholds}
+                  onSaveOperatingHours={updateOperatingHours}
                 />
               )}
               {key === 'budgets' && (
                 <BudgetSection
                   budgets={settings.budgets}
                   onSave={updateBudgets}
-                />
-              )}
-              {key === 'thresholds' && (
-                <ThresholdSection
-                  thresholds={settings.thresholds}
-                  onSave={updateThresholds}
-                />
-              )}
-              {key === 'operating-hours' && (
-                <OperatingHoursSection
-                  operatingHours={settings.operatingHours}
-                  onSave={updateOperatingHours}
                 />
               )}
             </Tab>

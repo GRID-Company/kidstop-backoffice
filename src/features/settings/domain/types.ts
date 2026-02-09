@@ -54,7 +54,5 @@ export interface ISettingsFilters {
 }
 
 export type SettingsSection =
-  | 'geofence'
-  | 'budgets'
-  | 'thresholds'
-  | 'operating-hours';
+  | 'general'
+  | 'budgets';
