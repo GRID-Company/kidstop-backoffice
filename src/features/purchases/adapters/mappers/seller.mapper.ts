@@ -7,6 +7,7 @@ export function toCreateSellerPayload(data: SellerFormData) {
       name: data.name,
       phone: data.phone,
       email: data.email || undefined,
+      notes: data.notes || undefined,
     },
   };
 }
@@ -16,5 +17,6 @@ export function toSellerFormDefaults(seller: ISeller): SellerFormData {
     name: seller.name,
     phone: seller.phone,
     email: seller.email || '',
+    notes: seller.notes || '',
   };
 }

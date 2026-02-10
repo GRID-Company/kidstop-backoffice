@@ -28,6 +28,7 @@ export interface ISeller {
   name: string;
   phone: string;
   email?: string;
+  notes?: string;
 }
 
 export interface IPurchaseItem {
