@@ -64,6 +64,26 @@ export interface IPurchase {
   updatedAt: string;
 }
 
+export interface ICardSearchMetrics {
+  referencePrice: number;
+  currentStock: number;
+  lastSaleDate: string | null;
+  daysInInventory: number;
+  wishlistCount: number;
+}
+
+export interface ICardSearchResult {
+  id: string;
+  name: string;
+  setName: string;
+  setCode: string;
+  number: string;
+  rarity: string;
+  imageUrl: string;
+  tcgType: TCGType;
+  metrics: ICardSearchMetrics;
+}
+
 export interface PurchaseFilters {
   tcgType?: TCGType;
   status?: PurchaseStatus;
