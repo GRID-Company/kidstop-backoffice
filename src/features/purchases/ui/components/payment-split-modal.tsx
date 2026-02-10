@@ -17,8 +17,8 @@ import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { IPurchaseItem, IPaymentDetail, PaymentMethod, PAYMENT_METHOD } from '../../domain/types';
-import { PAYMENT_METHOD_LABELS, PAYMENT_METHOD_OPTIONS } from '../../domain/constants';
+import { IPurchaseItem, IPaymentDetail, PaymentMethod } from '../../domain/types';
+import { PAYMENT_METHOD_OPTIONS } from '../../domain/constants';
 import {
   calculateTotal,
   validatePaymentSplit,
