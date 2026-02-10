@@ -54,6 +54,8 @@ export default function PaymentSplitModal({
 
   const total = useMemo(() => calculateTotal(items), [items]);
 
+  const serializedPayments = JSON.stringify(watchedPayments);
+
   const validation = useMemo(
     () =>
       validatePaymentSplit(
@@ -63,7 +65,8 @@ export default function PaymentSplitModal({
           amount: Number(p.amount) || 0,
         }))
       ),
-    [items, watchedPayments]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [items, serializedPayments]
   );
 
   const assignedPercentage = useMemo(() => {
@@ -73,7 +76,8 @@ export default function PaymentSplitModal({
 
   const usedMethods = useMemo(
     () => new Set(watchedPayments.map((p) => p.method)),
-    [watchedPayments]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [serializedPayments]
   );
 
   const availableMethods = useMemo(
