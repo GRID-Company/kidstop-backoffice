@@ -69,7 +69,7 @@ export function DataTable({
         }
       >
         {(item) => (
-          <TableRow key={item.guid ?? '-'}>
+          <TableRow key={item.guid ?? item.id ?? item.key}>
             {cols.map((col: ITableColumn) => (
               <TableCell
                 key={col.key}

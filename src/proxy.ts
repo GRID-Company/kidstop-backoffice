@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const PUBLIC_PAGES = ['/login', '/nueva-contrasena', '/recuperar-contrasena'];
-const PROTECTED_PREFIXES = ['/usuarios'];
+const PROTECTED_PREFIXES = ['/usuarios', '/clientes'];
 
 const startsWithAny = (pathname: string, prefixes: readonly string[]) =>
   prefixes.some((p) => pathname.startsWith(p));
