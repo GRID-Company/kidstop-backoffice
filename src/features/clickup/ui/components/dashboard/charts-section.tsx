@@ -109,11 +109,9 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     </motion.div>
   );
 
-
   return (
     <>
       <PriorityDistribution />
-
       {metrics.phases && metrics.phases.length > 0 && (
         <PhaseProgress />
       )}

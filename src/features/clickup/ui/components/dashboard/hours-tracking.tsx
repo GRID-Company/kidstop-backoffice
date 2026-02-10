@@ -7,12 +7,7 @@ import { PROJECT_BUDGET } from '@/features/clickup/domain/constants/project-time
 
 interface HoursTrackingProps {
   metrics: {
-    totalHours?: number;
     completedHours?: number;
-    pendingHours?: number;
-    totalCost?: number;
-    completedCost?: number;
-    pendingCost?: number;
   };
 }
 

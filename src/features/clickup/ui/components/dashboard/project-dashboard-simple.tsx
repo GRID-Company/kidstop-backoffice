@@ -32,7 +32,7 @@ export const ProjectDashboard = forwardRef<
   { handleRefresh: () => void },
   ProjectDashboardProps
 >(({ listId, refreshInterval = 0, className = '' }, ref) => {
-  const { data, loading, error, isRefreshing, handleRefresh } = useClickUpData(listId, refreshInterval);
+  const { data, loading, error, handleRefresh } = useClickUpData(listId, refreshInterval);
 
   // Expose handleRefresh to parent via ref
   useImperativeHandle(ref, () => ({
@@ -42,11 +42,10 @@ export const ProjectDashboard = forwardRef<
   // Emergency metrics calculations
   const isEmergencyMode = (data?.metrics.daysBehind || 0) > 20;
   
-  // Calculate health status
-  const healthScore = Math.max(0, 100 - (data?.metrics.daysBehind || 0));
-  const healthStatus = healthScore >= 80 ? 'HEALTHY' : 
-                      healthScore >= 50 ? 'WARNING' : 
-                      healthScore >= 20 ? 'CRITICAL' : 'EMERGENCY';
+  const daysBehind = data?.metrics.daysBehind || 0;
+  const healthStatus = daysBehind <= 20 ? 'HEALTHY' : 
+                      daysBehind <= 50 ? 'WARNING' : 
+                      daysBehind <= 80 ? 'CRITICAL' : 'EMERGENCY';
 
   if (loading) {
     return (
