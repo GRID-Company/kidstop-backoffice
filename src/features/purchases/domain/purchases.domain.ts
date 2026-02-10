@@ -20,6 +20,10 @@ export const getPurchasesVars = (
   };
 };
 
+export const calculateItemSubtotal = (item: IPurchaseItem): number => {
+  return item.unitBuyPrice * item.quantity;
+};
+
 export const calculateTotal = (items: IPurchaseItem[]): number => {
   return items.reduce(
     (total, item) => total + item.unitBuyPrice * item.quantity,
