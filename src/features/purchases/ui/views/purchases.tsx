@@ -21,15 +21,10 @@ import {
   PURCHASE_STATUS_OPTIONS,
   PURCHASE_STATUS_LABELS,
 } from '../../domain/constants';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { usePurchases } from '../hooks/use-purchases';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
-
-const formatCurrency = (value: number): string =>
-  `$${value.toLocaleString('es-MX', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
 
 const formatDate = (date: string): string =>
   new Date(date).toLocaleDateString('es-MX', {
@@ -48,7 +43,8 @@ export default function Purchases() {
     filters,
     setStatusFilter,
     setSearch,
-    setDateRange,
+    setDateFrom,
+    setDateTo,
     resetFilters,
     hasActiveFilters,
   } = usePurchases();
@@ -64,16 +60,16 @@ export default function Purchases() {
 
   const handleDateFromChange = useCallback(
     (value: string) => {
-      setDateRange(value || undefined, undefined);
+      setDateFrom(value || undefined);
     },
-    [setDateRange]
+    [setDateFrom]
   );
 
   const handleDateToChange = useCallback(
     (value: string) => {
-      setDateRange(undefined, value || undefined);
+      setDateTo(value || undefined);
     },
-    [setDateRange]
+    [setDateTo]
   );
 
   const columns: ITableColumn[] = useMemo(

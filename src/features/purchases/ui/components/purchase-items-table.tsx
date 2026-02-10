@@ -14,6 +14,7 @@ import { Icon } from '@iconify/react';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardCondition, IPurchaseItem } from '../../domain/types';
 import {
   CARD_CONDITION_OPTIONS,
@@ -32,12 +33,6 @@ interface PurchaseItemsTableProps {
   onRemoveItem: (itemId: string) => void;
   isReadOnly?: boolean;
 }
-
-const formatCurrency = (value: number): string =>
-  `$${value.toLocaleString('es-MX', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
 
 export default function PurchaseItemsTable({
   items,

@@ -15,7 +15,8 @@ interface UsePurchasesReturn {
   setStatusFilter: (status: PurchaseStatus | undefined) => void;
   setSearch: (search: string) => void;
   setSellerFilter: (sellerId: string | undefined) => void;
-  setDateRange: (from: string | undefined, to: string | undefined) => void;
+  setDateFrom: (from: string | undefined) => void;
+  setDateTo: (to: string | undefined) => void;
   resetFilters: () => void;
   hasActiveFilters: boolean;
 }
@@ -88,8 +89,12 @@ export function usePurchases(): UsePurchasesReturn {
     setPage(1);
   };
 
-  const setDateRange = (from: string | undefined, to: string | undefined) => {
+  const handleSetDateFrom = (from: string | undefined) => {
     setDateFrom(from);
+    setPage(1);
+  };
+
+  const handleSetDateTo = (to: string | undefined) => {
     setDateTo(to);
     setPage(1);
   };
@@ -118,7 +123,8 @@ export function usePurchases(): UsePurchasesReturn {
     setStatusFilter,
     setSearch,
     setSellerFilter,
-    setDateRange,
+    setDateFrom: handleSetDateFrom,
+    setDateTo: handleSetDateTo,
     resetFilters,
     hasActiveFilters,
   };

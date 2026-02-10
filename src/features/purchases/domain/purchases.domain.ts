@@ -1,6 +1,7 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { TCGType } from '@/lib/types/tcg.types';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { DEFAULT_BUDGET_LIMIT, DEFAULT_INVENTORY_LIMIT } from './constants';
 import { IPaymentDetail, IPurchaseItem, ISeller, PurchaseFilters } from './types';
 
@@ -96,9 +97,6 @@ const TCG_LABELS: Record<TCGType, string> = {
   MAGIC: 'Magic: The Gathering',
 };
 
-const formatQuoteCurrency = (value: number): string =>
-  `$${value.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
 const sanitizePhone = (phone: string): string =>
   phone.replace(/[^0-9]/g, '');
 
@@ -120,7 +118,7 @@ export const buildWhatsAppQuoteMessage = (params: WhatsAppQuoteParams): string =
       return [
         `  • *${item.cardName}* (${condition})`,
         `    ${item.setName} · ${item.setCode}`,
-        `    Cant: ${item.quantity} × ${formatQuoteCurrency(item.unitBuyPrice)} = ${formatQuoteCurrency(subtotal)}`,
+        `    Cant: ${item.quantity} × ${formatCurrency(item.unitBuyPrice)} = ${formatCurrency(subtotal)}`,
       ].join('\n');
     })
     .join('\n\n');
@@ -131,7 +129,7 @@ export const buildWhatsAppQuoteMessage = (params: WhatsAppQuoteParams): string =
     `*TCG:* ${TCG_LABELS[tcgType]}`,
     `*Cartas:* ${totalQty}\n`,
     itemLines,
-    `\n*Total:* ${formatQuoteCurrency(total)}`,
+    `\n*Total:* ${formatCurrency(total)}`,
   ].join('\n');
 };
 
@@ -189,8 +187,8 @@ export const validatePaymentSplit = (
   if (Math.abs(difference) > 0.01) {
     errors.push(
       difference > 0
-        ? `Faltan ${formatQuoteCurrency(difference)} por asignar`
-        : `Se excede por ${formatQuoteCurrency(Math.abs(difference))}`
+        ? `Faltan ${formatCurrency(difference)} por asignar`
+        : `Se excede por ${formatCurrency(Math.abs(difference))}`
     );
   }
 
