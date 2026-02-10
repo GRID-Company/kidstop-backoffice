@@ -12,7 +12,6 @@ import { useClickUpData } from '@/features/clickup/ui/hooks/use-clickup-data';
 
 // Import sub-components
 import { EmergencyBanner } from './emergency-banner';
-import { HealthIndicator } from './health-indicator';
 import { MetricsCards } from './metrics-cards';
 import { ProgressBars } from './progress-bars';
 import { ChartsSection } from './charts-section';
@@ -86,12 +85,6 @@ export const ProjectDashboard = forwardRef<
         daysBehind={data.metrics.daysBehind || 0}
         daysToNextMilestone={data.metrics.daysToNextMilestone || 0}
         nextMilestone={data.metrics.nextMilestone}
-        healthStatus={healthStatus}
-        isEmergencyMode={isEmergencyMode}
-      />
-
-      <HealthIndicator
-        healthScore={healthScore}
         healthStatus={healthStatus}
         isEmergencyMode={isEmergencyMode}
       />

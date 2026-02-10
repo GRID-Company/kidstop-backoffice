@@ -9,8 +9,6 @@ interface ProgressBarsProps {
     milestoneProgress?: number;
     nextMilestone?: string;
     daysToNextMilestone?: number;
-    completed: number;
-    total: number;
   };
   isEmergencyMode: boolean;
 }
@@ -19,14 +17,8 @@ export const ProgressBars: React.FC<ProgressBarsProps> = ({
   metrics,
   isEmergencyMode,
 }) => {
-  const completionRate = metrics.total > 0 
-    ? Math.round((metrics.completed / metrics.total) * 100) 
-    : 0;
-
   return (
-    <>
-      {/* Milestone Progress */}
-      <motion.div
+    <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
@@ -53,37 +45,6 @@ export const ProgressBars: React.FC<ProgressBarsProps> = ({
             </div>
           </CardBody>
         </Card>
-      </motion.div>
-
-      {/* Progress Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Card className={isEmergencyMode ? 'border-2 border-red-500' : ''}>
-          <CardBody>
-            <div className="flex justify-between items-center mb-2">
-              <Tooltip content="Porcentaje de tareas completadas vs el total del proyecto. Indica el avance global independiente de los hitos." placement="top" delay={300}>
-              <h3 className="text-lg font-semibold cursor-help">Progreso general</h3>
-            </Tooltip>
-              <span className={`text-2xl font-bold ${isEmergencyMode ? 'text-red-600' : 'text-blue-600'}`}>
-                {completionRate}%
-              </span>
-            </div>
-            <Progress 
-              value={completionRate} 
-              color={isEmergencyMode ? 'danger' : 'primary'} 
-              size="md"
-              className="w-full"
-              aria-label={`Project completion progress: ${completionRate}%`}
-            />
-            <div className="text-sm text-gray-600 mt-2">
-              {metrics.completed}/{metrics.total} tareas completadas
-            </div>
-          </CardBody>
-        </Card>
-      </motion.div>
-    </>
+    </motion.div>
   );
 };

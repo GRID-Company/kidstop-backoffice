@@ -13,7 +13,6 @@ interface HoursTrackingProps {
     totalCost?: number;
     completedCost?: number;
     pendingCost?: number;
-    hoursPerDay?: number;
   };
 }
 
@@ -26,7 +25,6 @@ export const HoursTracking: React.FC<HoursTrackingProps> = ({ metrics }) => {
   const completedHours = metrics.completedHours || 0;
   const pendingHours = totalHours - completedHours;
   const completedCost = completedHours * PROJECT_BUDGET.COST_PER_HOUR;
-  const hoursPerDay = metrics.hoursPerDay || 0;
   const hoursProgress = totalHours > 0 ? Math.round((completedHours / totalHours) * 100) : 0;
 
   const cards = [
@@ -51,13 +49,6 @@ export const HoursTracking: React.FC<HoursTrackingProps> = ({ metrics }) => {
       color: 'text-purple-600',
       tooltip: `Costo acumulado basado en horas completadas × $${PROJECT_BUDGET.COST_PER_HOUR}/hora. Refleja cuánto del presupuesto se ha consumido.`,
     },
-    {
-      title: 'Velocidad',
-      value: `${hoursPerDay}h/día`,
-      subtitle: `${Math.round(pendingHours)}h pendientes`,
-      color: 'text-cyan-600',
-      tooltip: 'Promedio de horas completadas por día natural desde el inicio del proyecto. Indica el ritmo actual de avance.',
-    },
   ];
 
   return (
@@ -67,7 +58,7 @@ export const HoursTracking: React.FC<HoursTrackingProps> = ({ metrics }) => {
       transition={{ delay: 0.15 }}
       className="space-y-4"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {cards.map((card, index) => (
           <Tooltip key={index} content={card.tooltip} placement="bottom" delay={300}>
             <Card className="cursor-help">
