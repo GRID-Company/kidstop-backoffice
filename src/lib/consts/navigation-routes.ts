@@ -20,13 +20,18 @@ const InventoryCards = {
   route: '/inventario-cartas',
   icon: 'lucide:package',
 };
+const Customers = {
+  label: 'Clientes',
+  route: '/clientes',
+  icon: 'lucide:users',
+};
 const ClickUp = {
   label: 'ClickUp',
   route: '/clickup',
   icon: 'simple-icons:clickup',
 };
 
-const ADMIN_ROUTES = [Catalog, InventoryCards, Users, Settings, ClickUp];
+const ADMIN_ROUTES = [Catalog, InventoryCards, Customers, Users, Settings, ClickUp];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
