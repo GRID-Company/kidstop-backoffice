@@ -16,6 +16,7 @@ import { Icon } from '@iconify/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import {
@@ -35,12 +36,6 @@ interface PriceAdjustmentModalProps {
   onClose: () => void;
   onConfirm?: (adjustedItems: IPurchaseItem[]) => void;
 }
-
-const formatCurrency = (value: number): string =>
-  `$${value.toLocaleString('es-MX', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
 
 export default function PriceAdjustmentModal({
   items,

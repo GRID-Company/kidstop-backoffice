@@ -17,6 +17,7 @@ import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { IPurchaseItem, IPaymentDetail, PaymentMethod } from '../../domain/types';
 import { PAYMENT_METHOD_OPTIONS } from '../../domain/constants';
 import {
@@ -34,12 +35,6 @@ interface PaymentSplitModalProps {
   onConfirm?: (payments: IPaymentDetail[]) => void;
   defaultPayments?: IPaymentDetail[];
 }
-
-const formatCurrency = (value: number): string =>
-  `$${value.toLocaleString('es-MX', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
 
 export default function PaymentSplitModal({
   items,

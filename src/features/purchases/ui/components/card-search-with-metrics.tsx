@@ -15,6 +15,7 @@ import Image from 'next/image';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -23,12 +24,6 @@ interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
   existingItemIds: Set<string>;
 }
-
-const formatCurrency = (value: number): string =>
-  `$${value.toLocaleString('es-MX', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
 
 const formatDate = (date: string | null): string => {
   if (!date) return 'Sin ventas';

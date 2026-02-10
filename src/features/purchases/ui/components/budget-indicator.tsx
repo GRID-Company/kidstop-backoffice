@@ -5,6 +5,7 @@ import { Card, CardBody, Progress } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { checkBudget, BudgetCheckResult } from '../../domain/purchases.domain';
 import { DEFAULT_BUDGET_LIMIT } from '../../domain/constants';
@@ -16,10 +17,6 @@ interface BudgetIndicatorProps {
   currentSpent: number;
   budgetLimit?: number;
 }
-
-const formatCurrency = (value: number): string => {
-  return `$${Math.abs(value).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
 
 const getUsagePercentage = (result: BudgetCheckResult): number => {
   if (result.budgetLimit <= 0) return 0;
@@ -76,7 +73,7 @@ export default function BudgetIndicator({
   const config = LEVEL_CONFIG[level];
 
   const displayCurrency = (value: number): string =>
-    isPrivacyMode ? REDACTED_VALUE : formatCurrency(value);
+    isPrivacyMode ? REDACTED_VALUE : formatCurrency(Math.abs(value));
 
   return (
     <Card
