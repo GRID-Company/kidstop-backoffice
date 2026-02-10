@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Button,
   Chip,
@@ -34,6 +35,7 @@ const formatDate = (date: string): string =>
   });
 
 export default function Purchases() {
+  const router = useRouter();
   const {
     purchases,
     totalCount,
@@ -142,6 +144,7 @@ export default function Purchases() {
               size="sm"
               variant="light"
               aria-label={`Ver compra ${row.code}`}
+              onPress={() => router.push(`/compras/${row.id}`)}
             >
               <Icon icon="lucide:eye" width={16} />
             </Button>
@@ -149,7 +152,7 @@ export default function Purchases() {
         ),
       },
     ],
-    []
+    [router]
   );
 
   return (
