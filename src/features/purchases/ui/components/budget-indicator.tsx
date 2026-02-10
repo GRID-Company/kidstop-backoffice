@@ -4,9 +4,12 @@ import { useMemo } from 'react';
 import { Card, CardBody, Progress } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
+import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { IPurchaseItem } from '../../domain/types';
 import { checkBudget, BudgetCheckResult } from '../../domain/purchases.domain';
 import { DEFAULT_BUDGET_LIMIT } from '../../domain/constants';
+
+const REDACTED_VALUE = '$••••••';
 
 interface BudgetIndicatorProps {
   items: IPurchaseItem[];
@@ -68,7 +71,12 @@ export default function BudgetIndicator({
     [usagePercentage, budgetResult.withinBudget]
   );
 
+  const { isPrivacyMode } = usePrivacyModeStore();
+
   const config = LEVEL_CONFIG[level];
+
+  const displayCurrency = (value: number): string =>
+    isPrivacyMode ? REDACTED_VALUE : formatCurrency(value);
 
   return (
     <Card
@@ -120,13 +128,15 @@ export default function BudgetIndicator({
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
           <span className="text-default-500">Asignado</span>
           <span className="text-right font-medium">
-            {formatCurrency(budgetResult.budgetLimit)}
+            {displayCurrency(budgetResult.budgetLimit)}
           </span>
 
           <span className="text-default-500">Gastado previamente</span>
           <span className="text-right font-medium">
-            {formatCurrency(budgetResult.currentSpent)}{' '}
-            <span className="text-default-400">({Math.round(spentPercentage)}%)</span>
+            {displayCurrency(budgetResult.currentSpent)}{' '}
+            {!isPrivacyMode && (
+              <span className="text-default-400">({Math.round(spentPercentage)}%)</span>
+            )}
           </span>
 
           <span className="text-default-500">Compra actual</span>
@@ -135,7 +145,7 @@ export default function BudgetIndicator({
               level === 'danger' ? 'text-danger' : ''
             }`}
           >
-            {formatCurrency(budgetResult.purchaseTotal)}
+            {displayCurrency(budgetResult.purchaseTotal)}
           </span>
 
           <span className="text-default-500">Restante</span>
@@ -148,8 +158,8 @@ export default function BudgetIndicator({
                   : 'text-success'
             }`}
           >
-            {budgetResult.remaining < 0 ? '-' : ''}
-            {formatCurrency(budgetResult.remaining)}
+            {!isPrivacyMode && budgetResult.remaining < 0 ? '-' : ''}
+            {displayCurrency(budgetResult.remaining)}
           </span>
         </div>
       </CardBody>
