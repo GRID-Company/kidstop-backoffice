@@ -2,7 +2,7 @@ import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { DEFAULT_BUDGET_LIMIT, DEFAULT_INVENTORY_LIMIT } from './constants';
-import { IPurchaseItem, ISeller, PurchaseFilters } from './types';
+import { IPaymentDetail, IPurchaseItem, ISeller, PurchaseFilters } from './types';
 
 export const getPurchasesVars = (
   args: IPaginatedApiArgs,
@@ -152,6 +152,56 @@ export interface WhatsAppQuoteValidation {
   valid: boolean;
   errors: string[];
 }
+
+export interface PaymentSplitValidation {
+  valid: boolean;
+  totalRequired: number;
+  totalAssigned: number;
+  difference: number;
+  errors: string[];
+}
+
+export const validatePaymentSplit = (
+  items: IPurchaseItem[],
+  payments: IPaymentDetail[]
+): PaymentSplitValidation => {
+  const errors: string[] = [];
+  const totalRequired = calculateTotal(items);
+  const totalAssigned = payments.reduce((sum, p) => sum + p.amount, 0);
+  const difference = totalRequired - totalAssigned;
+
+  if (payments.length === 0) {
+    errors.push('Debe agregar al menos un método de pago');
+  }
+
+  payments.forEach((payment, index) => {
+    if (payment.amount <= 0) {
+      errors.push(`El monto del pago ${index + 1} debe ser mayor a 0`);
+    }
+  });
+
+  const methods = payments.map((p) => p.method);
+  const uniqueMethods = new Set(methods);
+  if (uniqueMethods.size !== methods.length) {
+    errors.push('No se puede repetir el mismo método de pago');
+  }
+
+  if (Math.abs(difference) > 0.01) {
+    errors.push(
+      difference > 0
+        ? `Faltan ${formatQuoteCurrency(difference)} por asignar`
+        : `Se excede por ${formatQuoteCurrency(Math.abs(difference))}`
+    );
+  }
+
+  return {
+    valid: errors.length === 0,
+    totalRequired,
+    totalAssigned,
+    difference,
+    errors,
+  };
+};
 
 export const validateWhatsAppQuote = (params: Partial<WhatsAppQuoteParams>): WhatsAppQuoteValidation => {
   const errors: string[] = [];
