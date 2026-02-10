@@ -162,6 +162,7 @@ export default function Purchases() {
           className="bg-accent text-white"
           startContent={<Icon icon="lucide:plus" width={16} />}
           size="sm"
+          onPress={() => router.push('/compras/nueva')}
         >
           Nueva compra
         </Button>
