@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 
 interface ChartsSectionProps {
   metrics: {
-    byStatus?: Record<string, number>;
     byPriority?: Record<string, number>;
     phases?: Array<{
       name: string;
@@ -17,7 +16,6 @@ interface ChartsSectionProps {
       estimatedSP: number;
       color: string;
     }>;
-    tags?: Record<string, number>;
     total: number;
   };
   isEmergencyMode: boolean;
@@ -27,42 +25,6 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
   metrics,
   isEmergencyMode,
 }) => {
-  const StatusDistribution = () => (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.4 }}
-    >
-      <Card>
-        <CardBody>
-          <Tooltip content="Cantidad de tareas agrupadas por su estado actual (todo, in progress, done, etc.). Permite ver dónde se concentra el trabajo." placement="top" delay={300}>
-            <h3 className="text-lg font-semibold mb-4 cursor-help">Distribución por estado</h3>
-          </Tooltip>
-          <div className="space-y-3">
-            {metrics.byStatus && Object.entries(metrics.byStatus).map(([status, count]) => (
-              <div key={status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-4 h-4 rounded-full ${
-                    status === 'done' ? 'bg-green-500' :
-                    status === 'in progress' || status === 'inprogress' ? 'bg-orange-500' :
-                    status === 'todo' ? 'bg-blue-500' : 'bg-gray-500'
-                  }`} />
-                  <span className="font-medium capitalize">{status}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-2xl font-bold text-gray-900">{count}</span>
-                  <span className="text-sm text-gray-500">
-                    ({metrics.total > 0 ? Math.round((count / metrics.total) * 100) : 0}%)
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
-    </motion.div>
-  );
-
   const PriorityDistribution = () => (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -147,89 +109,12 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     </motion.div>
   );
 
-  const StoryPointsByPhase = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.7 }}
-    >
-      <Card>
-        <CardBody>
-          <Tooltip content="Story Points estimados por cada fase. 1 SP = 1 hora. Indica el peso relativo de cada fase en el proyecto." placement="top" delay={300}>
-            <h3 className="text-lg font-semibold mb-4 cursor-help">Story Points por fase</h3>
-          </Tooltip>
-          <div className="space-y-3">
-            {metrics.phases?.map((phase) => (
-              <div key={phase.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div 
-                    className="w-4 h-4 rounded-full" 
-                    style={{ backgroundColor: phase.color }}
-                  />
-                  <span className="font-medium">{phase.name}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-2xl font-bold text-gray-900">{phase.estimatedSP}</span>
-                  <span className="text-sm text-gray-500">SP</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
-    </motion.div>
-  );
-
-  const TagsDistribution = () => {
-    if (!metrics.tags || Object.keys(metrics.tags).length === 0) {
-      return null;
-    }
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-      >
-        <Card>
-          <CardBody>
-            <Tooltip content="Frecuencia de etiquetas técnicas encontradas en las tareas (UI, backend, GraphQL, etc.). Muestra en qué áreas se concentra el trabajo." placement="top" delay={300}>
-              <h3 className="text-lg font-semibold mb-4 cursor-help">Distribución de etiquetas</h3>
-            </Tooltip>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-              {Object.entries(metrics.tags)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 10)
-                .map(([tag, count]) => (
-                  <div key={tag} className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{count}</div>
-                    <div className="text-sm text-gray-600">{tag}</div>
-                  </div>
-                ))}
-            </div>
-          </CardBody>
-        </Card>
-      </motion.div>
-    );
-  };
-
   return (
     <>
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StatusDistribution />
-        <PriorityDistribution />
-      </div>
-
-      {/* Emergency Dashboard Metrics */}
+      <PriorityDistribution />
       {metrics.phases && metrics.phases.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PhaseProgress />
-          <StoryPointsByPhase />
-        </div>
+        <PhaseProgress />
       )}
-
-      <TagsDistribution />
     </>
   );
 };

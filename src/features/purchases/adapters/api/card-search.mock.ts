@@ -145,7 +145,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     setCode: 'LTR',
     number: '246',
     rarity: 'Mythic Rare',
-    imageUrl: 'https://cards.scryfall.io/large/front/d/5/d5806e68-1054-458e-bcd0-27571f2f8571.jpg',
+    imageUrl: 'https://cards.scryfall.io/large/front/d/5/d5806e68-1054-458e-866d-1f2470f682b2.jpg',
     tcgType: TCG_TYPES.MAGIC,
     metrics: {
       referencePrice: 1200.0,

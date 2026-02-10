@@ -602,7 +602,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: '4ED',
     number: '208',
     rarity: 'Common',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/9/5/9521375e-0bc1-45ef-b513-6d332a25f9d2.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -628,7 +628,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '138',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/a/9/a9738cda-adb1-47fb-9f4c-ecd930228c4d.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -647,7 +647,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'DMU',
     number: '107',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/d/6/d67be074-cdd4-41d9-ac89-0a0456c4e4b2.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -673,7 +673,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '267',
     rarity: 'Uncommon',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/1/9/1920dae4-fb92-4f19-ae4b-eb3276b8dac7.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -692,7 +692,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'LTR',
     number: '246',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/d/5/d5806e68-1054-458e-866d-1f2470f682b2.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -718,7 +718,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'AER',
     number: '057',
     rarity: 'Uncommon',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/b/5/b5e81649-9954-424c-89d1-f87d73b66047.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -737,7 +737,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH1',
     number: '217',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/4/a/4a706ecf-3277-40e3-871c-4ba4ead16e20.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -763,7 +763,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'THS',
     number: '107',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/6/5/65b7275a-5305-42e6-b5c3-8b88568b4e28.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -782,7 +782,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '244',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/2/5/25ac5405-df7b-4097-914a-022cb18e20d4.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -808,7 +808,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '032',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/4/7/47a6234f-309f-4e03-9263-66da48b57153.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -827,7 +827,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '126',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/b/d/bd281158-8180-40b9-a5b7-03cfc712d81a.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -853,7 +853,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'LTR',
     number: '103',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/7/c/7c024bae-5631-4e20-ac69-df392ac9e109.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -872,7 +872,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'IMA',
     number: '036',
     rarity: 'Uncommon',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/f/3/f3a0ae49-8aca-44fe-abea-2cff92a6adbc.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -898,7 +898,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'CNS',
     number: '026',
     rarity: 'Common',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/2/5/254d1363-1204-41d2-9799-34484a3eb211.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -917,7 +917,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'DTK',
     number: '177',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/c/f/cfa7b456-7e83-4587-a875-9b35fde318c2.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -943,7 +943,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH1',
     number: '052',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/e/9/e9be371c-c688-44ad-ab71-bd4c9f242d58.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -969,7 +969,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'A25',
     number: '222',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/1/f/1f0d2e8e-c8f2-4b31-a6ba-6283fc8740d4.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -988,7 +988,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'CON',
     number: '015',
     rarity: 'Uncommon',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/2/9/29b7a8b1-b98e-483a-87a4-73bd831c03d4.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1014,7 +1014,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'IMA',
     number: '212',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/c/1/c14cdc38-dd46-495e-93bd-d2694b64d5ad.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1033,7 +1033,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'DMU',
     number: '097',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/d/1/d12c8c97-6491-452c-811d-943441a7ef9f.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1059,7 +1059,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '254',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/7/1/71e491c5-8c07-449b-b2f1-ffa052e6d311.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1078,7 +1078,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '250',
     rarity: 'Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/8/8/88231c0d-0cc8-44ec-bf95-81d1710ac141.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1104,7 +1104,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'MH2',
     number: '157',
     rarity: 'Mythic Rare',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/e/b/eb0e0404-4846-4891-acfa-bd0951ecf9c6.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1123,7 +1123,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'ISD',
     number: '051',
     rarity: 'Common',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/1/1/11bf83bb-c95b-4b4f-9a56-ce7a1816307a.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
@@ -1149,7 +1149,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'KTK',
     number: '118',
     rarity: 'Uncommon',
-    imageUrl: '',
+    imageUrl: 'https://cards.scryfall.io/large/front/b/8/b81c6c8b-a9cf-4866-89ba-7f8ad077b836.jpg',
     tcgType: TCG_TYPES.MAGIC,
     variants: [
       {
