@@ -203,6 +203,43 @@ export const validatePaymentSplit = (
   };
 };
 
+export interface PriceAdjustmentValidation {
+  valid: boolean;
+  errors: string[];
+  itemsWithoutPrice: string[];
+}
+
+export const validatePriceAdjustment = (
+  items: IPurchaseItem[],
+  adjustedPrices: Record<string, number>
+): PriceAdjustmentValidation => {
+  const errors: string[] = [];
+  const itemsWithoutPrice: string[] = [];
+
+  if (items.length === 0) {
+    errors.push('No hay items para ajustar');
+  }
+
+  items.forEach((item) => {
+    const price = adjustedPrices[item.id];
+    if (price === undefined || price <= 0) {
+      itemsWithoutPrice.push(item.id);
+    }
+  });
+
+  if (itemsWithoutPrice.length > 0) {
+    errors.push(
+      `${itemsWithoutPrice.length} item(s) sin precio público definido`
+    );
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    itemsWithoutPrice,
+  };
+};
+
 export const validateWhatsAppQuote = (params: Partial<WhatsAppQuoteParams>): WhatsAppQuoteValidation => {
   const errors: string[] = [];
 
