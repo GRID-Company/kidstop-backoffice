@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -25,6 +25,8 @@ import SaleCodeDisplay from './sale-code-display';
 import SaleStatusBadge from './sale-status-badge';
 import SaleItemsTable from './sale-items-table';
 import GeneratePdfButton from './generate-pdf-button';
+import CompleteSaleModal from './complete-sale-modal';
+import { CompleteSaleFormData } from '../../adapters/forms/complete-sale.form.schema';
 
 const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
   [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
@@ -47,6 +49,7 @@ const NEXT_STATUS_ICONS: Partial<Record<SaleStatus, string>> = {
 interface SaleDetailCardProps {
   sale: ISale;
   onStatusChange?: (saleId: string, newStatus: SaleStatus) => void;
+  onCompleteSale?: (data: CompleteSaleFormData, generatedCode: string) => void;
   onCancel?: (saleId: string) => void;
   onFulfillmentChange?: (itemId: string, status: FulfillmentStatus) => void;
 }
@@ -54,9 +57,11 @@ interface SaleDetailCardProps {
 export default function SaleDetailCard({
   sale,
   onStatusChange,
+  onCompleteSale,
   onCancel,
   onFulfillmentChange,
 }: SaleDetailCardProps) {
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const total = useMemo(() => calculateTotal(sale.items), [sale.items]);
 
   const itemCount = useMemo(
@@ -71,6 +76,26 @@ export default function SaleDetailCard({
   const nextStatus = NEXT_STATUS[sale.status];
   const nextStatusLabel = NEXT_STATUS_LABELS[sale.status];
   const nextStatusIcon = NEXT_STATUS_ICONS[sale.status];
+
+  const isReadyForPickup = sale.status === SALE_STATUS.READY_FOR_PICKUP;
+
+  const handleNextStatusPress = useCallback(() => {
+    if (isReadyForPickup) {
+      setIsCompleteModalOpen(true);
+      return;
+    }
+    if (nextStatus) {
+      onStatusChange?.(sale.id, nextStatus);
+    }
+  }, [isReadyForPickup, nextStatus, onStatusChange, sale.id]);
+
+  const handleCompleteSaleConfirm = useCallback(
+    (data: CompleteSaleFormData, generatedCode: string) => {
+      onCompleteSale?.(data, generatedCode);
+      setIsCompleteModalOpen(false);
+    },
+    [onCompleteSale]
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -165,7 +190,7 @@ export default function SaleDetailCard({
                   <Button
                     className="bg-accent text-white"
                     startContent={<Icon icon={nextStatusIcon} width={18} />}
-                    onPress={() => onStatusChange?.(sale.id, nextStatus)}
+                    onPress={handleNextStatusPress}
                   >
                     {nextStatusLabel}
                   </Button>
@@ -205,6 +230,12 @@ export default function SaleDetailCard({
           </div>
         </div>
       )}
+      <CompleteSaleModal
+        sale={sale}
+        isOpen={isCompleteModalOpen}
+        onClose={() => setIsCompleteModalOpen(false)}
+        onConfirm={handleCompleteSaleConfirm}
+      />
     </div>
   );
 }
