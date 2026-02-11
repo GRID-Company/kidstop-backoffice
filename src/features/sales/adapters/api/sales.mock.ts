@@ -1,4 +1,4 @@
-import { ISale, SALE_STATUS } from '../../domain/types';
+import { FULFILLMENT_STATUS, ISale, SALE_STATUS } from '../../domain/types';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 
@@ -26,6 +26,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 65.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.PENDING,
       },
       {
         id: 'si-002',
@@ -38,6 +39,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 2,
         unitPrice: 30.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.PENDING,
       },
     ],
   },
@@ -63,6 +65,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 250.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
     ],
   },
@@ -89,6 +92,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 120.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
       {
         id: 'si-005',
@@ -101,6 +105,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.LIGHTLY_PLAYED,
         quantity: 2,
         unitPrice: 8.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
     ],
   },
@@ -126,6 +131,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 22.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
     ],
   },
@@ -152,6 +158,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.MODERATELY_PLAYED,
         quantity: 1,
         unitPrice: 28.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.NOT_AVAILABLE,
       },
     ],
   },
@@ -177,6 +184,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 95.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.PENDING,
       },
       {
         id: 'si-009',
@@ -189,6 +197,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.LIGHTLY_PLAYED,
         quantity: 4,
         unitPrice: 2.5,
+        fulfillmentStatus: FULFILLMENT_STATUS.PENDING,
       },
     ],
   },
@@ -215,6 +224,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 2,
         unitPrice: 75.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
       {
         id: 'si-011',
@@ -227,6 +237,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 60.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.NOT_AVAILABLE,
       },
     ],
   },
@@ -252,6 +263,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.LIGHTLY_PLAYED,
         quantity: 1,
         unitPrice: 55.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
     ],
   },
@@ -277,6 +289,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 2,
         unitPrice: 50.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
       {
         id: 'si-014',
@@ -289,6 +302,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 4,
         unitPrice: 5.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.FOUND,
       },
     ],
   },
@@ -315,6 +329,7 @@ export const MOCK_SALES: ISale[] = [
         condition: CARD_CONDITIONS.NEAR_MINT,
         quantity: 1,
         unitPrice: 65.0,
+        fulfillmentStatus: FULFILLMENT_STATUS.PENDING,
       },
     ],
   },

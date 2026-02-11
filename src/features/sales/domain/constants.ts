@@ -1,5 +1,5 @@
 import { ITableSort } from '@/lib/types/datatable.types';
-import { SaleStatus, SALE_STATUS } from './types';
+import { FulfillmentStatus, FULFILLMENT_STATUS, SaleStatus, SALE_STATUS } from './types';
 
 export {
   CARD_CONDITIONS,
@@ -33,6 +33,21 @@ export const SALE_STATUS_OPTIONS = Object.values(SALE_STATUS).map(
     label: SALE_STATUS_LABELS[status],
   })
 );
+
+export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
+  [FULFILLMENT_STATUS.PENDING]: 'Pendiente',
+  [FULFILLMENT_STATUS.FOUND]: 'Encontrado',
+  [FULFILLMENT_STATUS.NOT_AVAILABLE]: 'No disponible',
+};
+
+export const FULFILLMENT_STATUS_COLORS: Record<
+  FulfillmentStatus,
+  'default' | 'success' | 'danger'
+> = {
+  [FULFILLMENT_STATUS.PENDING]: 'default',
+  [FULFILLMENT_STATUS.FOUND]: 'success',
+  [FULFILLMENT_STATUS.NOT_AVAILABLE]: 'danger',
+};
 
 export const DEFAULT_SALES_SORT: ITableSort = {
   column: 'createdAt',
