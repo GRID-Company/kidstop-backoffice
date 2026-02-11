@@ -24,6 +24,7 @@ import { SALE_STATUS_LABELS } from '../../domain/constants';
 import SaleCodeDisplay from './sale-code-display';
 import SaleStatusBadge from './sale-status-badge';
 import SaleItemsTable from './sale-items-table';
+import GeneratePdfButton from './generate-pdf-button';
 
 const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
   [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
@@ -170,6 +171,8 @@ export default function SaleDetailCard({
                   </Button>
                 </Tooltip>
               )}
+
+              <GeneratePdfButton sale={sale} />
 
               <Button
                 color="danger"
