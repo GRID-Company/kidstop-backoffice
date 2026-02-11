@@ -15,6 +15,7 @@ import { Icon } from '@iconify/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatDateTime } from '@/lib/utils/format-date';
 import { PURCHASE_STATUS, IPaymentDetail, IPurchaseItem, IPurchase } from '../../domain/types';
 import {
   PURCHASE_STATUS_LABELS,
@@ -32,15 +33,6 @@ import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
 
 const REDACTED_VALUE = '$••••••';
-
-const formatDate = (date: string): string =>
-  new Date(date).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
 interface PurchaseDetailProps {
   purchaseId: string;
@@ -342,7 +334,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               />
               <span className="text-sm font-medium">
                 Compra {PURCHASE_STATUS_LABELS[purchase.status].toLowerCase()} el{' '}
-                {formatDate(purchase.updatedAt)}
+                {formatDateTime(purchase.updatedAt)}
               </span>
             </div>
           </div>
@@ -403,11 +395,11 @@ function SellerInfoCard({
           )}
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Creada</span>
-            <span className="font-medium">{formatDate(createdAt)}</span>
+            <span className="font-medium">{formatDateTime(createdAt)}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Actualizada</span>
-            <span className="font-medium">{formatDate(updatedAt)}</span>
+            <span className="font-medium">{formatDateTime(updatedAt)}</span>
           </div>
         </div>
 

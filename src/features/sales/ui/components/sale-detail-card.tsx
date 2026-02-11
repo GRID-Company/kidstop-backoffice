@@ -12,6 +12,7 @@ import {
 import { Icon } from '@iconify/react';
 
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatDateTime } from '@/lib/utils/format-date';
 import {
   FulfillmentStatus,
   ISale,
@@ -23,15 +24,6 @@ import { SALE_STATUS_LABELS } from '../../domain/constants';
 import SaleCodeDisplay from './sale-code-display';
 import SaleStatusBadge from './sale-status-badge';
 import SaleItemsTable from './sale-items-table';
-
-const formatDate = (date: string): string =>
-  new Date(date).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
 const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
   [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
@@ -116,11 +108,11 @@ export default function SaleDetailCard({
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-default-400">Creado</span>
-              <span className="font-medium">{formatDate(sale.createdAt)}</span>
+              <span className="font-medium">{formatDateTime(sale.createdAt)}</span>
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="text-default-400">Actualizado</span>
-              <span className="font-medium">{formatDate(sale.updatedAt)}</span>
+              <span className="font-medium">{formatDateTime(sale.updatedAt)}</span>
             </div>
           </div>
 
@@ -205,7 +197,7 @@ export default function SaleDetailCard({
             />
             <span className="text-sm font-medium">
               Pedido {SALE_STATUS_LABELS[sale.status].toLowerCase()} el{' '}
-              {formatDate(sale.updatedAt)}
+              {formatDateTime(sale.updatedAt)}
             </span>
           </div>
         </div>

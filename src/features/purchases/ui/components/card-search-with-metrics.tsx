@@ -16,6 +16,7 @@ import Image from 'next/image';
 import Search from '@/shared/base/heorui-overrides/search';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatDate } from '@/lib/utils/format-date';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -24,15 +25,6 @@ interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
   existingItemIds: Set<string>;
 }
-
-const formatDate = (date: string | null): string => {
-  if (!date) return 'Sin ventas';
-  return new Date(date).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-};
 
 const formatDaysInInventory = (days: number): string => {
   if (days === 0) return 'Sin stock';
@@ -127,7 +119,7 @@ function CardResultItem({
           <MetricItem
             icon="lucide:calendar"
             label="Última venta"
-            value={formatDate(metrics.lastSaleDate)}
+            value={formatDate(metrics.lastSaleDate, 'Sin ventas')}
           />
           <MetricItem
             icon="lucide:clock"

@@ -23,16 +23,10 @@ import {
   PURCHASE_STATUS_LABELS,
 } from '../../domain/constants';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatDate } from '@/lib/utils/format-date';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { usePurchases } from '../hooks/use-purchases';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
-
-const formatDate = (date: string): string =>
-  new Date(date).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
 
 export default function Purchases() {
   const router = useRouter();
