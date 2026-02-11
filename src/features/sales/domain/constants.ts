@@ -16,6 +16,17 @@ export const SALE_STATUS_LABELS: Record<SaleStatus, string> = {
   [SALE_STATUS.CANCELLED]: 'Cancelado',
 };
 
+export const SALE_STATUS_COLORS: Record<
+  SaleStatus,
+  'primary' | 'warning' | 'secondary' | 'success' | 'danger'
+> = {
+  [SALE_STATUS.NEW]: 'primary',
+  [SALE_STATUS.IN_PROGRESS]: 'warning',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'secondary',
+  [SALE_STATUS.COMPLETED]: 'success',
+  [SALE_STATUS.CANCELLED]: 'danger',
+};
+
 export const SALE_STATUS_OPTIONS = Object.values(SALE_STATUS).map(
   (status) => ({
     value: status,
