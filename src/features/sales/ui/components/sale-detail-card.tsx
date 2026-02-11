@@ -26,6 +26,7 @@ import SaleStatusBadge from './sale-status-badge';
 import SaleItemsTable from './sale-items-table';
 import GeneratePdfButton from './generate-pdf-button';
 import CompleteSaleModal from './complete-sale-modal';
+import SendReadyEmailButton from './send-ready-email-button';
 import { CompleteSaleFormData } from '../../adapters/forms/complete-sale.form.schema';
 
 const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
@@ -198,6 +199,8 @@ export default function SaleDetailCard({
               )}
 
               <GeneratePdfButton sale={sale} />
+
+              <SendReadyEmailButton sale={sale} />
 
               <Button
                 color="danger"
