@@ -3,6 +3,15 @@ import { CardCondition } from '@/lib/types/card.types';
 
 export type { CardCondition };
 
+export const FULFILLMENT_STATUS = {
+  PENDING: 'PENDING',
+  FOUND: 'FOUND',
+  NOT_AVAILABLE: 'NOT_AVAILABLE',
+} as const;
+
+export type FulfillmentStatus =
+  (typeof FULFILLMENT_STATUS)[keyof typeof FULFILLMENT_STATUS];
+
 export const SALE_STATUS = {
   NEW: 'NEW',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -26,6 +35,7 @@ export interface ISaleItem {
   condition: CardCondition;
   quantity: number;
   unitPrice: number;
+  fulfillmentStatus: FulfillmentStatus;
 }
 
 export interface ISale {
