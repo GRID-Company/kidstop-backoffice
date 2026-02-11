@@ -28,7 +28,7 @@ export default function SaleTimeline({ currentStatus }: SaleTimelineProps) {
   const currentIndex = STATUS_ORDER[currentStatus] ?? -1;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       {isCancelled && (
         <div className="flex items-center gap-2 rounded-lg bg-danger-50 px-3 py-2">
           <Icon icon="lucide:x-circle" width={16} className="text-danger" />
@@ -44,7 +44,7 @@ export default function SaleTimeline({ currentStatus }: SaleTimelineProps) {
           const isFuture = idx > currentIndex || isCancelled;
 
           return (
-            <div key={step.status} className="flex flex-1 items-center">
+            <div key={step.status} className={`flex items-center ${idx < TIMELINE_STEPS.length - 1 ? 'flex-1' : 'shrink-0'}`}>
               <div className="flex flex-col items-center gap-1">
                 <div
                   className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${

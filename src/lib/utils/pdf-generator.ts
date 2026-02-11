@@ -52,9 +52,10 @@ function getTcgColors(tcgType: string) {
 }
 
 async function loadImageAsBase64(url: string): Promise<string | null> {
+  if (typeof window === 'undefined') return null;
   try {
     return await new Promise<string | null>((resolve) => {
-      const img = new Image();
+      const img = new window.Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         const canvas = document.createElement('canvas');
@@ -307,13 +308,15 @@ export async function generatePickingListPdf(data: PickingListData): Promise<voi
 
   data.items.forEach((item, idx) => {
     const col = idx % GRID_COLS;
-    if (col === 0 && idx > 0) {
-      y += CARD_CELL_HEIGHT;
-    }
 
-    if (y + CARD_CELL_HEIGHT > maxY && col === 0) {
-      doc.addPage();
-      y = PAGE_MARGIN;
+    if (col === 0) {
+      if (idx > 0) {
+        y += CARD_CELL_HEIGHT;
+      }
+      if (y + CARD_CELL_HEIGHT > maxY) {
+        doc.addPage();
+        y = PAGE_MARGIN;
+      }
     }
 
     const x = PAGE_MARGIN + col * (CARD_WIDTH + CARD_GAP);

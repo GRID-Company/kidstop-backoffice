@@ -57,3 +57,21 @@ export const DEFAULT_SALES_SORT: ITableSort = {
 };
 
 export const DEFAULT_PAGE_SIZE = 20;
+
+export const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
+  [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
+  [SALE_STATUS.IN_PROGRESS]: SALE_STATUS.READY_FOR_PICKUP,
+  [SALE_STATUS.READY_FOR_PICKUP]: SALE_STATUS.COMPLETED,
+};
+
+export const NEXT_STATUS_LABELS: Partial<Record<SaleStatus, string>> = {
+  [SALE_STATUS.NEW]: 'Iniciar surtido',
+  [SALE_STATUS.IN_PROGRESS]: 'Marcar listo para recolección',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'Completar venta',
+};
+
+export const NEXT_STATUS_ICONS: Partial<Record<SaleStatus, string>> = {
+  [SALE_STATUS.NEW]: 'lucide:play',
+  [SALE_STATUS.IN_PROGRESS]: 'lucide:package-check',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'lucide:check-circle',
+};

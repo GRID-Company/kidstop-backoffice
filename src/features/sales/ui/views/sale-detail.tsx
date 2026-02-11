@@ -20,7 +20,12 @@ import {
   SALE_STATUS,
   SaleStatus,
 } from '../../domain/types';
-import { SALE_STATUS_LABELS } from '../../domain/constants';
+import {
+  NEXT_STATUS,
+  NEXT_STATUS_ICONS,
+  NEXT_STATUS_LABELS,
+  SALE_STATUS_LABELS,
+} from '../../domain/constants';
 import { useSaleDetail } from '../hooks/use-sale-detail';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
@@ -30,24 +35,6 @@ import SendReadyEmailButton from '../components/send-ready-email-button';
 import CompleteSaleModal from '../components/complete-sale-modal';
 import SaleTimeline from '../components/sale-timeline';
 import { CompleteSaleFormData } from '../../adapters/forms/complete-sale.form.schema';
-
-const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
-  [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
-  [SALE_STATUS.IN_PROGRESS]: SALE_STATUS.READY_FOR_PICKUP,
-  [SALE_STATUS.READY_FOR_PICKUP]: SALE_STATUS.COMPLETED,
-};
-
-const NEXT_STATUS_LABELS: Partial<Record<SaleStatus, string>> = {
-  [SALE_STATUS.NEW]: 'Iniciar surtido',
-  [SALE_STATUS.IN_PROGRESS]: 'Marcar listo para recolección',
-  [SALE_STATUS.READY_FOR_PICKUP]: 'Completar venta',
-};
-
-const NEXT_STATUS_ICONS: Partial<Record<SaleStatus, string>> = {
-  [SALE_STATUS.NEW]: 'lucide:play',
-  [SALE_STATUS.IN_PROGRESS]: 'lucide:package-check',
-  [SALE_STATUS.READY_FOR_PICKUP]: 'lucide:check-circle',
-};
 
 interface SaleDetailProps {
   saleId: string;
