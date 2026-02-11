@@ -2,6 +2,22 @@ import { FULFILLMENT_STATUS, ISale, SALE_STATUS } from '../../domain/types';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 
+const MOCK_EMAIL_DELAY_MS = 1500;
+
+export const sendReadyForPickupEmail = async (
+  customerEmail: string,
+  saleCode: string
+): Promise<{ success: boolean }> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log(
+        `[MOCK] Email "listo para recolección" enviado a ${customerEmail} para pedido ${saleCode}`
+      );
+      resolve({ success: true });
+    }, MOCK_EMAIL_DELAY_MS);
+  });
+};
+
 export const MOCK_SALES: ISale[] = [
   {
     id: 'sale-001',
