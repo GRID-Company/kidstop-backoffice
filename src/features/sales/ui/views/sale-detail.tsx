@@ -1,0 +1,290 @@
+'use client';
+
+import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Divider,
+  Tooltip,
+} from '@heroui/react';
+import { Icon } from '@iconify/react';
+
+import { EntitiesPage } from '@/shared/blocks/entities-page';
+import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatDateTime } from '@/lib/utils/format-date';
+import {
+  FulfillmentStatus,
+  ISale,
+  SALE_STATUS,
+  SaleStatus,
+} from '../../domain/types';
+import { SALE_STATUS_LABELS } from '../../domain/constants';
+import { useSaleDetail } from '../hooks/use-sale-detail';
+import SaleStatusBadge from '../components/sale-status-badge';
+import SaleCodeDisplay from '../components/sale-code-display';
+import SaleItemsTable from '../components/sale-items-table';
+import GeneratePdfButton from '../components/generate-pdf-button';
+import SendReadyEmailButton from '../components/send-ready-email-button';
+import CompleteSaleModal from '../components/complete-sale-modal';
+import { CompleteSaleFormData } from '../../adapters/forms/complete-sale.form.schema';
+
+const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
+  [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
+  [SALE_STATUS.IN_PROGRESS]: SALE_STATUS.READY_FOR_PICKUP,
+  [SALE_STATUS.READY_FOR_PICKUP]: SALE_STATUS.COMPLETED,
+};
+
+const NEXT_STATUS_LABELS: Partial<Record<SaleStatus, string>> = {
+  [SALE_STATUS.NEW]: 'Iniciar surtido',
+  [SALE_STATUS.IN_PROGRESS]: 'Marcar listo para recolección',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'Completar venta',
+};
+
+const NEXT_STATUS_ICONS: Partial<Record<SaleStatus, string>> = {
+  [SALE_STATUS.NEW]: 'lucide:play',
+  [SALE_STATUS.IN_PROGRESS]: 'lucide:package-check',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'lucide:check-circle',
+};
+
+interface SaleDetailProps {
+  saleId: string;
+}
+
+export default function SaleDetail({ saleId }: SaleDetailProps) {
+  const router = useRouter();
+  const {
+    sale,
+    total,
+    itemCount,
+    isTerminal,
+    updateStatus,
+    updateFulfillment,
+    cancelSale,
+  } = useSaleDetail(saleId);
+
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+
+  const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
+  const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
+  const nextStatusIcon = sale ? NEXT_STATUS_ICONS[sale.status] : undefined;
+
+  const handleNextStatusPress = useCallback(() => {
+    if (!sale) return;
+    if (sale.status === SALE_STATUS.READY_FOR_PICKUP) {
+      setIsCompleteModalOpen(true);
+      return;
+    }
+    if (nextStatus) {
+      updateStatus(nextStatus);
+    }
+  }, [sale, nextStatus, updateStatus]);
+
+  const handleCompleteSaleConfirm = useCallback(
+    (data: CompleteSaleFormData, generatedCode: string) => {
+      updateStatus(SALE_STATUS.COMPLETED);
+      setIsCompleteModalOpen(false);
+    },
+    [updateStatus]
+  );
+
+  const handleFulfillmentChange = useCallback(
+    (itemId: string, status: FulfillmentStatus) => {
+      updateFulfillment(itemId, status);
+    },
+    [updateFulfillment]
+  );
+
+  if (!sale) {
+    return (
+      <EntitiesPage>
+        <div className="flex flex-col items-center justify-center py-20 text-default-400">
+          <Icon icon="lucide:search-x" width={48} className="mb-3" />
+          <span className="text-lg font-medium">Pedido no encontrado</span>
+          <Button
+            variant="light"
+            className="mt-4 text-accent"
+            onPress={() => router.push('/ventas')}
+            startContent={<Icon icon="lucide:arrow-left" width={16} />}
+          >
+            Volver a ventas
+          </Button>
+        </div>
+      </EntitiesPage>
+    );
+  }
+
+  return (
+    <EntitiesPage>
+      <EntitiesPage.Toolbar label="">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              isIconOnly
+              variant="light"
+              onPress={() => router.push('/ventas')}
+              aria-label="Volver a ventas"
+            >
+              <Icon icon="lucide:arrow-left" width={20} />
+            </Button>
+            <div className="flex items-center gap-3">
+              <span className="text-lg font-semibold text-accent">
+                {sale.code}
+              </span>
+              <SaleStatusBadge status={sale.status} />
+            </div>
+          </div>
+        </div>
+      </EntitiesPage.Toolbar>
+
+      <div className="flex flex-col gap-6 px-4">
+        <SaleInfoCard sale={sale} />
+
+        <EntitiesPage.CardContainer>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:list" width={18} className="text-accent" />
+                <span className="text-sm font-semibold">Items del pedido</span>
+                <Chip size="sm" variant="flat">
+                  {itemCount} {itemCount === 1 ? 'carta' : 'cartas'}
+                </Chip>
+              </div>
+              <span className="text-lg font-bold text-accent">
+                {formatCurrency(total)}
+              </span>
+            </div>
+            <SaleItemsTable
+              items={sale.items}
+              onFulfillmentChange={
+                !isTerminal ? handleFulfillmentChange : undefined
+              }
+            />
+          </div>
+        </EntitiesPage.CardContainer>
+
+        {!isTerminal && (
+          <EntitiesPage.CardContainer>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:zap" width={18} className="text-accent" />
+                <span className="text-sm font-semibold">Acciones</span>
+              </div>
+              <Divider />
+              <div className="flex flex-wrap gap-3">
+                {nextStatus && nextStatusLabel && nextStatusIcon && (
+                  <Tooltip content={nextStatusLabel}>
+                    <Button
+                      className="bg-accent text-white"
+                      startContent={<Icon icon={nextStatusIcon} width={18} />}
+                      onPress={handleNextStatusPress}
+                    >
+                      {nextStatusLabel}
+                    </Button>
+                  </Tooltip>
+                )}
+
+                <GeneratePdfButton sale={sale} />
+
+                <SendReadyEmailButton sale={sale} />
+
+                <Button
+                  color="danger"
+                  variant="flat"
+                  startContent={<Icon icon="lucide:x-circle" width={18} />}
+                  onPress={cancelSale}
+                >
+                  Cancelar pedido
+                </Button>
+              </div>
+            </div>
+          </EntitiesPage.CardContainer>
+        )}
+
+        {isTerminal && (
+          <div className="flex items-center justify-center rounded-lg border border-default-200 bg-default-50 py-4">
+            <div className="flex items-center gap-2 text-default-500">
+              <Icon
+                icon={
+                  sale.status === SALE_STATUS.COMPLETED
+                    ? 'lucide:check-circle'
+                    : 'lucide:x-circle'
+                }
+                width={18}
+              />
+              <span className="text-sm font-medium">
+                Pedido {SALE_STATUS_LABELS[sale.status].toLowerCase()} el{' '}
+                {formatDateTime(sale.updatedAt)}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <CompleteSaleModal
+        sale={sale}
+        isOpen={isCompleteModalOpen}
+        onClose={() => setIsCompleteModalOpen(false)}
+        onConfirm={handleCompleteSaleConfirm}
+      />
+    </EntitiesPage>
+  );
+}
+
+function SaleInfoCard({ sale }: { sale: ISale }) {
+  return (
+    <Card>
+      <CardBody className="flex flex-col gap-4">
+        <div className="flex items-center gap-2">
+          <Icon icon="lucide:receipt" width={18} className="text-accent" />
+          <span className="text-sm font-semibold">Información del pedido</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-default-400">Código</span>
+            <SaleCodeDisplay code={sale.code} />
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-default-400">Cliente</span>
+            <span className="font-medium">{sale.customerName}</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-default-400">Email</span>
+            <span className="font-medium">{sale.customerEmail}</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-default-400">TCG</span>
+            <Chip size="sm" variant="flat" className="w-fit">
+              {sale.tcgType}
+            </Chip>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-default-400">Creado</span>
+            <span className="font-medium">
+              {formatDateTime(sale.createdAt)}
+            </span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-default-400">Actualizado</span>
+            <span className="font-medium">
+              {formatDateTime(sale.updatedAt)}
+            </span>
+          </div>
+        </div>
+
+        {sale.notes && (
+          <>
+            <Divider />
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-default-400">Notas</span>
+              <span className="text-sm text-default-600">{sale.notes}</span>
+            </div>
+          </>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
