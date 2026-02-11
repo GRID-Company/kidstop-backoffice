@@ -13,6 +13,7 @@ import { useAddCardModal } from '../hooks/use-add-card-modal';
 import { useMostWantedList } from '../hooks/use-most-wanted-list';
 import AddCardModal from '../components/add-card-modal';
 import MostWantedList from '../components/most-wanted-list';
+import MostWantedPreview from '../components/most-wanted-preview';
 
 export default function MostWantedConfig() {
   const {
@@ -78,13 +79,21 @@ export default function MostWantedConfig() {
             </p>
           </div>
 
-          <MostWantedList
-            items={items}
-            onReorder={reorder}
-            onToggleActive={toggleActive}
-            onUpdateCard={updateCard}
-            onRemoveCard={removeCard}
-          />
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <MostWantedList
+                items={items}
+                onReorder={reorder}
+                onToggleActive={toggleActive}
+                onUpdateCard={updateCard}
+                onRemoveCard={removeCard}
+              />
+            </div>
+
+            <div className="xl:sticky xl:top-4 xl:self-start">
+              <MostWantedPreview items={items} />
+            </div>
+          </div>
         </EntitiesPage.CardContainer>
       </EntitiesPage>
 
