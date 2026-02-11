@@ -14,7 +14,6 @@ import { Icon } from '@iconify/react';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import {
-  FulfillmentStatus,
   ISale,
   SALE_STATUS,
   SaleStatus,
@@ -52,7 +51,7 @@ interface SaleDetailCardProps {
   onStatusChange?: (saleId: string, newStatus: SaleStatus) => void;
   onCompleteSale?: (data: CompleteSaleFormData, generatedCode: string) => void;
   onCancel?: (saleId: string) => void;
-  onFulfillmentChange?: (itemId: string, status: FulfillmentStatus) => void;
+  onFoundQuantityChange?: (itemId: string, delta: number) => void;
 }
 
 export default function SaleDetailCard({
@@ -60,7 +59,7 @@ export default function SaleDetailCard({
   onStatusChange,
   onCompleteSale,
   onCancel,
-  onFulfillmentChange,
+  onFoundQuantityChange,
 }: SaleDetailCardProps) {
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const total = useMemo(() => calculateTotal(sale.items), [sale.items]);
@@ -172,7 +171,7 @@ export default function SaleDetailCard({
 
           <SaleItemsTable
             items={sale.items}
-            onFulfillmentChange={onFulfillmentChange}
+            onFoundQuantityChange={onFoundQuantityChange}
           />
         </CardBody>
       </Card>

@@ -37,15 +37,17 @@ export const SALE_STATUS_OPTIONS = Object.values(SALE_STATUS).map(
 export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
   [FULFILLMENT_STATUS.PENDING]: 'Pendiente',
   [FULFILLMENT_STATUS.FOUND]: 'Encontrado',
+  [FULFILLMENT_STATUS.PARTIAL]: 'Parcial',
   [FULFILLMENT_STATUS.NOT_AVAILABLE]: 'No disponible',
 };
 
 export const FULFILLMENT_STATUS_COLORS: Record<
   FulfillmentStatus,
-  'default' | 'success' | 'danger'
+  'default' | 'success' | 'warning' | 'danger'
 > = {
   [FULFILLMENT_STATUS.PENDING]: 'default',
   [FULFILLMENT_STATUS.FOUND]: 'success',
+  [FULFILLMENT_STATUS.PARTIAL]: 'warning',
   [FULFILLMENT_STATUS.NOT_AVAILABLE]: 'danger',
 };
 

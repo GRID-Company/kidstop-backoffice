@@ -1,23 +1,31 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import {
+  FULFILLMENT_STATUS,
   FulfillmentStatus,
   ISale,
   ISaleItem,
   SALE_STATUS,
   SaleStatus,
 } from '../../domain/types';
-import { calculateTotal, formatSaleTotal } from '../../domain/sales.domain';
+import {
+  calculateAdjustedTotal,
+  calculateTotal,
+  deriveFulfillmentStatus,
+  formatSaleTotal,
+} from '../../domain/sales.domain';
 import { MOCK_SALES } from '../../adapters/api/sales.mock';
 
 interface UseSaleDetailReturn {
   sale: ISale | undefined;
   total: number;
+  adjustedTotal: number;
   formattedTotal: string;
   itemCount: number;
   isTerminal: boolean;
   updateStatus: (newStatus: SaleStatus) => void;
   updateFulfillment: (itemId: string, status: FulfillmentStatus) => void;
+  updateFoundQuantity: (itemId: string, delta: number) => void;
   cancelSale: () => void;
 }
 
@@ -38,6 +46,7 @@ export function useSaleDetail(saleId: string): UseSaleDetailReturn {
   }, [baseSale, items, status]);
 
   const total = useMemo(() => calculateTotal(items), [items]);
+  const adjustedTotal = useMemo(() => calculateAdjustedTotal(items), [items]);
 
   const formattedTotal = useMemo(
     () => formatSaleTotal(items),
@@ -67,6 +76,40 @@ export function useSaleDetail(saleId: string): UseSaleDetailReturn {
     []
   );
 
+  const updateFoundQuantity = useCallback(
+    (itemId: string, delta: number) => {
+      setItems((prev) =>
+        prev.map((item) => {
+          if (item.id !== itemId) return item;
+
+          if (delta < 0 && item.foundQuantity === 0) {
+            return {
+              ...item,
+              foundQuantity: 0,
+              fulfillmentStatus: FULFILLMENT_STATUS.NOT_AVAILABLE,
+            };
+          }
+
+          if (delta > 0 && item.fulfillmentStatus === FULFILLMENT_STATUS.NOT_AVAILABLE) {
+            return {
+              ...item,
+              foundQuantity: 1,
+              fulfillmentStatus: deriveFulfillmentStatus(1, item.quantity),
+            };
+          }
+
+          const newFound = Math.max(0, Math.min(item.quantity, item.foundQuantity + delta));
+          return {
+            ...item,
+            foundQuantity: newFound,
+            fulfillmentStatus: deriveFulfillmentStatus(newFound, item.quantity),
+          };
+        })
+      );
+    },
+    []
+  );
+
   const cancelSale = useCallback(() => {
     setStatus(SALE_STATUS.CANCELLED);
   }, []);
@@ -74,11 +117,13 @@ export function useSaleDetail(saleId: string): UseSaleDetailReturn {
   return {
     sale,
     total,
+    adjustedTotal,
     formattedTotal,
     itemCount,
     isTerminal,
     updateStatus,
     updateFulfillment,
+    updateFoundQuantity,
     cancelSale,
   };
 }

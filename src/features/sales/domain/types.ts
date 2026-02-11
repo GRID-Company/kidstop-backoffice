@@ -6,6 +6,7 @@ export type { CardCondition };
 export const FULFILLMENT_STATUS = {
   PENDING: 'PENDING',
   FOUND: 'FOUND',
+  PARTIAL: 'PARTIAL',
   NOT_AVAILABLE: 'NOT_AVAILABLE',
 } as const;
 
@@ -34,6 +35,7 @@ export interface ISaleItem {
   tcgType: TCGType;
   condition: CardCondition;
   quantity: number;
+  foundQuantity: number;
   unitPrice: number;
   fulfillmentStatus: FulfillmentStatus;
 }

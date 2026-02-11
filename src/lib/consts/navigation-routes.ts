@@ -25,6 +25,11 @@ const Purchases = {
   route: '/compras',
   icon: 'lucide:shopping-cart',
 };
+const Sales = {
+  label: 'Ventas',
+  route: '/ventas',
+  icon: 'lucide:receipt',
+};
 const Customers = {
   label: 'Clientes',
   route: '/clientes',
@@ -36,7 +41,7 @@ const ClickUp = {
   icon: 'simple-icons:clickup',
 };
 
-const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Customers, Users, Settings, ClickUp];
+const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, Users, Settings, ClickUp];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,

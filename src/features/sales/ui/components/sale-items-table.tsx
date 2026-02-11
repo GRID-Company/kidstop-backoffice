@@ -2,23 +2,13 @@
 
 import React from 'react';
 import Image from 'next/image';
-import {
-  Chip,
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+import { Chip, Button } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import {
-  FulfillmentStatus,
-  FULFILLMENT_STATUS,
-  ISaleItem,
-} from '../../domain/types';
+import { ISaleItem } from '../../domain/types';
 import { calculateItemSubtotal } from '../../domain/sales.domain';
 import {
   CARD_CONDITION_SHORT_LABELS,
@@ -29,7 +19,64 @@ import {
 interface SaleItemsTableProps {
   items: ISaleItem[];
   loading?: boolean;
-  onFulfillmentChange?: (itemId: string, status: FulfillmentStatus) => void;
+  onFoundQuantityChange?: (itemId: string, delta: number) => void;
+}
+
+const FULFILLMENT_BORDER_CLASSES: Record<string, string> = {
+  PENDING: 'border-default-300',
+  FOUND: 'border-success',
+  PARTIAL: 'border-warning',
+  NOT_AVAILABLE: 'border-danger',
+};
+
+function FoundQuantityStepper({
+  item,
+  onDelta,
+}: {
+  item: ISaleItem;
+  onDelta?: (itemId: string, delta: number) => void;
+}) {
+  const borderClass = FULFILLMENT_BORDER_CLASSES[item.fulfillmentStatus] ?? 'border-default-300';
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className={`flex items-center gap-0 rounded-lg border-2 ${borderClass} transition-colors`}>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          className="h-10 w-10 min-w-0 text-lg"
+          onPress={() => onDelta?.(item.id, -1)}
+          isDisabled={item.fulfillmentStatus === 'NOT_AVAILABLE' || !onDelta}
+          aria-label="Disminuir cantidad encontrada"
+        >
+          <Icon icon="lucide:minus" width={18} />
+        </Button>
+        <span className="min-w-[3rem] text-center text-sm font-bold tabular-nums">
+          {item.foundQuantity}/{item.quantity}
+        </span>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          className="h-10 w-10 min-w-0 text-lg"
+          onPress={() => onDelta?.(item.id, 1)}
+          isDisabled={item.foundQuantity >= item.quantity || !onDelta}
+          aria-label="Aumentar cantidad encontrada"
+        >
+          <Icon icon="lucide:plus" width={18} />
+        </Button>
+      </div>
+      <Chip
+        size="sm"
+        variant="flat"
+        color={FULFILLMENT_STATUS_COLORS[item.fulfillmentStatus]}
+        className="h-5 text-[10px]"
+      >
+        {FULFILLMENT_STATUS_LABELS[item.fulfillmentStatus]}
+      </Chip>
+    </div>
+  );
 }
 
 const SALE_ITEMS_COLUMNS: ITableColumn[] = [
@@ -37,17 +84,15 @@ const SALE_ITEMS_COLUMNS: ITableColumn[] = [
   { key: 'cardName', label: 'Carta' },
   { key: 'set', label: 'Set' },
   { key: 'condition', label: 'Condición', className: 'w-24' },
-  { key: 'quantity', label: 'Cant.', className: 'w-16' },
   { key: 'unitPrice', label: 'Precio', className: 'w-24' },
   { key: 'subtotal', label: 'Subtotal', className: 'w-24' },
-  { key: 'fulfillmentStatus', label: 'Surtido', className: 'w-32' },
-  { key: 'actions', label: 'Acciones', className: 'w-28' },
+  { key: 'surtido', label: 'Surtido', className: 'w-36' },
 ];
 
 type ColumnRenderer = (row: ISaleItem) => React.ReactNode;
 
 function getColumnRenderers(
-  onFulfillmentChange?: (itemId: string, status: FulfillmentStatus) => void
+  onFoundQuantityChange?: (itemId: string, delta: number) => void
 ): Record<string, ColumnRenderer> {
   return {
     image: (row) => (
@@ -88,53 +133,16 @@ function getColumnRenderers(
         {formatCurrency(calculateItemSubtotal(row))}
       </span>
     ),
-    fulfillmentStatus: (row) => (
-      <Chip
-        size="sm"
-        variant="flat"
-        color={FULFILLMENT_STATUS_COLORS[row.fulfillmentStatus]}
-      >
-        {FULFILLMENT_STATUS_LABELS[row.fulfillmentStatus]}
-      </Chip>
-    ),
-    actions: (row) => (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button size="sm" variant="light" isIconOnly aria-label="Acciones">
-            ⋮
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu
-          aria-label="Acciones del item"
-          onAction={(key) => {
-            onFulfillmentChange?.(row.id, key as FulfillmentStatus);
-          }}
-        >
-          <DropdownItem
-            key={FULFILLMENT_STATUS.FOUND}
-            className="text-success"
-          >
-            {FULFILLMENT_STATUS_LABELS[FULFILLMENT_STATUS.FOUND]}
-          </DropdownItem>
-          <DropdownItem
-            key={FULFILLMENT_STATUS.NOT_AVAILABLE}
-            className="text-danger"
-          >
-            {FULFILLMENT_STATUS_LABELS[FULFILLMENT_STATUS.NOT_AVAILABLE]}
-          </DropdownItem>
-          <DropdownItem key={FULFILLMENT_STATUS.PENDING}>
-            {FULFILLMENT_STATUS_LABELS[FULFILLMENT_STATUS.PENDING]}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+    surtido: (row) => (
+      <FoundQuantityStepper item={row} onDelta={onFoundQuantityChange} />
     ),
   };
 }
 
 function buildColumns(
-  onFulfillmentChange?: (itemId: string, status: FulfillmentStatus) => void
+  onFoundQuantityChange?: (itemId: string, delta: number) => void
 ): ITableColumn[] {
-  const renderers = getColumnRenderers(onFulfillmentChange);
+  const renderers = getColumnRenderers(onFoundQuantityChange);
   return SALE_ITEMS_COLUMNS.map((col) => {
     const renderer = renderers[col.key];
     return renderer ? { ...col, customCol: renderer } : col;
@@ -144,9 +152,9 @@ function buildColumns(
 export default function SaleItemsTable({
   items,
   loading = false,
-  onFulfillmentChange,
+  onFoundQuantityChange,
 }: SaleItemsTableProps) {
-  const columns = buildColumns(onFulfillmentChange);
+  const columns = buildColumns(onFoundQuantityChange);
 
   if (!loading && items.length === 0) {
     return (

@@ -1,6 +1,6 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import { ISaleItem, SaleCode, SaleFilters } from './types';
+import { FulfillmentStatus, FULFILLMENT_STATUS, ISaleItem, SaleCode, SaleFilters } from './types';
 
 export const getSalesVars = (
   args: IPaginatedApiArgs,
@@ -44,4 +44,20 @@ export const calculateTotal = (items: ISaleItem[]): number => {
 
 export const formatSaleTotal = (items: ISaleItem[]): string => {
   return formatCurrency(calculateTotal(items));
+};
+
+export const deriveFulfillmentStatus = (
+  foundQuantity: number,
+  requestedQuantity: number
+): FulfillmentStatus => {
+  if (foundQuantity <= 0) return FULFILLMENT_STATUS.PENDING;
+  if (foundQuantity >= requestedQuantity) return FULFILLMENT_STATUS.FOUND;
+  return FULFILLMENT_STATUS.PARTIAL;
+};
+
+export const calculateAdjustedTotal = (items: ISaleItem[]): number => {
+  return items.reduce(
+    (total, item) => total + Math.min(item.foundQuantity, item.quantity) * item.unitPrice,
+    0
+  );
 };

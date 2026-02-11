@@ -14,12 +14,12 @@ import {
   Checkbox,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import { ISale, SALE_STATUS } from '../../domain/types';
-import { calculateTotal, generateSaleCode } from '../../domain/sales.domain';
+import { FULFILLMENT_STATUS, ISale, SALE_STATUS } from '../../domain/types';
+import { calculateAdjustedTotal, calculateTotal, generateSaleCode } from '../../domain/sales.domain';
 import {
   CARD_CONDITION_SHORT_LABELS,
   FULFILLMENT_STATUS_COLORS,
@@ -46,13 +46,18 @@ export default function CompleteSaleModal({
   onConfirm,
   loading = false,
 }: CompleteSaleModalProps) {
-  const { control, handleSubmit, formState, reset, watch, setValue } =
+  const { control, handleSubmit, formState, reset, setValue } =
     useCompleteSaleForm();
 
-  const verifiedItems = watch('verifiedItems');
+  const verifiedItems = useWatch({ control, name: 'verifiedItems' });
 
   const total = useMemo(
     () => (sale ? calculateTotal(sale.items) : 0),
+    [sale]
+  );
+
+  const adjustedTotal = useMemo(
+    () => (sale ? calculateAdjustedTotal(sale.items) : 0),
     [sale]
   );
 
@@ -60,6 +65,22 @@ export default function CompleteSaleModal({
     () => (sale ? sale.items.reduce((sum, item) => sum + item.quantity, 0) : 0),
     [sale]
   );
+
+  const fulfillmentSummary = useMemo(() => {
+    if (!sale) return { found: 0, partial: 0, notAvailable: 0, pending: 0 };
+    return sale.items.reduce(
+      (acc, item) => {
+        if (item.fulfillmentStatus === FULFILLMENT_STATUS.FOUND) acc.found++;
+        else if (item.fulfillmentStatus === FULFILLMENT_STATUS.PARTIAL) acc.partial++;
+        else if (item.fulfillmentStatus === FULFILLMENT_STATUS.NOT_AVAILABLE) acc.notAvailable++;
+        else acc.pending++;
+        return acc;
+      },
+      { found: 0, partial: 0, notAvailable: 0, pending: 0 }
+    );
+  }, [sale]);
+
+  const hasIssues = fulfillmentSummary.partial > 0 || fulfillmentSummary.notAvailable > 0;
 
   const allVerified = useMemo(
     () => verifiedItems.length > 0 && verifiedItems.every((vi) => vi.verified),
@@ -144,16 +165,55 @@ export default function CompleteSaleModal({
                 <p className="text-xs text-default-500">{sale.customerEmail}</p>
               </div>
               <div className="flex flex-col items-end gap-1">
-                <span className="text-xs text-default-400">Total</span>
-                <span className="text-lg font-bold text-accent">
+                <span className="text-xs text-default-400">Total original</span>
+                <span className={`text-sm font-semibold ${hasIssues ? 'text-default-400 line-through' : 'text-accent'}`}>
                   {formatCurrency(total)}
                 </span>
-                <Chip size="sm" variant="flat">
-                  {itemCount} {itemCount === 1 ? 'carta' : 'cartas'}
-                </Chip>
+                {hasIssues && (
+                  <>
+                    <span className="text-xs text-default-400">Total ajustado</span>
+                    <span className="text-lg font-bold text-accent">
+                      {formatCurrency(adjustedTotal)}
+                    </span>
+                  </>
+                )}
+                {!hasIssues && (
+                  <Chip size="sm" variant="flat">
+                    {itemCount} {itemCount === 1 ? 'carta' : 'cartas'}
+                  </Chip>
+                )}
               </div>
             </div>
           </div>
+
+          <div className="flex flex-wrap gap-2">
+            {fulfillmentSummary.found > 0 && (
+              <Chip size="sm" variant="flat" color="success" startContent={<Icon icon="lucide:check" width={12} />}>
+                {fulfillmentSummary.found} encontrado{fulfillmentSummary.found !== 1 ? 's' : ''}
+              </Chip>
+            )}
+            {fulfillmentSummary.partial > 0 && (
+              <Chip size="sm" variant="flat" color="warning" startContent={<Icon icon="lucide:alert-triangle" width={12} />}>
+                {fulfillmentSummary.partial} parcial{fulfillmentSummary.partial !== 1 ? 'es' : ''}
+              </Chip>
+            )}
+            {fulfillmentSummary.notAvailable > 0 && (
+              <Chip size="sm" variant="flat" color="danger" startContent={<Icon icon="lucide:x" width={12} />}>
+                {fulfillmentSummary.notAvailable} no disponible{fulfillmentSummary.notAvailable !== 1 ? 's' : ''}
+              </Chip>
+            )}
+            {fulfillmentSummary.pending > 0 && (
+              <Chip size="sm" variant="flat" startContent={<Icon icon="lucide:clock" width={12} />}>
+                {fulfillmentSummary.pending} pendiente{fulfillmentSummary.pending !== 1 ? 's' : ''}
+              </Chip>
+            )}
+          </div>
+
+          {hasIssues && (
+            <Chip size="sm" color="warning" variant="flat" startContent={<Icon icon="lucide:info" width={12} />}>
+              El total se ajustó según las cantidades encontradas
+            </Chip>
+          )}
 
           <Divider />
 
