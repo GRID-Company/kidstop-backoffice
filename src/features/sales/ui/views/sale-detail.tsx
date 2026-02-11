@@ -16,12 +16,16 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import {
-  FulfillmentStatus,
   ISale,
   SALE_STATUS,
   SaleStatus,
 } from '../../domain/types';
-import { SALE_STATUS_LABELS } from '../../domain/constants';
+import {
+  NEXT_STATUS,
+  NEXT_STATUS_ICONS,
+  NEXT_STATUS_LABELS,
+  SALE_STATUS_LABELS,
+} from '../../domain/constants';
 import { useSaleDetail } from '../hooks/use-sale-detail';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
@@ -29,25 +33,8 @@ import SaleItemsTable from '../components/sale-items-table';
 import GeneratePdfButton from '../components/generate-pdf-button';
 import SendReadyEmailButton from '../components/send-ready-email-button';
 import CompleteSaleModal from '../components/complete-sale-modal';
+import SaleTimeline from '../components/sale-timeline';
 import { CompleteSaleFormData } from '../../adapters/forms/complete-sale.form.schema';
-
-const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
-  [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
-  [SALE_STATUS.IN_PROGRESS]: SALE_STATUS.READY_FOR_PICKUP,
-  [SALE_STATUS.READY_FOR_PICKUP]: SALE_STATUS.COMPLETED,
-};
-
-const NEXT_STATUS_LABELS: Partial<Record<SaleStatus, string>> = {
-  [SALE_STATUS.NEW]: 'Iniciar surtido',
-  [SALE_STATUS.IN_PROGRESS]: 'Marcar listo para recolección',
-  [SALE_STATUS.READY_FOR_PICKUP]: 'Completar venta',
-};
-
-const NEXT_STATUS_ICONS: Partial<Record<SaleStatus, string>> = {
-  [SALE_STATUS.NEW]: 'lucide:play',
-  [SALE_STATUS.IN_PROGRESS]: 'lucide:package-check',
-  [SALE_STATUS.READY_FOR_PICKUP]: 'lucide:check-circle',
-};
 
 interface SaleDetailProps {
   saleId: string;
@@ -58,10 +45,11 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
   const {
     sale,
     total,
+    adjustedTotal,
     itemCount,
     isTerminal,
     updateStatus,
-    updateFulfillment,
+    updateFoundQuantity,
     cancelSale,
   } = useSaleDetail(saleId);
 
@@ -90,11 +78,11 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
     [updateStatus]
   );
 
-  const handleFulfillmentChange = useCallback(
-    (itemId: string, status: FulfillmentStatus) => {
-      updateFulfillment(itemId, status);
+  const handleFoundQuantityChange = useCallback(
+    (itemId: string, delta: number) => {
+      updateFoundQuantity(itemId, delta);
     },
-    [updateFulfillment]
+    [updateFoundQuantity]
   );
 
   if (!sale) {
@@ -143,6 +131,10 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
         <SaleInfoCard sale={sale} />
 
         <EntitiesPage.CardContainer>
+          <SaleTimeline currentStatus={sale.status} />
+        </EntitiesPage.CardContainer>
+
+        <EntitiesPage.CardContainer>
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -158,8 +150,8 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
             </div>
             <SaleItemsTable
               items={sale.items}
-              onFulfillmentChange={
-                !isTerminal ? handleFulfillmentChange : undefined
+              onFoundQuantityChange={
+                !isTerminal ? handleFoundQuantityChange : undefined
               }
             />
           </div>
@@ -173,22 +165,24 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 <span className="text-sm font-semibold">Acciones</span>
               </div>
               <Divider />
-              <div className="flex flex-wrap gap-3">
-                {nextStatus && nextStatusLabel && nextStatusIcon && (
-                  <Tooltip content={nextStatusLabel}>
-                    <Button
-                      className="bg-accent text-white"
-                      startContent={<Icon icon={nextStatusIcon} width={18} />}
-                      onPress={handleNextStatusPress}
-                    >
-                      {nextStatusLabel}
-                    </Button>
-                  </Tooltip>
-                )}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-3">
+                  {nextStatus && nextStatusLabel && nextStatusIcon && (
+                    <Tooltip content={nextStatusLabel}>
+                      <Button
+                        className="bg-accent text-white"
+                        startContent={<Icon icon={nextStatusIcon} width={18} />}
+                        onPress={handleNextStatusPress}
+                      >
+                        {nextStatusLabel}
+                      </Button>
+                    </Tooltip>
+                  )}
 
-                <GeneratePdfButton sale={sale} />
+                  <GeneratePdfButton sale={sale} />
 
-                <SendReadyEmailButton sale={sale} />
+                  <SendReadyEmailButton sale={sale} />
+                </div>
 
                 <Button
                   color="danger"

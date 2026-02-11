@@ -18,7 +18,7 @@ interface GeneratePdfButtonProps {
 export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerate = useCallback(() => {
+  const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     try {
       const data: PickingListData = {
@@ -30,6 +30,7 @@ export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
         notes: sale.notes,
         items: sale.items.map((item) => ({
           cardName: item.cardName,
+          cardImageUrl: item.cardImageUrl,
           setName: item.setName,
           setCode: item.setCode,
           condition: CARD_CONDITION_SHORT_LABELS[item.condition],
@@ -37,7 +38,7 @@ export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
           unitPrice: item.unitPrice,
         })),
       };
-      generatePickingListPdf(data);
+      await generatePickingListPdf(data);
     } finally {
       setIsGenerating(false);
     }

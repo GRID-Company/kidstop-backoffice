@@ -37,15 +37,17 @@ export const SALE_STATUS_OPTIONS = Object.values(SALE_STATUS).map(
 export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
   [FULFILLMENT_STATUS.PENDING]: 'Pendiente',
   [FULFILLMENT_STATUS.FOUND]: 'Encontrado',
+  [FULFILLMENT_STATUS.PARTIAL]: 'Parcial',
   [FULFILLMENT_STATUS.NOT_AVAILABLE]: 'No disponible',
 };
 
 export const FULFILLMENT_STATUS_COLORS: Record<
   FulfillmentStatus,
-  'default' | 'success' | 'danger'
+  'default' | 'success' | 'warning' | 'danger'
 > = {
   [FULFILLMENT_STATUS.PENDING]: 'default',
   [FULFILLMENT_STATUS.FOUND]: 'success',
+  [FULFILLMENT_STATUS.PARTIAL]: 'warning',
   [FULFILLMENT_STATUS.NOT_AVAILABLE]: 'danger',
 };
 
@@ -55,3 +57,21 @@ export const DEFAULT_SALES_SORT: ITableSort = {
 };
 
 export const DEFAULT_PAGE_SIZE = 20;
+
+export const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
+  [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,
+  [SALE_STATUS.IN_PROGRESS]: SALE_STATUS.READY_FOR_PICKUP,
+  [SALE_STATUS.READY_FOR_PICKUP]: SALE_STATUS.COMPLETED,
+};
+
+export const NEXT_STATUS_LABELS: Partial<Record<SaleStatus, string>> = {
+  [SALE_STATUS.NEW]: 'Iniciar surtido',
+  [SALE_STATUS.IN_PROGRESS]: 'Marcar listo para recolección',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'Completar venta',
+};
+
+export const NEXT_STATUS_ICONS: Partial<Record<SaleStatus, string>> = {
+  [SALE_STATUS.NEW]: 'lucide:play',
+  [SALE_STATUS.IN_PROGRESS]: 'lucide:package-check',
+  [SALE_STATUS.READY_FOR_PICKUP]: 'lucide:check-circle',
+};
