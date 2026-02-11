@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
         hostname: 'cards.scryfall.io',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'tcgplayer-cdn.tcgplayer.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: '/**',
+      },
     ],
   },
   async redirects() {

@@ -10,7 +10,7 @@ export const MOCK_CARDS: ICard[] = [
     setCode: 'OBF',
     number: '125',
     rarity: 'Special Art Rare',
-    imageUrl: 'https://images.pokemontcg.io/sv3/125_hires.png',
+    imageUrl: 'https://storage.googleapis.com/images.pricecharting.com/83e642af4338affb9d77be8d84c9a29d3bb5c3a1909ab4428ce2651365c62d97/240.jpg',
     tcgType: TCG_TYPES.POKEMON,
     variants: [
       {
