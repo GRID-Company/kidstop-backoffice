@@ -40,13 +40,18 @@ const MostWanted = {
   route: '/most-wanted',
   icon: 'lucide:star',
 };
+const DeckBuilder = {
+  label: 'Buscador Avanzado',
+  route: '/deck-builder',
+  icon: 'lucide:file-search',
+};
 const ClickUp = {
   label: 'ClickUp',
   route: '/clickup',
   icon: 'simple-icons:clickup',
 };
 
-const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings, ClickUp];
+const ADMIN_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings, ClickUp];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
