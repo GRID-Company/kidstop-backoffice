@@ -16,6 +16,16 @@ interface MostWantedPreviewProps {
   selectedTCG: TCGType;
 }
 
+const PARCHMENT = {
+  bg: 'linear-gradient(180deg, #d4b896 0%, #c9ad82 10%, #d4b896 30%, #c4a67a 60%, #d4b896 80%, #b89460 100%)',
+  cardBg: 'linear-gradient(135deg, #f5e6c8 0%, #ecdbb5 40%, #e4cea3 100%)',
+  rankBg: 'linear-gradient(180deg, #dbb45c 0%, #b8922e 100%)',
+  vignette: 'inset 0 0 80px rgba(80,40,10,0.25), inset 0 0 160px rgba(80,40,10,0.1)',
+  ctaBg: 'linear-gradient(180deg, rgba(139,90,43,0.05) 0%, rgba(139,90,43,0.18) 100%)',
+} as const;
+
+const NOISE_TEXTURE_URI = `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
 const PRIORITY_BADGE: Record<string, { bg: string; text: string; border: string; glow?: string }> = {
   HIGH: { bg: 'bg-red-800', text: 'text-white', border: 'border-red-900/30', glow: 'animate-[pulse-glow_2s_ease-in-out_infinite]' },
   MEDIUM: { bg: 'bg-amber-700', text: 'text-white', border: 'border-amber-800/30' },
@@ -29,6 +39,7 @@ const cardVariants = {
     y: 0,
     transition: { delay: 0.15 * i, duration: 0.5, ease: [0, 0, 0.2, 1] as const },
   }),
+  exit: { opacity: 0, y: -16, transition: { duration: 0.3 } },
 };
 
 function OrnamentalDivider() {
@@ -62,14 +73,14 @@ function PreviewCardItem({
       animate="visible"
       className="flex items-center gap-5 rounded-xl border border-amber-900/20 px-5 py-4"
       style={{
-        background: 'linear-gradient(135deg, #f5e6c8 0%, #ecdbb5 40%, #e4cea3 100%)',
+        background: PARCHMENT.cardBg,
         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 8px rgba(0,0,0,0.12)',
       }}
     >
       <span
         className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg text-3xl font-black text-amber-950"
         style={{
-          background: 'linear-gradient(180deg, #dbb45c 0%, #b8922e 100%)',
+          background: PARCHMENT.rankBg,
           textShadow: '0 1px 0 rgba(255,255,255,0.4)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.2)',
         }}
@@ -155,25 +166,25 @@ export default function MostWantedPreview({ items, selectedTCG }: MostWantedPrev
       <div
         className="relative overflow-hidden rounded-2xl border-4 border-amber-950"
         style={{
-          background: 'linear-gradient(180deg, #d4b896 0%, #c9ad82 10%, #d4b896 30%, #c4a67a 60%, #d4b896 80%, #b89460 100%)',
+          background: PARCHMENT.bg,
           boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
         }}
       >
         <div
           className="pointer-events-none absolute inset-0 z-10"
           style={{
-            boxShadow: 'inset 0 0 80px rgba(80,40,10,0.25), inset 0 0 160px rgba(80,40,10,0.1)',
+            boxShadow: PARCHMENT.vignette,
           }}
         />
 
         <div
           className="pointer-events-none absolute inset-0 z-10 opacity-[0.03]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundImage: NOISE_TEXTURE_URI,
           }}
         />
 
-        <div className="bg-shimmer pointer-events-none absolute inset-0 z-10" />
+        <div className="mw-bg-shimmer pointer-events-none absolute inset-0 z-10" />
 
         <div className="relative z-20 flex flex-col items-center gap-4 px-8 pb-4 pt-10">
           <motion.div
@@ -190,55 +201,11 @@ export default function MostWantedPreview({ items, selectedTCG }: MostWantedPrev
           </motion.div>
 
           <h2
-            className="shimmer-title text-4xl font-black uppercase tracking-[0.2em] text-amber-950"
+            className="mw-shimmer-title text-4xl font-black uppercase tracking-[0.2em] text-amber-950"
             style={{ textShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
           >
             Most Wanted
           </h2>
-
-          <style>{`
-            .shimmer-title {
-              background: linear-gradient(
-                90deg,
-                #5c3a1e 0%,
-                #5c3a1e 40%,
-                #d4a853 50%,
-                #5c3a1e 60%,
-                #5c3a1e 100%
-              );
-              background-size: 200% 100%;
-              -webkit-background-clip: text;
-              background-clip: text;
-              -webkit-text-fill-color: transparent;
-              animation: shimmer 3s ease-in-out infinite;
-            }
-            @keyframes shimmer {
-              0%, 100% { background-position: 100% 0; }
-              50% { background-position: -100% 0; }
-            }
-            @keyframes pulse-glow {
-              0%, 100% { box-shadow: 0 0 4px rgba(185, 28, 28, 0.3); }
-              50% { box-shadow: 0 0 14px rgba(185, 28, 28, 0.7), 0 0 28px rgba(185, 28, 28, 0.3); }
-            }
-            .bg-shimmer {
-              background: linear-gradient(
-                120deg,
-                transparent 0%,
-                transparent 35%,
-                rgba(212, 168, 83, 0.12) 45%,
-                rgba(255, 215, 100, 0.18) 50%,
-                rgba(212, 168, 83, 0.12) 55%,
-                transparent 65%,
-                transparent 100%
-              );
-              background-size: 300% 100%;
-              animation: bg-shimmer 12s ease-in-out infinite;
-            }
-            @keyframes bg-shimmer {
-              0% { background-position: 150% 0; }
-              100% { background-position: -150% 0; }
-            }
-          `}</style>
 
           {tcgOption && (
             <div
@@ -261,7 +228,7 @@ export default function MostWantedPreview({ items, selectedTCG }: MostWantedPrev
           {activeItems.length === 0 ? (
             <EmptyPreview />
           ) : (
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {activeItems.map((item, index) => (
                 <PreviewCardItem key={item.id} item={item} rank={index + 1} index={index} />
               ))}
@@ -276,7 +243,7 @@ export default function MostWantedPreview({ items, selectedTCG }: MostWantedPrev
         <div
           className="relative z-20 px-8 py-6 text-center"
           style={{
-            background: 'linear-gradient(180deg, rgba(139,90,43,0.05) 0%, rgba(139,90,43,0.18) 100%)',
+            background: PARCHMENT.ctaBg,
           }}
         >
           <motion.p

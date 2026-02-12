@@ -12,3 +12,49 @@
   --color-content-primary: #272e35;
   --color-neutral-subtle: #f5f7f9;
 }
+
+.mw-shimmer-title {
+  background: linear-gradient(
+    90deg,
+    #5c3a1e 0%,
+    #5c3a1e 40%,
+    #d4a853 50%,
+    #5c3a1e 60%,
+    #5c3a1e 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: mw-shimmer 3s ease-in-out infinite;
+}
+
+.mw-bg-shimmer {
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(212, 168, 83, 0.12) 45%,
+    rgba(255, 215, 100, 0.18) 50%,
+    rgba(212, 168, 83, 0.12) 55%,
+    transparent 65%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  animation: mw-bg-shimmer 12s ease-in-out infinite;
+}
+
+@keyframes mw-shimmer {
+  0%, 100% { background-position: 100% 0; }
+  50% { background-position: -100% 0; }
+}
+
+@keyframes mw-bg-shimmer {
+  0% { background-position: 150% 0; }
+  100% { background-position: -150% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(185, 28, 28, 0.3); }
+  50% { box-shadow: 0 0 14px rgba(185, 28, 28, 0.7), 0 0 28px rgba(185, 28, 28, 0.3); }
+}
