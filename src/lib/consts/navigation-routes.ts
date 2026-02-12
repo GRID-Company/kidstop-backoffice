@@ -35,13 +35,18 @@ const Customers = {
   route: '/clientes',
   icon: 'lucide:users',
 };
+const MostWanted = {
+  label: 'Most Wanted',
+  route: '/most-wanted',
+  icon: 'lucide:star',
+};
 const ClickUp = {
   label: 'ClickUp',
   route: '/clickup',
   icon: 'simple-icons:clickup',
 };
 
-const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, Users, Settings, ClickUp];
+const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings, ClickUp];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
