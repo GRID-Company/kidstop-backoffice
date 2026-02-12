@@ -91,7 +91,7 @@ export default function MostWantedConfig() {
             </div>
 
             <div className="xl:sticky xl:top-4 xl:self-start">
-              <MostWantedPreview items={items} />
+              <MostWantedPreview items={items} selectedTCG={selectedTCG} />
             </div>
           </div>
         </EntitiesPage.CardContainer>
