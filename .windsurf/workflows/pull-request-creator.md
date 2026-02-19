@@ -7,7 +7,7 @@ This workflow is for creating pull requests from feature branches to a specific 
 
 # Instructions
 - Use GH CLI
-- The target repo is https://github.com/GRID-Company/iguanas-ranas-frontend
+- The target repo is https://github.com/GRID-Company/exarmi-frontend
 
 ## Workflow
 Step 1
