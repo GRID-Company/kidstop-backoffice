@@ -1,0 +1,43 @@
+query Users($findUsersArgs: FindUsersArgs!) {
+  users(findUsersArgs: $findUsersArgs) {
+    data {
+      guid
+      name
+      emailAddress
+      role
+      activated
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
+
+mutation CreateUser($createUserInput: CreateUserInput!) {
+  createUser(createUserInput: $createUserInput) {
+    guid
+    name
+    emailAddress
+    phone
+    role
+    activated
+  }
+}
+
+mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+  updateUser(updateUserInput: $updateUserInput) {
+    message
+  }
+}
+
+mutation ActivateUser($guid: String!) {
+  activateUser(guid: $guid) {
+    message
+  }
+}
+
+mutation DeactivateUser($guid: String!) {
+  deactivateUser(guid: $guid) {
+    message
+  }
+}

@@ -1,0 +1,353 @@
+import type * as Types from '../schema-types';
+
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+export type UsersQueryVariables = Types.Exact<{
+  findUsersArgs: Types.FindUsersArgs;
+}>;
+
+export type UsersQuery = {
+  users: {
+    count: number | null;
+    data: Array<{
+      guid: string;
+      name: string | null;
+      emailAddress: string;
+      phone: string | null;
+      role: string;
+      clientStatus: string | null;
+      activated: boolean;
+      createdDate: unknown;
+      updatedDate: unknown;
+    }> | null;
+  };
+};
+
+export type CreateUserMutationVariables = Types.Exact<{
+  createUserInput: Types.CreateUserInput;
+}>;
+
+export type CreateUserMutation = {
+  createUser: {
+    guid: string;
+    name: string | null;
+    emailAddress: string;
+    phone: string | null;
+    role: string;
+    activated: boolean;
+  };
+};
+
+export type UpdateUserMutationVariables = Types.Exact<{
+  updateUserInput: Types.UpdateUserInput;
+}>;
+
+export type UpdateUserMutation = { updateUser: { message: string } };
+
+export type ActivateUserMutationVariables = Types.Exact<{
+  guid: Types.Scalars['String']['input'];
+}>;
+
+export type ActivateUserMutation = { activateUser: { message: string } };
+
+export type DeactivateUserMutationVariables = Types.Exact<{
+  guid: Types.Scalars['String']['input'];
+}>;
+
+export type DeactivateUserMutation = { deactivateUser: { message: string } };
+
+export const UsersDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'Users' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findUsersArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindUsersArgs' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'users' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findUsersArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findUsersArgs' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'emailAddress' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'role' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'clientStatus' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'activated' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatedDate' },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UsersQuery, UsersQueryVariables>;
+export const CreateUserDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'createUserInput' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateUserInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'createUserInput' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'createUserInput' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'emailAddress' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'role' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'activated' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
+export const UpdateUserDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'updateUserInput' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateUserInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'updateUserInput' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'updateUserInput' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
+export const ActivateUserDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'ActivateUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'activateUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'guid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'guid' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ActivateUserMutation,
+  ActivateUserMutationVariables
+>;
+export const DeactivateUserDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeactivateUser' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deactivateUser' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'guid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'guid' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeactivateUserMutation,
+  DeactivateUserMutationVariables
+>;

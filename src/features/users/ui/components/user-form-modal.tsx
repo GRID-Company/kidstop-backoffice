@@ -14,7 +14,7 @@ import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import { useUserForm } from '../../adapters/forms/use-user-form';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
-import { USER_ROLE_OPTIONS } from '../../domain/constants';
+import { USER_ROLE_OPTIONS, USER_ROLES } from '../../domain/constants';
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -38,8 +38,9 @@ export default function UserFormModal({
   const { control, handleSubmit, formState, reset } = useUserForm(defaults);
 
   useEffect(() => {
-    if (defaults) reset(defaults);
-  }, [defaults, reset]);
+    if (!isOpen) return;
+    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION, activated: true });
+  }, [isOpen, defaults, reset]);
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose} size="xl">
