@@ -30,41 +30,62 @@ export type Scalars = {
   Upload: { input: unknown; output: unknown };
 };
 
-export type AddressData = {
-  city: Scalars['String']['output'];
-  exteriorNumber: Scalars['String']['output'];
-  interiorNumber: Scalars['String']['output'];
-  neighborhood: Scalars['String']['output'];
-  postalCode: Scalars['String']['output'];
-  state: Scalars['String']['output'];
-  street: Scalars['String']['output'];
+export type AddCartItemInput = {
+  condition: Scalars['String']['input'];
+  magicCardGuid?: InputMaybe<Scalars['String']['input']>;
+  pokemonCardGuid?: InputMaybe<Scalars['String']['input']>;
+  quantity: Scalars['Int']['input'];
+  tcg: Scalars['String']['input'];
 };
 
-export type AddressDataInput = {
-  city: Scalars['String']['input'];
-  exteriorNumber: Scalars['String']['input'];
-  interiorNumber: Scalars['String']['input'];
-  neighborhood: Scalars['String']['input'];
-  postalCode: Scalars['String']['input'];
-  state: Scalars['String']['input'];
-  street: Scalars['String']['input'];
+export type AddPurchaseItemInput = {
+  condition: Scalars['String']['input'];
+  magicCardGuid?: InputMaybe<Scalars['String']['input']>;
+  offerPrice: Scalars['Float']['input'];
+  pokemonCardGuid?: InputMaybe<Scalars['String']['input']>;
+  quantity: Scalars['Int']['input'];
+  referencePrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
-export type AddressDataOutput = AddressData & {
-  city: Scalars['String']['output'];
-  exteriorNumber: Scalars['String']['output'];
-  interiorNumber: Scalars['String']['output'];
-  neighborhood: Scalars['String']['output'];
-  postalCode: Scalars['String']['output'];
-  state: Scalars['String']['output'];
-  street: Scalars['String']['output'];
-};
-
-export type BranchOffice = {
+export type BuyerBudgetWithUsage = {
+  assignedAmount: Scalars['Float']['output'];
+  buyer: User;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  name: Scalars['String']['output'];
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+  usedAmount: Scalars['Float']['output'];
+  utilization: Scalars['Float']['output'];
+};
+
+export type CancelSaleInput = {
+  cancelReason: Scalars['String']['input'];
+  saleGuid: Scalars['String']['input'];
+};
+
+export type Cart = {
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  customer: User;
+  guid: Scalars['String']['output'];
+  items?: Maybe<Array<CartItem>>;
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type CartItem = {
+  cart: Cart;
+  condition: Scalars['String']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  guid: Scalars['String']['output'];
+  magicCard?: Maybe<MagicCard>;
+  pokemonCard?: Maybe<PokemonCard>;
+  quantity: Scalars['Int']['output'];
+  tcg: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
 };
@@ -78,174 +99,52 @@ export type ChangePasswordOutput = {
   success: Scalars['Boolean']['output'];
 };
 
-export type ChapeInventoryItem = {
-  category: Scalars['String']['output'];
-  color: Scalars['String']['output'];
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  guid: Scalars['String']['output'];
-  line: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  stock?: Maybe<Array<InventoryItemStock>>;
-  supplier: Scalars['String']['output'];
-  unitMeasure: Scalars['String']['output'];
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
+export type CreateInventoryMovementInput = {
+  condition: Scalars['String']['input'];
+  movementType: Scalars['String']['input'];
+  notes: Scalars['String']['input'];
+  pokemonCardGuid: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
+  reference?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type ChapeInventoryItemData = {
-  category: Scalars['String']['output'];
-  color: Scalars['String']['output'];
-  guid: Scalars['String']['output'];
-  line: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  supplier: Scalars['String']['output'];
-  unitMeasure: Scalars['String']['output'];
+export type CreatePurchaseInput = {
+  anonymousClientEmail?: InputMaybe<Scalars['String']['input']>;
+  anonymousClientName?: InputMaybe<Scalars['String']['input']>;
+  anonymousClientPhone?: InputMaybe<Scalars['String']['input']>;
+  clientGuid?: InputMaybe<Scalars['String']['input']>;
+  items: Array<CreatePurchaseItemInput>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  payments?: InputMaybe<Array<CreatePurchasePaymentInput>>;
+  tcg: Scalars['String']['input'];
 };
 
-export type ChapeInventoryItemDataOutput = ChapeInventoryItemData & {
-  category: Scalars['String']['output'];
-  color: Scalars['String']['output'];
-  guid: Scalars['String']['output'];
-  line: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  supplier: Scalars['String']['output'];
-  unitMeasure: Scalars['String']['output'];
+export type CreatePurchaseItemInput = {
+  condition: Scalars['String']['input'];
+  magicCardGuid?: InputMaybe<Scalars['String']['input']>;
+  offerPrice: Scalars['Float']['input'];
+  pokemonCardGuid?: InputMaybe<Scalars['String']['input']>;
+  quantity: Scalars['Int']['input'];
+  referencePrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
-export type ChapeWindow = {
-  chapeInventoryItem: ChapeInventoryItem;
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  guid: Scalars['String']['output'];
-  quantity: Scalars['Float']['output'];
-  subWindow: SubWindow;
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
+export type CreatePurchasePaymentInput = {
+  amount: Scalars['Float']['input'];
+  method: Scalars['String']['input'];
 };
 
-export type ChapeWindowData = {
-  chapeInventoryItem: ChapeInventoryItemData;
-  quantity: Scalars['Int']['output'];
-};
-
-export type ChapeWindowDataOutput = ChapeWindowData & {
-  chapeInventoryItem: ChapeInventoryItemDataOutput;
-  quantity: Scalars['Int']['output'];
-};
-
-export type CreateBranchOfficeInput = {
-  name: Scalars['String']['input'];
-};
-
-export type CreateChapeInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  color: Scalars['String']['input'];
-  line: Scalars['String']['input'];
-  minStock: Scalars['Float']['input'];
-  name: Scalars['String']['input'];
-  price: Scalars['Float']['input'];
-  sku: Scalars['String']['input'];
-  stock: Scalars['Float']['input'];
-  supplier: Scalars['String']['input'];
-  unitMeasure: Scalars['String']['input'];
-};
-
-export type CreateChapeWindowInput = {
-  chapeInventoryItemGuid: Scalars['String']['input'];
-  quantity: Scalars['Float']['input'];
-};
-
-export type CreateGlassInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  minStock: Scalars['Float']['input'];
-  name: Scalars['String']['input'];
-  price: Scalars['Float']['input'];
-  sku: Scalars['String']['input'];
-  stock: Scalars['Float']['input'];
-  thickness: Scalars['Float']['input'];
-};
-
-export type CreateOtherInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  minStock: Scalars['Float']['input'];
-  name: Scalars['String']['input'];
-  price: Scalars['Float']['input'];
-  sku: Scalars['String']['input'];
-  stock: Scalars['Float']['input'];
-  unitMeasure: Scalars['String']['input'];
-};
-
-export type CreateProfileInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  color: Scalars['String']['input'];
-  line: Scalars['String']['input'];
-  minStock?: InputMaybe<Scalars['Float']['input']>;
-  name: Scalars['String']['input'];
-  price: Scalars['Float']['input'];
-  size: Scalars['Float']['input'];
-  sku: Scalars['String']['input'];
-  stock: Scalars['Float']['input'];
-  supplier?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type CreateProfileVariantInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  groupGuid: Scalars['String']['input'];
-  minStock?: InputMaybe<Scalars['Float']['input']>;
-  size: Scalars['Float']['input'];
-  stock: Scalars['Float']['input'];
-};
-
-export type CreateQuotationInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  clientData: QuotationClientDataInput;
-  finish: Scalars['String']['input'];
-  finishProfitAmount: Scalars['Float']['input'];
-  finishProfitPercentage: Scalars['Float']['input'];
-  invoiceData?: InputMaybe<InvoiceDataInput>;
-  iva: Scalars['Float']['input'];
-  paymentMethod: Scalars['String']['input'];
-  pdfUrl: Scalars['String']['input'];
-  shipping: Scalars['Float']['input'];
-  subtotal: Scalars['Float']['input'];
-  total: Scalars['Float']['input'];
-  windowFinish: Scalars['String']['input'];
-  windows: Array<WindowQuotationInput>;
-};
-
-export type CreateSubWindowInput = {
-  chapeWindows: Array<CreateChapeWindowInput>;
-  horizontalProfiles: Array<WindowProfileInput>;
-  projectionQuantity?: InputMaybe<Scalars['Float']['input']>;
-  verticalProfiles: Array<WindowProfileInput>;
-  windowType: Scalars['String']['input'];
+export type CreateSaleFromCartInput = {
+  kioskCustomerEmail?: InputMaybe<Scalars['String']['input']>;
+  kioskCustomerName?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type CreateUserInput = {
-  branchOfficeGuids?: InputMaybe<Array<Scalars['ID']['input']>>;
   emailAddress: Scalars['String']['input'];
   name: Scalars['String']['input'];
   password?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
   role: Scalars['String']['input'];
-};
-
-export type CreateWindowInput = {
-  categoryType?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  glassInventoryItemGuid: Scalars['String']['input'];
-  hasMosquitoNet: Scalars['Boolean']['input'];
-  name: Scalars['String']['input'];
-  sampleImageGuids: Array<Scalars['String']['input']>;
-  subWindows: Array<CreateSubWindowInput>;
-  technicalImageGuid: Scalars['String']['input'];
-  windowTypes: Array<Scalars['String']['input']>;
 };
 
 export type DashboardTableOutput = {
@@ -280,110 +179,96 @@ export type File = {
   updatedDate: Scalars['Timestamp']['output'];
 };
 
-export type FindBranchOfficesArgs = {
-  filters?: InputMaybe<FindBranchOfficesFilter>;
+export type FindInventoryItemsArgs = {
+  filters?: InputMaybe<FindInventoryItemsFilter>;
   limit: Scalars['Int']['input'];
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
 };
 
-export type FindBranchOfficesFilter = {
+export type FindInventoryItemsFilter = {
+  condition?: InputMaybe<Scalars['String']['input']>;
+  lastSellDate?: InputMaybe<DateRangeFilter>;
+  pokemonFilters?: InputMaybe<PokemonFilters>;
+  stockStatus?: InputMaybe<Scalars['String']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FindInventoryMovementsArgs = {
+  filters?: InputMaybe<FindInventoryMovementsFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindInventoryMovementsFilter = {
   createdDate?: InputMaybe<DateRangeFilter>;
+  movementType?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type FindChapeArgs = {
-  branchOfficeGuid?: InputMaybe<Scalars['String']['input']>;
-  guid?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindChapesArgs = {
-  filters: FindChapesFilter;
+export type FindMySalesArgs = {
+  filters?: InputMaybe<FindMySalesFilter>;
   limit: Scalars['Int']['input'];
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
 };
 
-export type FindChapesFilter = {
-  branchOfficeGuid?: InputMaybe<Scalars['String']['input']>;
-  color?: InputMaybe<Scalars['String']['input']>;
-  line?: InputMaybe<Scalars['String']['input']>;
-  supplier?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindGlassArgs = {
-  branchOfficeGuid?: InputMaybe<Scalars['String']['input']>;
-  guid?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindGlassesArgs = {
-  filters: FindGlassesFilter;
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
-};
-
-export type FindGlassesFilter = {
-  branchOfficeGuid?: InputMaybe<Scalars['String']['input']>;
-  thickness?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export type FindOtherArgs = {
-  branchOfficeGuid?: InputMaybe<Scalars['String']['input']>;
-  guid?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindOtherFilter = {
-  branchOfficeGuid?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindOthersArgs = {
-  filters: FindOtherFilter;
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
-};
-
-export type FindProfileGroupArgs = {
-  branchOfficeGuid: Scalars['String']['input'];
-  profileGroupGuid: Scalars['String']['input'];
-};
-
-export type FindProfileVariantArgs = {
-  branchOfficeGuid: Scalars['String']['input'];
-  profileVariantGuid: Scalars['String']['input'];
-};
-
-export type FindProfilesArgs = {
-  filters: FindProfilesFilter;
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
-};
-
-export type FindProfilesFilter = {
-  branchOfficeGuid: Scalars['String']['input'];
-  color?: InputMaybe<Scalars['String']['input']>;
-  line?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindQuotationsArgs = {
-  filters: FindQuotationsFilter;
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
-};
-
-export type FindQuotationsFilter = {
-  branchOffice: RelationFilter;
-  clientName?: InputMaybe<Scalars['String']['input']>;
-  invoiceNeeded?: InputMaybe<Scalars['Boolean']['input']>;
+export type FindMySalesFilter = {
   status?: InputMaybe<Scalars['String']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FindPokemonCardsPublicArgs = {
+  filters?: InputMaybe<FindPokemonCardsPublicFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindPokemonCardsPublicFilter = {
+  condition?: InputMaybe<Scalars['String']['input']>;
+  /** Default: Pokemon Card */
+  genre?: InputMaybe<Scalars['String']['input']>;
+  rarity?: InputMaybe<Scalars['String']['input']>;
+  sellPrice?: InputMaybe<NumericRangeFilter>;
+  /** Collection guid */
+  set?: InputMaybe<Scalars['String']['input']>;
+  stockStatus?: InputMaybe<Scalars['String']['input']>;
+  variant?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FindPurchasesArgs = {
+  filters?: InputMaybe<FindPurchasesFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindPurchasesFilter = {
+  buyer?: InputMaybe<Scalars['String']['input']>;
+  createdDate?: InputMaybe<DateRangeFilter>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FindSalesArgs = {
+  filters?: InputMaybe<FindSalesFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindSalesFilter = {
+  createdDate?: InputMaybe<DateRangeFilter>;
+  customer?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FindUsersArgs = {
@@ -396,84 +281,32 @@ export type FindUsersArgs = {
 
 export type FindUsersFilter = {
   activated?: InputMaybe<Scalars['Boolean']['input']>;
+  clientStatus?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FindWindowsArgs = {
-  filters?: InputMaybe<FindWindowsFilter>;
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
-};
-
-export type FindWindowsFilter = {
-  categoryType?: InputMaybe<Scalars['String']['input']>;
-  hasMosquitoNet?: InputMaybe<Scalars['Boolean']['input']>;
-  windowType?: InputMaybe<Scalars['String']['input']>;
+  /** Filter by multiple roles using :multiple_values: filter type */
+  roles?: InputMaybe<MultipleValuesFilter>;
 };
 
 export type GenericOutput = {
   message: Scalars['String']['output'];
 };
 
-export type GlassInventoryItem = {
-  category: Scalars['String']['output'];
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  guid: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  stock?: Maybe<Array<InventoryItemStock>>;
-  thickness: Scalars['Float']['output'];
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
-};
-
-export type GlassInventoryItemData = {
-  category: Scalars['String']['output'];
-  guid: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  thickness: Scalars['Int']['output'];
-};
-
-export type GlassInventoryItemDataOutput = GlassInventoryItemData & {
-  category: Scalars['String']['output'];
-  guid: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  thickness: Scalars['Int']['output'];
-};
-
 export type GlobalConfig = {
+  config: GlobalConfigData;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
-  values: Array<GlobalConfigValueOutput>;
 };
 
-export type GlobalConfigValue = {
-  /** Accepted values: SIMULATOR_INSTRUCTIONS, SIMULATOR_DURATION */
-  identifier: Scalars['String']['output'];
-  value: Scalars['String']['output'];
-};
-
-export type GlobalConfigValueInput = {
-  /** Accepted values: SIMULATOR_INSTRUCTIONS, SIMULATOR_DURATION */
-  identifier: Scalars['String']['input'];
-  value: Scalars['String']['input'];
-};
-
-export type GlobalConfigValueOutput = GlobalConfigValue & {
-  /** Accepted values: SIMULATOR_INSTRUCTIONS, SIMULATOR_DURATION */
-  identifier: Scalars['String']['output'];
-  value: Scalars['String']['output'];
+export type GlobalConfigData = {
+  /** Maximum units per card in inventory (frontend warning) */
+  inventoryLimit?: Maybe<Scalars['Int']['output']>;
+  /** Default percentage for auto-calculating offer price */
+  purchasePercentage?: Maybe<Scalars['Float']['output']>;
+  /** Number of CLIENT_UNREACHABLE cancellations before auto-blocking a customer */
+  saleCancellationBlockThreshold?: Maybe<Scalars['Int']['output']>;
 };
 
 export type IndicatorsDataOutput = {
@@ -481,40 +314,41 @@ export type IndicatorsDataOutput = {
   value: Scalars['Float']['output'];
 };
 
-export type InventoryItemStock = {
-  branchOffice: BranchOffice;
-  chape?: Maybe<ChapeInventoryItem>;
+export type InventoryIndicatorsOutput = {
+  avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
+  lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
+  totalStock: Scalars['Int']['output'];
+};
+
+export type InventoryItem = {
+  avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
+  condition: Scalars['String']['output'];
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
-  glass?: Maybe<GlassInventoryItem>;
   guid: Scalars['String']['output'];
-  minStock: Scalars['Float']['output'];
-  other?: Maybe<OtherInventoryItem>;
-  profile?: Maybe<ProfileInventoryItemVariant>;
+  lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
+  magicCard?: Maybe<MagicCard>;
+  movements?: Maybe<Array<InventoryMovement>>;
+  pokemonCard?: Maybe<PokemonCard>;
+  purchasePrice?: Maybe<Scalars['Float']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Float']['output'];
+  tcg: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
 };
 
-export type InvoiceData = {
-  address: AddressData;
-  cfdi: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  rfc: Scalars['String']['output'];
-};
-
-export type InvoiceDataInput = {
-  address: AddressDataInput;
-  cfdi: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  rfc: Scalars['String']['input'];
-};
-
-export type InvoiceDataOutput = InvoiceData & {
-  address: AddressDataOutput;
-  cfdi: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  rfc: Scalars['String']['output'];
+export type InventoryMovement = {
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  guid: Scalars['String']['output'];
+  inventoryItem: InventoryItem;
+  movementType: Scalars['String']['output'];
+  notes: Scalars['String']['output'];
+  quantity: Scalars['Int']['output'];
+  reference?: Maybe<Scalars['String']['output']>;
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
 };
 
 export type IsValidTokenOutput = {
@@ -532,84 +366,152 @@ export type LoginUserInput = {
   password: Scalars['String']['input'];
 };
 
+export type MagicCard = {
+  cardKingdomId: Scalars['Float']['output'];
+  cardType?: Maybe<Scalars['String']['output']>;
+  castSymbols?: Maybe<Scalars['String']['output']>;
+  collection: MagicCardCollection;
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  detailsUrl: Scalars['String']['output'];
+  edition: Scalars['String']['output'];
+  fetchCardKingdomErrorMessage?: Maybe<Scalars['String']['output']>;
+  fetchCardKingdomErrors?: Maybe<Scalars['Float']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  power?: Maybe<Scalars['String']['output']>;
+  priceBuy?: Maybe<Scalars['Float']['output']>;
+  priceRetail?: Maybe<Scalars['Float']['output']>;
+  rarity?: Maybe<Scalars['String']['output']>;
+  scryfallId?: Maybe<Scalars['String']['output']>;
+  sku: Scalars['String']['output'];
+  toughness?: Maybe<Scalars['String']['output']>;
+  transformDescription?: Maybe<Scalars['String']['output']>;
+  transformImageUri?: Maybe<Scalars['String']['output']>;
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+  variation?: Maybe<Scalars['String']['output']>;
+};
+
+export type MagicCardCollection = {
+  cards: Array<MagicCard>;
+  cardsWithImages: Scalars['Float']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  editionIconUri?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  normalizedName: Scalars['String']['output'];
+  releaseDate?: Maybe<Scalars['String']['output']>;
+  tcgType: Scalars['String']['output'];
+  totalCards: Scalars['Float']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type MultipleValuesFilter = {
+  /** filterType -> :multiple_values: */
+  filterType: Scalars['String']['input'];
+  values: Array<Scalars['String']['input']>;
+};
+
 export type Mutation = {
+  /** Mutation to reactivate a deactivated user (admin only) */
+  activateUser: GenericOutput;
+  /** Add item to cart (carpeta digital) */
+  addCartItem: Cart;
+  /** Cancel a sale with reason (backoffice) */
+  cancelSale: Sale;
   /** Mutation to reset your password after requesting a change or expiration */
   changePassword: ChangePasswordOutput;
-  /** Mutation to create a branchOffice */
-  createBranchOffice: BranchOffice;
-  createChape: ChapeInventoryItem;
-  createGlass: GlassInventoryItem;
-  createOther: OtherInventoryItem;
-  createProfile: ProfileInventoryGroup;
-  createProfileVariant: ProfileInventoryItemVariant;
-  /** Mutation to create a quotation */
-  createQuotation: Quotation;
+  /** Clear all items from cart for a TCG (carpeta digital) */
+  clearCart: Cart;
+  /** Create a new inventory movement (admin only) */
+  createInventoryMovement: InventoryMovement;
+  /** Create a new purchase (always DRAFT) */
+  createPurchase: Purchase;
+  /** Checkout: create sale from cart (carpeta digital) */
+  createSaleFromCart: Sale;
   /** One use mutation to create the first superUser */
   createSuperUser: User;
   /** Mutation to create an User */
   createUser: User;
-  createWindow: WindowTemplate;
-  deactiveUser: GenericOutput;
-  /** Mutation to delete a branchOffice */
-  deleteBranchOffice: GenericOutput;
-  deleteChape: ChapeInventoryItem;
-  deleteGlass: GlassInventoryItem;
-  deleteOther: OtherInventoryItem;
-  deleteProfileVariant: ProfileInventoryItemVariant;
-  /** Mutation to soft delete a quotation */
-  deleteQuotation: Quotation;
-  deleteWindow: WindowTemplate;
+  /** Mutation to deactivate a user (admin only) */
+  deactivateUser: GenericOutput;
+  /** Finalize a purchase (WAITING_PRICE → FINALIZED) */
+  finalizePurchase: Purchase;
   login: LoginOutput;
+  /** Public mutation for client self-registration */
+  registerClient: User;
+  /** Remove item from cart (carpeta digital) */
+  removeCartItem: Cart;
   requestPasswordChange: RequestPasswordChangeOutput;
-  /** Mutation to update a branchOffice */
-  updateBranchOffice: GenericOutput;
-  updateChape: ChapeInventoryItem;
-  updateGlass: GlassInventoryItem;
+  /** Mutation to set client status (STANDARD, VIP, BLOCKED) - admin only */
+  setClientStatus: GenericOutput;
+  /** Set sell price (and optionally reference price) on a purchase item */
+  setPurchaseItemSellPrice: PurchaseItem;
+  /** Manually trigger Magic card sync from Card Kingdom */
+  triggerMagicSync: SyncMetricsOutput;
+  /** Manually trigger Pokemon card sync from PriceCharting */
+  triggerPokemonSync: SyncMetricsOutput;
+  /** Create or update a buyer budget (ADMIN only) */
+  updateBuyerBudget: BuyerBudgetWithUsage;
+  /** Update cart item quantity (carpeta digital) */
+  updateCartItem: Cart;
   updateGlobalConfig: GenericOutput;
-  updateOther: OtherInventoryItem;
-  updateProfile: ProfileInventoryGroup;
-  /** Mutation to update quotation status */
-  updateQuotationStatus: Quotation;
+  /** Update inventory item prices (internal only) */
+  updatePokemonCardPrices: InventoryItem;
+  /** Update purchase details (client, notes, payments) */
+  updatePurchase: Purchase;
+  /** Add, remove, or update purchase items (DRAFT only) */
+  updatePurchaseItems: Purchase;
+  /** Transition purchase status (ADMIN/BUYER only) */
+  updatePurchaseStatus: Purchase;
+  /** Transition sale status (backoffice) */
+  updateSaleStatus: Sale;
   /** Mutation to update an user */
   updateUser: GenericOutput;
-  /** Mutation to update a user profile */
+  /** Mutation to update a user profile (self-service for all authenticated users) */
   updateUserProfile: GenericOutput;
-  updateWindow: WindowTemplate;
   uploadBase64: File;
   uploadFile: File;
   userFinishSignUp: ChangePasswordOutput;
+};
+
+export type MutationActivateUserArgs = {
+  guid: Scalars['String']['input'];
+};
+
+export type MutationAddCartItemArgs = {
+  addCartItemInput: AddCartItemInput;
+};
+
+export type MutationCancelSaleArgs = {
+  cancelSaleInput: CancelSaleInput;
 };
 
 export type MutationChangePasswordArgs = {
   changePasswordInput: ChangePasswordInput;
 };
 
-export type MutationCreateBranchOfficeArgs = {
-  createBranchOfficeInput: CreateBranchOfficeInput;
+export type MutationClearCartArgs = {
+  tcg: Scalars['String']['input'];
 };
 
-export type MutationCreateChapeArgs = {
-  createChapeInput: CreateChapeInput;
+export type MutationCreateInventoryMovementArgs = {
+  createInventoryMovementInput: CreateInventoryMovementInput;
 };
 
-export type MutationCreateGlassArgs = {
-  createGlassInput: CreateGlassInput;
+export type MutationCreatePurchaseArgs = {
+  createPurchaseInput: CreatePurchaseInput;
 };
 
-export type MutationCreateOtherArgs = {
-  createOtherInput: CreateOtherInput;
-};
-
-export type MutationCreateProfileArgs = {
-  createProfileInput: CreateProfileInput;
-};
-
-export type MutationCreateProfileVariantArgs = {
-  createProfileVariantInput: CreateProfileVariantInput;
-};
-
-export type MutationCreateQuotationArgs = {
-  createQuotationInput: CreateQuotationInput;
+export type MutationCreateSaleFromCartArgs = {
+  createSaleFromCartInput: CreateSaleFromCartInput;
 };
 
 export type MutationCreateSuperUserArgs = {
@@ -620,76 +522,68 @@ export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
 };
 
-export type MutationCreateWindowArgs = {
-  createWindowInput: CreateWindowInput;
-};
-
-export type MutationDeactiveUserArgs = {
+export type MutationDeactivateUserArgs = {
   guid: Scalars['String']['input'];
 };
 
-export type MutationDeleteBranchOfficeArgs = {
-  guid: Scalars['String']['input'];
-};
-
-export type MutationDeleteChapeArgs = {
-  guid: Scalars['String']['input'];
-};
-
-export type MutationDeleteGlassArgs = {
-  guid: Scalars['String']['input'];
-};
-
-export type MutationDeleteOtherArgs = {
-  guid: Scalars['String']['input'];
-};
-
-export type MutationDeleteProfileVariantArgs = {
-  guid: Scalars['String']['input'];
-};
-
-export type MutationDeleteQuotationArgs = {
-  quotationGuid: Scalars['String']['input'];
-};
-
-export type MutationDeleteWindowArgs = {
-  windowGuid: Scalars['String']['input'];
+export type MutationFinalizePurchaseArgs = {
+  purchaseGuid: Scalars['String']['input'];
 };
 
 export type MutationLoginArgs = {
   loginUserInput: LoginUserInput;
 };
 
+export type MutationRegisterClientArgs = {
+  registerClientInput: RegisterClientInput;
+};
+
+export type MutationRemoveCartItemArgs = {
+  cartItemGuid: Scalars['String']['input'];
+};
+
 export type MutationRequestPasswordChangeArgs = {
   requestPasswordChangeInput: RequestPasswordChangeInput;
 };
 
-export type MutationUpdateBranchOfficeArgs = {
-  updateBranchOfficeInput: UpdateBranchOfficeInput;
+export type MutationSetClientStatusArgs = {
+  setClientStatusInput: SetClientStatusInput;
 };
 
-export type MutationUpdateChapeArgs = {
-  updateChapeInput: UpdateChapeInput;
+export type MutationSetPurchaseItemSellPriceArgs = {
+  setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput;
 };
 
-export type MutationUpdateGlassArgs = {
-  updateGlassInput: UpdateGlassInput;
+export type MutationUpdateBuyerBudgetArgs = {
+  updateBuyerBudgetInput: UpdateBuyerBudgetInput;
+};
+
+export type MutationUpdateCartItemArgs = {
+  updateCartItemInput: UpdateCartItemInput;
 };
 
 export type MutationUpdateGlobalConfigArgs = {
   updateGlobalConfigInput: UpdateGlobalConfigInput;
 };
 
-export type MutationUpdateOtherArgs = {
-  updateOtherInput: UpdateOtherInput;
+export type MutationUpdatePokemonCardPricesArgs = {
+  updateInventoryItemPricesInput: UpdateInventoryItemPricesInput;
 };
 
-export type MutationUpdateProfileArgs = {
-  updateProfileInput: UpdateProfileInput;
+export type MutationUpdatePurchaseArgs = {
+  updatePurchaseInput: UpdatePurchaseInput;
 };
 
-export type MutationUpdateQuotationStatusArgs = {
-  updateQuotationInput: UpdateQuotationStatusInput;
+export type MutationUpdatePurchaseItemsArgs = {
+  updatePurchaseItemsInput: UpdatePurchaseItemsInput;
+};
+
+export type MutationUpdatePurchaseStatusArgs = {
+  updatePurchaseStatusInput: UpdatePurchaseStatusInput;
+};
+
+export type MutationUpdateSaleStatusArgs = {
+  updateSaleStatusInput: UpdateSaleStatusInput;
 };
 
 export type MutationUpdateUserArgs = {
@@ -698,10 +592,6 @@ export type MutationUpdateUserArgs = {
 
 export type MutationUpdateUserProfileArgs = {
   updateUserProfileInput: UpdateUserProfileInput;
-};
-
-export type MutationUpdateWindowArgs = {
-  updateWindowInput: UpdateWindowInput;
 };
 
 export type MutationUploadBase64Args = {
@@ -716,63 +606,47 @@ export type MutationUserFinishSignUpArgs = {
   userFinishSignupInput: UserFinishSignupInput;
 };
 
-export type OtherInventoryItem = {
-  category: Scalars['String']['output'];
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  guid: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  stock?: Maybe<Array<InventoryItemStock>>;
-  unitMeasure: Scalars['String']['output'];
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
+export type NumericRange = {
+  /** Number */
+  from?: InputMaybe<Scalars['Float']['input']>;
+  /** Number */
+  to?: InputMaybe<Scalars['Float']['input']>;
 };
 
-export type PaginatedBranchOffices = {
-  count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<BranchOffice>>;
+export type NumericRangeFilter = {
+  /** filterType -> :numericrange: */
+  filterType: Scalars['String']['input'];
+  range: NumericRange;
 };
 
-export type PaginatedChapes = {
+export type PaginatedInventoryItems = {
   count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<ChapeInventoryItem>>;
+  data?: Maybe<Array<InventoryItem>>;
 };
 
-export type PaginatedGlasses = {
+export type PaginatedInventoryMovements = {
   count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<GlassInventoryItem>>;
+  data?: Maybe<Array<InventoryMovement>>;
 };
 
-export type PaginatedOthers = {
+export type PaginatedPokemonCardsInternal = {
   count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<OtherInventoryItem>>;
+  data?: Maybe<Array<PokemonCardInternalItem>>;
 };
 
-export type PaginatedProfileVariants = {
+export type PaginatedPokemonCardsPublic = {
   count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<ProfileInventoryItemVariant>>;
+  data?: Maybe<Array<PokemonCardPublicItem>>;
 };
 
-export type PaginatedQuotations = {
+export type PaginatedPurchases = {
   count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<Quotation>>;
+  data?: Maybe<Array<Purchase>>;
 };
 
-export type PaginatedSelectChapes = {
+export type PaginatedSales = {
   count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<SelectChapeOutput>>;
-};
-
-export type PaginatedSelectGlasses = {
-  count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<SelectGlassOutput>>;
-};
-
-export type PaginatedSelectProfiles = {
-  count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<SelectProfileOutput>>;
+  data?: Maybe<Array<Sale>>;
 };
 
 export type PaginatedUsers = {
@@ -780,148 +654,296 @@ export type PaginatedUsers = {
   data?: Maybe<Array<User>>;
 };
 
-export type PaginatedWindows = {
-  count?: Maybe<Scalars['Float']['output']>;
-  data?: Maybe<Array<WindowTemplate>>;
+export type PokemonCard = {
+  artistTcgPlayer?: Maybe<Scalars['String']['output']>;
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  cardNumberTcgPlayer?: Maybe<Scalars['String']['output']>;
+  cardTextTcgPlayer?: Maybe<Scalars['String']['output']>;
+  cardTypeTcgPlayer?: Maybe<Scalars['String']['output']>;
+  cibPrice?: Maybe<Scalars['Float']['output']>;
+  collection: PokemonCardCollection;
+  consoleName?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  fetchPriceChartingErrorMessage?: Maybe<Scalars['String']['output']>;
+  fetchPriceChartingErrors?: Maybe<Scalars['Float']['output']>;
+  fetchTcgPlayerErrorMessage?: Maybe<Scalars['String']['output']>;
+  fetchTcgPlayerErrors?: Maybe<Scalars['Float']['output']>;
+  genre?: Maybe<Scalars['String']['output']>;
+  gradedPrice?: Maybe<Scalars['Float']['output']>;
+  guid: Scalars['String']['output'];
+  hpTcgPlayer?: Maybe<Scalars['String']['output']>;
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryItems?: Maybe<Array<InventoryItem>>;
+  loosePrice?: Maybe<Scalars['Float']['output']>;
+  newPrice?: Maybe<Scalars['Float']['output']>;
+  productId: Scalars['String']['output'];
+  productName: Scalars['String']['output'];
+  rarityPriceCharting?: Maybe<Scalars['String']['output']>;
+  rarityTcgPlayer?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
+  stageTcgPlayer?: Maybe<Scalars['String']['output']>;
+  tcgPlayerId?: Maybe<Scalars['String']['output']>;
+  tcgPlayerImageUri?: Maybe<Scalars['String']['output']>;
+  titleName: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+  variant: Scalars['String']['output'];
 };
 
-export type ProfileInventoryGroup = {
-  category: Scalars['String']['output'];
-  color: Scalars['String']['output'];
+export type PokemonCardCollection = {
+  cards: Array<PokemonCard>;
+  cardsWithImages: Scalars['Float']['output'];
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  line: Scalars['String']['output'];
   name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  supplier: Scalars['String']['output'];
+  normalizedName: Scalars['String']['output'];
+  releaseDate?: Maybe<Scalars['String']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setLogo?: Maybe<Scalars['String']['output']>;
+  tcgType: Scalars['String']['output'];
+  totalCards: Scalars['Float']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
-  variants: Array<ProfileInventoryItemVariant>;
 };
 
-export type ProfileInventoryItemVariant = {
+export type PokemonCardCollectionOutput = {
+  code?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PokemonCardInternalDetail = {
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+  totalStock: Scalars['Int']['output'];
+  variant?: Maybe<Scalars['String']['output']>;
+};
+
+export type PokemonCardInternalItem = {
+  availableStock: Scalars['Boolean']['output'];
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
+  name: Scalars['String']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+  totalStock: Scalars['Int']['output'];
+};
+
+export type PokemonCardInventoryItemInternal = {
+  condition: Scalars['String']['output'];
+  purchasePrice?: Maybe<Scalars['Float']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  stock: Scalars['Int']['output'];
+};
+
+export type PokemonCardInventoryItemPublic = {
+  condition: Scalars['String']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  stock: Scalars['Int']['output'];
+};
+
+export type PokemonCardPublicDetail = {
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryCards?: Maybe<Array<PokemonCardInventoryItemPublic>>;
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+  variant?: Maybe<Scalars['String']['output']>;
+};
+
+export type PokemonCardPublicItem = {
+  availableStock: Scalars['Boolean']['output'];
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+};
+
+export type PokemonFilters = {
+  rarity?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Purchase = {
+  anonymousClientEmail?: Maybe<Scalars['String']['output']>;
+  anonymousClientName?: Maybe<Scalars['String']['output']>;
+  anonymousClientPhone?: Maybe<Scalars['String']['output']>;
+  buyer?: Maybe<User>;
+  client?: Maybe<User>;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  profileGroup: ProfileInventoryGroup;
-  size: Scalars['Float']['output'];
-  stock?: Maybe<Array<InventoryItemStock>>;
+  items?: Maybe<Array<PurchaseItem>>;
+  notes?: Maybe<Scalars['String']['output']>;
+  payments?: Maybe<Array<PurchasePayment>>;
+  reference: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  tcg: Scalars['String']['output'];
+  total: Scalars['Float']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type PurchaseItem = {
+  condition: Scalars['String']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  guid: Scalars['String']['output'];
+  magicCard?: Maybe<MagicCard>;
+  offerPrice: Scalars['Float']['output'];
+  pokemonCard?: Maybe<PokemonCard>;
+  purchase: Purchase;
+  quantity: Scalars['Int']['output'];
+  referencePrice?: Maybe<Scalars['Float']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type PurchasePayment = {
+  amount: Scalars['Float']['output'];
+  method: Scalars['String']['output'];
 };
 
 export type Query = {
-  branchOffice: BranchOffice;
-  /** Query to get a list of paginated branchOffices */
-  branchOffices: PaginatedBranchOffices;
-  chapeColors: Array<Scalars['String']['output']>;
-  chapeLines: Array<Scalars['String']['output']>;
-  chapeSuppliers: Array<Scalars['String']['output']>;
-  getChape: ChapeInventoryItem;
-  getChapes: PaginatedChapes;
-  getGlass: GlassInventoryItem;
-  getGlassThicknesses: Array<Scalars['Float']['output']>;
-  getGlasses: PaginatedGlasses;
-  getOther: OtherInventoryItem;
-  getOthers: PaginatedOthers;
-  getProfile: ProfileInventoryGroup;
-  getProfileVariant: ProfileInventoryItemVariant;
-  getProfileVariants: PaginatedProfileVariants;
-  /** Query to get the glboal config */
+  /** Get a single buyer budget with usage */
+  buyerBudget: BuyerBudgetWithUsage;
+  /** Get all buyer budgets with usage (ADMIN only) */
+  buyerBudgets: Array<BuyerBudgetWithUsage>;
+  /** Query to get the global config */
   globalConfig: GlobalConfig;
+  /** Get aggregated inventory indicators */
+  indicatorsInventoryItems: InventoryIndicatorsOutput;
+  /** Get inventory item detail by guid */
+  inventoryItem: InventoryItem;
+  /** Get paginated list of inventory items */
+  inventoryItems: PaginatedInventoryItems;
+  /** Get paginated list of inventory movements */
+  inventoryMovements: PaginatedInventoryMovements;
   isValidToken: IsValidTokenOutput;
-  profileColors: Array<Scalars['String']['output']>;
-  profileLines: Array<Scalars['String']['output']>;
-  profileSuppliers: Array<Scalars['String']['output']>;
-  /** Query to get a single quotation by guid */
-  quotation: Quotation;
-  /** Query to get a list of paginated quotations */
-  quotations: PaginatedQuotations;
-  /** Query to get a list of chapes with only guid, sku, name, and unitMeasure for selection */
-  selectChapes: PaginatedSelectChapes;
-  /** Query to get a list of glasses with only guid, sku, name, and thickness for selection */
-  selectGlasses: PaginatedSelectGlasses;
-  /** Query to get a list of profiles with only guid, sku, and name for selection */
-  selectProfiles: PaginatedSelectProfiles;
+  /** Get current user cart for a TCG (carpeta digital) */
+  myCart: Cart;
+  /** Get current user sale detail (carpeta digital) */
+  mySale: Sale;
+  /** Get current user sales (carpeta digital) */
+  mySales: PaginatedSales;
+  /** Get all Pokemon card collections (public) */
+  pokemonCardCollections: Array<PokemonCardCollectionOutput>;
+  /** Get all unique card genres available in the catalog (cached 1hr) */
+  pokemonCardGenres: Array<Scalars['String']['output']>;
+  /** Get internal detail of a single Pokemon card with inventory data */
+  pokemonCardInternalDetail: PokemonCardInternalDetail;
+  /** Get paginated internal list of Pokemon cards with inventory data */
+  pokemonCardInternalList: PaginatedPokemonCardsInternal;
+  /** Get public detail of a single Pokemon card */
+  pokemonCardPublicDetail: PokemonCardPublicDetail;
+  /** Get paginated public list of Pokemon cards with filters and search */
+  pokemonCardPublicList: PaginatedPokemonCardsPublic;
+  /** Get all unique card rarities available in the catalog (cached 1hr) */
+  pokemonCardRarities: Array<Scalars['String']['output']>;
+  /** Get all unique card variants available in the catalog (cached 1hr) */
+  pokemonCardVariants: Array<Scalars['String']['output']>;
+  /** Get purchase detail by guid */
+  purchase: Purchase;
+  /** Get paginated list of purchases */
+  purchases: PaginatedPurchases;
+  /** Get sale detail by guid (backoffice) */
+  sale: Sale;
+  /** Get paginated list of sales (backoffice) */
+  sales: PaginatedSales;
   /** Query to get an user detail with branch offices */
   user: UserDetail;
   /** Query to get a user profile given the token */
   userProfile: User;
   /** Query to get a list of paginated users */
   users: PaginatedUsers;
-  window: WindowTemplate;
-  /** Query to get available profile colors for a window template used in quotations */
-  windowTemplateColors: Array<Scalars['String']['output']>;
-  /** Query to get profiles cost breakdown for a window template, color and size */
-  windowTemplateProfilesCost: WindowTemplateProfilesCostOutput;
-  /** Query to get a list of paginated windows */
-  windows: PaginatedWindows;
 };
 
-export type QueryBranchOfficeArgs = {
+export type QueryBuyerBudgetArgs = {
+  buyerGuid: Scalars['String']['input'];
+  tcg: Scalars['String']['input'];
+};
+
+export type QueryBuyerBudgetsArgs = {
+  tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueryIndicatorsInventoryItemsArgs = {
+  forceRefresh?: InputMaybe<Scalars['Boolean']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueryInventoryItemArgs = {
   guid: Scalars['String']['input'];
 };
 
-export type QueryBranchOfficesArgs = {
-  findBranchOfficesArgs: FindBranchOfficesArgs;
+export type QueryInventoryItemsArgs = {
+  findInventoryItemsArgs: FindInventoryItemsArgs;
 };
 
-export type QueryGetChapeArgs = {
-  findChapeArgs: FindChapeArgs;
+export type QueryInventoryMovementsArgs = {
+  findInventoryMovementsArgs: FindInventoryMovementsArgs;
 };
 
-export type QueryGetChapesArgs = {
-  findChapesArgs: FindChapesArgs;
+export type QueryMyCartArgs = {
+  tcg: Scalars['String']['input'];
 };
 
-export type QueryGetGlassArgs = {
-  findGlassArgs: FindGlassArgs;
+export type QueryMySaleArgs = {
+  saleGuid: Scalars['String']['input'];
 };
 
-export type QueryGetGlassesArgs = {
-  findGlassesArgs: FindGlassesArgs;
+export type QueryMySalesArgs = {
+  findMySalesArgs: FindMySalesArgs;
 };
 
-export type QueryGetOtherArgs = {
-  findOtherArgs: FindOtherArgs;
+export type QueryPokemonCardInternalDetailArgs = {
+  guid: Scalars['String']['input'];
 };
 
-export type QueryGetOthersArgs = {
-  findOthersArgs: FindOthersArgs;
+export type QueryPokemonCardInternalListArgs = {
+  findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs;
 };
 
-export type QueryGetProfileArgs = {
-  findProfileGroupArgs: FindProfileGroupArgs;
+export type QueryPokemonCardPublicDetailArgs = {
+  guid: Scalars['String']['input'];
 };
 
-export type QueryGetProfileVariantArgs = {
-  findProfileVariantArgs: FindProfileVariantArgs;
+export type QueryPokemonCardPublicListArgs = {
+  findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs;
 };
 
-export type QueryGetProfileVariantsArgs = {
-  findProfilesArgs: FindProfilesArgs;
+export type QueryPurchaseArgs = {
+  guid: Scalars['String']['input'];
 };
 
-export type QueryQuotationArgs = {
-  quotationGuid: Scalars['String']['input'];
+export type QueryPurchasesArgs = {
+  findPurchasesArgs: FindPurchasesArgs;
 };
 
-export type QueryQuotationsArgs = {
-  findQuotationsArgs: FindQuotationsArgs;
+export type QuerySaleArgs = {
+  guid: Scalars['String']['input'];
 };
 
-export type QuerySelectChapesArgs = {
-  selectChapesArgs: SelectChapesArgs;
-};
-
-export type QuerySelectGlassesArgs = {
-  selectGlassesArgs: SelectGlassesArgs;
-};
-
-export type QuerySelectProfilesArgs = {
-  selectProfilesArgs: SelectProfilesArgs;
+export type QuerySalesArgs = {
+  findSalesArgs: FindSalesArgs;
 };
 
 export type QueryUserArgs = {
@@ -932,72 +954,11 @@ export type QueryUsersArgs = {
   findUsersArgs: FindUsersArgs;
 };
 
-export type QueryWindowArgs = {
-  windowGuid: Scalars['String']['input'];
-};
-
-export type QueryWindowTemplateColorsArgs = {
-  windowTemplateColorsArgs: WindowTemplateColorsArgs;
-};
-
-export type QueryWindowTemplateProfilesCostArgs = {
-  windowTemplateProfilesCostArgs: WindowTemplateProfilesCostArgs;
-};
-
-export type QueryWindowsArgs = {
-  findWindowsArgs: FindWindowsArgs;
-};
-
-export type Quotation = {
-  branchOffice: BranchOffice;
-  clientData: QuotationClientDataOutput;
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  finish: Scalars['String']['output'];
-  finishProfitAmount: Scalars['Float']['output'];
-  finishProfitPercentage: Scalars['Float']['output'];
-  glass?: Maybe<GlassInventoryItemDataOutput>;
-  guid: Scalars['String']['output'];
-  invoiceData?: Maybe<InvoiceDataOutput>;
-  iva: Scalars['Float']['output'];
-  paymentMethod: Scalars['String']['output'];
-  pdfUrl: Scalars['String']['output'];
-  shipping: Scalars['Float']['output'];
-  status: Scalars['String']['output'];
-  subtotal: Scalars['Float']['output'];
-  total: Scalars['Float']['output'];
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
-  windowFinish: Scalars['String']['output'];
-  windows: Array<WindowQuotationOutput>;
-};
-
-export type QuotationClientData = {
-  address: AddressData;
-  email: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  phone: Scalars['String']['output'];
-};
-
-export type QuotationClientDataInput = {
-  address: AddressDataInput;
-  email: Scalars['String']['input'];
+export type RegisterClientInput = {
+  emailAddress: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
-};
-
-export type QuotationClientDataOutput = QuotationClientData & {
-  address: AddressDataOutput;
-  email: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  phone: Scalars['String']['output'];
-};
-
-export type RelationFilter = {
-  /** filterType -> :single_relation: */
-  filterType: Scalars['String']['input'];
-  relationKey: Scalars['String']['input'];
-  value: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type RequestPasswordChangeInput = {
@@ -1008,47 +969,50 @@ export type RequestPasswordChangeOutput = {
   success: Scalars['Boolean']['output'];
 };
 
-export type SelectChapeOutput = {
+export type Sale = {
+  cancelReason?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  customer?: Maybe<User>;
+  emailNotificationSent: Scalars['Boolean']['output'];
   guid: Scalars['String']['output'];
-  line: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  sku: Scalars['String']['output'];
-  unitMeasure: Scalars['String']['output'];
+  items?: Maybe<Array<SaleItem>>;
+  kioskCustomerEmail?: Maybe<Scalars['String']['output']>;
+  kioskCustomerName?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  saleCode: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  statusTimestamps?: Maybe<Scalars['String']['output']>;
+  tcg: Scalars['String']['output'];
+  total: Scalars['Float']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
 };
 
-export type SelectChapesArgs = {
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
-};
-
-export type SelectGlassOutput = {
+export type SaleItem = {
+  condition: Scalars['String']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  sku: Scalars['String']['output'];
-  thickness: Scalars['Float']['output'];
+  magicCard?: Maybe<MagicCard>;
+  pokemonCard?: Maybe<PokemonCard>;
+  price: Scalars['Float']['output'];
+  quantity: Scalars['Int']['output'];
+  sale: Sale;
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
 };
 
-export type SelectGlassesArgs = {
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
+export type SetClientStatusInput = {
+  clientStatus: Scalars['String']['input'];
+  guid: Scalars['ID']['input'];
 };
 
-export type SelectProfileOutput = {
-  guid: Scalars['String']['output'];
-  line: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  sku: Scalars['String']['output'];
-};
-
-export type SelectProfilesArgs = {
-  limit: Scalars['Int']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  sort: SortType;
+export type SetPurchaseItemSellPriceInput = {
+  purchaseItemGuid: Scalars['String']['input'];
+  referencePrice?: InputMaybe<Scalars['Float']['input']>;
+  sellPrice: Scalars['Float']['input'];
 };
 
 export type SortType = {
@@ -1057,105 +1021,82 @@ export type SortType = {
   order: Scalars['String']['input'];
 };
 
-export type SubWindow = {
-  chapes: Array<ChapeWindow>;
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  guid: Scalars['String']['output'];
-  horizontalProfiles: Array<WindowProfileOutput>;
-  projectionQuantity?: Maybe<Scalars['Float']['output']>;
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
-  verticalProfiles: Array<WindowProfileOutput>;
-  windowTemplate: WindowTemplate;
-  windowType: Scalars['String']['output'];
+export type SyncMetricsOutput = {
+  cardsPerCollection: Scalars['String']['output'];
+  collectionsDetected: Scalars['Int']['output'];
+  collectionsNew: Scalars['Int']['output'];
+  collectionsSkipped: Scalars['Int']['output'];
+  durationMs?: Maybe<Scalars['Int']['output']>;
+  finishedAt?: Maybe<Scalars['TimestampScalar']['output']>;
+  startedAt: Scalars['TimestampScalar']['output'];
+  totalCards: Scalars['Int']['output'];
 };
 
-export type SubWindowData = {
-  chapes: Array<ChapeWindowData>;
-  horizontalProfiles: Array<WindowProfileOutput>;
-  projectionQuantity?: Maybe<Scalars['Int']['output']>;
-  verticalProfiles: Array<WindowProfileOutput>;
-  windowType: Scalars['String']['output'];
+export type UpdateBuyerBudgetInput = {
+  assignedAmount: Scalars['Float']['input'];
+  buyerGuid: Scalars['String']['input'];
+  tcg: Scalars['String']['input'];
 };
 
-export type SubWindowDataOutput = SubWindowData & {
-  chapes: Array<ChapeWindowDataOutput>;
-  horizontalProfiles: Array<WindowProfileOutput>;
-  projectionQuantity?: Maybe<Scalars['Int']['output']>;
-  verticalProfiles: Array<WindowProfileOutput>;
-  windowType: Scalars['String']['output'];
-};
-
-export type UpdateBranchOfficeInput = {
-  guid: Scalars['String']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateChapeInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  chapeGuid: Scalars['String']['input'];
-  color?: InputMaybe<Scalars['String']['input']>;
-  line?: InputMaybe<Scalars['String']['input']>;
-  minStock?: InputMaybe<Scalars['Float']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  price?: InputMaybe<Scalars['Float']['input']>;
-  sku?: InputMaybe<Scalars['String']['input']>;
-  stock?: InputMaybe<Scalars['Float']['input']>;
-  supplier?: InputMaybe<Scalars['String']['input']>;
-  unitMeasure?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateGlassInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  glassGuid: Scalars['String']['input'];
-  minStock?: InputMaybe<Scalars['Float']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  price?: InputMaybe<Scalars['Float']['input']>;
-  sku?: InputMaybe<Scalars['String']['input']>;
-  stock?: InputMaybe<Scalars['Float']['input']>;
-  thickness?: InputMaybe<Scalars['Float']['input']>;
+export type UpdateCartItemInput = {
+  cartItemGuid: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
 };
 
 export type UpdateGlobalConfigInput = {
-  values: Array<GlobalConfigValueInput>;
+  /** Maximum units per card in inventory (frontend warning) */
+  inventoryLimit?: InputMaybe<Scalars['Int']['input']>;
+  /** Default percentage for auto-calculating offer price */
+  purchasePercentage?: InputMaybe<Scalars['Float']['input']>;
+  /** Number of CLIENT_UNREACHABLE cancellations before auto-blocking a customer */
+  saleCancellationBlockThreshold?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type UpdateOtherInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  minStock?: InputMaybe<Scalars['Float']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  otherGuid: Scalars['String']['input'];
-  price?: InputMaybe<Scalars['Float']['input']>;
-  sku?: InputMaybe<Scalars['String']['input']>;
-  stock?: InputMaybe<Scalars['Float']['input']>;
-  unitMeasure?: InputMaybe<Scalars['String']['input']>;
+export type UpdateInventoryItemPricesInput = {
+  inventoryItemGuid: Scalars['String']['input'];
+  purchasePrice?: InputMaybe<Scalars['Float']['input']>;
+  sellPrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
-export type UpdateProfileInput = {
-  branchOfficeGuid: Scalars['String']['input'];
-  color?: InputMaybe<Scalars['String']['input']>;
-  groupGuid: Scalars['String']['input'];
-  line?: InputMaybe<Scalars['String']['input']>;
-  minStock?: InputMaybe<Scalars['Float']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  price?: InputMaybe<Scalars['Float']['input']>;
-  sku?: InputMaybe<Scalars['String']['input']>;
-  stock?: InputMaybe<Scalars['Float']['input']>;
-  supplier?: InputMaybe<Scalars['String']['input']>;
-  variantGuid: Scalars['String']['input'];
+export type UpdatePurchaseInput = {
+  anonymousClientEmail?: InputMaybe<Scalars['String']['input']>;
+  anonymousClientName?: InputMaybe<Scalars['String']['input']>;
+  anonymousClientPhone?: InputMaybe<Scalars['String']['input']>;
+  clientGuid?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  payments?: InputMaybe<Array<CreatePurchasePaymentInput>>;
+  purchaseGuid: Scalars['String']['input'];
 };
 
-export type UpdateQuotationStatusInput = {
-  quotationGuid: Scalars['String']['input'];
-  status: Scalars['String']['input'];
+export type UpdatePurchaseItemDetailInput = {
+  condition?: InputMaybe<Scalars['String']['input']>;
+  itemGuid: Scalars['String']['input'];
+  offerPrice?: InputMaybe<Scalars['Float']['input']>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdatePurchaseItemsInput = {
+  addItems?: InputMaybe<Array<AddPurchaseItemInput>>;
+  purchaseGuid: Scalars['String']['input'];
+  removeItemGuids?: InputMaybe<Array<Scalars['String']['input']>>;
+  updateItems?: InputMaybe<Array<UpdatePurchaseItemDetailInput>>;
+};
+
+export type UpdatePurchaseStatusInput = {
+  newStatus: Scalars['String']['input'];
+  purchaseGuid: Scalars['String']['input'];
+};
+
+export type UpdateSaleStatusInput = {
+  newStatus: Scalars['String']['input'];
+  saleGuid: Scalars['String']['input'];
 };
 
 export type UpdateUserInput = {
-  branchOfficeGuids?: InputMaybe<Array<Scalars['ID']['input']>>;
   emailAddress?: InputMaybe<Scalars['String']['input']>;
   guid?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1163,19 +1104,7 @@ export type UpdateUserProfileInput = {
   emailAddress?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   oldPassword?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateWindowInput = {
-  categoryType?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  glassInventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
-  hasMosquitoNet?: InputMaybe<Scalars['Boolean']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  sampleImageGuids?: InputMaybe<Array<Scalars['String']['input']>>;
-  subWindows?: InputMaybe<Array<CreateSubWindowInput>>;
-  technicalImageGuid?: InputMaybe<Scalars['String']['input']>;
-  windowGuid: Scalars['String']['input'];
-  windowTypes?: InputMaybe<Array<Scalars['String']['input']>>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UploadBase64Input = {
@@ -1195,12 +1124,15 @@ export type UploadFileInput = {
 
 export type User = {
   activated: Scalars['Boolean']['output'];
+  /** Accepted values: STANDARD, VIP, BLOCKED */
+  clientStatus?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   emailAddress: Scalars['String']['output'];
   guid: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
-  /** Accepted values: SUPERUSER, ADMIN, ASSISTANT */
+  phone?: Maybe<Scalars['String']['output']>;
+  /** Accepted values: SUPERUSER, ADMIN, RECEPTION, BUYER, CLIENT, CLIENT_KIOSK */
   role: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
@@ -1208,13 +1140,15 @@ export type User = {
 
 export type UserDetail = {
   activated: Scalars['Boolean']['output'];
-  branchOffices?: Maybe<Array<BranchOffice>>;
+  /** Accepted values: STANDARD, VIP, BLOCKED */
+  clientStatus?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   emailAddress: Scalars['String']['output'];
   guid: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
-  /** Accepted values: SUPERUSER, ADMIN, ASSISTANT */
+  phone?: Maybe<Scalars['String']['output']>;
+  /** Accepted values: SUPERUSER, ADMIN, RECEPTION, BUYER, CLIENT, CLIENT_KIOSK */
   role: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
@@ -1223,110 +1157,4 @@ export type UserDetail = {
 export type UserFinishSignupInput = {
   otp_guid: Scalars['String']['input'];
   password: Scalars['String']['input'];
-};
-
-export type WindowProfile = {
-  inventoryItemSKU: Scalars['String']['output'];
-  quantity: Scalars['Int']['output'];
-  size: Scalars['Float']['output'];
-  windowType: Scalars['String']['output'];
-};
-
-export type WindowProfileCost = {
-  name?: Maybe<Scalars['String']['output']>;
-  quantity: Scalars['Float']['output'];
-  sku: Scalars['String']['output'];
-  subtotal: Scalars['Float']['output'];
-  unitPrice: Scalars['Float']['output'];
-};
-
-export type WindowProfileInput = {
-  inventoryItemSKU: Scalars['String']['input'];
-  quantity: Scalars['Int']['input'];
-  size: Scalars['Float']['input'];
-  windowType: Scalars['String']['input'];
-};
-
-export type WindowProfileOutput = WindowProfile & {
-  inventoryItemSKU: Scalars['String']['output'];
-  quantity: Scalars['Int']['output'];
-  size: Scalars['Float']['output'];
-  windowType: Scalars['String']['output'];
-};
-
-export type WindowQuotationInput = {
-  color: Scalars['String']['input'];
-  height: Scalars['Float']['input'];
-  price: Scalars['Float']['input'];
-  quantity: Scalars['Int']['input'];
-  width: Scalars['Float']['input'];
-  windowTemplateGuid: Scalars['String']['input'];
-};
-
-export type WindowQuotationOutput = {
-  color: Scalars['String']['output'];
-  height: Scalars['Float']['output'];
-  price: Scalars['Float']['output'];
-  quantity: Scalars['Int']['output'];
-  width: Scalars['Float']['output'];
-  window: WindowTemplateDataOutput;
-};
-
-export type WindowTemplate = {
-  categoryType?: Maybe<Scalars['String']['output']>;
-  createdBy?: Maybe<User>;
-  createdDate: Scalars['Timestamp']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  glass: GlassInventoryItem;
-  guid: Scalars['String']['output'];
-  hasMosquitoNet: Scalars['Boolean']['output'];
-  name: Scalars['String']['output'];
-  sampleImages?: Maybe<Array<File>>;
-  subWindows: Array<SubWindow>;
-  technicalImage?: Maybe<File>;
-  updatedBy?: Maybe<User>;
-  updatedDate: Scalars['Timestamp']['output'];
-  windowTypes: Array<Scalars['String']['output']>;
-};
-
-export type WindowTemplateColorsArgs = {
-  templateGuid: Scalars['String']['input'];
-};
-
-export type WindowTemplateData = {
-  categoryType?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  glass: GlassInventoryItemData;
-  guid: Scalars['String']['output'];
-  hasMosquitoNet: Scalars['Boolean']['output'];
-  name: Scalars['String']['output'];
-  sampleImageUrls: Array<Scalars['String']['output']>;
-  subWindows: Array<SubWindowData>;
-  technicalImageUrl?: Maybe<Scalars['String']['output']>;
-  windowTypes: Array<Scalars['String']['output']>;
-};
-
-export type WindowTemplateDataOutput = WindowTemplateData & {
-  categoryType?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  glass: GlassInventoryItemDataOutput;
-  guid: Scalars['String']['output'];
-  hasMosquitoNet: Scalars['Boolean']['output'];
-  name: Scalars['String']['output'];
-  sampleImageUrls: Array<Scalars['String']['output']>;
-  subWindows: Array<SubWindowDataOutput>;
-  technicalImageUrl?: Maybe<Scalars['String']['output']>;
-  windowTypes: Array<Scalars['String']['output']>;
-};
-
-export type WindowTemplateProfilesCostArgs = {
-  color: Scalars['String']['input'];
-  height: Scalars['Float']['input'];
-  templateGuid: Scalars['String']['input'];
-  width: Scalars['Float']['input'];
-};
-
-export type WindowTemplateProfilesCostOutput = {
-  horizontalProfiles: Array<WindowProfileCost>;
-  verticalProfiles: Array<WindowProfileCost>;
 };
