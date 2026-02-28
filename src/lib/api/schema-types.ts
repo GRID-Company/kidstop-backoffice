@@ -299,7 +299,7 @@ export type FindUsersArgs = {
 };
 
 export type FindUsersFilter = {
-  activated?: InputMaybe<Scalars['Boolean']['input']>;
+  active?: InputMaybe<Scalars['Boolean']['input']>;
   clientStatus?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
   /** Filter by multiple roles using :multiple_values: filter type */
@@ -447,8 +447,6 @@ export type MultipleValuesFilter = {
 };
 
 export type Mutation = {
-  /** Mutation to reactivate a deactivated user (admin only) */
-  activateUser: GenericOutput;
   /** Add item to cart (carpeta digital) */
   addCartItem: Cart;
   /** Add item to wishlist (carpeta digital) */
@@ -471,8 +469,8 @@ export type Mutation = {
   createSuperUser: User;
   /** Mutation to create an User */
   createUser: User;
-  /** Mutation to deactivate a user (admin only) */
-  deactivateUser: GenericOutput;
+  /** Mutation to delete a user (soft-delete, admin only) */
+  deleteUser: GenericOutput;
   /** Finalize a purchase (WAITING_PRICE → FINALIZED) */
   finalizePurchase: Purchase;
   login: LoginOutput;
@@ -513,10 +511,6 @@ export type Mutation = {
   uploadBase64: File;
   uploadFile: File;
   userFinishSignUp: ChangePasswordOutput;
-};
-
-export type MutationActivateUserArgs = {
-  guid: Scalars['String']['input'];
 };
 
 export type MutationAddCartItemArgs = {
@@ -563,7 +557,7 @@ export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
 };
 
-export type MutationDeactivateUserArgs = {
+export type MutationDeleteUserArgs = {
   guid: Scalars['String']['input'];
 };
 
@@ -1160,6 +1154,8 @@ export type UpdateSaleStatusInput = {
 };
 
 export type UpdateUserInput = {
+  /** Enable or disable user access (admin only) */
+  active?: InputMaybe<Scalars['Boolean']['input']>;
   emailAddress?: InputMaybe<Scalars['String']['input']>;
   guid?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -1190,7 +1186,7 @@ export type UploadFileInput = {
 };
 
 export type User = {
-  activated: Scalars['Boolean']['output'];
+  active: Scalars['Boolean']['output'];
   /** Accepted values: STANDARD, VIP, BLOCKED */
   clientStatus?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<User>;
@@ -1201,12 +1197,13 @@ export type User = {
   phone?: Maybe<Scalars['String']['output']>;
   /** Accepted values: SUPERUSER, ADMIN, RECEPTION, BUYER, CLIENT, CLIENT_KIOSK */
   role: Scalars['String']['output'];
+  signedUp: Scalars['Boolean']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
 };
 
 export type UserDetail = {
-  activated: Scalars['Boolean']['output'];
+  active: Scalars['Boolean']['output'];
   /** Accepted values: STANDARD, VIP, BLOCKED */
   clientStatus?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<User>;
@@ -1217,6 +1214,7 @@ export type UserDetail = {
   phone?: Maybe<Scalars['String']['output']>;
   /** Accepted values: SUPERUSER, ADMIN, RECEPTION, BUYER, CLIENT, CLIENT_KIOSK */
   role: Scalars['String']['output'];
+  signedUp: Scalars['Boolean']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
 };

@@ -13,7 +13,6 @@ export const userFormSchema = z.object({
   role: z.enum(userRoleValues, {
     message: 'El rol es obligatorio',
   }),
-  activated: z.boolean(),
 });
 
 export type UserFormData = z.infer<typeof userFormSchema>;

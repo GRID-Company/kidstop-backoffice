@@ -3,7 +3,7 @@ import { USER_STATUS, USER_STATUS_LABELS } from '../../domain/constants';
 import { UserStatus } from '../../domain/types';
 
 interface UserStatusBadgeProps {
-  activated: boolean;
+  active: boolean;
   className?: string;
 }
 
@@ -13,10 +13,10 @@ const STATUS_COLOR_MAP: Record<UserStatus, 'success' | 'danger'> = {
 };
 
 export default function UserStatusBadge({
-  activated,
+  active,
   className,
 }: UserStatusBadgeProps) {
-  const status = activated ? USER_STATUS.ACTIVE : USER_STATUS.INACTIVE;
+  const status = active ? USER_STATUS.ACTIVE : USER_STATUS.INACTIVE;
 
   return (
     <Chip

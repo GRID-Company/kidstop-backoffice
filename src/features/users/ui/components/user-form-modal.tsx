@@ -5,10 +5,9 @@ import {
   DrawerBody,
   DrawerFooter,
   Button,
-  Switch,
 } from '@heroui/react';
 import { useEffect } from 'react';
-import { Controller, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
@@ -39,11 +38,11 @@ export default function UserFormModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION, activated: true });
+    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION });
   }, [isOpen, defaults, reset]);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <Drawer isOpen={isOpen} onClose={onClose} size="xl" classNames={{ base: 'bg-white', header: 'border-b border-gray-100 text-content-primary font-semibold', body: 'bg-neutral-subtle/30', footer: 'border-t border-gray-100 bg-white' }}>
       <form
         onSubmit={(...args) => {
           void handleSubmit(onSubmit)(...args);
@@ -70,19 +69,6 @@ export default function UserFormModal({
               placeholder="Selecciona un rol"
               controlProps={{ control, name: 'role' }}
               items={USER_ROLE_OPTIONS}
-            />
-
-            <Controller
-              control={control}
-              name="activated"
-              render={({ field }) => (
-                <Switch
-                  isSelected={field.value}
-                  onValueChange={field.onChange}
-                >
-                  {field.value ? 'Activo' : 'Inactivo'}
-                </Switch>
-              )}
             />
           </DrawerBody>
 

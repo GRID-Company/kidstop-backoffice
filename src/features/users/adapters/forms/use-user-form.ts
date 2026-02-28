@@ -10,7 +10,6 @@ export function useUserForm(defaults?: Partial<UserFormData>) {
       name: '',
       emailAddress: '',
       role: USER_ROLES.RECEPTION,
-      activated: true,
       ...defaults,
     },
     mode: 'all',

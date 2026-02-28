@@ -6,8 +6,7 @@ import {
   UsersDocument,
   CreateUserDocument,
   UpdateUserDocument,
-  ActivateUserDocument,
-  DeactivateUserDocument,
+  DeleteUserDocument,
 } from '@/lib/api/generated/users.generated';
 import { getUsersVars } from '../../domain/users.domain';
 import { UserFilters } from '../../domain/types';
@@ -43,11 +42,7 @@ export function useUsers(
     refetchQueries: [UsersDocument],
   });
 
-  const [activateMutation] = useMutation(ActivateUserDocument, {
-    refetchQueries: [UsersDocument],
-  });
-
-  const [deactivateMutation] = useMutation(DeactivateUserDocument, {
+  const [deleteMutation, { loading: deleting }] = useMutation(DeleteUserDocument, {
     refetchQueries: [UsersDocument],
   });
 
@@ -80,17 +75,29 @@ export function useUsers(
   const toggleUserStatus = useCallback(
     async (guid: string, currentlyActive: boolean) => {
       try {
-        if (currentlyActive) {
-          await deactivateMutation({ variables: { guid } });
-        } else {
-          await activateMutation({ variables: { guid } });
-        }
+        await updateMutation({
+          variables: { updateUserInput: { guid, active: !currentlyActive } },
+        });
+        toast.success(currentlyActive ? 'Usuario desactivado' : 'Usuario activado');
       } catch (error) {
         const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
         toast.error(message ?? 'Error al cambiar estado del usuario');
       }
     },
-    [activateMutation, deactivateMutation]
+    [updateMutation]
+  );
+
+  const deleteUser = useCallback(
+    async (guid: string) => {
+      try {
+        await deleteMutation({ variables: { guid } });
+        toast.success('Usuario eliminado');
+      } catch (error) {
+        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        toast.error(message ?? 'Error al eliminar usuario');
+      }
+    },
+    [deleteMutation]
   );
 
   return {
@@ -99,8 +106,10 @@ export function useUsers(
     loading,
     creating,
     updating,
+    deleting,
     createUser,
     updateUser,
     toggleUserStatus,
+    deleteUser,
   };
 }
