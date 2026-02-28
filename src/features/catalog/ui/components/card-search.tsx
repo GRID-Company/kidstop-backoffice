@@ -10,7 +10,7 @@ import CatalogFilterDrawer from './catalog-filter-drawer';
 import { TCGType, TCG_TYPES } from '@/lib/types/tcg.types';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import { POKEMON_SORT_OPTIONS, MAGIC_SORT_OPTIONS } from '../../domain/constants';
-import { IPokemonCollection } from '../../domain/types';
+import { IPokemonCollection, PokemonCatalogFilters } from '../../domain/types';
 
 interface CardSearchProps {
   onSearchChange: SearchFn;
@@ -22,6 +22,7 @@ interface CardSearchProps {
   resultCount: number;
   selectedTCG: TCGType;
   resetKey?: number;
+  filters?: PokemonCatalogFilters;
   collections?: IPokemonCollection[];
   rarities?: string[];
   variants?: string[];
@@ -38,6 +39,7 @@ export default function CardSearch({
   resultCount,
   selectedTCG,
   resetKey,
+  filters,
   collections,
   rarities,
   variants,
@@ -110,6 +112,7 @@ export default function CardSearch({
         hasActiveFilters={hasActiveFilters}
         selectedTCG={selectedTCG}
         resetKey={resetKey}
+        filters={filters}
         collections={collections}
         rarities={rarities}
         variants={variants}

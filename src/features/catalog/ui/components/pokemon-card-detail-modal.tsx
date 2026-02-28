@@ -89,24 +89,6 @@ export default function PokemonCardDetailModal({
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  classNames={{ base: 'bg-accent/10', content: 'text-accent font-medium' }}
-                >
-                  Pokémon
-                </Chip>
-                {loading ? (
-                  <Skeleton className="h-6 w-16 rounded-full" />
-                ) : detail?.rarity ? (
-                  <Chip size="sm" variant="flat">{detail.rarity}</Chip>
-                ) : null}
-                {!loading && detail?.variant && (
-                  <Chip size="sm" variant="flat">{detail.variant}</Chip>
-                )}
-              </div>
-
               <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
                 {setName && (
                   <>
@@ -131,6 +113,23 @@ export default function PokemonCardDetailModal({
                     <span className="font-medium">#{detail.cardNumber}</span>
                   </>
                 ) : null}
+                {loading ? (
+                  <>
+                    <span className="text-default-500">Rareza</span>
+                    <Skeleton className="h-4 w-20 rounded" />
+                  </>
+                ) : detail?.rarity ? (
+                  <>
+                    <span className="text-default-500">Rareza</span>
+                    <span className="font-medium">{detail.rarity}</span>
+                  </>
+                ) : null}
+                {!loading && detail?.variant && (
+                  <>
+                    <span className="text-default-500">Variante</span>
+                    <span className="font-medium">{detail.variant}</span>
+                  </>
+                )}
                 <span className="text-default-500">Stock total</span>
                 <span className="font-medium">{totalStock}</span>
                 {sellPrice !== null && (

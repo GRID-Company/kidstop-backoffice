@@ -15,7 +15,7 @@ import AutocompleteFilter from '@/shared/base/heorui-overrides/autocomplete-filt
 import { FilterFn } from '@/lib/types/paginated-datatable.types';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 import { CARD_CONDITION_OPTIONS, MAGIC_RARITY_OPTIONS } from '../../domain/constants';
-import { IPokemonCollection } from '../../domain/types';
+import { IPokemonCollection, PokemonCatalogFilters } from '../../domain/types';
 
 interface CatalogFilterDrawerProps {
   isOpen: boolean;
@@ -25,6 +25,7 @@ interface CatalogFilterDrawerProps {
   hasActiveFilters: boolean;
   selectedTCG: TCGType;
   resetKey?: number;
+  filters?: PokemonCatalogFilters;
   collections?: IPokemonCollection[];
   rarities?: string[];
   variants?: string[];
@@ -39,6 +40,7 @@ export default function CatalogFilterDrawer({
   hasActiveFilters,
   selectedTCG,
   resetKey,
+  filters,
   collections,
   rarities,
   variants,
@@ -89,6 +91,7 @@ export default function CatalogFilterDrawer({
             placeholder="Todas las condiciones"
             label="Condición"
             items={CARD_CONDITION_OPTIONS}
+            selectedKeys={filters?.condition ? [filters.condition] : []}
             onChange={(e) => onFilterChange('condition', e.target.value)}
             aria-label="Filtrar por condición"
           />
@@ -101,6 +104,7 @@ export default function CatalogFilterDrawer({
                 items={rarityOptions}
                 onSelectionChange={(value) => onFilterChange('rarity', value)}
                 resetKey={resetKey}
+                selectedValue={filters?.rarity}
                 aria-label="Filtrar por rareza"
               />
             ) : (
@@ -108,6 +112,7 @@ export default function CatalogFilterDrawer({
                 placeholder="Todas las rarezas"
                 label="Rareza"
                 items={rarityOptions}
+                selectedKeys={filters?.rarity ? [filters.rarity] : []}
                 onChange={(e) => onFilterChange('rarity', e.target.value)}
                 aria-label="Filtrar por rareza"
               />
@@ -120,6 +125,7 @@ export default function CatalogFilterDrawer({
               items={collectionOptions}
               onSelectionChange={(value) => onFilterChange('set', value)}
               resetKey={resetKey}
+              selectedValue={filters?.set}
               aria-label="Filtrar por colección"
             />
           )}
@@ -131,6 +137,7 @@ export default function CatalogFilterDrawer({
               items={variantOptions}
               onSelectionChange={(value) => onFilterChange('variant', value)}
               resetKey={resetKey}
+              selectedValue={filters?.variant}
               aria-label="Filtrar por variante"
             />
           )}
@@ -142,6 +149,7 @@ export default function CatalogFilterDrawer({
               items={genreOptions}
               onSelectionChange={(value) => onFilterChange('genre', value)}
               resetKey={resetKey}
+              selectedValue={filters?.genre}
               aria-label="Filtrar por género"
             />
           )}

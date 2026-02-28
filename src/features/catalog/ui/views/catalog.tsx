@@ -11,8 +11,8 @@ import { useCardSearch } from '../hooks/use-card-search';
 import { usePokemonCatalog } from '../hooks/use-pokemon-catalog';
 import CardSearch from '../components/card-search';
 import CardGrid from '../components/card-grid';
-import PokemonCardGrid from '../components/pokemon-card-grid';
 import CardDetailModal from '../components/card-detail-modal';
+import PokemonCardGrid from '../components/pokemon-card-grid';
 import PokemonCardDetailModal from '../components/pokemon-card-detail-modal';
 
 export default function Catalog() {
@@ -75,6 +75,7 @@ export default function Catalog() {
                 resultCount={pokemon.totalCount}
                 selectedTCG={selectedTCG}
                 resetKey={pokemon.resetKey}
+                filters={pokemon.filters}
                 collections={pokemon.collections}
                 rarities={pokemon.rarities}
                 variants={pokemon.variants}
@@ -91,6 +92,7 @@ export default function Catalog() {
                 resultCount={magic.results.length}
                 selectedTCG={selectedTCG}
                 resetKey={magic.resetKey}
+                filters={magic.filters}
               />
             )}
           </div>
