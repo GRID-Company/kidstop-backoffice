@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { MOCK_CARDS } from '../../adapters/api/catalog.mock';
 import { ICard, CardFilters } from '../../domain/types';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 export function useCardSearch() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
@@ -29,9 +30,7 @@ export function useCardSearch() {
   }, []);
 
   const results = useMemo(() => {
-    let cards: ICard[] = [...MOCK_CARDS];
-
-    cards = cards.filter((c) => c.tcgType === selectedTCG);
+    let cards: ICard[] = MOCK_CARDS.filter((c) => c.tcgType === TCG_TYPES.MAGIC);
 
     if (search.trim()) {
       const term = search.toLowerCase();

@@ -88,8 +88,8 @@ export type CartItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  magicCard?: Maybe<MagicCard>;
-  pokemonCard?: Maybe<PokemonCard>;
+  magicCardSummary?: Maybe<MagicCardSummary>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
   quantity: Scalars['Int']['output'];
   tcg: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
@@ -198,7 +198,7 @@ export type FindInventoryItemsFilter = {
   lastSellDate?: InputMaybe<DateRangeFilter>;
   pokemonFilters?: InputMaybe<PokemonFilters>;
   stockStatus?: InputMaybe<Scalars['String']['input']>;
-  tcg?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type FindInventoryMovementsArgs = {
@@ -224,7 +224,7 @@ export type FindMySalesArgs = {
 
 export type FindMySalesFilter = {
   status?: InputMaybe<Scalars['String']['input']>;
-  tcg?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type FindMyWishlistArgs = {
@@ -272,7 +272,7 @@ export type FindPurchasesFilter = {
   buyer?: InputMaybe<Scalars['String']['input']>;
   createdDate?: InputMaybe<DateRangeFilter>;
   status?: InputMaybe<Scalars['String']['input']>;
-  tcg?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type FindSalesArgs = {
@@ -287,7 +287,7 @@ export type FindSalesFilter = {
   createdDate?: InputMaybe<DateRangeFilter>;
   customer?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
-  tcg?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type FindUsersArgs = {
@@ -346,9 +346,9 @@ export type InventoryItem = {
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
   lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
-  magicCard?: Maybe<MagicCard>;
+  magicCardSummary?: Maybe<MagicCardSummary>;
   movements?: Maybe<Array<InventoryMovement>>;
-  pokemonCard?: Maybe<PokemonCard>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
   purchasePrice?: Maybe<Scalars['Float']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Float']['output'];
@@ -396,8 +396,6 @@ export type MagicCard = {
   description?: Maybe<Scalars['String']['output']>;
   detailsUrl: Scalars['String']['output'];
   edition: Scalars['String']['output'];
-  fetchCardKingdomErrorMessage?: Maybe<Scalars['String']['output']>;
-  fetchCardKingdomErrors?: Maybe<Scalars['Float']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
@@ -430,6 +428,16 @@ export type MagicCardCollection = {
   totalCards: Scalars['Float']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type MagicCardSummary = {
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
 };
 
 export type MultipleValuesFilter = {
@@ -707,10 +715,6 @@ export type PokemonCard = {
   consoleName?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
-  fetchPriceChartingErrorMessage?: Maybe<Scalars['String']['output']>;
-  fetchPriceChartingErrors?: Maybe<Scalars['Float']['output']>;
-  fetchTcgPlayerErrorMessage?: Maybe<Scalars['String']['output']>;
-  fetchTcgPlayerErrors?: Maybe<Scalars['Float']['output']>;
   genre?: Maybe<Scalars['String']['output']>;
   gradedPrice?: Maybe<Scalars['Float']['output']>;
   guid: Scalars['String']['output'];
@@ -719,7 +723,6 @@ export type PokemonCard = {
   inventoryItems?: Maybe<Array<InventoryItem>>;
   loosePrice?: Maybe<Scalars['Float']['output']>;
   newPrice?: Maybe<Scalars['Float']['output']>;
-  productId: Scalars['String']['output'];
   productName: Scalars['String']['output'];
   rarityPriceCharting?: Maybe<Scalars['String']['output']>;
   rarityTcgPlayer?: Maybe<Scalars['String']['output']>;
@@ -818,6 +821,16 @@ export type PokemonCardPublicItem = {
   setName?: Maybe<Scalars['String']['output']>;
 };
 
+export type PokemonCardSummary = {
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+};
+
 export type PokemonFilters = {
   rarity?: InputMaybe<Scalars['String']['input']>;
 };
@@ -847,9 +860,9 @@ export type PurchaseItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  magicCard?: Maybe<MagicCard>;
+  magicCardSummary?: Maybe<MagicCardSummary>;
   offerPrice: Scalars['Float']['output'];
-  pokemonCard?: Maybe<PokemonCard>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
   purchase: Purchase;
   quantity: Scalars['Int']['output'];
   referencePrice?: Maybe<Scalars['Float']['output']>;
@@ -1048,8 +1061,8 @@ export type SaleItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
-  magicCard?: Maybe<MagicCard>;
-  pokemonCard?: Maybe<PokemonCard>;
+  magicCardSummary?: Maybe<MagicCardSummary>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
   price: Scalars['Float']['output'];
   quantity: Scalars['Int']['output'];
   sale: Sale;
@@ -1230,8 +1243,8 @@ export type WishlistItem = {
   createdDate: Scalars['Timestamp']['output'];
   customer: User;
   guid: Scalars['String']['output'];
-  magicCard?: Maybe<MagicCard>;
-  pokemonCard?: Maybe<PokemonCard>;
+  magicCardSummary?: Maybe<MagicCardSummary>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   tcg: Scalars['String']['output'];
   updatedBy?: Maybe<User>;

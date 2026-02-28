@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         hostname: 'storage.googleapis.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.pricecharting.com',
+        pathname: '/**',
+      },
     ],
   },
   async redirects() {
