@@ -12,9 +12,7 @@ export type UsersQuery = {
       guid: string;
       name: string | null;
       emailAddress: string;
-      phone: string | null;
       role: string;
-      clientStatus: string | null;
       activated: boolean;
       createdDate: unknown;
       updatedDate: unknown;
@@ -109,12 +107,7 @@ export const UsersDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'emailAddress' },
                       },
-                      { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'role' } },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'clientStatus' },
-                      },
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'activated' },

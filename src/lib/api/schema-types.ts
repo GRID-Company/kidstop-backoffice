@@ -47,6 +47,12 @@ export type AddPurchaseItemInput = {
   referencePrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type AddWishlistItemInput = {
+  cardGuid: Scalars['String']['input'];
+  condition: Scalars['String']['input'];
+  tcg: Scalars['String']['input'];
+};
+
 export type BuyerBudgetWithUsage = {
   assignedAmount: Scalars['Float']['output'];
   buyer: User;
@@ -219,6 +225,19 @@ export type FindMySalesArgs = {
 export type FindMySalesFilter = {
   status?: InputMaybe<Scalars['String']['input']>;
   tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FindMyWishlistArgs = {
+  filters: FindMyWishlistFilter;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindMyWishlistFilter = {
+  condition?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type FindPokemonCardsPublicArgs = {
@@ -424,12 +443,16 @@ export type Mutation = {
   activateUser: GenericOutput;
   /** Add item to cart (carpeta digital) */
   addCartItem: Cart;
+  /** Add item to wishlist (carpeta digital) */
+  addWishlistItem: WishlistItem;
   /** Cancel a sale with reason (backoffice) */
   cancelSale: Sale;
   /** Mutation to reset your password after requesting a change or expiration */
   changePassword: ChangePasswordOutput;
   /** Clear all items from cart for a TCG (carpeta digital) */
   clearCart: Cart;
+  /** Clear all wishlist items for a TCG (carpeta digital) */
+  clearWishlist: Scalars['Boolean']['output'];
   /** Create a new inventory movement (admin only) */
   createInventoryMovement: InventoryMovement;
   /** Create a new purchase (always DRAFT) */
@@ -449,6 +472,8 @@ export type Mutation = {
   registerClient: User;
   /** Remove item from cart (carpeta digital) */
   removeCartItem: Cart;
+  /** Remove item from wishlist (carpeta digital) */
+  removeWishlistItem: Scalars['Boolean']['output'];
   requestPasswordChange: RequestPasswordChangeOutput;
   /** Mutation to set client status (STANDARD, VIP, BLOCKED) - admin only */
   setClientStatus: GenericOutput;
@@ -490,6 +515,10 @@ export type MutationAddCartItemArgs = {
   addCartItemInput: AddCartItemInput;
 };
 
+export type MutationAddWishlistItemArgs = {
+  addWishlistItemInput: AddWishlistItemInput;
+};
+
 export type MutationCancelSaleArgs = {
   cancelSaleInput: CancelSaleInput;
 };
@@ -499,6 +528,10 @@ export type MutationChangePasswordArgs = {
 };
 
 export type MutationClearCartArgs = {
+  tcg: Scalars['String']['input'];
+};
+
+export type MutationClearWishlistArgs = {
   tcg: Scalars['String']['input'];
 };
 
@@ -540,6 +573,10 @@ export type MutationRegisterClientArgs = {
 
 export type MutationRemoveCartItemArgs = {
   cartItemGuid: Scalars['String']['input'];
+};
+
+export type MutationRemoveWishlistItemArgs = {
+  wishlistItemGuid: Scalars['String']['input'];
 };
 
 export type MutationRequestPasswordChangeArgs = {
@@ -652,6 +689,11 @@ export type PaginatedSales = {
 export type PaginatedUsers = {
   count?: Maybe<Scalars['Float']['output']>;
   data?: Maybe<Array<User>>;
+};
+
+export type PaginatedWishlistItems = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<WishlistItem>>;
 };
 
 export type PokemonCard = {
@@ -844,6 +886,8 @@ export type Query = {
   mySale: Sale;
   /** Get current user sales (carpeta digital) */
   mySales: PaginatedSales;
+  /** Get current user wishlist (carpeta digital) */
+  myWishlist: PaginatedWishlistItems;
   /** Get all Pokemon card collections (public) */
   pokemonCardCollections: Array<PokemonCardCollectionOutput>;
   /** Get all unique card genres available in the catalog (cached 1hr) */
@@ -874,6 +918,8 @@ export type Query = {
   userProfile: User;
   /** Query to get a list of paginated users */
   users: PaginatedUsers;
+  /** Get wishlist count for a card+condition (backoffice) */
+  wishlistCount: WishlistCountOutput;
 };
 
 export type QueryBuyerBudgetArgs = {
@@ -914,6 +960,10 @@ export type QueryMySalesArgs = {
   findMySalesArgs: FindMySalesArgs;
 };
 
+export type QueryMyWishlistArgs = {
+  findMyWishlistArgs: FindMyWishlistArgs;
+};
+
 export type QueryPokemonCardInternalDetailArgs = {
   guid: Scalars['String']['input'];
 };
@@ -952,6 +1002,10 @@ export type QueryUserArgs = {
 
 export type QueryUsersArgs = {
   findUsersArgs: FindUsersArgs;
+};
+
+export type QueryWishlistCountArgs = {
+  wishlistCountArgs: WishlistCountArgs;
 };
 
 export type RegisterClientInput = {
@@ -1157,4 +1211,29 @@ export type UserDetail = {
 export type UserFinishSignupInput = {
   otp_guid: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+export type WishlistCountArgs = {
+  cardGuid: Scalars['String']['input'];
+  condition: Scalars['String']['input'];
+  tcg: Scalars['String']['input'];
+};
+
+export type WishlistCountOutput = {
+  count: Scalars['Int']['output'];
+};
+
+export type WishlistItem = {
+  availableStock?: Maybe<Scalars['Int']['output']>;
+  condition: Scalars['String']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  customer: User;
+  guid: Scalars['String']['output'];
+  magicCard?: Maybe<MagicCard>;
+  pokemonCard?: Maybe<PokemonCard>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
 };
