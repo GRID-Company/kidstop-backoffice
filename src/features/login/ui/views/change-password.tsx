@@ -8,7 +8,7 @@ import { usePasswordConfirmationForm } from '@/shared/hooks/use-password-confirm
 import { PasswordConfirmationForm } from '@/shared/schemas/password-confirmation.schema';
 import { ChangePasswordDocument } from '@/lib/api/generated/password.generated';
 import { ERROR_MESSAGES } from '@/lib/consts/error-messages';
-import PasswordFormLayout from '@/shared/components/password-form-layout';
+import { PasswordFormLayout } from '@/shared/base/form-controls/password-form-layout';
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -19,10 +19,7 @@ export default function ChangePasswordPage() {
   const [mutate, { loading }] = useMutation(ChangePasswordDocument);
 
   const onSubmit: SubmitHandler<PasswordConfirmationForm> = async (payload) => {
-    if (!otpGuid) {
-      toast.error(ERROR_MESSAGES.CHANGE_PASSWORD_INVALID_LINK);
-      return;
-    }
+    if (!otpGuid) return;
 
     try {
       await mutate({

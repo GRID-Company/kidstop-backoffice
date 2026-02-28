@@ -3,8 +3,8 @@
 import { Control } from 'react-hook-form';
 import { Button, Link } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { PasswordConfirmationForm } from '../schemas/password-confirmation.schema';
-import PasswordForm from '../base/form-controls/password-form';
+import { PasswordConfirmationForm } from '@/shared/schemas/password-confirmation.schema';
+import PasswordForm from './password-form';
 
 interface PasswordFormLayoutProps {
   title: string;
@@ -17,7 +17,7 @@ interface PasswordFormLayoutProps {
   invalidLinkMessage: string;
 }
 
-export default function PasswordFormLayout({
+export const PasswordFormLayout = ({
   title,
   description,
   onSubmit,
@@ -26,16 +26,20 @@ export default function PasswordFormLayout({
   control,
   otpGuid,
   invalidLinkMessage,
-}: PasswordFormLayoutProps) {
+}: PasswordFormLayoutProps) => {
+  const header = (
+    <div className='mb-8 flex w-full items-center gap-2'>
+      <Link href='/login' className='text-foreground'>
+        <Icon icon='mdi:arrow-left' className='text-2xl' />
+      </Link>
+      <h1 className='text-xl font-bold'>{title}</h1>
+    </div>
+  );
+
   if (!otpGuid) {
     return (
       <>
-        <div className='mb-8 flex w-full items-center gap-2'>
-          <Link href='/login' className='text-foreground'>
-            <Icon icon='mdi:arrow-left' className='text-2xl' />
-          </Link>
-          <h1 className='text-xl font-bold'>{title}</h1>
-        </div>
+        {header}
         <p className='text-sm text-gray-500'>{invalidLinkMessage}</p>
       </>
     );
@@ -43,12 +47,7 @@ export default function PasswordFormLayout({
 
   return (
     <>
-      <div className='mb-8 flex w-full items-center gap-2'>
-        <Link href='/login' className='text-foreground'>
-          <Icon icon='mdi:arrow-left' className='text-2xl' />
-        </Link>
-        <h1 className='text-xl font-bold'>{title}</h1>
-      </div>
+      {header}
 
       <p className='mb-8 text-sm text-gray-500'>{description}</p>
 
@@ -83,4 +82,4 @@ export default function PasswordFormLayout({
       </form>
     </>
   );
-}
+};

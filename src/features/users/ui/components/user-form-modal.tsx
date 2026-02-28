@@ -38,8 +38,9 @@ export default function UserFormModal({
   const { control, handleSubmit, formState, reset } = useUserForm(defaults);
 
   useEffect(() => {
+    if (!isOpen) return;
     reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION, activated: true });
-  }, [defaults, reset]);
+  }, [isOpen, defaults, reset]);
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose} size="xl">

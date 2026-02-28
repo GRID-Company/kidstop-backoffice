@@ -32,3 +32,5 @@ export const DEFAULT_USERS_SORT = {
   column: 'createdDate',
   order: 'DESC',
 };
+
+export const DEFAULT_PAGE_SIZE = 10;

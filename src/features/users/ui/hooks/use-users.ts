@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
+import { CombinedGraphQLErrors } from '@apollo/client';
 import toast from 'react-hot-toast';
 import {
   UsersDocument,
@@ -12,9 +13,7 @@ import { getUsersVars } from '../../domain/users.domain';
 import { UserFilters } from '../../domain/types';
 import { toCreateUserPayload, toUpdateUserPayload } from '../../adapters/mappers/user.mapper';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
-import { DEFAULT_USERS_SORT } from '../../domain/constants';
-
-const DEFAULT_PAGE_SIZE = 10;
+import { DEFAULT_USERS_SORT, DEFAULT_PAGE_SIZE } from '../../domain/constants';
 
 export function useUsers(
   page: number,
@@ -31,7 +30,7 @@ export function useUsers(
     filters
   );
 
-  const { data, loading, refetch } = useQuery(UsersDocument, {
+  const { data, loading } = useQuery(UsersDocument, {
     variables: vars,
     fetchPolicy: 'cache-and-network',
   });
@@ -57,8 +56,9 @@ export function useUsers(
       try {
         await createMutation({ variables: toCreateUserPayload(formData) });
         toast.success('Usuario creado');
-      } catch {
-        toast.error('Error al crear usuario');
+      } catch (error) {
+        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        toast.error(message ?? 'Error al crear usuario');
       }
     },
     [createMutation]
@@ -69,8 +69,9 @@ export function useUsers(
       try {
         await updateMutation({ variables: toUpdateUserPayload(formData, guid) });
         toast.success('Usuario actualizado');
-      } catch {
-        toast.error('Error al actualizar usuario');
+      } catch (error) {
+        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        toast.error(message ?? 'Error al actualizar usuario');
       }
     },
     [updateMutation]
@@ -84,8 +85,9 @@ export function useUsers(
         } else {
           await activateMutation({ variables: { guid } });
         }
-      } catch {
-        toast.error('Error al cambiar estado del usuario');
+      } catch (error) {
+        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        toast.error(message ?? 'Error al cambiar estado del usuario');
       }
     },
     [activateMutation, deactivateMutation]
@@ -100,6 +102,5 @@ export function useUsers(
     createUser,
     updateUser,
     toggleUserStatus,
-    refetch,
   };
 }

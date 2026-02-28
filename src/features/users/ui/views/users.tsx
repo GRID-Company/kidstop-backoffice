@@ -22,6 +22,8 @@ import { UserFormData } from '../../adapters/forms/user-form.schema';
 import { toUserFormDefaults } from '../../adapters/mappers/user.mapper';
 import { UserFilters, UserRole } from '../../domain/types';
 import { UsersQuery } from '@/lib/api/generated/users.generated';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
+import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 
 type UserRow = NonNullable<NonNullable<UsersQuery['users']['data']>[number]>;
 
@@ -32,8 +34,10 @@ export default function Users() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
 
-  const { users, loading, creating, updating, toggleUserStatus, createUser, updateUser } =
+  const { users, totalCount, loading, creating, updating, toggleUserStatus, createUser, updateUser } =
     useUsers(page, search, filters);
+
+  const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
 
   const handleFilterChange = useCallback(
     (key: string, value: string | boolean) => {
@@ -174,6 +178,16 @@ export default function Users() {
             data={users}
             isLoading={loading}
           />
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center">
+              <KidstopPagination
+                total={totalPages}
+                page={page}
+                onChange={setPage}
+              />
+            </div>
+          )}
         </EntitiesPage.CardContainer>
       </EntitiesPage>
 

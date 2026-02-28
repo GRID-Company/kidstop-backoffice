@@ -4,9 +4,7 @@ query Users($findUsersArgs: FindUsersArgs!) {
       guid
       name
       emailAddress
-      phone
       role
-      clientStatus
       activated
       createdDate
       updatedDate
