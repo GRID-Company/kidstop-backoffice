@@ -27,6 +27,31 @@ export type PokemonCardInternalListQuery = {
   };
 };
 
+export type PokemonCardInternalDetailQueryVariables = Types.Exact<{
+  guid: Types.Scalars['String']['input'];
+}>;
+
+export type PokemonCardInternalDetailQuery = {
+  pokemonCardInternalDetail: {
+    guid: string;
+    name: string;
+    cardNumber: string | null;
+    rarity: string | null;
+    variant: string | null;
+    setName: string | null;
+    setCode: string | null;
+    sellPrice: number | null;
+    totalStock: number;
+    imageUri: string | null;
+    inventoryCards: Array<{
+      condition: string;
+      stock: number;
+      purchasePrice: number | null;
+      sellPrice: number | null;
+    }> | null;
+  };
+};
+
 export type PokemonCardCollectionsQueryVariables = Types.Exact<{
   [key: string]: never;
 }>;
@@ -170,6 +195,88 @@ export const PokemonCardInternalListDocument = {
 } as unknown as DocumentNode<
   PokemonCardInternalListQuery,
   PokemonCardInternalListQueryVariables
+>;
+export const PokemonCardInternalDetailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'PokemonCardInternalDetail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'pokemonCardInternalDetail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'guid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'guid' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'cardNumber' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'rarity' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'variant' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'setName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'setCode' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'totalStock' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'imageUri' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'inventoryCards' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'condition' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'purchasePrice' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'sellPrice' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  PokemonCardInternalDetailQuery,
+  PokemonCardInternalDetailQueryVariables
 >;
 export const PokemonCardCollectionsDocument = {
   kind: 'Document',
