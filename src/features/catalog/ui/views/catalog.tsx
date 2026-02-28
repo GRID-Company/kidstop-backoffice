@@ -68,10 +68,13 @@ export default function Catalog() {
               <CardSearch
                 onSearchChange={pokemon.setSearch}
                 onFilterChange={pokemon.handleFilterChange}
+                onSortChange={pokemon.handleSortChange}
                 onReset={pokemon.resetFilters}
                 hasActiveFilters={pokemon.hasActiveFilters}
+                activeFilterCount={pokemon.activeFilterCount}
                 resultCount={pokemon.totalCount}
                 selectedTCG={selectedTCG}
+                resetKey={pokemon.resetKey}
                 collections={pokemon.collections}
                 rarities={pokemon.rarities}
                 variants={pokemon.variants}
@@ -81,10 +84,13 @@ export default function Catalog() {
               <CardSearch
                 onSearchChange={magic.setSearch}
                 onFilterChange={magic.handleFilterChange}
+                onSortChange={magic.handleSortChange}
                 onReset={magic.resetFilters}
                 hasActiveFilters={magic.hasActiveFilters}
+                activeFilterCount={magic.activeFilterCount}
                 resultCount={magic.results.length}
                 selectedTCG={selectedTCG}
+                resetKey={magic.resetKey}
               />
             )}
           </div>

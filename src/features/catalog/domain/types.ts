@@ -71,6 +71,8 @@ export interface PokemonCatalogFilters {
   condition?: string;
   variant?: string;
   genre?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 export interface IPokemonCollection {

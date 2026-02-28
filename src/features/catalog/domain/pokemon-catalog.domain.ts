@@ -7,11 +7,16 @@ export const getPokemonCatalogVars = (
   search?: string,
   filters?: PokemonCatalogFilters
 ): { findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs } => {
+  const sort =
+    filters?.sortBy
+      ? { column: filters.sortBy, order: filters.sortOrder ?? 'ASC' }
+      : DEFAULT_CARDS_SORT;
+
   return {
     findPokemonCardsPublicArgs: {
       skip: (page - 1) * DEFAULT_PAGE_SIZE,
       limit: DEFAULT_PAGE_SIZE,
-      sort: DEFAULT_CARDS_SORT,
+      sort,
       search: search || undefined,
       filters: {
         rarity: filters?.rarity || undefined,

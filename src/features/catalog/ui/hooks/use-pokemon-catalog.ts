@@ -16,6 +16,7 @@ export function usePokemonCatalog() {
   const [page, setPage] = useState(1);
   const [search, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<PokemonCatalogFilters>({});
+  const [resetKey, setResetKey] = useState(0);
 
   const vars = getPokemonCatalogVars(page, search, filters);
 
@@ -74,13 +75,31 @@ export function usePokemonCatalog() {
     setPage(1);
   }, []);
 
+  const handleSortChange = useCallback((sortValue: string) => {
+    setFilters((prev) => {
+      if (!sortValue) {
+        const next = { ...prev };
+        delete next.sortBy;
+        delete next.sortOrder;
+        return next;
+      }
+      const [column, order] = sortValue.split('_');
+      return { ...prev, sortBy: column, sortOrder: order as 'ASC' | 'DESC' };
+    });
+    setPage(1);
+  }, []);
+
   const resetFilters = useCallback(() => {
     setSearchTerm('');
     setFilters({});
     setPage(1);
+    setResetKey((k) => k + 1);
   }, []);
 
   const hasActiveFilters = search.trim() !== '' || Object.keys(filters).length > 0;
+  const activeFilterCount = Object.keys(filters).filter(
+    (k) => k !== 'sortBy' && k !== 'sortOrder'
+  ).length;
 
   return {
     cards,
@@ -93,8 +112,11 @@ export function usePokemonCatalog() {
     setSearch,
     filters,
     handleFilterChange,
+    handleSortChange,
     resetFilters,
+    resetKey,
     hasActiveFilters,
+    activeFilterCount,
     collections,
     rarities,
     collectionsLoading,

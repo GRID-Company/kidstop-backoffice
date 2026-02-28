@@ -9,6 +9,7 @@ interface AutocompleteFilterProps {
   placeholder: string;
   items: ISelectOption[];
   onSelectionChange: (value: string) => void;
+  resetKey?: number;
   'aria-label'?: string;
 }
 
@@ -17,6 +18,7 @@ export default function AutocompleteFilter({
   placeholder,
   items,
   onSelectionChange,
+  resetKey,
   'aria-label': ariaLabel,
 }: AutocompleteFilterProps) {
   const [selectedKey, setSelectedKey] = useState('');
@@ -30,6 +32,12 @@ export default function AutocompleteFilter({
     }, {});
     setIndexedItems(indexed);
   }, [items]);
+
+  useEffect(() => {
+    if (resetKey === undefined) return;
+    setSelectedKey('');
+    setInputValue('');
+  }, [resetKey]);
 
   const filteredItems = useMemo(() => {
     if (!inputValue.trim() || selectedKey) return items;
