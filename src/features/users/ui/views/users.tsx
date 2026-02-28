@@ -7,7 +7,6 @@ import {
   DropdownItem,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { User } from '@/lib/api/schema-types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -22,18 +21,23 @@ import { useUsers } from '../hooks/use-users';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
 import { toUserFormDefaults } from '../../adapters/mappers/user.mapper';
 import { UserFilters, UserRole } from '../../domain/types';
+import { UsersQuery } from '@/lib/api/generated/users.generated';
+
+type UserRow = NonNullable<NonNullable<UsersQuery['users']['data']>[number]>;
 
 export default function Users() {
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState<string | undefined>();
   const [filters, setFilters] = useState<UserFilters>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<UserRow | null>(null);
 
-  const { users, loading, toggleUserStatus, createUser, updateUser } =
-    useUsers(search, filters);
+  const { users, loading, creating, updating, toggleUserStatus, createUser, updateUser } =
+    useUsers(page, search, filters);
 
   const handleFilterChange = useCallback(
     (key: string, value: string | boolean) => {
+      setPage(1);
       if (value === '') {
         setFilters((prev) => {
           const next = { ...prev };
@@ -53,12 +57,17 @@ export default function Users() {
     []
   );
 
+  const handleSearchChange = useCallback((value?: string) => {
+    setPage(1);
+    setSearch(value);
+  }, []);
+
   const handleOpenCreate = useCallback(() => {
     setEditingUser(null);
     setIsModalOpen(true);
   }, []);
 
-  const handleOpenEdit = useCallback((user: User) => {
+  const handleOpenEdit = useCallback((user: UserRow) => {
     setEditingUser(user);
     setIsModalOpen(true);
   }, []);
@@ -69,21 +78,11 @@ export default function Users() {
   }, []);
 
   const handleSubmit = useCallback(
-    (data: UserFormData) => {
+    async (data: UserFormData) => {
       if (editingUser) {
-        updateUser(editingUser.guid, {
-          name: data.name,
-          emailAddress: data.emailAddress,
-          role: data.role,
-          activated: data.activated,
-        });
+        await updateUser(editingUser.guid, data);
       } else {
-        createUser({
-          name: data.name,
-          emailAddress: data.emailAddress,
-          role: data.role,
-          activated: data.activated,
-        });
+        await createUser(data);
       }
       handleCloseModal();
     },
@@ -95,7 +94,7 @@ export default function Users() {
       key: 'name',
       label: 'Nombre',
       allowSorting: true,
-      customCol: (row: User) => row.name ?? 'Sin nombre',
+      customCol: (row: UserRow) => row.name ?? 'Sin nombre',
     },
     {
       key: 'emailAddress',
@@ -105,18 +104,18 @@ export default function Users() {
     {
       key: 'role',
       label: 'Rol',
-      customCol: (row: User) => <UserRoleBadge role={row.role as UserRole} />,
+      customCol: (row: UserRow) => <UserRoleBadge role={row.role as UserRole} />,
     },
     {
       key: 'activated',
       label: 'Estado',
-      customCol: (row: User) => <UserStatusBadge activated={row.activated} />,
+      customCol: (row: UserRow) => <UserStatusBadge activated={row.activated} />,
     },
     {
       key: 'actions',
       label: '',
       className: 'w-12',
-      customCol: (row: User) => (
+      customCol: (row: UserRow) => (
         <Dropdown>
           <DropdownTrigger>
             <Button variant="light" size="sm" isIconOnly>
@@ -142,7 +141,7 @@ export default function Users() {
                   }
                 />
               }
-              onPress={() => toggleUserStatus(row.guid)}
+              onPress={() => toggleUserStatus(row.guid, row.activated)}
               className={row.activated ? 'text-danger' : 'text-success'}
             >
               {row.activated ? 'Desactivar' : 'Activar'}
@@ -165,7 +164,7 @@ export default function Users() {
         <EntitiesPage.CardContainer>
           <div className="mb-4 flex items-center gap-4">
             <UserFiltersPanel
-              onSearchChange={setSearch}
+              onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
             />
           </div>
@@ -185,6 +184,7 @@ export default function Users() {
         defaults={editingUser ? toUserFormDefaults(editingUser) : undefined}
         title={editingUser ? 'Editar usuario' : 'Nuevo usuario'}
         submitLabel={editingUser ? 'Actualizar' : 'Guardar'}
+        loading={creating || updating}
       />
     </>
   );
