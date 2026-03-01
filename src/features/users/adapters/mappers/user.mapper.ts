@@ -25,12 +25,10 @@ export function toUserFormDefaults(user: {
   name?: string | null;
   emailAddress: string;
   role: string;
-  activated: boolean;
 }): Partial<UserFormData> {
   return {
     name: user.name ?? '',
     emailAddress: user.emailAddress,
     role: user.role as UserFormData['role'],
-    activated: user.activated,
   };
 }

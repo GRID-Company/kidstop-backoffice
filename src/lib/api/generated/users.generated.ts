@@ -13,7 +13,7 @@ export type UsersQuery = {
       name: string | null;
       emailAddress: string;
       role: string;
-      activated: boolean;
+      active: boolean;
       createdDate: unknown;
       updatedDate: unknown;
     }> | null;
@@ -31,7 +31,7 @@ export type CreateUserMutation = {
     emailAddress: string;
     phone: string | null;
     role: string;
-    activated: boolean;
+    active: boolean;
   };
 };
 
@@ -41,17 +41,11 @@ export type UpdateUserMutationVariables = Types.Exact<{
 
 export type UpdateUserMutation = { updateUser: { message: string } };
 
-export type ActivateUserMutationVariables = Types.Exact<{
+export type DeleteUserMutationVariables = Types.Exact<{
   guid: Types.Scalars['String']['input'];
 }>;
 
-export type ActivateUserMutation = { activateUser: { message: string } };
-
-export type DeactivateUserMutationVariables = Types.Exact<{
-  guid: Types.Scalars['String']['input'];
-}>;
-
-export type DeactivateUserMutation = { deactivateUser: { message: string } };
+export type DeleteUserMutation = { deleteUser: { message: string } };
 
 export const UsersDocument = {
   kind: 'Document',
@@ -110,7 +104,7 @@ export const UsersDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'activated' },
+                        name: { kind: 'Name', value: 'active' },
                       },
                       {
                         kind: 'Field',
@@ -182,7 +176,7 @@ export const CreateUserDocument = {
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'activated' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'active' } },
               ],
             },
           },
@@ -242,13 +236,13 @@ export const UpdateUserDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
-export const ActivateUserDocument = {
+export const DeleteUserDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'mutation',
-      name: { kind: 'Name', value: 'ActivateUser' },
+      name: { kind: 'Name', value: 'DeleteUser' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
@@ -267,7 +261,7 @@ export const ActivateUserDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'activateUser' },
+            name: { kind: 'Name', value: 'deleteUser' },
             arguments: [
               {
                 kind: 'Argument',
@@ -289,58 +283,4 @@ export const ActivateUserDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<
-  ActivateUserMutation,
-  ActivateUserMutationVariables
->;
-export const DeactivateUserDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'DeactivateUser' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'String' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'deactivateUser' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'guid' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'guid' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  DeactivateUserMutation,
-  DeactivateUserMutationVariables
->;
+} as unknown as DocumentNode<DeleteUserMutation, DeleteUserMutationVariables>;

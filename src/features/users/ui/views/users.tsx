@@ -12,6 +12,7 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import AddNewButton from '@/shared/base/buttons/add-new-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
+import ConfirmationModal from '@/shared/blocks/confirmation-modal/confirmation-modal';
 
 import UserFiltersPanel from '../components/user-filters';
 import UserFormModal from '../components/user-form-modal';
@@ -33,8 +34,10 @@ export default function Users() {
   const [filters, setFilters] = useState<UserFilters>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
+  const [toggleTarget, setToggleTarget] = useState<UserRow | null>(null);
 
-  const { users, totalCount, loading, creating, updating, toggleUserStatus, createUser, updateUser } =
+  const { users, totalCount, loading, creating, updating, deleting, toggleUserStatus, createUser, updateUser, deleteUser } =
     useUsers(page, search, filters);
 
   const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
@@ -51,8 +54,8 @@ export default function Users() {
         return;
       }
 
-      if (key === 'activated') {
-        setFilters((prev) => ({ ...prev, activated: value as boolean }));
+      if (key === 'active') {
+        setFilters((prev) => ({ ...prev, active: value as boolean }));
         return;
       }
 
@@ -93,6 +96,18 @@ export default function Users() {
     [editingUser, createUser, updateUser, handleCloseModal]
   );
 
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    await deleteUser(deleteTarget.guid);
+    setDeleteTarget(null);
+  }, [deleteTarget, deleteUser]);
+
+  const handleConfirmToggle = useCallback(async () => {
+    if (!toggleTarget) return;
+    await toggleUserStatus(toggleTarget.guid, toggleTarget.active);
+    setToggleTarget(null);
+  }, [toggleTarget, toggleUserStatus]);
+
   const COLS: ITableColumn[] = useMemo(() => [
     {
       key: 'name',
@@ -111,9 +126,9 @@ export default function Users() {
       customCol: (row: UserRow) => <UserRoleBadge role={row.role as UserRole} />,
     },
     {
-      key: 'activated',
+      key: 'active',
       label: 'Estado',
-      customCol: (row: UserRow) => <UserStatusBadge activated={row.activated} />,
+      customCol: (row: UserRow) => <UserStatusBadge active={row.active} />,
     },
     {
       key: 'actions',
@@ -136,25 +151,26 @@ export default function Users() {
             </DropdownItem>
             <DropdownItem
               key="toggle-status"
-              startContent={
-                <Icon
-                  icon={
-                    row.activated
-                      ? 'lucide:user-x'
-                      : 'lucide:user-check'
-                  }
-                />
-              }
-              onPress={() => toggleUserStatus(row.guid, row.activated)}
-              className={row.activated ? 'text-danger' : 'text-success'}
+              startContent={<Icon icon={row.active ? 'lucide:user-x' : 'lucide:user-check'} />}
+              onPress={() => setToggleTarget(row)}
+              className={row.active ? 'text-warning' : 'text-success'}
             >
-              {row.activated ? 'Desactivar' : 'Activar'}
+              {row.active ? 'Desactivar' : 'Activar'}
+            </DropdownItem>
+            <DropdownItem
+              key="delete"
+              startContent={<Icon icon="lucide:trash-2" />}
+              onPress={() => setDeleteTarget(row)}
+              className="text-danger"
+              color="danger"
+            >
+              Eliminar
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
       ),
     },
-  ], [handleOpenEdit, toggleUserStatus]);
+  ], [handleOpenEdit]);
 
   return (
     <>
@@ -199,6 +215,32 @@ export default function Users() {
         title={editingUser ? 'Editar usuario' : 'Nuevo usuario'}
         submitLabel={editingUser ? 'Actualizar' : 'Guardar'}
         loading={creating || updating}
+      />
+
+      <ConfirmationModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Eliminar usuario"
+        message={`¿Estás seguro de que deseas eliminar a ${deleteTarget?.name ?? deleteTarget?.emailAddress}? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        confirmVariant="danger"
+        onConfirm={handleConfirmDelete}
+        isLoading={deleting}
+      />
+
+      <ConfirmationModal
+        isOpen={!!toggleTarget}
+        onClose={() => setToggleTarget(null)}
+        title={toggleTarget?.active ? 'Desactivar usuario' : 'Activar usuario'}
+        message={
+          toggleTarget?.active
+            ? `¿Deseas desactivar a ${toggleTarget?.name ?? toggleTarget?.emailAddress}? El usuario no podrá iniciar sesión.`
+            : `¿Deseas activar a ${toggleTarget?.name ?? toggleTarget?.emailAddress}?`
+        }
+        confirmLabel={toggleTarget?.active ? 'Desactivar' : 'Activar'}
+        confirmVariant={toggleTarget?.active ? 'danger' : 'primary'}
+        onConfirm={handleConfirmToggle}
+        isLoading={updating}
       />
     </>
   );

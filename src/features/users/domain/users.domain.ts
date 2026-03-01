@@ -18,7 +18,7 @@ export const getUsersVars = (
       search: args.search,
       filters: {
         role: filters?.role,
-        activated: filters?.activated,
+        active: filters?.active,
       },
     },
   };

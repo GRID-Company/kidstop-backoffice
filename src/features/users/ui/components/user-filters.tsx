@@ -34,10 +34,10 @@ export default function UserFilters({
         onChange={(e) => {
           const value = e.target.value;
           if (value === '') {
-            onFilterChange('activated', '');
+            onFilterChange('active', '');
             return;
           }
-          onFilterChange('activated', value === 'true');
+          onFilterChange('active', value === 'true');
         }}
       />
     </>

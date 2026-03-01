@@ -1,40 +1,27 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { ICard } from '../../domain/types';
-import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
-import CardGridItem from './card-grid-item';
 import GridSkeleton from '@/shared/base/skeletons/grid-skeleton';
+import { IPokemonCard } from '../../domain/types';
+import PokemonCardGridItem from './pokemon-card-grid-item';
 
-interface CardGridProps {
-  cards: ICard[];
+interface PokemonCardGridProps {
+  cards: IPokemonCard[];
   loading?: boolean;
-  pageSize?: number;
-  onCardPress?: (card: ICard) => void;
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onCardPress?: (card: IPokemonCard) => void;
 }
 
-export default function CardGrid({
+export default function PokemonCardGrid({
   cards,
   loading = false,
-  pageSize = DEFAULT_PAGE_SIZE,
+  page,
+  totalPages,
+  onPageChange,
   onCardPress,
-}: CardGridProps) {
-  const [page, setPage] = useState(1);
-
-  const totalPages = Math.max(1, Math.ceil(cards.length / pageSize));
-
-  const paginatedCards = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return cards.slice(start, start + pageSize);
-  }, [cards, page, pageSize]);
-
-  useEffect(() => {
-    if (page > totalPages) {
-      setPage(1);
-    }
-  }, [page, totalPages]);
-
+}: PokemonCardGridProps) {
   if (loading) {
     return <GridSkeleton count={8} />;
   }
@@ -52,8 +39,8 @@ export default function CardGrid({
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {paginatedCards.map((card) => (
-          <CardGridItem key={card.id} card={card} onPress={onCardPress} />
+        {cards.map((card) => (
+          <PokemonCardGridItem key={card.guid} card={card} onPress={onCardPress} />
         ))}
       </div>
 
@@ -62,7 +49,7 @@ export default function CardGrid({
           <KidstopPagination
             total={totalPages}
             page={page}
-            onChange={setPage}
+            onChange={onPageChange}
             showControls
           />
         </div>

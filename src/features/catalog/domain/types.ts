@@ -45,3 +45,38 @@ export interface CardListProps<T> {
   onSearchChange: SearchFn;
   onFilterChange: FilterFn;
 }
+
+export interface IPokemonCardVariant {
+  condition: string;
+  stock: number;
+  purchasePrice: number | null;
+  sellPrice: number | null;
+}
+
+export interface IPokemonCard {
+  guid: string;
+  name: string;
+  setName: string | null;
+  setCode: string | null;
+  sellPrice: number | null;
+  availableStock: boolean;
+  totalStock: number;
+  imageUri: string | null;
+  variants: IPokemonCardVariant[];
+}
+
+export interface PokemonCatalogFilters {
+  set?: string;
+  rarity?: string;
+  condition?: string;
+  variant?: string;
+  genre?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+export interface IPokemonCollection {
+  guid: string;
+  name: string;
+  code: string | null;
+}

@@ -30,7 +30,7 @@ export default function KidstopAutocomplete({
       {...autocompleteProps}
     >
       {(item: any) => (
-        <AutocompleteItem key={item.value}>
+        <AutocompleteItem key={item.value} textValue={item.label}>
           <div className='max-w-full truncate'>
             <span className='line-clamp-2 block overflow-hidden text-ellipsis whitespace-normal'>
               {item.label}

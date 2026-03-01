@@ -1,14 +1,13 @@
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
   Button,
-  Switch,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { useEffect } from 'react';
-import { Controller, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
@@ -39,11 +38,11 @@ export default function UserFormModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION, activated: true });
+    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION });
   }, [isOpen, defaults, reset]);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <form
         onSubmit={(...args) => {
           void handleSubmit(onSubmit)(...args);
@@ -71,42 +70,30 @@ export default function UserFormModal({
               controlProps={{ control, name: 'role' }}
               items={USER_ROLE_OPTIONS}
             />
-
-            <Controller
-              control={control}
-              name="activated"
-              render={({ field }) => (
-                <Switch
-                  isSelected={field.value}
-                  onValueChange={field.onChange}
-                >
-                  {field.value ? 'Activo' : 'Inactivo'}
-                </Switch>
-              )}
-            />
           </DrawerBody>
 
           <DrawerFooter>
             <Button
-              color="primary"
               variant="light"
               onPress={onClose}
               type="button"
+              className="text-accent"
             >
               Cancelar
             </Button>
             <Button
-              color="primary"
               size="lg"
               isLoading={loading}
               type="submit"
               isDisabled={!formState.isValid}
+              className="text-white"
+              style={{ backgroundColor: 'var(--color-accent)' }}
             >
               {submitLabel}
             </Button>
           </DrawerFooter>
         </DrawerContent>
       </form>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

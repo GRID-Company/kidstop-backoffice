@@ -12,7 +12,7 @@ export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
 
 export interface UserFilters {
   role?: UserRole;
-  activated?: boolean;
+  active?: boolean;
 }
 
 export interface UserListProps<T> {

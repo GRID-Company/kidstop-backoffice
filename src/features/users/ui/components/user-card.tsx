@@ -19,7 +19,7 @@ export default function UserCard({ user, onPress }: UserCardProps) {
       <CardBody className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">{user.name ?? 'Sin nombre'}</p>
-          <UserStatusBadge activated={user.activated} />
+          <UserStatusBadge active={user.active} />
         </div>
 
         <p className="text-content-tertiary text-sm">{user.emailAddress}</p>

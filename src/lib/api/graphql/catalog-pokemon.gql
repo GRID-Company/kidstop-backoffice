@@ -1,0 +1,62 @@
+query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
+  pokemonCardInternalList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+    data {
+      guid
+      name
+      setName
+      setCode
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      inventoryCards {
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+    }
+    count
+  }
+}
+
+query PokemonCardInternalDetail($guid: String!) {
+  pokemonCardInternalDetail(guid: $guid) {
+    guid
+    name
+    cardNumber
+    rarity
+    variant
+    setName
+    setCode
+    sellPrice
+    totalStock
+    imageUri
+    inventoryCards {
+      condition
+      stock
+      purchasePrice
+      sellPrice
+    }
+  }
+}
+
+query PokemonCardCollections {
+  pokemonCardCollections {
+    guid
+    name
+    code
+  }
+}
+
+query PokemonCardRarities {
+  pokemonCardRarities
+}
+
+query PokemonCardVariants {
+  pokemonCardVariants
+}
+
+query PokemonCardGenres {
+  pokemonCardGenres
+}
