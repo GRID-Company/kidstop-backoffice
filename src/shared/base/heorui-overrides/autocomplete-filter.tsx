@@ -25,15 +25,15 @@ export default function AutocompleteFilter({
 }: AutocompleteFilterProps) {
   const [selectedKey, setSelectedKey] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const [indexedItems, setIndexedItems] = useState<Record<string, ISelectOption>>({});
 
-  useEffect(() => {
-    const indexed = items.reduce<Record<string, ISelectOption>>((acc, item) => {
-      acc[item.value] = item;
-      return acc;
-    }, {});
-    setIndexedItems(indexed);
-  }, [items]);
+  const indexedItems = useMemo(
+    () =>
+      items.reduce<Record<string, ISelectOption>>((acc, item) => {
+        acc[item.value] = item;
+        return acc;
+      }, {}),
+    [items]
+  );
 
   useEffect(() => {
     if (resetKey === undefined) return;

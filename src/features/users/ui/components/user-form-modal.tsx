@@ -1,11 +1,11 @@
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
   Button,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { useEffect } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 
@@ -42,7 +42,7 @@ export default function UserFormModal({
   }, [isOpen, defaults, reset]);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl" classNames={{ base: 'bg-white', header: 'border-b border-gray-100 text-content-primary font-semibold', body: 'bg-neutral-subtle/30', footer: 'border-t border-gray-100 bg-white' }}>
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <form
         onSubmit={(...args) => {
           void handleSubmit(onSubmit)(...args);
@@ -74,25 +74,26 @@ export default function UserFormModal({
 
           <DrawerFooter>
             <Button
-              color="primary"
               variant="light"
               onPress={onClose}
               type="button"
+              className="text-accent"
             >
               Cancelar
             </Button>
             <Button
-              color="primary"
               size="lg"
               isLoading={loading}
               type="submit"
               isDisabled={!formState.isValid}
+              className="text-white"
+              style={{ backgroundColor: 'var(--color-accent)' }}
             >
               {submitLabel}
             </Button>
           </DrawerFooter>
         </DrawerContent>
       </form>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

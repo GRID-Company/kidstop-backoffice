@@ -20,7 +20,7 @@ export default function Catalog() {
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
 
   const magic = useCardSearch();
-  const pokemon = usePokemonCatalog();
+  const pokemon = usePokemonCatalog(!isPokemon);
 
   const [selectedMagicCard, setSelectedMagicCard] = useState<ICard | null>(null);
   const [isMagicDetailOpen, setIsMagicDetailOpen] = useState(false);

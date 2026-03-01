@@ -12,7 +12,7 @@ import { toPokemonCard } from '../../adapters/mappers/card.mapper';
 import { PokemonCatalogFilters, IPokemonCard, IPokemonCollection } from '../../domain/types';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 
-export function usePokemonCatalog() {
+export function usePokemonCatalog(skip = false) {
   const [page, setPage] = useState(1);
   const [search, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<PokemonCatalogFilters>({});
@@ -23,24 +23,27 @@ export function usePokemonCatalog() {
   const { data, loading } = useQuery(PokemonCardInternalListDocument, {
     variables: vars,
     fetchPolicy: 'cache-and-network',
+    skip,
   });
 
   const { data: collectionsData, loading: collectionsLoading } = useQuery(
     PokemonCardCollectionsDocument,
-    { fetchPolicy: 'cache-first' }
+    { fetchPolicy: 'cache-first', skip }
   );
 
   const { data: raritiesData, loading: raritiesLoading } = useQuery(
     PokemonCardRaritiesDocument,
-    { fetchPolicy: 'cache-first' }
+    { fetchPolicy: 'cache-first', skip }
   );
 
   const { data: variantsData } = useQuery(PokemonCardVariantsDocument, {
     fetchPolicy: 'cache-first',
+    skip,
   });
 
   const { data: genresData } = useQuery(PokemonCardGenresDocument, {
     fetchPolicy: 'cache-first',
+    skip,
   });
 
   const cards: IPokemonCard[] = (data?.pokemonCardInternalList.data ?? []).map(toPokemonCard);
@@ -96,10 +99,10 @@ export function usePokemonCatalog() {
     setResetKey((k) => k + 1);
   }, []);
 
-  const hasActiveFilters = search.trim() !== '' || Object.keys(filters).length > 0;
   const activeFilterCount = Object.keys(filters).filter(
     (k) => k !== 'sortBy' && k !== 'sortOrder'
   ).length;
+  const hasActiveFilters = search.trim() !== '' || activeFilterCount > 0;
 
   return {
     cards,

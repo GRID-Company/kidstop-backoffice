@@ -3,8 +3,6 @@
 import KidstopModal from '@/shared/base/heorui-overrides/modal';
 import { Button, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 
-
-
 type ConfirmVariant = 'danger' | 'primary';
 
 type ConfirmationModalProps = {
@@ -38,13 +36,14 @@ export default function ConfirmationModal({
           <p>{message}</p>
         </ModalBody>
         <ModalFooter className='flex justify-center gap-4'>
-          <Button variant='light' onPress={onClose} isDisabled={isLoading}>
+          <Button variant='light' onPress={onClose} isDisabled={isLoading} className='text-accent'>
             Cancelar
           </Button>
           <Button
-            color={confirmVariant}
             onPress={onConfirm}
             isLoading={isLoading}
+            className="text-white"
+            style={{ backgroundColor: 'var(--color-accent)' }}
           >
             {confirmLabel}
           </Button>

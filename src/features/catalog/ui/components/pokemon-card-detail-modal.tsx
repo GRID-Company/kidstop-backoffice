@@ -66,7 +66,7 @@ export default function PokemonCardDetailModal({
           <span className="text-lg font-semibold text-accent">{name}</span>
           <span className="text-sm font-normal text-default-500">
             {[setName, setCode].filter(Boolean).join(' · ')}
-            {detail?.cardNumber ? ` · #${detail.cardNumber}` : ''}
+            {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
           </span>
         </DrawerHeader>
 
@@ -110,7 +110,7 @@ export default function PokemonCardDetailModal({
                 ) : detail?.cardNumber ? (
                   <>
                     <span className="text-default-500">Número</span>
-                    <span className="font-medium">#{detail.cardNumber}</span>
+                    <span className="font-medium">{detail.cardNumber}</span>
                   </>
                 ) : null}
                 {loading ? (
