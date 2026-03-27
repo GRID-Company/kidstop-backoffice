@@ -64,6 +64,11 @@ function PreviewCardItem({
   index: number;
 }) {
   const badge = PRIORITY_BADGE[item.priority] ?? PRIORITY_BADGE.LOW;
+  const cardData = item.pokemonCardSummary || item.magicCardSummary;
+  const cardName = cardData?.name || 'Unknown';
+  const cardImage = cardData?.imageUri || null;
+  const cardSet = item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '';
+  const cardNumber = item.pokemonCardSummary?.cardNumber || item.magicCardSummary?.collectorNumber || '';
 
   return (
     <motion.div
@@ -97,10 +102,10 @@ function PreviewCardItem({
           ease: 'easeInOut',
         }}
       >
-        {item.card.imageUrl ? (
+        {cardImage ? (
           <Image
-            src={item.card.imageUrl}
-            alt={item.card.name}
+            src={cardImage}
+            alt={cardName}
             fill
             sizes="96px"
             className="object-contain p-0.5"
@@ -114,10 +119,10 @@ function PreviewCardItem({
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate text-xl font-extrabold text-amber-950">
-          {item.card.name}
+          {cardName}
         </span>
         <span className="truncate text-base text-amber-800/70">
-          {item.card.setName} — #{item.card.number}
+          {cardSet} {cardNumber ? `— #${cardNumber}` : ''}
         </span>
         {item.notes && (
           <span className="truncate text-sm italic text-amber-700/60">
@@ -146,7 +151,7 @@ function EmptyPreview() {
 }
 
 export default function MostWantedPreview({ items, selectedTCG }: MostWantedPreviewProps) {
-  const activeItems = items.filter((item) => item.isActive);
+  const activeItems = items.filter((item) => item.active);
   const tcgOption = TCG_OPTIONS.find((o) => o.key === selectedTCG);
 
   return (
@@ -230,7 +235,7 @@ export default function MostWantedPreview({ items, selectedTCG }: MostWantedPrev
           ) : (
             <AnimatePresence mode="popLayout">
               {activeItems.map((item, index) => (
-                <PreviewCardItem key={item.id} item={item} rank={index + 1} index={index} />
+                <PreviewCardItem key={item.guid} item={item} rank={index + 1} index={index} />
               ))}
             </AnimatePresence>
           )}

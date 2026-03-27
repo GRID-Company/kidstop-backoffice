@@ -38,6 +38,14 @@ export type AddCartItemInput = {
   tcg: Scalars['String']['input'];
 };
 
+export type AddMostWantedCardInput = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  cardGuid: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
+};
+
 export type AddPurchaseItemInput = {
   condition: Scalars['String']['input'];
   magicCardGuid?: InputMaybe<Scalars['String']['input']>;
@@ -69,6 +77,11 @@ export type BuyerBudgetWithUsage = {
 export type CancelSaleInput = {
   cancelReason: Scalars['String']['input'];
   saleGuid: Scalars['String']['input'];
+};
+
+export type CardOrderInput = {
+  mostWantedCardGuid: Scalars['String']['input'];
+  priority: Scalars['String']['input'];
 };
 
 export type Cart = {
@@ -212,6 +225,19 @@ export type FindInventoryMovementsArgs = {
 export type FindInventoryMovementsFilter = {
   createdDate?: InputMaybe<DateRangeFilter>;
   movementType?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FindMostWantedCardsArgs = {
+  filters?: InputMaybe<FindMostWantedCardsFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindMostWantedCardsFilter = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type FindMySalesArgs = {
@@ -440,6 +466,20 @@ export type MagicCardSummary = {
   rarity?: Maybe<Scalars['String']['output']>;
 };
 
+export type MostWantedCard = {
+  active: Scalars['Boolean']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  guid: Scalars['String']['output'];
+  magicCardSummary?: Maybe<MagicCardSummary>;
+  notes?: Maybe<Scalars['String']['output']>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
+  priority: Scalars['String']['output'];
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
 export type MultipleValuesFilter = {
   /** filterType -> :multiple_values: */
   filterType: Scalars['String']['input'];
@@ -449,6 +489,8 @@ export type MultipleValuesFilter = {
 export type Mutation = {
   /** Add item to cart (carpeta digital) */
   addCartItem: Cart;
+  /** Add a card to the most wanted list (admin only) */
+  addMostWantedCard: MostWantedCard;
   /** Add item to wishlist (carpeta digital) */
   addWishlistItem: WishlistItem;
   /** Cancel a sale with reason (backoffice) */
@@ -478,8 +520,12 @@ export type Mutation = {
   registerClient: User;
   /** Remove item from cart (carpeta digital) */
   removeCartItem: Cart;
+  /** Remove a card from the most wanted list (admin only) */
+  removeMostWantedCard: Scalars['Boolean']['output'];
   /** Remove item from wishlist (carpeta digital) */
   removeWishlistItem: Scalars['Boolean']['output'];
+  /** Reorder most wanted cards priorities in bulk (admin only) */
+  reorderMostWantedCards: Scalars['Boolean']['output'];
   requestPasswordChange: RequestPasswordChangeOutput;
   /** Mutation to set client status (STANDARD, VIP, BLOCKED) - admin only */
   setClientStatus: GenericOutput;
@@ -494,6 +540,8 @@ export type Mutation = {
   /** Update cart item quantity (carpeta digital) */
   updateCartItem: Cart;
   updateGlobalConfig: GenericOutput;
+  /** Update a most wanted card (admin only) */
+  updateMostWantedCard: MostWantedCard;
   /** Update inventory item prices (internal only) */
   updatePokemonCardPrices: InventoryItem;
   /** Update purchase details (client, notes, payments) */
@@ -515,6 +563,10 @@ export type Mutation = {
 
 export type MutationAddCartItemArgs = {
   addCartItemInput: AddCartItemInput;
+};
+
+export type MutationAddMostWantedCardArgs = {
+  addMostWantedCardInput: AddMostWantedCardInput;
 };
 
 export type MutationAddWishlistItemArgs = {
@@ -577,8 +629,16 @@ export type MutationRemoveCartItemArgs = {
   cartItemGuid: Scalars['String']['input'];
 };
 
+export type MutationRemoveMostWantedCardArgs = {
+  mostWantedCardGuid: Scalars['String']['input'];
+};
+
 export type MutationRemoveWishlistItemArgs = {
   wishlistItemGuid: Scalars['String']['input'];
+};
+
+export type MutationReorderMostWantedCardsArgs = {
+  reorderMostWantedCardsInput: ReorderMostWantedCardsInput;
 };
 
 export type MutationRequestPasswordChangeArgs = {
@@ -603,6 +663,10 @@ export type MutationUpdateCartItemArgs = {
 
 export type MutationUpdateGlobalConfigArgs = {
   updateGlobalConfigInput: UpdateGlobalConfigInput;
+};
+
+export type MutationUpdateMostWantedCardArgs = {
+  updateMostWantedCardInput: UpdateMostWantedCardInput;
 };
 
 export type MutationUpdatePokemonCardPricesArgs = {
@@ -666,6 +730,11 @@ export type PaginatedInventoryItems = {
 export type PaginatedInventoryMovements = {
   count?: Maybe<Scalars['Float']['output']>;
   data?: Maybe<Array<InventoryMovement>>;
+};
+
+export type PaginatedMostWantedCards = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<MostWantedCard>>;
 };
 
 export type PaginatedPokemonCardsInternal = {
@@ -887,6 +956,14 @@ export type Query = {
   /** Get paginated list of inventory movements */
   inventoryMovements: PaginatedInventoryMovements;
   isValidToken: IsValidTokenOutput;
+  /** Get most wanted card detail (admin only) */
+  mostWantedCard: MostWantedCard;
+  /** Get paginated most wanted cards list (admin only) */
+  mostWantedCards: PaginatedMostWantedCards;
+  /** Get active most wanted Magic cards (public, no auth required) */
+  mostWantedMagicCards: Array<MostWantedCard>;
+  /** Get active most wanted Pokemon cards (public, no auth required) */
+  mostWantedPokemonCards: Array<MostWantedCard>;
   /** Get current user cart for a TCG (carpeta digital) */
   myCart: Cart;
   /** Get current user sale detail (carpeta digital) */
@@ -955,6 +1032,14 @@ export type QueryInventoryMovementsArgs = {
   findInventoryMovementsArgs: FindInventoryMovementsArgs;
 };
 
+export type QueryMostWantedCardArgs = {
+  mostWantedCardGuid: Scalars['String']['input'];
+};
+
+export type QueryMostWantedCardsArgs = {
+  findMostWantedCardsArgs: FindMostWantedCardsArgs;
+};
+
 export type QueryMyCartArgs = {
   tcg: Scalars['String']['input'];
 };
@@ -1020,6 +1105,11 @@ export type RegisterClientInput = {
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ReorderMostWantedCardsInput = {
+  cardOrders: Array<CardOrderInput>;
+  tcg: Scalars['String']['input'];
 };
 
 export type RequestPasswordChangeInput = {
@@ -1117,6 +1207,13 @@ export type UpdateInventoryItemPricesInput = {
   inventoryItemGuid: Scalars['String']['input'];
   purchasePrice?: InputMaybe<Scalars['Float']['input']>;
   sellPrice?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type UpdateMostWantedCardInput = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  mostWantedCardGuid: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdatePurchaseInput = {

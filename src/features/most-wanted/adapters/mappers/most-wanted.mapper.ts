@@ -1,37 +1,40 @@
+import { AddMostWantedCardInput, UpdateMostWantedCardInput } from '@/lib/api/schema-types';
 import { IMostWantedCard } from '../../domain/types';
 import { MostWantedCardFormData } from '../forms/most-wanted-card.schema';
 
-export function toAddMostWantedPayload(data: MostWantedCardFormData, tcgType: string) {
+export function toAddMostWantedCardInput(
+  data: MostWantedCardFormData,
+  tcg: 'POKEMON' | 'MAGIC'
+): AddMostWantedCardInput {
   return {
-    addMostWantedInput: {
-      cardId: data.cardId,
-      tcgType,
-      priority: data.priority,
-      notes: data.notes,
-      isActive: data.isActive,
-      order: data.order,
-    },
+    tcg,
+    cardGuid: data.cardId,
+    priority: data.priority,
+    active: data.isActive,
+    notes: data.notes || undefined,
   };
 }
 
-export function toUpdateMostWantedPayload(data: MostWantedCardFormData, id: string) {
+export function toUpdateMostWantedCardInput(
+  mostWantedCardGuid: string,
+  data: Partial<MostWantedCardFormData> & { active?: boolean }
+): UpdateMostWantedCardInput {
   return {
-    updateMostWantedInput: {
-      id,
-      priority: data.priority,
-      notes: data.notes,
-      isActive: data.isActive,
-      order: data.order,
-    },
+    mostWantedCardGuid,
+    priority: data.priority,
+    active: data.active !== undefined ? data.active : data.isActive,
+    notes: data.notes || undefined,
   };
 }
 
 export function toMostWantedFormDefaults(item: IMostWantedCard): MostWantedCardFormData {
+  const cardGuid = item.pokemonCardSummary?.guid || item.magicCardSummary?.guid || '';
+  
   return {
-    cardId: item.card.id,
+    cardId: cardGuid,
     priority: item.priority,
-    notes: item.notes,
-    isActive: item.isActive,
-    order: item.order,
+    notes: item.notes || '',
+    isActive: item.active,
+    order: 0,
   };
 }

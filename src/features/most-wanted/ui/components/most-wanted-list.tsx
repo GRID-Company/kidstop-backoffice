@@ -24,10 +24,10 @@ import EditCardModal from './edit-card-modal';
 
 interface MostWantedListProps {
   items: IMostWantedCard[];
-  onReorder: (activeId: string, overId: string) => void;
-  onToggleActive: (id: string) => void;
-  onUpdateCard: (id: string, updates: { priority?: MostWantedPriority; notes?: string }) => void;
-  onRemoveCard: (id: string) => void;
+  onReorder: (activeId: string, overId: string) => void | Promise<void>;
+  onToggleActive: (guid: string, currentActive: boolean) => void | Promise<void>;
+  onUpdateCard: (guid: string, updates: { priority?: MostWantedPriority; notes?: string; active?: boolean }) => void | Promise<void>;
+  onRemoveCard: (guid: string) => void | Promise<void>;
 }
 
 export default function MostWantedList({
@@ -74,13 +74,13 @@ export default function MostWantedList({
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={items.map((i) => i.id)}
+          items={items.map((i) => i.guid)}
           strategy={verticalListSortingStrategy}
         >
           <div className="flex flex-col gap-2">
             {items.map((item) => (
               <MostWantedCardItem
-                key={item.id}
+                key={item.guid}
                 item={item}
                 onToggleActive={onToggleActive}
                 onEdit={setEditingItem}
