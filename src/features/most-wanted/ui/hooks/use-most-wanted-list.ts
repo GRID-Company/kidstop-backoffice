@@ -16,6 +16,17 @@ import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.sc
 
 const PRIORITY_ORDER = { HIGH: 0, MEDIUM: 1, LOW: 2 };
 
+const handleMutationError = (error: any, defaultMessage: string): string => {
+  console.error(defaultMessage, error);
+  if (error.graphQLErrors?.length > 0) {
+    const message = error.graphQLErrors[0].message;
+    if (message.includes('already exists')) {
+      return 'Esta carta ya está en Most Wanted';
+    }
+  }
+  return defaultMessage;
+};
+
 export function useMostWantedList() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
 
@@ -63,11 +74,8 @@ export function useMostWantedList() {
         await addMutation({ variables: { addMostWantedCardInput: input } });
         toast.success('Carta agregada a Most Wanted');
       } catch (error: any) {
-        if (error.message?.includes('already exists')) {
-          toast.error('Esta carta ya está en Most Wanted');
-        } else {
-          toast.error('Error al agregar carta');
-        }
+        const message = handleMutationError(error, 'Error al agregar carta');
+        toast.error(message);
         throw error;
       }
     },
@@ -80,9 +88,10 @@ export function useMostWantedList() {
         const input = toUpdateMostWantedCardInput(guid, updates);
         await updateMutation({ variables: { updateMostWantedCardInput: input } });
         toast.success('Carta actualizada');
-      } catch {
-        toast.error('Error al actualizar carta');
-        throw new Error('Update failed');
+      } catch (error: any) {
+        const message = handleMutationError(error, 'Error al actualizar carta');
+        toast.error(message);
+        throw error;
       }
     },
     [updateMutation]
@@ -94,9 +103,10 @@ export function useMostWantedList() {
         const input = toUpdateMostWantedCardInput(guid, { active: !currentActive });
         await updateMutation({ variables: { updateMostWantedCardInput: input } });
         toast.success(currentActive ? 'Carta desactivada' : 'Carta activada');
-      } catch {
-        toast.error('Error al cambiar estado');
-        throw new Error('Toggle failed');
+      } catch (error: any) {
+        const message = handleMutationError(error, 'Error al cambiar estado');
+        toast.error(message);
+        throw error;
       }
     },
     [updateMutation]
@@ -107,9 +117,10 @@ export function useMostWantedList() {
       try {
         await removeMutation({ variables: { mostWantedCardGuid: guid } });
         toast.success('Carta eliminada de Most Wanted');
-      } catch {
-        toast.error('Error al eliminar carta');
-        throw new Error('Remove failed');
+      } catch (error: any) {
+        const message = handleMutationError(error, 'Error al eliminar carta');
+        toast.error(message);
+        throw error;
       }
     },
     [removeMutation]
@@ -154,9 +165,10 @@ export function useMostWantedList() {
           },
         });
         toast.success('Orden actualizado');
-      } catch {
-        toast.error('Error al reordenar');
-        throw new Error('Reorder failed');
+      } catch (error: any) {
+        const message = handleMutationError(error, 'Error al reordenar');
+        toast.error(message);
+        throw error;
       }
     },
     [items, reorderMutation, selectedTCG]

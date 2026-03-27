@@ -18,21 +18,32 @@ Step 2
 - Fetch the pull request details and changed files
 - Get the diff and statistics
 
-Step 3
-- Analyze the code changes:
-  - Check for unused code (imports, variables, functions)
-  - Review component structure and separation of concerns
-  - Verify React state patterns and useEffect dependencies
-  - Check TypeScript type safety
-  - Review error handling and edge cases
-  - Validate against project standards
+Step 2.5 - Check for Code Duplication
+- Search for similar patterns, constants, or functions in the codebase
+- Use grep/ripgrep to find existing implementations
+- Verify if new code reuses existing utilities from lib/, shared/, or other features
+- Check for duplicate types, constants, or business logic
 
-Step 4
-- Generate a comprehensive review with:
-  - Summary of changes
-  - Specific feedback on issues found
-  - Suggestions for improvements
-  - Approval status or requested changes
+Step 3 - Analyze the code changes in really strict mode:
+  - **Code Duplication**: Search codebase for similar implementations
+  - **Architecture Compliance**: Verify Feature-First pattern adherence
+  - **Import Analysis**: Check for unused imports and circular dependencies
+  - **Component Structure**: Review separation of concerns
+  - **React Patterns**: Verify state patterns and useEffect dependencies
+  - **TypeScript Safety**: Check type safety and proper typing
+  - **Error Handling**: Review error handling and edge cases
+  - **Project Standards**: Validate naming conventions and file organization
+  - **Comments**: Ensure no unnecessary comments (especially non-English)
+  - **Constants/Types**: Verify reuse of existing shared constants and types
+
+Step 4 - Generate a comprehensive review with:
+  - **Duplication Analysis**: Specific findings of duplicate code
+  - **Architecture Assessment**: Compliance with project patterns
+  - **Summary of Changes**: What was added/modified
+  - **Critical Issues**: Blocking issues that must be fixed
+  - **Suggestions**: Non-blocking improvements
+  - **Approval Status**: APPROVED / REQUEST CHANGES / COMMENT
+  - **Action Items**: Specific tasks for the author
 
 Step 5
 - Post the review as a comment on the pull request

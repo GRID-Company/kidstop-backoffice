@@ -52,9 +52,11 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
   }, [form]);
 
   const selectCard = useCallback(
-    (card: IPokemonCard) => {
+    (card: IPokemonCard | null) => {
       setSelectedCard(card);
-      form.setValue('cardId', card.guid, { shouldValidate: true });
+      if (card) {
+        form.setValue('cardId', card.guid, { shouldValidate: true });
+      }
     },
     [form]
   );

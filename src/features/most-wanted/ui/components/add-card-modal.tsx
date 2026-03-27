@@ -29,7 +29,7 @@ interface AddCardModalProps {
   onSearchChange: (value: string) => void;
   searchResults: IPokemonCard[];
   selectedCard: IPokemonCard | null;
-  onSelectCard: (card: IPokemonCard) => void;
+  onSelectCard: (card: IPokemonCard | null) => void;
   form: ReturnType<typeof useAddCardModal>['form'];
   onSubmit: ReturnType<typeof useAddCardModal>['handleSubmit'];
   loading?: boolean;
@@ -204,7 +204,7 @@ export default function AddCardModal({
                   variant="light"
                   startContent={<Icon icon="lucide:x" width={14} />}
                   onPress={() => {
-                    onSelectCard(null as unknown as IPokemonCard);
+                    onSelectCard(null);
                     onSearchChange('');
                   }}
                   className="text-default-500"

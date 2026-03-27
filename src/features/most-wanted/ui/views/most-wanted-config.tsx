@@ -8,6 +8,7 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import { useAddCardModal } from '../hooks/use-add-card-modal';
 import { useMostWantedList } from '../hooks/use-most-wanted-list';
+import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
 import AddCardModal from '../components/add-card-modal';
 import MostWantedList from '../components/most-wanted-list';
 import MostWantedPreview from '../components/most-wanted-preview';
@@ -35,7 +36,7 @@ export default function MostWantedConfig() {
   const addCardModal = useAddCardModal({ existingCards });
 
   const handleAddCard = useCallback(
-    async (data: any) => {
+    async (data: MostWantedCardFormData) => {
       await addCard(data);
     },
     [addCard]
