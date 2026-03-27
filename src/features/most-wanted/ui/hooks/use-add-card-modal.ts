@@ -1,48 +1,41 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { MOCK_CARDS } from '@/features/catalog/adapters/api/catalog.mock';
-import { ICard } from '@/features/catalog/domain/types';
-import { MOCK_MOST_WANTED } from '../../adapters/api/most-wanted.mock';
+import { usePokemonCatalog } from '@/features/catalog/ui/hooks/use-pokemon-catalog';
+import { IPokemonCard } from '@/features/catalog/domain/types';
 import { useMostWantedForm } from '../../adapters/forms/use-most-wanted-form';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
-import { toAddMostWantedPayload } from '../../adapters/mappers/most-wanted.mapper';
 
-export function useAddCardModal() {
+interface UseAddCardModalProps {
+  existingCards: Array<{ guid: string }>;
+}
+
+export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedCard, setSelectedCard] = useState<ICard | null>(null);
+  const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(null);
 
   const form = useMostWantedForm();
 
-  const existingCardIds = useMemo(
-    () =>
-      new Set(
-        MOCK_MOST_WANTED.filter((mw) => mw.tcgType === selectedTCG).map(
-          (mw) => mw.card.id
-        )
-      ),
-    [selectedTCG]
+  const { cards, loading, setSearch: setPokemonSearch } = usePokemonCatalog(
+    selectedTCG !== 'POKEMON'
+  );
+
+  useEffect(() => {
+    if (selectedTCG === 'POKEMON') {
+      setPokemonSearch(search);
+    }
+  }, [search, setPokemonSearch, selectedTCG]);
+
+  const existingCardGuids = useMemo(
+    () => new Set(existingCards.map((card) => card.guid)),
+    [existingCards]
   );
 
   const searchResults = useMemo(() => {
-    let cards = MOCK_CARDS.filter((c) => c.tcgType === selectedTCG);
-
-    cards = cards.filter((c) => !existingCardIds.has(c.id));
-
-    if (search.trim()) {
-      const term = search.toLowerCase();
-      cards = cards.filter(
-        (c) =>
-          c.name.toLowerCase().includes(term) ||
-          c.setName.toLowerCase().includes(term) ||
-          c.setCode.toLowerCase().includes(term) ||
-          c.number.toLowerCase().includes(term)
-      );
-    }
-
-    return cards;
-  }, [selectedTCG, search, existingCardIds]);
+    if (selectedTCG !== 'POKEMON') return [];
+    return cards.filter((card) => !existingCardGuids.has(card.guid));
+  }, [cards, existingCardGuids, selectedTCG]);
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -59,22 +52,23 @@ export function useAddCardModal() {
   }, [form]);
 
   const selectCard = useCallback(
-    (card: ICard) => {
+    (card: IPokemonCard | null) => {
       setSelectedCard(card);
-      form.setValue('cardId', card.id, { shouldValidate: true });
+      if (card) {
+        form.setValue('cardId', card.guid, { shouldValidate: true });
+      }
     },
     [form]
   );
 
   const handleSubmit = useCallback(
-    (onSuccess?: (payload: ReturnType<typeof toAddMostWantedPayload>) => void) => {
-      return form.handleSubmit((data: MostWantedCardFormData) => {
-        const payload = toAddMostWantedPayload(data, selectedTCG);
-        onSuccess?.(payload);
+    (onSuccess?: (data: MostWantedCardFormData) => void | Promise<void>) => {
+      return form.handleSubmit(async (data: MostWantedCardFormData) => {
+        await onSuccess?.(data);
         closeModal();
       });
     },
-    [form, selectedTCG, closeModal]
+    [form, closeModal]
   );
 
   return {
@@ -89,5 +83,6 @@ export function useAddCardModal() {
     form,
     handleSubmit,
     selectedTCG,
+    loading,
   };
 }

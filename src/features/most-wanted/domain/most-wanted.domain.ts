@@ -28,6 +28,6 @@ export const sortByPriority = (cards: IMostWantedCard[]): IMostWantedCard[] => {
   return [...cards].sort((a, b) => {
     const priorityDiff = (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99);
     if (priorityDiff !== 0) return priorityDiff;
-    return a.order - b.order;
+    return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
   });
 };

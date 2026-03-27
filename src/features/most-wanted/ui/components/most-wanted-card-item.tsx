@@ -10,9 +10,9 @@ import { MOST_WANTED_PRIORITY_LABELS } from '../../domain/constants';
 
 interface MostWantedCardItemProps {
   item: IMostWantedCard;
-  onToggleActive: (id: string) => void;
+  onToggleActive: (guid: string, currentActive: boolean) => void | Promise<void>;
   onEdit: (item: IMostWantedCard) => void;
-  onRemove: (id: string) => void;
+  onRemove: (guid: string) => void | Promise<void>;
 }
 
 const PRIORITY_STYLES: Record<string, { bg: string; text: string }> = {
@@ -34,7 +34,7 @@ export default function MostWantedCardItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: item.id });
+  } = useSortable({ id: item.guid });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -42,6 +42,12 @@ export default function MostWantedCardItem({
   };
 
   const priorityStyle = PRIORITY_STYLES[item.priority] ?? PRIORITY_STYLES.LOW;
+  
+  const cardData = item.pokemonCardSummary || item.magicCardSummary;
+  const cardName = cardData?.name || 'Unknown';
+  const cardImage = cardData?.imageUri || null;
+  const cardSet = item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '';
+  const cardNumber = item.pokemonCardSummary?.cardNumber || item.magicCardSummary?.collectorNumber || '';
 
   return (
     <div
@@ -49,7 +55,7 @@ export default function MostWantedCardItem({
       style={style}
       className={`flex items-center gap-3 rounded-lg border border-default-200 bg-content1 p-3 ${
         isDragging ? 'z-50 shadow-lg opacity-90' : ''
-      } ${!item.isActive ? 'opacity-50' : ''}`}
+      } ${!item.active ? 'opacity-50' : ''}`}
     >
       <button
         type="button"
@@ -60,15 +66,11 @@ export default function MostWantedCardItem({
         <Icon icon="lucide:grip-vertical" width={20} />
       </button>
 
-      <span className="w-6 text-center text-xs font-bold text-default-400">
-        {item.order}
-      </span>
-
       <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded bg-default-100">
-        {item.card.imageUrl ? (
+        {cardImage ? (
           <Image
-            src={item.card.imageUrl}
-            alt={item.card.name}
+            src={cardImage}
+            alt={cardName}
             fill
             sizes="36px"
             className="object-contain"
@@ -81,9 +83,9 @@ export default function MostWantedCardItem({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-sm font-semibold">{item.card.name}</span>
+        <span className="truncate text-sm font-semibold">{cardName}</span>
         <span className="truncate text-xs text-default-500">
-          {item.card.setName} · #{item.card.number}
+          {cardSet} {cardNumber ? `· #${cardNumber}` : ''}
         </span>
         {item.notes && (
           <span className="truncate text-xs italic text-default-400">
@@ -105,9 +107,9 @@ export default function MostWantedCardItem({
 
       <Switch
         size="sm"
-        isSelected={item.isActive}
-        onValueChange={() => onToggleActive(item.id)}
-        aria-label={item.isActive ? 'Desactivar carta' : 'Activar carta'}
+        isSelected={item.active}
+        onValueChange={() => onToggleActive(item.guid, item.active)}
+        aria-label={item.active ? 'Desactivar carta' : 'Activar carta'}
       />
 
       <div className="flex items-center gap-1">
@@ -129,7 +131,7 @@ export default function MostWantedCardItem({
             size="sm"
             variant="light"
             color="danger"
-            onPress={() => onRemove(item.id)}
+            onPress={() => onRemove(item.guid)}
             aria-label="Eliminar carta"
           >
             <Icon icon="lucide:trash-2" width={16} />

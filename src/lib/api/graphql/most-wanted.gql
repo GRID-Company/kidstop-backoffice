@@ -1,0 +1,172 @@
+query MostWantedPokemonCards {
+  mostWantedPokemonCards {
+    guid
+    tcg
+    priority
+    active
+    notes
+    pokemonCardSummary {
+      guid
+      name
+      setName
+      setCode
+      cardNumber
+      rarity
+      imageUri
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+query MostWantedMagicCards {
+  mostWantedMagicCards {
+    guid
+    tcg
+    priority
+    active
+    notes
+    magicCardSummary {
+      guid
+      name
+      edition
+      collectorNumber
+      rarity
+      imageUri
+      isFoil
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+query MostWantedCards($findMostWantedCardsArgs: FindMostWantedCardsArgs!) {
+  mostWantedCards(findMostWantedCardsArgs: $findMostWantedCardsArgs) {
+    data {
+      guid
+      tcg
+      priority
+      active
+      notes
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
+
+query MostWantedCard($mostWantedCardGuid: String!) {
+  mostWantedCard(mostWantedCardGuid: $mostWantedCardGuid) {
+    guid
+    tcg
+    priority
+    active
+    notes
+    pokemonCardSummary {
+      guid
+      name
+      setName
+      setCode
+      cardNumber
+      rarity
+      imageUri
+    }
+    magicCardSummary {
+      guid
+      name
+      edition
+      collectorNumber
+      rarity
+      imageUri
+      isFoil
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation AddMostWantedCard($addMostWantedCardInput: AddMostWantedCardInput!) {
+  addMostWantedCard(addMostWantedCardInput: $addMostWantedCardInput) {
+    guid
+    tcg
+    priority
+    active
+    notes
+    pokemonCardSummary {
+      guid
+      name
+      setName
+      setCode
+      cardNumber
+      rarity
+      imageUri
+    }
+    magicCardSummary {
+      guid
+      name
+      edition
+      collectorNumber
+      rarity
+      imageUri
+      isFoil
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation UpdateMostWantedCard($updateMostWantedCardInput: UpdateMostWantedCardInput!) {
+  updateMostWantedCard(updateMostWantedCardInput: $updateMostWantedCardInput) {
+    guid
+    tcg
+    priority
+    active
+    notes
+    pokemonCardSummary {
+      guid
+      name
+      setName
+      setCode
+      cardNumber
+      rarity
+      imageUri
+    }
+    magicCardSummary {
+      guid
+      name
+      edition
+      collectorNumber
+      rarity
+      imageUri
+      isFoil
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation RemoveMostWantedCard($mostWantedCardGuid: String!) {
+  removeMostWantedCard(mostWantedCardGuid: $mostWantedCardGuid)
+}
+
+mutation ReorderMostWantedCards($reorderMostWantedCardsInput: ReorderMostWantedCardsInput!) {
+  reorderMostWantedCards(reorderMostWantedCardsInput: $reorderMostWantedCardsInput)
+}

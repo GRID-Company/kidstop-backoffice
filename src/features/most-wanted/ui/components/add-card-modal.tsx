@@ -16,24 +16,23 @@ import { Icon } from '@iconify/react';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import { ICard } from '@/features/catalog/domain/types';
-import { CARD_CONDITION_SHORT_LABELS } from '@/features/catalog/domain/constants';
+import { IPokemonCard } from '@/features/catalog/domain/types';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
-import { toAddMostWantedPayload } from '../../adapters/mappers/most-wanted.mapper';
 import CardPrioritySelector from './card-priority-selector';
 import { useAddCardModal } from '../hooks/use-add-card-modal';
 
 interface AddCardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd?: (payload: ReturnType<typeof toAddMostWantedPayload>) => void;
+  onAdd?: (data: MostWantedCardFormData) => void | Promise<void>;
   search: string;
   onSearchChange: (value: string) => void;
-  searchResults: ICard[];
-  selectedCard: ICard | null;
-  onSelectCard: (card: ICard) => void;
+  searchResults: IPokemonCard[];
+  selectedCard: IPokemonCard | null;
+  onSelectCard: (card: IPokemonCard | null) => void;
   form: ReturnType<typeof useAddCardModal>['form'];
   onSubmit: ReturnType<typeof useAddCardModal>['handleSubmit'];
+  loading?: boolean;
 }
 
 function CardSearchResult({
@@ -41,12 +40,10 @@ function CardSearchResult({
   isSelected,
   onPress,
 }: {
-  card: ICard;
+  card: IPokemonCard;
   isSelected: boolean;
   onPress: () => void;
 }) {
-  const totalStock = card.variants.reduce((sum, v) => sum + v.stock, 0);
-
   return (
     <Button
       variant={isSelected ? 'flat' : 'light'}
@@ -56,9 +53,9 @@ function CardSearchResult({
       onPress={onPress}
     >
       <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded bg-default-100">
-        {card.imageUrl ? (
+        {card.imageUri ? (
           <Image
-            src={card.imageUrl}
+            src={card.imageUri}
             alt={card.name}
             fill
             sizes="40px"
@@ -74,27 +71,23 @@ function CardSearchResult({
       <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
         <span className="truncate text-sm font-semibold">{card.name}</span>
         <span className="truncate text-xs text-default-500">
-          {card.setName} · {card.setCode} · #{card.number}
+          {card.setName} · {card.setCode}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-default-400">{card.rarity}</span>
-          <span className="text-xs text-default-400">·</span>
-          <span className="text-xs text-default-500">Stock: {totalStock}</span>
+          <span className="text-xs text-default-500">Stock: {card.totalStock}</span>
         </div>
       </div>
     </Button>
   );
 }
 
-function SelectedCardPreview({ card }: { card: ICard }) {
-  const totalStock = card.variants.reduce((sum, v) => sum + v.stock, 0);
-
+function SelectedCardPreview({ card }: { card: IPokemonCard }) {
   return (
     <div className="flex gap-4 rounded-lg bg-default-50 p-4">
       <div className="relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-lg bg-default-100">
-        {card.imageUrl ? (
+        {card.imageUri ? (
           <Image
-            src={card.imageUrl}
+            src={card.imageUri}
             alt={card.name}
             fill
             sizes="96px"
@@ -110,7 +103,7 @@ function SelectedCardPreview({ card }: { card: ICard }) {
       <div className="flex flex-col gap-1.5">
         <p className="text-sm font-semibold text-accent">{card.name}</p>
         <p className="text-xs text-default-500">
-          {card.setName} · {card.setCode} · #{card.number}
+          {card.setName} · {card.setCode}
         </p>
 
         <div className="flex items-center gap-2">
@@ -122,26 +115,12 @@ function SelectedCardPreview({ card }: { card: ICard }) {
               content: 'text-accent font-medium',
             }}
           >
-            {card.tcgType}
+            POKEMON
           </Chip>
-          <Chip size="sm" variant="flat">
-            {card.rarity}
-          </Chip>
-        </div>
-
-        <div className="mt-1 flex flex-wrap gap-1">
-          {card.variants.map((v) => (
-            <span
-              key={v.id}
-              className="rounded-full bg-default-100 px-2 py-0.5 text-[10px] text-default-600"
-            >
-              {CARD_CONDITION_SHORT_LABELS[v.condition]} ({v.stock})
-            </span>
-          ))}
         </div>
 
         <span className="text-xs text-default-500">
-          Stock total: {totalStock}
+          Stock total: {card.totalStock}
         </span>
       </div>
     </div>
@@ -198,7 +177,7 @@ export default function AddCardModal({
                 <div className="flex flex-col gap-1">
                   {searchResults.map((card) => (
                     <CardSearchResult
-                      key={card.id}
+                      key={card.guid}
                       card={card}
                       isSelected={false}
                       onPress={() => onSelectCard(card)}
@@ -225,7 +204,7 @@ export default function AddCardModal({
                   variant="light"
                   startContent={<Icon icon="lucide:x" width={14} />}
                   onPress={() => {
-                    onSelectCard(null as unknown as ICard);
+                    onSelectCard(null);
                     onSearchChange('');
                   }}
                   className="text-default-500"

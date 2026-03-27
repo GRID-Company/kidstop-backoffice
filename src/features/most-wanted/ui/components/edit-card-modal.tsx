@@ -22,7 +22,7 @@ interface EditCardModalProps {
   item: IMostWantedCard | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (id: string, updates: { priority: MostWantedPriority; notes: string }) => void;
+  onSave: (guid: string, updates: { priority: MostWantedPriority; notes: string }) => void | Promise<void>;
 }
 
 export default function EditCardModal({
@@ -40,14 +40,17 @@ export default function EditCardModal({
     }
   }, [item, isOpen, reset]);
 
-  const onSubmit = handleSubmit((data: MostWantedCardFormData) => {
+  const onSubmit = handleSubmit(async (data: MostWantedCardFormData) => {
     if (!item) return;
-    onSave(item.id, {
+    await onSave(item.guid, {
       priority: data.priority as MostWantedPriority,
       notes: data.notes,
     });
     onClose();
   });
+
+  const cardName = item?.pokemonCardSummary?.name || item?.magicCardSummary?.name || '';
+  const cardSet = item?.pokemonCardSummary?.setName || item?.magicCardSummary?.edition || '';
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md">
@@ -62,7 +65,7 @@ export default function EditCardModal({
             <span className="text-accent">Editar carta</span>
             {item && (
               <span className="text-sm font-normal text-default-500">
-                {item.card.name} · {item.card.setName}
+                {cardName} · {cardSet}
               </span>
             )}
           </ModalHeader>

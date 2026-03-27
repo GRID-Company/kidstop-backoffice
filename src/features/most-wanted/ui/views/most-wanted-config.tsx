@@ -1,16 +1,14 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
-import { toAddMostWantedPayload } from '../../adapters/mappers/most-wanted.mapper';
-import { MOCK_CARDS } from '@/features/catalog/adapters/api/catalog.mock';
-import { IMostWantedCard, MOST_WANTED_PRIORITIES } from '../../domain/types';
 import { useAddCardModal } from '../hooks/use-add-card-modal';
 import { useMostWantedList } from '../hooks/use-most-wanted-list';
+import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
 import AddCardModal from '../components/add-card-modal';
 import MostWantedList from '../components/most-wanted-list';
 import MostWantedPreview from '../components/most-wanted-preview';
@@ -18,6 +16,7 @@ import MostWantedPreview from '../components/most-wanted-preview';
 export default function MostWantedConfig() {
   const {
     items,
+    loading,
     reorder,
     toggleActive,
     updateCard,
@@ -26,29 +25,21 @@ export default function MostWantedConfig() {
     selectedTCG,
   } = useMostWantedList();
 
-  const addCardModal = useAddCardModal();
+  const existingCards = useMemo(
+    () =>
+      items.map((item) => ({
+        guid: item.pokemonCardSummary?.guid || item.magicCardSummary?.guid || '',
+      })),
+    [items]
+  );
+
+  const addCardModal = useAddCardModal({ existingCards });
 
   const handleAddCard = useCallback(
-    (payload: ReturnType<typeof toAddMostWantedPayload>) => {
-      const input = payload.addMostWantedInput;
-      const catalogCard = MOCK_CARDS.find((c) => c.id === input.cardId);
-      if (!catalogCard) return;
-
-      const newItem: IMostWantedCard = {
-        id: `mw-${Date.now()}`,
-        card: catalogCard,
-        tcgType: selectedTCG,
-        priority: (input.priority as IMostWantedCard['priority']) ?? MOST_WANTED_PRIORITIES.MEDIUM,
-        notes: input.notes ?? '',
-        isActive: input.isActive ?? true,
-        order: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      addCard(newItem);
+    async (data: MostWantedCardFormData) => {
+      await addCard(data);
     },
-    [selectedTCG, addCard]
+    [addCard]
   );
 
   return (
@@ -108,6 +99,7 @@ export default function MostWantedConfig() {
         onSelectCard={addCardModal.selectCard}
         form={addCardModal.form}
         onSubmit={addCardModal.handleSubmit}
+        loading={addCardModal.loading}
       />
     </>
   );
