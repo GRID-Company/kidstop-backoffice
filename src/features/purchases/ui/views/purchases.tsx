@@ -18,10 +18,7 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import Search from '@/shared/base/heorui-overrides/search';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { IPurchase, PurchaseStatus } from '../../domain/types';
-import {
-  PURCHASE_STATUS_OPTIONS,
-  PURCHASE_STATUS_LABELS,
-} from '../../domain/constants';
+import { PURCHASE_STATUS_OPTIONS } from '../../domain/constants';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { calculateTotal } from '../../domain/purchases.domain';
@@ -71,11 +68,11 @@ export default function Purchases() {
   const columns: ITableColumn[] = useMemo(
     () => [
       {
-        key: 'code',
+        key: 'reference',
         label: 'Código',
         className: '!text-left min-w-[140px]',
         customCol: (row: IPurchase) => (
-          <span className="text-sm font-semibold text-accent">{row.code}</span>
+          <span className="text-sm font-semibold text-accent">{row.reference}</span>
         ),
       },
       {
@@ -123,7 +120,7 @@ export default function Purchases() {
         className: 'min-w-[120px]',
         customCol: (row: IPurchase) => (
           <span className="text-sm text-default-500">
-            {formatDate(row.createdAt)}
+            {formatDate(row.createdDate)}
           </span>
         ),
       },
@@ -137,8 +134,8 @@ export default function Purchases() {
               isIconOnly
               size="sm"
               variant="light"
-              aria-label={`Ver compra ${row.code}`}
-              onPress={() => router.push(`/compras/${row.id}`)}
+              aria-label={`Ver compra ${row.reference}`}
+              onPress={() => router.push(`/compras/${row.guid}`)}
             >
               <Icon icon="lucide:eye" width={16} />
             </Button>

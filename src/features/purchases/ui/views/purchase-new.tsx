@@ -15,6 +15,7 @@ import { Icon } from '@iconify/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ISeller } from '../../domain/types';
 import { useNewPurchase } from '../hooks/use-new-purchase';
+import { useSellers } from '../hooks/use-sellers';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
@@ -33,7 +34,10 @@ export default function PurchaseNew() {
     removeItem,
     canSave,
     savePurchase,
+    saving,
   } = useNewPurchase();
+
+  const { createSeller, creating } = useSellers();
 
   const [sellerForm, setSellerForm] = useState({
     name: '',
@@ -43,17 +47,21 @@ export default function PurchaseNew() {
 
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
 
-  const handleConfirmSeller = useCallback(() => {
+  const handleConfirmSeller = useCallback(async () => {
     if (!sellerForm.name.trim() || !sellerForm.phone.trim()) return;
-    const newSeller: ISeller = {
-      id: `seller-${Date.now()}`,
+    
+    const newSeller = await createSeller({
       name: sellerForm.name.trim(),
       phone: sellerForm.phone.trim(),
       email: sellerForm.email.trim() || undefined,
-    };
-    setSeller(newSeller);
-    setIsSellerConfirmed(true);
-  }, [sellerForm, setSeller]);
+      notes: undefined,
+    });
+
+    if (newSeller) {
+      setSeller(newSeller);
+      setIsSellerConfirmed(true);
+    }
+  }, [sellerForm, setSeller, createSeller]);
 
   const handleEditSeller = useCallback(() => {
     setIsSellerConfirmed(false);
@@ -192,11 +200,12 @@ export default function PurchaseNew() {
                       <Button
                         size="sm"
                         className="bg-accent text-white"
-                        isDisabled={!isSellerFormValid}
+                        isDisabled={!isSellerFormValid || creating}
+                        isLoading={creating}
                         onPress={handleConfirmSeller}
-                        startContent={<Icon icon="lucide:check" width={16} />}
+                        startContent={!creating && <Icon icon="lucide:check" width={16} />}
                       >
-                        Confirmar vendedor
+                        {creating ? 'Confirmando...' : 'Confirmar vendedor'}
                       </Button>
                     </div>
                   </div>
@@ -260,10 +269,11 @@ export default function PurchaseNew() {
           <Button
             className="bg-accent text-white"
             isDisabled={!canSave}
+            isLoading={saving}
             onPress={handleSave}
-            startContent={<Icon icon="lucide:save" width={18} />}
+            startContent={!saving && <Icon icon="lucide:save" width={18} />}
           >
-            Guardar compra
+            {saving ? 'Guardando...' : 'Guardar compra'}
           </Button>
         </div>
       </div>

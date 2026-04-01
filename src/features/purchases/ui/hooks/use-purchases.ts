@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
+import { useQuery, useMutation } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
+import { PurchasesDocument, CreatePurchaseDocument, UpdatePurchaseDocument, UpdatePurchaseStatusDocument, FinalizePurchaseDocument } from '@/lib/api/generated/purchases.generated';
 import { IPurchase, PurchaseFilters, PurchaseStatus } from '../../domain/types';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
-import { MOCK_PURCHASES } from '../../adapters/api/purchases.mock';
 
 interface UsePurchasesReturn {
   purchases: IPurchase[];
@@ -14,11 +15,14 @@ interface UsePurchasesReturn {
   filters: PurchaseFilters;
   setStatusFilter: (status: PurchaseStatus | undefined) => void;
   setSearch: (search: string) => void;
-  setSellerFilter: (sellerId: string | undefined) => void;
+  setSellerFilter: (sellerGuid: string | undefined) => void;
   setDateFrom: (from: string | undefined) => void;
   setDateTo: (to: string | undefined) => void;
   resetFilters: () => void;
   hasActiveFilters: boolean;
+  loading: boolean;
+  error: Error | undefined;
+  refetch: () => void;
 }
 
 const DEFAULT_FILTERS: PurchaseFilters = {};
@@ -30,49 +34,30 @@ export function usePurchases(): UsePurchasesReturn {
   const [dateTo, setDateTo] = useState<string | undefined>();
   const [page, setPage] = useState(1);
 
-  const filtered = useMemo(() => {
-    let result = MOCK_PURCHASES.filter((p) => p.tcgType === selectedTCG);
+  const { data, loading, error, refetch } = useQuery(PurchasesDocument, {
+    variables: {
+      findPurchasesArgs: {
+        skip: (page - 1) * DEFAULT_PAGE_SIZE,
+        limit: DEFAULT_PAGE_SIZE,
+        sort: { column: 'createdDate', order: 'DESC' },
+        filters: {
+          tcg: selectedTCG,
+          status: filters.status,
+          buyer: filters.buyerGuid,
+        },
+        search: filters.search?.trim() || undefined,
+      },
+    },
+    fetchPolicy: 'cache-and-network',
+  });
 
-    if (filters.status) {
-      result = result.filter((p) => p.status === filters.status);
-    }
+  const purchases = useMemo(() => {
+    if (!data?.purchases?.data) return [];
+    return data.purchases.data as unknown as IPurchase[];
+  }, [data]);
 
-    if (filters.sellerId) {
-      result = result.filter((p) => p.seller.id === filters.sellerId);
-    }
-
-    if (filters.search?.trim()) {
-      const term = filters.search.toLowerCase().trim();
-      result = result.filter(
-        (p) =>
-          p.code.toLowerCase().includes(term) ||
-          p.seller.name.toLowerCase().includes(term) ||
-          p.items.some((i) => i.cardName.toLowerCase().includes(term))
-      );
-    }
-
-    if (dateFrom) {
-      const from = new Date(dateFrom);
-      result = result.filter((p) => new Date(p.createdAt) >= from);
-    }
-
-    if (dateTo) {
-      const to = new Date(dateTo);
-      to.setHours(23, 59, 59, 999);
-      result = result.filter((p) => new Date(p.createdAt) <= to);
-    }
-
-    return result.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }, [selectedTCG, filters, dateFrom, dateTo]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / DEFAULT_PAGE_SIZE));
-
-  const paginated = useMemo(() => {
-    const start = (page - 1) * DEFAULT_PAGE_SIZE;
-    return filtered.slice(start, start + DEFAULT_PAGE_SIZE);
-  }, [filtered, page]);
+  const totalCount = data?.purchases?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
 
   const setStatusFilter = (status: PurchaseStatus | undefined) => {
     setFilters((prev) => ({ ...prev, status }));
@@ -84,8 +69,8 @@ export function usePurchases(): UsePurchasesReturn {
     setPage(1);
   };
 
-  const setSellerFilter = (sellerId: string | undefined) => {
-    setFilters((prev) => ({ ...prev, sellerId }));
+  const setSellerFilter = (sellerGuid: string | undefined) => {
+    setFilters((prev) => ({ ...prev, sellerGuid }));
     setPage(1);
   };
 
@@ -108,14 +93,14 @@ export function usePurchases(): UsePurchasesReturn {
 
   const hasActiveFilters =
     !!filters.status ||
-    !!filters.sellerId ||
+    !!filters.sellerGuid ||
     !!filters.search?.trim() ||
     !!dateFrom ||
     !!dateTo;
 
   return {
-    purchases: paginated,
-    totalCount: filtered.length,
+    purchases,
+    totalCount,
     page,
     setPage,
     totalPages,
@@ -127,5 +112,8 @@ export function usePurchases(): UsePurchasesReturn {
     setDateTo: handleSetDateTo,
     resetFilters,
     hasActiveFilters,
+    loading,
+    error,
+    refetch,
   };
 }

@@ -21,19 +21,21 @@ import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 interface SellerCreateDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: SellerFormData) => void;
+  onSubmit: (data: SellerFormData) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export default function SellerCreateDrawer({
   isOpen,
   onClose,
   onSubmit,
+  isLoading = false,
 }: SellerCreateDrawerProps) {
   const { control, handleSubmit, formState, reset } = useSellerForm();
 
   const handleFormSubmit: SubmitHandler<SellerFormData> = useCallback(
-    (data) => {
-      onSubmit(data);
+    async (data) => {
+      await onSubmit(data);
       reset();
       onClose();
     },
@@ -108,12 +110,13 @@ export default function SellerCreateDrawer({
           <Button
             type="submit"
             form="seller-create-form"
-            isDisabled={!formState.isValid}
-            startContent={<Icon icon="lucide:user-plus" />}
+            isDisabled={!formState.isValid || isLoading}
+            isLoading={isLoading}
+            startContent={!isLoading && <Icon icon="lucide:user-plus" />}
             className="text-white"
             style={{ backgroundColor: 'var(--color-accent)' }}
           >
-            Crear vendedor
+            {isLoading ? 'Creando...' : 'Crear vendedor'}
           </Button>
         </DrawerFooter>
       </DrawerContent>

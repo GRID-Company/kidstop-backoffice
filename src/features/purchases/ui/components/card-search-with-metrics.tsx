@@ -269,8 +269,8 @@ export default function CardSearchWithMetrics({
   const handleAddCard = useCallback(
     (card: ICardSearchResult, state: AddToCartState) => {
       const item: IPurchaseItem = {
-        id: `${card.id}-${state.condition}-${Date.now()}`,
-        cardId: card.id,
+        guid: `${card.guid}-${state.condition}-${Date.now()}`,
+        cardGuid: card.guid,
         cardName: card.name,
         cardImageUrl: card.imageUrl,
         setName: card.setName,
@@ -278,8 +278,9 @@ export default function CardSearchWithMetrics({
         tcgType: card.tcgType,
         condition: state.condition,
         quantity: state.quantity,
-        unitBuyPrice: state.unitBuyPrice,
-        unitSellPrice: card.metrics.referencePrice,
+        offerPrice: state.unitBuyPrice,
+        referencePrice: card.metrics.referencePrice,
+        sellPrice: card.metrics.referencePrice,
       };
       onAddItem(item);
     },
@@ -311,10 +312,10 @@ export default function CardSearchWithMetrics({
         <div className="flex flex-col gap-3">
           {results.map((card) => (
             <CardResultItem
-              key={card.id}
+              key={card.guid}
               card={card}
               onAdd={handleAddCard}
-              isAlreadyAdded={existingItemIds.has(card.id)}
+              isAlreadyAdded={existingItemIds.has(card.guid)}
             />
           ))}
         </div>

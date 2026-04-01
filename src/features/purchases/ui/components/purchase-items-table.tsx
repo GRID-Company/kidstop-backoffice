@@ -109,7 +109,7 @@ export default function PurchaseItemsTable({
               selectedKeys={new Set([item.condition])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
-                handleConditionChange(item.id, selected);
+                handleConditionChange(item.guid, selected);
               }}
               classNames={{
                 trigger: 'border-[1px] bg-white min-w-[140px]',
@@ -136,7 +136,7 @@ export default function PurchaseItemsTable({
               variant="bordered"
               min={1}
               value={String(item.quantity)}
-              onValueChange={(val) => handleQuantityChange(item.id, val)}
+              onValueChange={(val) => handleQuantityChange(item.guid, val)}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white w-[80px]',
                 input: 'text-center',
@@ -149,7 +149,7 @@ export default function PurchaseItemsTable({
         label: 'Precio oferta',
         customCol: (item: IPurchaseItem) => (
           <span className="text-sm font-medium">
-            {displayCurrency(item.unitBuyPrice)}
+            {displayCurrency(item.offerPrice)}
           </span>
         ),
       },
@@ -176,7 +176,7 @@ export default function PurchaseItemsTable({
               size="sm"
               variant="light"
               color="danger"
-              onPress={() => onRemoveItem(item.id)}
+              onPress={() => onRemoveItem(item.guid)}
               aria-label={`Eliminar ${item.cardName}`}
             >
               <Icon icon="lucide:trash-2" width={16} />

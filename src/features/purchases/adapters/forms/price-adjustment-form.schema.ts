@@ -2,9 +2,7 @@ import { z } from 'zod';
 
 const priceAdjustmentItemSchema = z.object({
   itemId: z.string(),
-  publicPrice: z.coerce
-    .number()
-    .min(0.01, 'El precio público debe ser mayor a 0'),
+  publicPrice: z.coerce.number().min(0),
 });
 
 export const priceAdjustmentFormSchema = z.object({

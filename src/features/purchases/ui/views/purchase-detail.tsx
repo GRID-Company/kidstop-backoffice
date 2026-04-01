@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMutation } from '@apollo/client/react';
+import toast from 'react-hot-toast';
 import {
   Button,
   Card,
@@ -16,6 +18,7 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
+import { SetPurchaseItemSellPriceDocument } from '@/lib/api/generated/purchases.generated';
 import { PURCHASE_STATUS, IPaymentDetail, IPurchaseItem, IPurchase } from '../../domain/types';
 import {
   PURCHASE_STATUS_LABELS,
@@ -48,6 +51,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     payments,
     isEditable,
     canSendQuote,
+    canAcceptQuote,
     canRegisterPayment,
     canAdjustPrices,
     canFinalize,
@@ -65,8 +69,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
 
+  const [setPurchaseItemSellPrice] = useMutation(SetPurchaseItemSellPriceDocument, {
+    onError: (error) => {
+      toast.error(`Error al actualizar precio: ${error.message}`);
+    },
+  });
+
   const existingItemIds = useMemo(
-    () => new Set(items.map((i) => i.cardId)),
+    () => new Set(items.map((i) => i.cardGuid)),
     [items]
   );
 
@@ -88,11 +98,36 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   );
 
   const handlePriceAdjustmentConfirm = useCallback(
-    (adjustedItems: IPurchaseItem[]) => {
-      updateItems(adjustedItems);
+    async (adjustedItems: IPurchaseItem[]) => {
+      try {
+        const promises = adjustedItems.map((item) => {
+          if (item.sellPrice !== undefined) {
+            return setPurchaseItemSellPrice({
+              variables: {
+                setPurchaseItemSellPriceInput: {
+                  purchaseItemGuid: item.guid,
+                  sellPrice: item.sellPrice,
+                  referencePrice: item.referencePrice,
+                },
+              },
+            });
+          }
+          return Promise.resolve();
+        });
+
+        await Promise.all(promises);
+        updateItems(adjustedItems);
+        toast.success('Precios actualizados exitosamente');
+      } catch (error) {
+        console.error('Error updating prices:', error);
+      }
     },
-    [updateItems]
+    [updateItems, setPurchaseItemSellPrice]
   );
+
+  const handleAcceptQuote = useCallback(() => {
+    updateStatus(PURCHASE_STATUS.WAITING_PRICE);
+  }, [updateStatus]);
 
   const handleFinalize = useCallback(() => {
     updateStatus(PURCHASE_STATUS.FINALIZED);
@@ -156,8 +191,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
           <div className="lg:col-span-2">
             <SellerInfoCard
               seller={purchase.seller}
-              createdAt={purchase.createdAt}
-              updatedAt={purchase.updatedAt}
+              createdAt={purchase.createdDate}
+              updatedAt={purchase.updatedDate}
               notes={purchase.notes}
             />
           </div>
@@ -272,6 +307,16 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                   />
                 )}
 
+                {canAcceptQuote && (
+                  <Button
+                    className="bg-success text-white"
+                    startContent={<Icon icon="lucide:check-check" width={18} />}
+                    onPress={handleAcceptQuote}
+                  >
+                    Vendedor aceptó cotización
+                  </Button>
+                )}
+
                 {canRegisterPayment && (
                   <Button
                     variant="bordered"
@@ -334,7 +379,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               />
               <span className="text-sm font-medium">
                 Compra {PURCHASE_STATUS_LABELS[purchase.status].toLowerCase()} el{' '}
-                {formatDateTime(purchase.updatedAt)}
+                {formatDateTime(purchase.updatedDate)}
               </span>
             </div>
           </div>

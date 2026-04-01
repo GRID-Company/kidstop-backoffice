@@ -6,7 +6,7 @@ export function usePurchaseForm(defaults?: Partial<PurchaseFormData>) {
   return useForm<PurchaseFormData>({
     resolver: zodResolver(purchaseFormSchema) as Resolver<PurchaseFormData>,
     defaultValues: {
-      sellerId: '',
+      sellerGuid: '',
       items: [],
       payments: [],
       notes: '',
