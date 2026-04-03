@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
+import { useDebounce } from '@/lib/hooks/use-debounce';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
@@ -9,6 +10,7 @@ import { MOCK_CARD_SEARCH_RESULTS } from '../../adapters/api/card-search.mock';
 
 export function useCardSearch() {
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 800);
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
 
   const { data: pokemonData, loading: pokemonLoading } = useQuery(
@@ -17,16 +19,18 @@ export function useCardSearch() {
       variables: {
         findPokemonCardsPublicArgs: {
           skip: 0,
-          limit: 50,
+          limit: 5,
           sort: { column: 'name', order: 'ASC' },
-          search: search.trim() || undefined,
+          search: debouncedSearch.trim() || undefined,
         },
       },
-      skip: selectedTCG !== TCG_TYPES.POKEMON,
+      skip: selectedTCG !== TCG_TYPES.POKEMON || !debouncedSearch.trim(),
     }
   );
 
   const results = useMemo(() => {
+    if (!debouncedSearch.trim()) return [];
+    
     if (selectedTCG === TCG_TYPES.POKEMON) {
       if (!pokemonData?.pokemonCardInternalList?.data) return [];
       
@@ -53,17 +57,15 @@ export function useCardSearch() {
       (card) => card.tcgType === selectedTCG
     );
 
-    if (!search.trim()) return filtered;
-
-    const term = search.toLowerCase().trim();
+    const term = debouncedSearch.toLowerCase().trim();
     return filtered.filter(
       (card) =>
         card.name.toLowerCase().includes(term) ||
         card.setName.toLowerCase().includes(term) ||
         card.setCode.toLowerCase().includes(term) ||
         card.number.includes(term)
-    );
-  }, [search, selectedTCG, pokemonData]);
+    ).slice(0, 5);
+  }, [debouncedSearch, selectedTCG, pokemonData]);
 
   const resetSearch = () => setSearch('');
 

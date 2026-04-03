@@ -5,7 +5,7 @@ import { CARD_CONDITIONS } from '@/lib/types/card.types';
 export const MOCK_PURCHASES: IPurchase[] = [
   {
     guid: 'pur-001',
-    code: 'CMP-2026-001',
+    reference: 'CMP-2026-001',
     status: PURCHASE_STATUS.FINALIZED,
     seller: {
       guid: 'seller-001',
@@ -51,7 +51,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-002',
-    code: 'CMP-2026-002',
+    reference: 'CMP-2026-002',
     status: PURCHASE_STATUS.QUOTED,
     seller: {
       guid: 'seller-002',
@@ -83,7 +83,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-003',
-    code: 'CMP-2026-003',
+    reference: 'CMP-2026-003',
     status: PURCHASE_STATUS.DRAFT,
     seller: {
       guid: 'seller-003',
@@ -127,7 +127,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-004',
-    code: 'CMP-2026-004',
+    reference: 'CMP-2026-004',
     status: PURCHASE_STATUS.WAITING_PRICE,
     seller: {
       guid: 'seller-004',
@@ -158,7 +158,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-005',
-    code: 'CMP-2026-005',
+    reference: 'CMP-2026-005',
     status: PURCHASE_STATUS.REJECTED,
     seller: {
       guid: 'seller-005',
@@ -189,7 +189,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-006',
-    code: 'CMP-2026-006',
+    reference: 'CMP-2026-006',
     status: PURCHASE_STATUS.FINALIZED,
     seller: {
       guid: 'seller-006',
@@ -236,7 +236,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-007',
-    code: 'CMP-2026-007',
+    reference: 'CMP-2026-007',
     status: PURCHASE_STATUS.QUOTED,
     seller: {
       guid: 'seller-007',
@@ -267,7 +267,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-008',
-    code: 'CMP-2026-008',
+    reference: 'CMP-2026-008',
     status: PURCHASE_STATUS.DRAFT,
     seller: {
       guid: 'seller-008',
@@ -297,7 +297,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-009',
-    code: 'CMP-2026-009',
+    reference: 'CMP-2026-009',
     status: PURCHASE_STATUS.FINALIZED,
     seller: {
       guid: 'seller-001',
@@ -330,7 +330,7 @@ export const MOCK_PURCHASES: IPurchase[] = [
   },
   {
     guid: 'pur-010',
-    code: 'CMP-2026-010',
+    reference: 'CMP-2026-010',
     status: PURCHASE_STATUS.FINALIZED,
     seller: {
       guid: 'seller-003',

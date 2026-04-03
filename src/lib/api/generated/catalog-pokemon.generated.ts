@@ -82,6 +82,25 @@ export type PokemonCardGenresQueryVariables = Types.Exact<{
 
 export type PokemonCardGenresQuery = { pokemonCardGenres: Array<string> };
 
+export type PokemonCardWithMetricsQueryVariables = Types.Exact<{
+  guid: Types.Scalars['String']['input'];
+}>;
+
+export type PokemonCardWithMetricsQuery = {
+  pokemonCardWithMetrics: {
+    ungradedPrice: number | null;
+    gradedPriceSeven: number | null;
+    gradedPriceEightOrAbove: number | null;
+    variantsMetrics: Array<{
+      condition: string;
+      stock: number;
+      lastSellDate: unknown | null;
+      avgDaysInInventory: number | null;
+      wishlistCount: number;
+    }>;
+  };
+};
+
 export const PokemonCardInternalListDocument = {
   kind: 'Document',
   definitions: [
@@ -370,4 +389,92 @@ export const PokemonCardGenresDocument = {
 } as unknown as DocumentNode<
   PokemonCardGenresQuery,
   PokemonCardGenresQueryVariables
+>;
+export const PokemonCardWithMetricsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'PokemonCardWithMetrics' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'pokemonCardWithMetrics' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'guid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'guid' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'variantsMetrics' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'condition' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'lastSellDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'avgDaysInInventory' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'wishlistCount' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'ungradedPrice' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'gradedPriceSeven' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'gradedPriceEightOrAbove' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  PokemonCardWithMetricsQuery,
+  PokemonCardWithMetricsQueryVariables
 >;

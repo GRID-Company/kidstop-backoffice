@@ -39,11 +39,6 @@ interface UsePurchaseDetailReturn {
   updateStatus: (status: PurchaseStatus) => void;
 }
 
-const MOCK_BUYER_SPENT: Record<string, number> = {
-  'buyer-001': 12500,
-  'buyer-002': 8200,
-};
-
 export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const { data, loading, error, refetch } = useQuery(PurchaseDocument, {
     variables: { guid: purchaseId },
@@ -76,7 +71,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
     return {
       guid: p.guid,
-      code: p.reference,
+      reference: p.reference,
       status: p.status as PurchaseStatus,
       seller: seller!,
       tcgType: p.tcg === 'POKEMON' ? 'POKEMON' : 'MAGIC',
@@ -129,10 +124,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const total = useMemo(() => calculateTotal(items), [items]);
 
-  const currentBuyerSpent = useMemo(
-    () => MOCK_BUYER_SPENT[basePurchase?.buyer?.guid ?? ''] ?? 0,
-    [basePurchase?.buyer?.guid]
-  );
+  const currentBuyerSpent = 0;
 
   const isEditable = status === PURCHASE_STATUS.DRAFT;
 
@@ -193,7 +185,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       });
       setStatus(newStatus);
     } catch (error) {
-      console.error('Error updating purchase status:', error);
+      // Error already handled by onError callback in mutation
     }
   }, [purchaseId, updatePurchaseStatusMutation]);
 

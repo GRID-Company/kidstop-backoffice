@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { PurchasesDocument, CreatePurchaseDocument, UpdatePurchaseDocument, UpdatePurchaseStatusDocument, FinalizePurchaseDocument } from '@/lib/api/generated/purchases.generated';
+import { PurchasesDocument } from '@/lib/api/generated/purchases.generated';
 import { IPurchase, PurchaseFilters, PurchaseStatus } from '../../domain/types';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 

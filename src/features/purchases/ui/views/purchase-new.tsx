@@ -2,13 +2,13 @@
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 import {
   Button,
   Card,
   CardBody,
   Chip,
   Divider,
-  Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
@@ -20,6 +20,11 @@ import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
+import SellerSelector from '../components/seller-selector';
+
+interface PurchaseFormData {
+  sellerGuid: string;
+}
 
 export default function PurchaseNew() {
   const router = useRouter();
@@ -37,31 +42,27 @@ export default function PurchaseNew() {
     saving,
   } = useNewPurchase();
 
-  const { createSeller, creating } = useSellers();
-
-  const [sellerForm, setSellerForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
+  const { getSellerById } = useSellers();
+  const { control, watch } = useForm<PurchaseFormData>({
+    defaultValues: { sellerGuid: '' },
   });
 
+  const selectedSellerGuid = watch('sellerGuid');
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
 
-  const handleConfirmSeller = useCallback(async () => {
-    if (!sellerForm.name.trim() || !sellerForm.phone.trim()) return;
-    
-    const newSeller = await createSeller({
-      name: sellerForm.name.trim(),
-      phone: sellerForm.phone.trim(),
-      email: sellerForm.email.trim() || undefined,
-      notes: undefined,
-    });
-
-    if (newSeller) {
-      setSeller(newSeller);
+  const handleConfirmSeller = useCallback(() => {
+    if (!selectedSellerGuid) return;
+    const selectedSeller = getSellerById(selectedSellerGuid);
+    if (selectedSeller) {
+      setSeller(selectedSeller);
       setIsSellerConfirmed(true);
     }
-  }, [sellerForm, setSeller, createSeller]);
+  }, [selectedSellerGuid, getSellerById, setSeller]);
+
+  const handleSellerCreated = useCallback((newSeller: ISeller) => {
+    setSeller(newSeller);
+    setIsSellerConfirmed(true);
+  }, [setSeller]);
 
   const handleEditSeller = useCallback(() => {
     setIsSellerConfirmed(false);
@@ -72,8 +73,7 @@ export default function PurchaseNew() {
     router.push('/compras');
   }, [savePurchase, router]);
 
-  const isSellerFormValid =
-    sellerForm.name.trim().length > 0 && sellerForm.phone.trim().length > 0;
+  const isSellerFormValid = !!selectedSellerGuid;
 
   return (
     <EntitiesPage>
@@ -145,67 +145,19 @@ export default function PurchaseNew() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <Input
-                        aria-label="Nombre del vendedor"
-                        label="Nombre"
-                        placeholder="Nombre del vendedor"
-                        size="sm"
-                        variant="bordered"
-                        isRequired
-                        value={sellerForm.name}
-                        onValueChange={(val) =>
-                          setSellerForm((s) => ({ ...s, name: val }))
-                        }
-                        classNames={{
-                          inputWrapper: 'border-[1px] bg-white',
-                          label: 'text-xs',
-                        }}
-                      />
-                      <Input
-                        aria-label="Teléfono del vendedor"
-                        label="Teléfono"
-                        placeholder="+52 55 1234 5678"
-                        size="sm"
-                        variant="bordered"
-                        isRequired
-                        value={sellerForm.phone}
-                        onValueChange={(val) =>
-                          setSellerForm((s) => ({ ...s, phone: val }))
-                        }
-                        classNames={{
-                          inputWrapper: 'border-[1px] bg-white',
-                          label: 'text-xs',
-                        }}
-                      />
-                    </div>
-                    <Input
-                      aria-label="Email del vendedor"
-                      label="Email"
-                      placeholder="email@ejemplo.com"
-                      type="email"
-                      size="sm"
-                      variant="bordered"
-                      value={sellerForm.email}
-                      onValueChange={(val) =>
-                        setSellerForm((s) => ({ ...s, email: val }))
-                      }
-                      classNames={{
-                        inputWrapper: 'border-[1px] bg-white',
-                        label: 'text-xs',
-                      }}
-                      className="sm:w-1/2"
+                    <SellerSelector
+                      controlProps={{ control, name: 'sellerGuid' }}
+                      onSellerCreated={handleSellerCreated}
                     />
                     <div className="flex justify-end">
                       <Button
                         size="sm"
                         className="bg-accent text-white"
-                        isDisabled={!isSellerFormValid || creating}
-                        isLoading={creating}
+                        isDisabled={!isSellerFormValid}
                         onPress={handleConfirmSeller}
-                        startContent={!creating && <Icon icon="lucide:check" width={16} />}
+                        startContent={<Icon icon="lucide:check" width={16} />}
                       >
-                        {creating ? 'Confirmando...' : 'Confirmar vendedor'}
+                        Confirmar vendedor
                       </Button>
                     </div>
                   </div>

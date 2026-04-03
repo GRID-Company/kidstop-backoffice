@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   Button,
   CardBody,
@@ -9,6 +9,7 @@ import {
   Select,
   SelectItem,
   Tooltip,
+  Skeleton,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
@@ -20,6 +21,7 @@ import { formatDate } from '@/lib/utils/format-date';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { useCardSearch } from '../hooks/use-card-search';
+import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 
 interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
@@ -57,23 +59,44 @@ function CardResultItem({
     ...DEFAULT_ADD_STATE,
     unitBuyPrice: Math.round(card.metrics.referencePrice * 0.6 * 100) / 100,
   });
+  const [isAdding, setIsAdding] = useState(false);
 
-  const handleAdd = useCallback(() => {
+  const { metrics: variantMetrics, ungradedPrice, loading: metricsLoading } = useCardVariantMetrics(
+    card.guid,
+    addState.condition
+  );
+
+  useEffect(() => {
+    if (ungradedPrice !== null) {
+      const calculatedPrice = Math.round(ungradedPrice * 0.6 * 100) / 100;
+      setAddState((s) => ({ ...s, unitBuyPrice: calculatedPrice }));
+    }
+  }, [ungradedPrice, addState.condition]);
+
+  const handleAdd = useCallback(async () => {
     if (addState.unitBuyPrice <= 0 || addState.quantity < 1) return;
-    onAdd(card, addState);
-    setAddState({
-      ...DEFAULT_ADD_STATE,
-      unitBuyPrice: Math.round(card.metrics.referencePrice * 0.6 * 100) / 100,
-    });
-  }, [card, addState, onAdd]);
+    setIsAdding(true);
+    try {
+      await onAdd(card, addState);
+      const resetPrice = ungradedPrice !== null 
+        ? Math.round(ungradedPrice * 0.6 * 100) / 100
+        : Math.round(card.metrics.referencePrice * 0.6 * 100) / 100;
+      setAddState({
+        ...DEFAULT_ADD_STATE,
+        unitBuyPrice: resetPrice,
+      });
+    } finally {
+      setIsAdding(false);
+    }
+  }, [card, addState, onAdd, ungradedPrice]);
 
-  const { metrics } = card;
+  const displayMetrics = variantMetrics || card.metrics;
 
   return (
     <KidstopCard className="w-full">
-      <CardBody className="flex flex-col gap-4 !p-4 sm:flex-row">
-        <div className="flex gap-3 sm:w-[200px] sm:shrink-0">
-          <div className="relative h-[100px] w-[72px] shrink-0 overflow-hidden rounded-md bg-default-100">
+      <CardBody className="flex flex-col gap-3 !p-3 xl:flex-row xl:gap-4 xl:!p-4">
+        <div className="flex gap-3 xl:w-[200px] xl:shrink-0">
+          <div className="relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md bg-default-100 xl:h-[100px] xl:w-[72px]">
             {card.imageUrl ? (
               <Image
                 src={card.imageUrl}
@@ -99,52 +122,72 @@ function CardResultItem({
           </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-5">
-          <MetricItem
-            icon="lucide:tag"
-            label="Precio ref."
-            value={formatCurrency(metrics.referencePrice)}
-            valueClassName="text-accent font-semibold"
-          />
-          <MetricItem
-            icon="lucide:package"
-            label="Stock"
-            value={String(metrics.currentStock)}
-            valueClassName={
-              metrics.currentStock === 0
-                ? 'text-danger font-semibold'
-                : 'font-semibold'
-            }
-          />
-          <MetricItem
-            icon="lucide:calendar"
-            label="Última venta"
-            value={formatDate(metrics.lastSaleDate, 'Sin ventas')}
-          />
-          <MetricItem
-            icon="lucide:clock"
-            label="En inventario"
-            value={formatDaysInInventory(metrics.daysInInventory)}
-            valueClassName={
-              metrics.daysInInventory > 30
-                ? 'text-warning font-semibold'
-                : ''
-            }
-          />
-          <MetricItem
-            icon="lucide:heart"
-            label="Wishlist"
-            value={String(metrics.wishlistCount)}
-            valueClassName={
-              metrics.wishlistCount >= 10
-                ? 'text-accent font-semibold'
-                : ''
-            }
-          />
+        <div className="grid flex-1 grid-cols-3 gap-x-2 gap-y-1.5 xl:grid-cols-5 xl:gap-x-4 xl:gap-y-2">
+          {metricsLoading ? (
+            <>
+              <Skeleton className="h-10 rounded-md" />
+              <Skeleton className="h-10 rounded-md" />
+              <Skeleton className="h-10 rounded-md" />
+              <div className="hidden xl:block">
+                <Skeleton className="h-10 rounded-md" />
+              </div>
+              <div className="hidden xl:block">
+                <Skeleton className="h-10 rounded-md" />
+              </div>
+            </>
+          ) : (
+            <>
+              <MetricItem
+                icon="lucide:tag"
+                label="Precio ref."
+                value={formatCurrency(ungradedPrice ?? card.metrics.referencePrice)}
+                valueClassName="text-accent font-semibold"
+              />
+              <MetricItem
+                icon="lucide:package"
+                label="Stock"
+                value={String(variantMetrics?.stock ?? 0)}
+                valueClassName={
+                  (variantMetrics?.stock ?? 0) === 0
+                    ? 'text-danger font-semibold'
+                    : 'font-semibold'
+                }
+              />
+              <MetricItem
+                icon="lucide:heart"
+                label="Wishlist"
+                value={String(displayMetrics.wishlistCount)}
+                valueClassName={
+                  displayMetrics.wishlistCount >= 10
+                    ? 'text-accent font-semibold'
+                    : ''
+                }
+              />
+              <div className="hidden xl:block">
+                <MetricItem
+                  icon="lucide:calendar"
+                  label="Última venta"
+                  value={formatDate(displayMetrics.lastSaleDate, 'Sin ventas')}
+                />
+              </div>
+              <div className="hidden xl:block">
+                <MetricItem
+                  icon="lucide:clock"
+                  label="En inventario"
+                  value={formatDaysInInventory(displayMetrics.daysInInventory)}
+                  valueClassName={
+                    displayMetrics.daysInInventory > 30
+                      ? 'text-warning font-semibold'
+                      : ''
+                  }
+                />
+              </div>
+            </>
+          )}
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-default-200 pt-3 sm:w-[320px] sm:shrink-0 sm:border-l sm:border-t-0 sm:pl-4 sm:pt-0">
-          <div className="grid grid-cols-3 gap-2">
+        <div className="flex flex-col gap-2 border-t border-default-200 pt-2 xl:w-[320px] xl:shrink-0 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
+          <div className="grid grid-cols-3 gap-1.5 xl:gap-2">
             <Select
               aria-label="Condición"
               size="sm"
@@ -220,12 +263,14 @@ function CardResultItem({
               <Button
                 size="sm"
                 className="w-full bg-accent text-white"
-                startContent={<Icon icon="lucide:plus" width={16} />}
+                startContent={!isAdding && <Icon icon="lucide:plus" width={16} />}
                 onPress={handleAdd}
+                isLoading={isAdding}
                 isDisabled={
                   isAlreadyAdded ||
                   addState.unitBuyPrice <= 0 ||
-                  addState.quantity < 1
+                  addState.quantity < 1 ||
+                  isAdding
                 }
               >
                 {isAlreadyAdded ? 'Ya agregada' : 'Agregar a compra'}

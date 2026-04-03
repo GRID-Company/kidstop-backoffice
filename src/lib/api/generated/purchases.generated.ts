@@ -265,6 +265,21 @@ export type FinalizePurchaseMutation = {
   };
 };
 
+export type SellersQueryVariables = Types.Exact<{ [key: string]: never }>;
+
+export type SellersQuery = {
+  sellers: {
+    count: number | null;
+    data: Array<{
+      guid: string;
+      name: string;
+      phone: string | null;
+      email: string | null;
+      notes: string | null;
+    }> | null;
+  };
+};
+
 export type CreateSellerMutationVariables = Types.Exact<{
   createSellerInput: Types.CreateSellerInput;
 }>;
@@ -1403,6 +1418,45 @@ export const FinalizePurchaseDocument = {
   FinalizePurchaseMutation,
   FinalizePurchaseMutationVariables
 >;
+export const SellersDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'Sellers' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sellers' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SellersQuery, SellersQueryVariables>;
 export const CreateSellerDocument = {
   kind: 'Document',
   definitions: [

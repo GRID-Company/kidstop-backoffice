@@ -991,6 +991,21 @@ export type PokemonCardSummary = {
   setName?: Maybe<Scalars['String']['output']>;
 };
 
+export type PokemonCardVariantMetrics = {
+  avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
+  condition: Scalars['String']['output'];
+  lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
+  stock: Scalars['Int']['output'];
+  wishlistCount: Scalars['Int']['output'];
+};
+
+export type PokemonCardWithMetrics = {
+  gradedPriceEightOrAbove?: Maybe<Scalars['Float']['output']>;
+  gradedPriceSeven?: Maybe<Scalars['Float']['output']>;
+  ungradedPrice?: Maybe<Scalars['Float']['output']>;
+  variantsMetrics: Array<PokemonCardVariantMetrics>;
+};
+
 export type PokemonFilters = {
   rarity?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1082,6 +1097,8 @@ export type Query = {
   pokemonCardRarities: Array<Scalars['String']['output']>;
   /** Get all unique card variants available in the catalog (cached 1hr) */
   pokemonCardVariants: Array<Scalars['String']['output']>;
+  /** Get inventory variants with metrics for a Pokemon card (authenticated) */
+  pokemonCardWithMetrics: PokemonCardWithMetrics;
   /** Get purchase detail by guid */
   purchase: Purchase;
   /** Get paginated list of purchases */
@@ -1168,6 +1185,10 @@ export type QueryPokemonCardPublicDetailArgs = {
 
 export type QueryPokemonCardPublicListArgs = {
   findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs;
+};
+
+export type QueryPokemonCardWithMetricsArgs = {
+  guid: Scalars['String']['input'];
 };
 
 export type QueryPurchaseArgs = {

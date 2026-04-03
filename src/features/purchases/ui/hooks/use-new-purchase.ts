@@ -4,12 +4,9 @@ import toast from 'react-hot-toast';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { CreatePurchaseDocument } from '@/lib/api/generated/purchases.generated';
-import { IPurchaseItem, ISeller, PURCHASE_STATUS } from '../../domain/types';
+import { IPurchaseItem, ISeller } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { toCreatePurchasePayload } from '../../adapters/mappers/purchase.mapper';
-
-const MOCK_BUYER_ID = 'buyer-001';
-const MOCK_BUYER_SPENT = 12500;
 
 interface UseNewPurchaseReturn {
   seller: ISeller | null;
@@ -95,7 +92,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
         variables: payload,
       });
     } catch (error) {
-      console.error('Error saving purchase:', error);
+      // Error already handled by onError callback
     }
   }, [canSave, seller, items, selectedTCG, createPurchase]);
 
@@ -103,7 +100,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     seller,
     items,
     total,
-    currentBuyerSpent: MOCK_BUYER_SPENT,
+    currentBuyerSpent: 0,
     existingItemIds,
     setSeller,
     addItem,

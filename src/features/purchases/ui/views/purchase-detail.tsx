@@ -58,6 +58,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canReject,
     total,
     currentBuyerSpent,
+    loading,
     updateItem,
     removeItem,
     addItem,
@@ -119,7 +120,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         updateItems(adjustedItems);
         toast.success('Precios actualizados exitosamente');
       } catch (error) {
-        console.error('Error updating prices:', error);
+        // Error already handled by mutation onError callback
       }
     },
     [updateItems, setPurchaseItemSellPrice]
@@ -136,6 +137,17 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const handleReject = useCallback(() => {
     updateStatus(PURCHASE_STATUS.REJECTED);
   }, [updateStatus]);
+
+  if (loading) {
+    return (
+      <EntitiesPage>
+        <div className="flex flex-col items-center justify-center py-20 text-default-400">
+          <Icon icon="lucide:loader-2" width={48} className="mb-3 animate-spin" />
+          <span className="text-lg font-medium">Cargando compra...</span>
+        </div>
+      </EntitiesPage>
+    );
+  }
 
   if (!purchase) {
     return (
@@ -175,7 +187,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
             </Button>
             <div className="flex items-center gap-3">
               <span className="text-lg font-semibold text-accent">
-                {purchase.code}
+                {purchase.reference}
               </span>
               <PurchaseStatusBadge status={purchase.status} />
             </div>
