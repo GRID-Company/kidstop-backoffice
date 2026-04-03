@@ -6,7 +6,7 @@ const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string
 const paymentMethodValues = Object.values(PAYMENT_METHOD) as [string, ...string[]];
 
 const purchaseItemSchema = z.object({
-  cardId: z.string().min(1, 'La carta es obligatoria'),
+  cardGuid: z.string().min(1, 'La carta es obligatoria'),
   cardName: z.string().min(1, 'El nombre es obligatorio'),
   cardImageUrl: z.string(),
   setName: z.string(),
@@ -15,8 +15,9 @@ const purchaseItemSchema = z.object({
     message: 'La condición es obligatoria',
   }),
   quantity: z.coerce.number().int().min(1, 'La cantidad debe ser al menos 1'),
-  unitBuyPrice: z.coerce.number().min(0, 'El precio de compra debe ser mayor o igual a 0'),
-  unitSellPrice: z.coerce.number().min(0, 'El precio de venta debe ser mayor o igual a 0'),
+  offerPrice: z.coerce.number().min(0, 'El precio de compra debe ser mayor o igual a 0'),
+  referencePrice: z.coerce.number().min(0).optional(),
+  sellPrice: z.coerce.number().min(0).optional(),
 });
 
 const paymentDetailSchema = z.object({
@@ -27,9 +28,9 @@ const paymentDetailSchema = z.object({
 });
 
 export const purchaseFormSchema = z.object({
-  sellerId: z.string().min(1, 'El vendedor es obligatorio'),
+  sellerGuid: z.string().min(1, 'El vendedor es obligatorio'),
   items: z.array(purchaseItemSchema).min(1, 'Debe agregar al menos una carta'),
-  payments: z.array(paymentDetailSchema),
+  payments: z.array(paymentDetailSchema).optional(),
   notes: z.string().optional(),
 });
 

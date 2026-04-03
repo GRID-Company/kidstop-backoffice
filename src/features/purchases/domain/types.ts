@@ -24,16 +24,18 @@ export type PaymentMethod =
   (typeof PAYMENT_METHOD)[keyof typeof PAYMENT_METHOD];
 
 export interface ISeller {
-  id: string;
+  guid: string;
   name: string;
   phone: string;
   email?: string;
   notes?: string;
+  createdDate?: string;
+  updatedDate?: string;
 }
 
 export interface IPurchaseItem {
-  id: string;
-  cardId: string;
+  guid: string;
+  cardGuid: string;
   cardName: string;
   cardImageUrl: string;
   setName: string;
@@ -41,8 +43,9 @@ export interface IPurchaseItem {
   tcgType: TCGType;
   condition: CardCondition;
   quantity: number;
-  unitBuyPrice: number;
-  unitSellPrice: number;
+  offerPrice: number;
+  referencePrice?: number;
+  sellPrice?: number;
 }
 
 export interface IPaymentDetail {
@@ -51,17 +54,19 @@ export interface IPaymentDetail {
 }
 
 export interface IPurchase {
-  id: string;
-  code: string;
+  guid: string;
+  reference: string;
   status: PurchaseStatus;
   seller: ISeller;
+  buyer?: { guid: string; name: string };
   items: IPurchaseItem[];
   payments: IPaymentDetail[];
   tcgType: TCGType;
-  buyerId: string;
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdBy?: { guid: string; name: string };
+  createdDate: string;
+  updatedBy?: { guid: string; name: string };
+  updatedDate: string;
 }
 
 export interface ICardSearchMetrics {
@@ -73,7 +78,7 @@ export interface ICardSearchMetrics {
 }
 
 export interface ICardSearchResult {
-  id: string;
+  guid: string;
   name: string;
   setName: string;
   setCode: string;
@@ -87,7 +92,7 @@ export interface ICardSearchResult {
 export interface PurchaseFilters {
   tcgType?: TCGType;
   status?: PurchaseStatus;
-  sellerId?: string;
-  buyerId?: string;
+  sellerGuid?: string;
+  buyerGuid?: string;
   search?: string;
 }

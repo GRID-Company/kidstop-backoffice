@@ -13,30 +13,29 @@ export const getPurchasesVars = (
     findPurchasesArgs: {
       ...args,
       filters: {
-        tcgType: filters.tcgType,
+        tcg: filters.tcgType,
         status: filters.status || undefined,
-        sellerId: filters.sellerId || undefined,
-        buyerId: filters.buyerId || undefined,
-        search: filters.search || undefined,
+        buyer: filters.buyerGuid || undefined,
       },
+      search: filters.search || undefined,
     },
   };
 };
 
 export const calculateItemSubtotal = (item: IPurchaseItem): number => {
-  return item.unitBuyPrice * item.quantity;
+  return item.offerPrice * item.quantity;
 };
 
 export const calculateTotal = (items: IPurchaseItem[]): number => {
   return items.reduce(
-    (total, item) => total + item.unitBuyPrice * item.quantity,
+    (total, item) => total + item.offerPrice * item.quantity,
     0
   );
 };
 
 export const calculateSellTotal = (items: IPurchaseItem[]): number => {
   return items.reduce(
-    (total, item) => total + item.unitSellPrice * item.quantity,
+    (total, item) => total + (item.sellPrice ?? 0) * item.quantity,
     0
   );
 };
@@ -68,7 +67,7 @@ export const checkBudget = (
 
 export interface InventoryLimitCheckResult {
   withinLimit: boolean;
-  cardId: string;
+  cardGuid: string;
   cardName: string;
   currentStock: number;
   purchaseQuantity: number;
@@ -84,7 +83,7 @@ export const checkInventoryLimit = (
 
   return {
     withinLimit: totalAfterPurchase <= inventoryLimit,
-    cardId: item.cardId,
+    cardGuid: item.cardGuid,
     cardName: item.cardName,
     currentStock,
     purchaseQuantity: item.quantity,
@@ -114,11 +113,11 @@ export const buildWhatsAppQuoteMessage = (params: WhatsAppQuoteParams): string =
   const itemLines = items
     .map((item) => {
       const condition = CARD_CONDITION_SHORT_LABELS[item.condition];
-      const subtotal = item.unitBuyPrice * item.quantity;
+      const subtotal = item.offerPrice * item.quantity;
       return [
         `  • *${item.cardName}* (${condition})`,
         `    ${item.setName} · ${item.setCode}`,
-        `    Cant: ${item.quantity} × ${formatCurrency(item.unitBuyPrice)} = ${formatCurrency(subtotal)}`,
+        `    Cant: ${item.quantity} × ${formatCurrency(item.offerPrice)} = ${formatCurrency(subtotal)}`,
       ].join('\n');
     })
     .join('\n\n');
@@ -219,9 +218,9 @@ export const validatePriceAdjustment = (
   }
 
   items.forEach((item) => {
-    const price = adjustedPrices[item.id];
+    const price = adjustedPrices[item.guid];
     if (price === undefined || price <= 0) {
-      itemsWithoutPrice.push(item.id);
+      itemsWithoutPrice.push(item.guid);
     }
   });
 

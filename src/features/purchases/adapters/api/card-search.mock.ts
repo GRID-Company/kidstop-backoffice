@@ -3,7 +3,7 @@ import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
   {
-    id: 'pkmn-001',
+    guid: 'pkmn-001',
     name: 'Charizard ex',
     setName: 'Obsidian Flames',
     setCode: 'OBF',
@@ -20,7 +20,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'pkmn-002',
+    guid: 'pkmn-002',
     name: 'Pikachu VMAX',
     setName: 'Vivid Voltage',
     setCode: 'VIV',
@@ -37,7 +37,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'pkmn-003',
+    guid: 'pkmn-003',
     name: 'Mewtwo V',
     setName: 'Pokémon GO',
     setCode: 'PGO',
@@ -54,7 +54,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'pkmn-004',
+    guid: 'pkmn-004',
     name: 'Umbreon VMAX',
     setName: 'Evolving Skies',
     setCode: 'EVS',
@@ -71,7 +71,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'pkmn-005',
+    guid: 'pkmn-005',
     name: 'Gardevoir ex',
     setName: 'Scarlet & Violet',
     setCode: 'SVI',
@@ -88,7 +88,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'pkmn-006',
+    guid: 'pkmn-006',
     name: 'Rayquaza VMAX',
     setName: 'Evolving Skies',
     setCode: 'EVS',
@@ -105,7 +105,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'pkmn-007',
+    guid: 'pkmn-007',
     name: 'Mew VMAX',
     setName: 'Fusion Strike',
     setCode: 'FST',
@@ -122,7 +122,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'mtg-001',
+    guid: 'mtg-001',
     name: 'Sheoldred, the Apocalypse',
     setName: 'Dominaria United',
     setCode: 'DMU',
@@ -139,7 +139,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'mtg-002',
+    guid: 'mtg-002',
     name: 'The One Ring',
     setName: 'Lord of the Rings',
     setCode: 'LTR',
@@ -156,7 +156,7 @@ export const MOCK_CARD_SEARCH_RESULTS: ICardSearchResult[] = [
     },
   },
   {
-    id: 'mtg-003',
+    guid: 'mtg-003',
     name: 'Ragavan, Nimble Pilferer',
     setName: 'Modern Horizons 2',
     setCode: 'MH2',

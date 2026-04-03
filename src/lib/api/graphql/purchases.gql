@@ -1,0 +1,284 @@
+query Purchases($findPurchasesArgs: FindPurchasesArgs!) {
+  purchases(findPurchasesArgs: $findPurchasesArgs) {
+    data {
+      guid
+      reference
+      status
+      tcg
+      total
+      notes
+      buyer {
+        guid
+        name
+      }
+      seller {
+        guid
+        name
+        phone
+        email
+        notes
+      }
+      items {
+        guid
+        condition
+        offerPrice
+        referencePrice
+        sellPrice
+        quantity
+        tcg
+        pokemonCardSummary {
+          guid
+          name
+          setName
+          setCode
+          cardNumber
+          rarity
+          imageUri
+        }
+        magicCardSummary {
+          guid
+          name
+          edition
+          collectorNumber
+          rarity
+          imageUri
+          isFoil
+        }
+      }
+      payments {
+        amount
+        method
+      }
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
+
+query Purchase($guid: String!) {
+  purchase(guid: $guid) {
+    guid
+    reference
+    status
+    tcg
+    total
+    notes
+    buyer {
+      guid
+      name
+    }
+    seller {
+      guid
+      name
+      phone
+      email
+      notes
+    }
+    items {
+      guid
+      condition
+      offerPrice
+      referencePrice
+      sellPrice
+      quantity
+      tcg
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    payments {
+      amount
+      method
+    }
+    createdBy {
+      guid
+      name
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
+  createPurchase(createPurchaseInput: $createPurchaseInput) {
+    guid
+    reference
+    status
+    tcg
+    total
+    notes
+    items {
+      guid
+      condition
+      offerPrice
+      referencePrice
+      quantity
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    payments {
+      amount
+      method
+    }
+    createdDate
+  }
+}
+
+mutation UpdatePurchase($updatePurchaseInput: UpdatePurchaseInput!) {
+  updatePurchase(updatePurchaseInput: $updatePurchaseInput) {
+    guid
+    reference
+    status
+    tcg
+    total
+    notes
+    seller {
+      guid
+      name
+      phone
+      email
+      notes
+    }
+    payments {
+      amount
+      method
+    }
+    updatedDate
+  }
+}
+
+mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput!) {
+  updatePurchaseItems(updatePurchaseItemsInput: $updatePurchaseItemsInput) {
+    guid
+    reference
+    status
+    total
+    items {
+      guid
+      condition
+      offerPrice
+      referencePrice
+      quantity
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+  }
+}
+
+mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusInput!) {
+  updatePurchaseStatus(updatePurchaseStatusInput: $updatePurchaseStatusInput) {
+    guid
+    reference
+    status
+    updatedDate
+  }
+}
+
+mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!) {
+  setPurchaseItemSellPrice(setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput) {
+    guid
+    offerPrice
+    referencePrice
+    sellPrice
+    condition
+    quantity
+  }
+}
+
+mutation FinalizePurchase($purchaseGuid: String!) {
+  finalizePurchase(purchaseGuid: $purchaseGuid) {
+    guid
+    reference
+    status
+    total
+    items {
+      guid
+      condition
+      offerPrice
+      sellPrice
+      quantity
+    }
+    payments {
+      amount
+      method
+    }
+    updatedDate
+  }
+}
+
+query Sellers {
+  sellers {
+    data {
+      guid
+      name
+      phone
+      email
+      notes
+    }
+    count
+  }
+}
+
+mutation CreateSeller($createSellerInput: CreateSellerInput!) {
+  createSeller(createSellerInput: $createSellerInput) {
+    guid
+    name
+    phone
+    email
+    notes
+    createdBy {
+      guid
+      name
+    }
+    createdDate
+    updatedDate
+  }
+}

@@ -27,21 +27,23 @@ export default function SellerSelector<T extends FieldValues>({
   const [search, setSearch] = useState<string | undefined>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { sellers, createSeller, getSellerById } = useSellers(search);
+  const { sellers, createSeller, getSellerById, creating } = useSellers(search);
 
   const sellerOptions: ISelectOption[] = useMemo(
     () =>
       sellers.map((seller) => ({
-        value: seller.id,
+        value: seller.guid,
         label: `${seller.name} · ${seller.phone}`,
       })),
     [sellers]
   );
 
   const handleCreateSeller = useCallback(
-    (data: SellerFormData) => {
-      const newSeller = createSeller(data);
-      onSellerCreated?.(newSeller);
+    async (data: SellerFormData) => {
+      const newSeller = await createSeller(data);
+      if (newSeller) {
+        onSellerCreated?.(newSeller);
+      }
     },
     [createSeller, onSellerCreated]
   );
@@ -81,6 +83,7 @@ export default function SellerSelector<T extends FieldValues>({
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         onSubmit={handleCreateSeller}
+        isLoading={creating}
       />
     </div>
   );

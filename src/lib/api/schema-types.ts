@@ -128,13 +128,10 @@ export type CreateInventoryMovementInput = {
 };
 
 export type CreatePurchaseInput = {
-  anonymousClientEmail?: InputMaybe<Scalars['String']['input']>;
-  anonymousClientName?: InputMaybe<Scalars['String']['input']>;
-  anonymousClientPhone?: InputMaybe<Scalars['String']['input']>;
-  clientGuid?: InputMaybe<Scalars['String']['input']>;
   items: Array<CreatePurchaseItemInput>;
   notes?: InputMaybe<Scalars['String']['input']>;
   payments?: InputMaybe<Array<CreatePurchasePaymentInput>>;
+  sellerGuid?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
 };
 
@@ -156,6 +153,13 @@ export type CreateSaleFromCartInput = {
   kioskCustomerEmail?: InputMaybe<Scalars['String']['input']>;
   kioskCustomerName?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
+};
+
+export type CreateSellerInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateUserInput = {
@@ -184,6 +188,20 @@ export type DateRangeFilter = {
   /** filterType -> :daterange: */
   filterType: Scalars['String']['input'];
   range: DateRange;
+};
+
+export type DaySchedule = {
+  /** Closing time */
+  closing?: Maybe<Time>;
+  /** Opening time */
+  opening?: Maybe<Time>;
+};
+
+export type DayScheduleInput = {
+  /** Closing time */
+  closing?: InputMaybe<TimeInput>;
+  /** Opening time */
+  opening?: InputMaybe<TimeInput>;
 };
 
 export type File = {
@@ -336,6 +354,24 @@ export type GenericOutput = {
   message: Scalars['String']['output'];
 };
 
+export type GeofenceData = {
+  /** Geofence latitude coordinate */
+  latitude?: Maybe<Scalars['Float']['output']>;
+  /** Geofence longitude coordinate */
+  longitude?: Maybe<Scalars['Float']['output']>;
+  /** Geofence radius in meters */
+  radius?: Maybe<Scalars['Float']['output']>;
+};
+
+export type GeofenceInput = {
+  /** Geofence latitude coordinate */
+  latitude?: InputMaybe<Scalars['Float']['input']>;
+  /** Geofence longitude coordinate */
+  longitude?: InputMaybe<Scalars['Float']['input']>;
+  /** Geofence radius in meters */
+  radius?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type GlobalConfig = {
   config: GlobalConfigData;
   createdBy?: Maybe<User>;
@@ -346,8 +382,12 @@ export type GlobalConfig = {
 };
 
 export type GlobalConfigData = {
+  /** Geofence configuration for location-based features */
+  geofence?: Maybe<GeofenceData>;
   /** Maximum units per card in inventory (frontend warning) */
   inventoryLimit?: Maybe<Scalars['Int']['output']>;
+  /** Weekly operation schedule with opening/closing times */
+  operationSchedule?: Maybe<OperationSchedule>;
   /** Default percentage for auto-calculating offer price */
   purchasePercentage?: Maybe<Scalars['Float']['output']>;
   /** Number of CLIENT_UNREACHABLE cancellations before auto-blocking a customer */
@@ -507,10 +547,14 @@ export type Mutation = {
   createPurchase: Purchase;
   /** Checkout: create sale from cart (carpeta digital) */
   createSaleFromCart: Sale;
+  /** Create a new seller */
+  createSeller: Seller;
   /** One use mutation to create the first superUser */
   createSuperUser: User;
   /** Mutation to create an User */
   createUser: User;
+  /** Delete a seller (soft delete) */
+  deleteSeller: Scalars['Boolean']['output'];
   /** Mutation to delete a user (soft-delete, admin only) */
   deleteUser: GenericOutput;
   /** Finalize a purchase (WAITING_PRICE → FINALIZED) */
@@ -552,6 +596,8 @@ export type Mutation = {
   updatePurchaseStatus: Purchase;
   /** Transition sale status (backoffice) */
   updateSaleStatus: Sale;
+  /** Update an existing seller */
+  updateSeller: Seller;
   /** Mutation to update an user */
   updateUser: GenericOutput;
   /** Mutation to update a user profile (self-service for all authenticated users) */
@@ -601,12 +647,20 @@ export type MutationCreateSaleFromCartArgs = {
   createSaleFromCartInput: CreateSaleFromCartInput;
 };
 
+export type MutationCreateSellerArgs = {
+  createSellerInput: CreateSellerInput;
+};
+
 export type MutationCreateSuperUserArgs = {
   createUserInput: CreateUserInput;
 };
 
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
+};
+
+export type MutationDeleteSellerArgs = {
+  guid: Scalars['String']['input'];
 };
 
 export type MutationDeleteUserArgs = {
@@ -689,6 +743,10 @@ export type MutationUpdateSaleStatusArgs = {
   updateSaleStatusInput: UpdateSaleStatusInput;
 };
 
+export type MutationUpdateSellerArgs = {
+  updateSellerInput: UpdateSellerInput;
+};
+
 export type MutationUpdateUserArgs = {
   updateUserInput: UpdateUserInput;
 };
@@ -720,6 +778,40 @@ export type NumericRangeFilter = {
   /** filterType -> :numericrange: */
   filterType: Scalars['String']['input'];
   range: NumericRange;
+};
+
+export type OperationSchedule = {
+  /** Friday schedule */
+  friday?: Maybe<DaySchedule>;
+  /** Monday schedule */
+  monday?: Maybe<DaySchedule>;
+  /** Saturday schedule */
+  saturday?: Maybe<DaySchedule>;
+  /** Sunday schedule */
+  sunday?: Maybe<DaySchedule>;
+  /** Thursday schedule */
+  thursday?: Maybe<DaySchedule>;
+  /** Tuesday schedule */
+  tuesday?: Maybe<DaySchedule>;
+  /** Wednesday schedule */
+  wednesday?: Maybe<DaySchedule>;
+};
+
+export type OperationScheduleInput = {
+  /** Friday schedule */
+  friday?: InputMaybe<DayScheduleInput>;
+  /** Monday schedule */
+  monday?: InputMaybe<DayScheduleInput>;
+  /** Saturday schedule */
+  saturday?: InputMaybe<DayScheduleInput>;
+  /** Sunday schedule */
+  sunday?: InputMaybe<DayScheduleInput>;
+  /** Thursday schedule */
+  thursday?: InputMaybe<DayScheduleInput>;
+  /** Tuesday schedule */
+  tuesday?: InputMaybe<DayScheduleInput>;
+  /** Wednesday schedule */
+  wednesday?: InputMaybe<DayScheduleInput>;
 };
 
 export type PaginatedInventoryItems = {
@@ -755,6 +847,11 @@ export type PaginatedPurchases = {
 export type PaginatedSales = {
   count?: Maybe<Scalars['Float']['output']>;
   data?: Maybe<Array<Sale>>;
+};
+
+export type PaginatedSellers = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<Seller>>;
 };
 
 export type PaginatedUsers = {
@@ -894,16 +991,27 @@ export type PokemonCardSummary = {
   setName?: Maybe<Scalars['String']['output']>;
 };
 
+export type PokemonCardVariantMetrics = {
+  avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
+  condition: Scalars['String']['output'];
+  lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
+  stock: Scalars['Int']['output'];
+  wishlistCount: Scalars['Int']['output'];
+};
+
+export type PokemonCardWithMetrics = {
+  gradedPriceEightOrAbove?: Maybe<Scalars['Float']['output']>;
+  gradedPriceSeven?: Maybe<Scalars['Float']['output']>;
+  ungradedPrice?: Maybe<Scalars['Float']['output']>;
+  variantsMetrics: Array<PokemonCardVariantMetrics>;
+};
+
 export type PokemonFilters = {
   rarity?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Purchase = {
-  anonymousClientEmail?: Maybe<Scalars['String']['output']>;
-  anonymousClientName?: Maybe<Scalars['String']['output']>;
-  anonymousClientPhone?: Maybe<Scalars['String']['output']>;
   buyer?: Maybe<User>;
-  client?: Maybe<User>;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
@@ -911,6 +1019,7 @@ export type Purchase = {
   notes?: Maybe<Scalars['String']['output']>;
   payments?: Maybe<Array<PurchasePayment>>;
   reference: Scalars['String']['output'];
+  seller?: Maybe<Seller>;
   status: Scalars['String']['output'];
   tcg: Scalars['String']['output'];
   total: Scalars['Float']['output'];
@@ -988,6 +1097,8 @@ export type Query = {
   pokemonCardRarities: Array<Scalars['String']['output']>;
   /** Get all unique card variants available in the catalog (cached 1hr) */
   pokemonCardVariants: Array<Scalars['String']['output']>;
+  /** Get inventory variants with metrics for a Pokemon card (authenticated) */
+  pokemonCardWithMetrics: PokemonCardWithMetrics;
   /** Get purchase detail by guid */
   purchase: Purchase;
   /** Get paginated list of purchases */
@@ -996,6 +1107,10 @@ export type Query = {
   sale: Sale;
   /** Get paginated list of sales (backoffice) */
   sales: PaginatedSales;
+  /** Get seller detail by guid */
+  seller: Seller;
+  /** Get paginated list of sellers */
+  sellers: PaginatedSellers;
   /** Query to get an user detail with branch offices */
   user: UserDetail;
   /** Query to get a user profile given the token */
@@ -1072,6 +1187,10 @@ export type QueryPokemonCardPublicListArgs = {
   findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs;
 };
 
+export type QueryPokemonCardWithMetricsArgs = {
+  guid: Scalars['String']['input'];
+};
+
 export type QueryPurchaseArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1086,6 +1205,10 @@ export type QuerySaleArgs = {
 
 export type QuerySalesArgs = {
   findSalesArgs: FindSalesArgs;
+};
+
+export type QuerySellerArgs = {
+  guid: Scalars['String']['input'];
 };
 
 export type QueryUserArgs = {
@@ -1155,6 +1278,18 @@ export type SaleItem = {
   updatedDate: Scalars['Timestamp']['output'];
 };
 
+export type Seller = {
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  email?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
 export type SetClientStatusInput = {
   clientStatus: Scalars['String']['input'];
   guid: Scalars['ID']['input'];
@@ -1183,6 +1318,30 @@ export type SyncMetricsOutput = {
   totalCards: Scalars['Int']['output'];
 };
 
+export type Time = {
+  /** Hour (1-12) */
+  hour?: Maybe<Scalars['Int']['output']>;
+  /** Minute (0-59) */
+  minute?: Maybe<Scalars['Int']['output']>;
+  /** Period (AM/PM) */
+  period?: Maybe<TimePeriod>;
+};
+
+export type TimeInput = {
+  /** Hour (1-12) */
+  hour?: InputMaybe<Scalars['Int']['input']>;
+  /** Minute (0-59) */
+  minute?: InputMaybe<Scalars['Int']['input']>;
+  /** Period (AM/PM) */
+  period?: InputMaybe<TimePeriod>;
+};
+
+/** Time period for 12-hour format (AM/PM) */
+export enum TimePeriod {
+  Am = 'AM',
+  Pm = 'PM',
+}
+
 export type UpdateBuyerBudgetInput = {
   assignedAmount: Scalars['Float']['input'];
   buyerGuid: Scalars['String']['input'];
@@ -1195,8 +1354,12 @@ export type UpdateCartItemInput = {
 };
 
 export type UpdateGlobalConfigInput = {
+  /** Geofence configuration for location-based features */
+  geofence?: InputMaybe<GeofenceInput>;
   /** Maximum units per card in inventory (frontend warning) */
   inventoryLimit?: InputMaybe<Scalars['Int']['input']>;
+  /** Weekly operation schedule with opening/closing times */
+  operationSchedule?: InputMaybe<OperationScheduleInput>;
   /** Default percentage for auto-calculating offer price */
   purchasePercentage?: InputMaybe<Scalars['Float']['input']>;
   /** Number of CLIENT_UNREACHABLE cancellations before auto-blocking a customer */
@@ -1217,13 +1380,10 @@ export type UpdateMostWantedCardInput = {
 };
 
 export type UpdatePurchaseInput = {
-  anonymousClientEmail?: InputMaybe<Scalars['String']['input']>;
-  anonymousClientName?: InputMaybe<Scalars['String']['input']>;
-  anonymousClientPhone?: InputMaybe<Scalars['String']['input']>;
-  clientGuid?: InputMaybe<Scalars['String']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
   payments?: InputMaybe<Array<CreatePurchasePaymentInput>>;
   purchaseGuid: Scalars['String']['input'];
+  sellerGuid?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdatePurchaseItemDetailInput = {
@@ -1248,6 +1408,14 @@ export type UpdatePurchaseStatusInput = {
 export type UpdateSaleStatusInput = {
   newStatus: Scalars['String']['input'];
   saleGuid: Scalars['String']['input'];
+};
+
+export type UpdateSellerInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  guid: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateUserInput = {

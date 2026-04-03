@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 import {
   Drawer,
   DrawerContent,
@@ -45,16 +46,22 @@ export default function PriceAdjustmentModal({
 }: PriceAdjustmentModalProps) {
   const { isPrivacyMode } = usePrivacyModeStore();
 
-  const { control, handleSubmit, watch, reset } = usePriceAdjustmentForm();
+  const { control, handleSubmit, reset, fieldArray } = usePriceAdjustmentForm();
+  const { fields } = fieldArray;
 
-  const watchedItems = watch('items');
+  const watchedItems = useWatch({
+    control,
+    name: 'items',
+    defaultValue: [],
+  });
 
   const buyTotal = useMemo(() => calculateTotal(items), [items]);
 
   const adjustedPrices = useMemo(() => {
     const map: Record<string, number> = {};
     watchedItems.forEach((wi) => {
-      map[wi.itemId] = Number(wi.publicPrice) || 0;
+      const price = Number(wi.publicPrice);
+      map[wi.itemId] = isNaN(price) || price < 0 ? 0 : price;
     });
     return map;
   }, [watchedItems]);
@@ -67,7 +74,7 @@ export default function PriceAdjustmentModal({
   const sellTotal = useMemo(
     () =>
       items.reduce(
-        (sum, item) => sum + (adjustedPrices[item.id] || 0) * item.quantity,
+        (sum, item) => sum + (adjustedPrices[item.guid] || 0) * item.quantity,
         0
       ),
     [items, adjustedPrices]
@@ -77,8 +84,8 @@ export default function PriceAdjustmentModal({
     if (isOpen) {
       reset({
         items: items.map((item) => ({
-          itemId: item.id,
-          publicPrice: item.unitSellPrice,
+          itemId: item.guid,
+          publicPrice: item.sellPrice || 0,
         })),
       });
     }
@@ -98,7 +105,7 @@ export default function PriceAdjustmentModal({
       );
       const adjustedItems = items.map((item) => ({
         ...item,
-        unitSellPrice: priceMap.get(item.id) ?? item.unitSellPrice,
+        sellPrice: priceMap.get(item.guid) ?? item.sellPrice,
       }));
       onConfirm(adjustedItems);
       onClose();
@@ -154,11 +161,11 @@ export default function PriceAdjustmentModal({
             )}
 
             {items.map((item, index) => {
-              const hasError = validation.itemsWithoutPrice.includes(item.id);
+              const hasError = validation.itemsWithoutPrice.includes(item.guid);
 
               return (
                 <div
-                  key={item.id}
+                  key={item.guid}
                   className={`flex flex-col gap-3 rounded-lg border p-4 ${
                     hasError
                       ? 'border-danger/50 bg-danger-50/30'
@@ -197,7 +204,7 @@ export default function PriceAdjustmentModal({
                         </span>
                         <span>
                           Precio compra:{' '}
-                          <strong>{displayCurrency(item.unitBuyPrice)}</strong>
+                          <strong>{displayCurrency(item.offerPrice)}</strong>
                         </span>
                       </div>
                     </div>
@@ -209,7 +216,7 @@ export default function PriceAdjustmentModal({
                         Precio referencia
                       </span>
                       <span className="text-sm font-medium text-default-600">
-                        {displayCurrency(item.unitSellPrice)}
+                        {displayCurrency(item.sellPrice || 0)}
                       </span>
                     </div>
 

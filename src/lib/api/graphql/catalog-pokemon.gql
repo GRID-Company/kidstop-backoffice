@@ -60,3 +60,18 @@ query PokemonCardVariants {
 query PokemonCardGenres {
   pokemonCardGenres
 }
+
+query PokemonCardWithMetrics($guid: String!) {
+  pokemonCardWithMetrics(guid: $guid) {
+    variantsMetrics {
+      condition
+      stock
+      lastSellDate
+      avgDaysInInventory
+      wishlistCount
+    }
+    ungradedPrice
+    gradedPriceSeven
+    gradedPriceEightOrAbove
+  }
+}
