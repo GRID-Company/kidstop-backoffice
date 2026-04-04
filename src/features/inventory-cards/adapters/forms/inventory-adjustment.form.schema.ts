@@ -6,7 +6,7 @@ const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string
 const movementTypeValues = Object.values(MOVEMENT_TYPES) as [string, ...string[]];
 
 export const inventoryAdjustmentFormSchema = z.object({
-  inventoryItemId: z.string().min(1, 'El item de inventario es obligatorio'),
+  cardGuid: z.string().min(1, 'La carta es obligatoria'),
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
@@ -14,7 +14,7 @@ export const inventoryAdjustmentFormSchema = z.object({
   movementType: z.enum(movementTypeValues, {
     message: 'El tipo de movimiento es obligatorio',
   }),
-  notes: z.string().optional(),
+  notes: z.string().min(1, 'Las notas son obligatorias'),
 });
 
 export type InventoryAdjustmentFormData = z.infer<typeof inventoryAdjustmentFormSchema>;

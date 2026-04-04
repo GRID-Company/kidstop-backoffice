@@ -11,7 +11,7 @@ export function useAdjustmentForm(defaults?: Partial<InventoryAdjustmentFormData
   return useForm<InventoryAdjustmentFormData>({
     resolver: zodResolver(inventoryAdjustmentFormSchema) as Resolver<InventoryAdjustmentFormData>,
     defaultValues: {
-      inventoryItemId: '',
+      cardGuid: '',
       condition: CARD_CONDITIONS.NEAR_MINT,
       quantity: 1,
       movementType: MOVEMENT_TYPES.MANUAL_ADJUSTMENT,
