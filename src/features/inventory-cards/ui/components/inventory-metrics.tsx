@@ -1,14 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
-import { CardBody } from '@heroui/react';
+import { CardBody, Skeleton } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
-import { IInventoryItem } from '../../domain/types';
-import { calculateInventoryMetrics } from '../../domain/inventory.domain';
 
 interface InventoryMetricsProps {
-  items: IInventoryItem[];
+  totalStock: number;
+  lastSellDate: string | null;
+  avgDaysInInventory: number | null;
+  loading?: boolean;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -27,27 +27,40 @@ function formatDays(days: number | null): string {
 
 const METRIC_CARDS = [
   {
-    key: 'totalStock',
+    key: 'totalStock' as const,
     label: 'Total en stock',
     icon: 'lucide:package',
-    format: (value: number) => value.toLocaleString('es-MX'),
   },
   {
-    key: 'lastSoldAt',
+    key: 'lastSellDate' as const,
     label: 'Última venta',
     icon: 'lucide:calendar-clock',
-    format: (value: string | null) => formatDate(value),
   },
   {
-    key: 'avgDaysInInventory',
+    key: 'avgDaysInInventory' as const,
     label: 'Tiempo promedio en inventario',
     icon: 'lucide:timer',
-    format: (value: number | null) => formatDays(value),
   },
-] as const;
+];
 
-export default function InventoryMetrics({ items }: InventoryMetricsProps) {
-  const metrics = useMemo(() => calculateInventoryMetrics(items), [items]);
+function formatMetric(key: string, value: number | string | null): string {
+  if (key === 'totalStock') return (value as number).toLocaleString('es-MX');
+  if (key === 'lastSellDate') return formatDate(value as string | null);
+  if (key === 'avgDaysInInventory') return formatDays(value as number | null);
+  return String(value ?? '—');
+}
+
+export default function InventoryMetrics({
+  totalStock,
+  lastSellDate,
+  avgDaysInInventory,
+  loading = false,
+}: InventoryMetricsProps) {
+  const values: Record<string, number | string | null> = {
+    totalStock,
+    lastSellDate,
+    avgDaysInInventory,
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -59,9 +72,13 @@ export default function InventoryMetrics({ items }: InventoryMetricsProps) {
             </div>
             <div className="min-w-0">
               <p className="text-xs text-default-400">{card.label}</p>
-              <p className="truncate text-lg font-semibold">
-                {card.format(metrics[card.key] as never)}
-              </p>
+              {loading ? (
+                <Skeleton className="mt-1 h-6 w-24 rounded" />
+              ) : (
+                <p className="truncate text-lg font-semibold">
+                  {formatMetric(card.key, values[card.key])}
+                </p>
+              )}
             </div>
           </CardBody>
         </KidstopCard>
