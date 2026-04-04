@@ -11,7 +11,6 @@ export default function MovementsContent() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
-    results,
     paginatedResults,
     hasActiveFilters,
     sortDescriptor,
@@ -19,6 +18,8 @@ export default function MovementsContent() {
     page,
     setPage,
     totalPages,
+    totalCount,
+    loading,
   } = useMovementSearch();
 
   return (
@@ -30,14 +31,15 @@ export default function MovementsContent() {
           onDateRangeChange={handleDateRangeChange}
           onReset={resetFilters}
           hasActiveFilters={hasActiveFilters}
-          resultCount={results.length}
+          resultCount={totalCount}
           dateRange={dateRange}
         />
       </div>
 
       <MovementHistoryTable
         items={paginatedResults}
-        totalItems={results.length}
+        totalItems={totalCount}
+        isLoading={loading}
         page={page}
         totalPages={totalPages}
         sortDescriptor={sortDescriptor}
