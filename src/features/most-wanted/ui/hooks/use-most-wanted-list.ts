@@ -60,7 +60,7 @@ export function useMostWantedList() {
 
   const items = useMemo(() => {
     const cards = (data?.mostWantedCards.data ?? []) as IMostWantedCard[];
-    return cards.sort((a, b) => {
+    return [...cards].sort((a, b) => {
       const priorityDiff = PRIORITY_ORDER[a.priority as keyof typeof PRIORITY_ORDER] - PRIORITY_ORDER[b.priority as keyof typeof PRIORITY_ORDER];
       if (priorityDiff !== 0) return priorityDiff;
       return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
