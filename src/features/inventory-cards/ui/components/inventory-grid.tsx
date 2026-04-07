@@ -43,7 +43,7 @@ const COLUMNS = [
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('es-MX', {
+  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

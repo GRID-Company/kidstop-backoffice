@@ -89,11 +89,3 @@ mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryM
     createdDate
   }
 }
-
-mutation UpdatePokemonCardPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
-  updatePokemonCardPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
-    guid
-    purchasePrice
-    sellPrice
-  }
-}

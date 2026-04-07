@@ -3,9 +3,10 @@
 import { useCallback, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
-import { Button, Tab, Tabs } from '@heroui/react';
+import { Button, Tab, Tabs, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { Key } from 'react';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { IInventoryItem } from '../../domain/types';
@@ -39,8 +40,7 @@ export default function Inventory() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
-    results,
-    paginatedResults,
+    items,
     hasActiveFilters,
     selectedTCG,
     sortDescriptor,
@@ -100,14 +100,25 @@ export default function Inventory() {
       <EntitiesPage>
         <EntitiesPage.Toolbar label="Inventario de Cartas">
           {activeTab === INVENTORY_TABS.STOCK && (
-            <Button
-              className="text-white"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-              startContent={<Icon icon="lucide:plus" />}
-              onPress={() => setIsAdjustmentOpen(true)}
+            <Tooltip
+              content="Los ajustes manuales solo están disponibles para Pokémon TCG"
+              isDisabled={selectedTCG !== TCG_TYPES.MAGIC}
             >
-              Ajuste manual
-            </Button>
+              <Button
+                className="text-white"
+                style={{
+                  backgroundColor:
+                    selectedTCG === TCG_TYPES.MAGIC
+                      ? 'var(--heroui-default-400)'
+                      : 'var(--color-accent)',
+                }}
+                startContent={<Icon icon="lucide:plus" />}
+                isDisabled={selectedTCG === TCG_TYPES.MAGIC}
+                onPress={() => setIsAdjustmentOpen(true)}
+              >
+                Ajuste manual
+              </Button>
+            </Tooltip>
           )}
         </EntitiesPage.Toolbar>
 
@@ -170,7 +181,7 @@ export default function Inventory() {
               </div>
 
               <InventoryGrid
-                items={paginatedResults}
+                items={items}
                 totalItems={totalCount}
                 isLoading={loading}
                 page={page}

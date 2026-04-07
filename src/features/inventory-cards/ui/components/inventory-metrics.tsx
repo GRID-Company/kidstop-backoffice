@@ -13,7 +13,7 @@ interface InventoryMetricsProps {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return 'Sin datos';
-  return new Date(dateStr).toLocaleDateString('es-MX', {
+  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

@@ -170,7 +170,7 @@ function MovementMobileCard({ item }: { item: IInventoryMovement }) {
           </div>
 
           <p className="truncate text-xs text-default-500">
-            {item.setName} ({item.setCode}) · #{item.cardNumber}
+            {item.setName} ({item.setCode}) · {item.cardNumber}
           </p>
 
           <div className="flex flex-wrap items-center gap-2">

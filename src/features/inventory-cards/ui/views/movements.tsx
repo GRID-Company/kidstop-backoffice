@@ -11,7 +11,7 @@ export default function MovementsContent() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
-    paginatedResults,
+    items,
     hasActiveFilters,
     sortDescriptor,
     setSortDescriptor,
@@ -37,7 +37,7 @@ export default function MovementsContent() {
       </div>
 
       <MovementHistoryTable
-        items={paginatedResults}
+        items={items}
         totalItems={totalCount}
         isLoading={loading}
         page={page}

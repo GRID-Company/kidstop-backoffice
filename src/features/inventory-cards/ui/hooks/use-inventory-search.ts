@@ -78,7 +78,7 @@ export function useInventorySearch() {
     fetchPolicy: 'network-only',
   });
 
-  const results = useMemo<IInventoryItem[]>(() => {
+  const items = useMemo<IInventoryItem[]>(() => {
     if (!data?.inventoryItems?.data) return [];
     return data.inventoryItems.data.map(fromApiInventoryItem);
   }, [data]);
@@ -97,8 +97,7 @@ export function useInventorySearch() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
-    results,
-    paginatedResults: results,
+    items,
     hasActiveFilters,
     selectedTCG,
     sortDescriptor,

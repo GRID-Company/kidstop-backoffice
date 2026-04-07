@@ -108,18 +108,6 @@ export type CreateInventoryMovementMutation = {
   };
 };
 
-export type UpdatePokemonCardPricesMutationVariables = Types.Exact<{
-  updateInventoryItemPricesInput: Types.UpdateInventoryItemPricesInput;
-}>;
-
-export type UpdatePokemonCardPricesMutation = {
-  updatePokemonCardPrices: {
-    guid: string;
-    purchasePrice: number | null;
-    sellPrice: number | null;
-  };
-};
-
 export const InventoryItemsDocument = {
   kind: 'Document',
   definitions: [
@@ -598,66 +586,4 @@ export const CreateInventoryMovementDocument = {
 } as unknown as DocumentNode<
   CreateInventoryMovementMutation,
   CreateInventoryMovementMutationVariables
->;
-export const UpdatePokemonCardPricesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdatePokemonCardPrices' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'updateInventoryItemPricesInput' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'UpdateInventoryItemPricesInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updatePokemonCardPrices' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'updateInventoryItemPricesInput' },
-                value: {
-                  kind: 'Variable',
-                  name: {
-                    kind: 'Name',
-                    value: 'updateInventoryItemPricesInput',
-                  },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'purchasePrice' },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  UpdatePokemonCardPricesMutation,
-  UpdatePokemonCardPricesMutationVariables
 >;

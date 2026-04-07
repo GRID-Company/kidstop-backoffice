@@ -82,6 +82,18 @@ export type PokemonCardGenresQueryVariables = Types.Exact<{
 
 export type PokemonCardGenresQuery = { pokemonCardGenres: Array<string> };
 
+export type UpdateInventoryItemPricesMutationVariables = Types.Exact<{
+  updateInventoryItemPricesInput: Types.UpdateInventoryItemPricesInput;
+}>;
+
+export type UpdateInventoryItemPricesMutation = {
+  updatePokemonCardPrices: {
+    guid: string;
+    purchasePrice: number | null;
+    sellPrice: number | null;
+  };
+};
+
 export type PokemonCardWithMetricsQueryVariables = Types.Exact<{
   guid: Types.Scalars['String']['input'];
 }>;
@@ -389,6 +401,68 @@ export const PokemonCardGenresDocument = {
 } as unknown as DocumentNode<
   PokemonCardGenresQuery,
   PokemonCardGenresQueryVariables
+>;
+export const UpdateInventoryItemPricesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateInventoryItemPrices' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'updateInventoryItemPricesInput' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateInventoryItemPricesInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updatePokemonCardPrices' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'updateInventoryItemPricesInput' },
+                value: {
+                  kind: 'Variable',
+                  name: {
+                    kind: 'Name',
+                    value: 'updateInventoryItemPricesInput',
+                  },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'purchasePrice' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateInventoryItemPricesMutation,
+  UpdateInventoryItemPricesMutationVariables
 >;
 export const PokemonCardWithMetricsDocument = {
   kind: 'Document',

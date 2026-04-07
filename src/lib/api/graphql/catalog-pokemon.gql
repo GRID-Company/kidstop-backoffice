@@ -61,6 +61,14 @@ query PokemonCardGenres {
   pokemonCardGenres
 }
 
+mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
+  updatePokemonCardPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+    guid
+    purchasePrice
+    sellPrice
+  }
+}
+
 query PokemonCardWithMetrics($guid: String!) {
   pokemonCardWithMetrics(guid: $guid) {
     variantsMetrics {

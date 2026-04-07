@@ -74,7 +74,7 @@ export function useMovementSearch() {
     fetchPolicy: 'network-only',
   });
 
-  const results = useMemo<IInventoryMovement[]>(() => {
+  const items = useMemo<IInventoryMovement[]>(() => {
     if (!data?.inventoryMovements?.data) return [];
     return data.inventoryMovements.data.map(fromApiInventoryMovement);
   }, [data]);
@@ -93,8 +93,7 @@ export function useMovementSearch() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
-    results,
-    paginatedResults: results,
+    items,
     hasActiveFilters,
     sortDescriptor,
     setSortDescriptor,

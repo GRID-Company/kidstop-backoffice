@@ -13,9 +13,16 @@ import {
   Divider,
   Skeleton,
 } from '@heroui/react';
+import { Icon } from '@iconify/react';
+import { SubmitHandler } from 'react-hook-form';
+import InputForm from '@/shared/base/form-controls/input-form';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
+import { useUpdateInventoryPrice } from '../hooks/use-update-inventory-price';
+import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
+import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
+import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
 
 interface InventoryCard {
   condition: string;
@@ -37,6 +44,8 @@ export default function PokemonCardDetailModal({
 }: PokemonCardDetailModalProps) {
   const { detail, loading } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
   const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
+  const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
+  const { control, handleSubmit, formState, reset } = useCardPriceForm();
 
   useEffect(() => {
     if (detail?.inventoryCards && detail.inventoryCards.length > 0) {
@@ -46,9 +55,36 @@ export default function PokemonCardDetailModal({
     }
   }, [detail]);
 
+  useEffect(() => {
+    if (selectedVariant) {
+      reset(
+        toCardPriceFormDefaults({
+          id: selectedVariant.condition,
+          condition: selectedVariant.condition as CardCondition,
+          stock: selectedVariant.stock,
+          buyPrice: selectedVariant.purchasePrice ?? 0,
+          sellPrice: selectedVariant.sellPrice ?? 0,
+        })
+      );
+    }
+  }, [selectedVariant, reset]);
+
   const handleVariantSelect = useCallback((variant: InventoryCard) => {
     setSelectedVariant(variant);
   }, []);
+
+  const handlePriceSubmit: SubmitHandler<CardPriceFormData> = useCallback(
+    async (data) => {
+      if (!detail || !selectedVariant) return;
+      await handleUpdatePrice({
+        pokemonCardGuid: detail.guid,
+        condition: selectedVariant.condition,
+        purchasePrice: data.buyPrice,
+        sellPrice: data.sellPrice,
+      });
+    },
+    [detail, selectedVariant, handleUpdatePrice]
+  );
 
   if (!card) return null;
 
@@ -72,7 +108,7 @@ export default function PokemonCardDetailModal({
 
         <DrawerBody className="flex flex-col gap-6">
           <div className="flex gap-6">
-            <div className="relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
+            <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
               {imageUri ? (
                 <Image
                   src={imageUri}
@@ -220,6 +256,42 @@ export default function PokemonCardDetailModal({
                   </div>
                 </div>
               </div>
+
+              <Divider />
+
+              <form
+                onSubmit={(...args) => {
+                  void handleSubmit(handlePriceSubmit)(...args);
+                }}
+                className="flex flex-col gap-4"
+              >
+                <h4 className="text-sm font-semibold">Editar precio público</h4>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <InputForm
+                    label="Precio de compra"
+                    type="number"
+                    controlProps={{ control, name: 'buyPrice' }}
+                  />
+                  <InputForm
+                    label="Precio de venta"
+                    type="number"
+                    controlProps={{ control, name: 'sellPrice' }}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  size="sm"
+                  isDisabled={!formState.isDirty || !formState.isValid || updatingPrice}
+                  isLoading={updatingPrice}
+                  startContent={<Icon icon="lucide:save" />}
+                  className="text-white"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                >
+                  Guardar precios
+                </Button>
+              </form>
             </>
           )}
         </DrawerBody>
