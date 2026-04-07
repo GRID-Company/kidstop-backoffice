@@ -4,23 +4,14 @@ export interface IGeofenceCoordinate {
 }
 
 export interface IGeofenceConfig {
-  enabled: boolean;
   center: IGeofenceCoordinate;
   radiusKm: number;
-  polygon: IGeofenceCoordinate[];
-}
-
-export interface IBudgetConfig {
-  buyerGuid: string;
-  buyerName: string;
-  dailyLimit: number;
-  weeklyLimit: number;
-  monthlyLimit: number;
 }
 
 export interface IThresholdConfig {
   uncompletedOrdersLimit: number;
   inventoryLimitPerCard: number;
+  purchasePercentage: number;
 }
 
 export interface IOperatingHoursSlot {
@@ -40,13 +31,28 @@ export interface IOperatingHours {
 
 export type DayOfWeek = keyof IOperatingHours;
 
+export interface IBudgetBuyer {
+  guid: string;
+  name: string;
+  emailAddress: string;
+}
+
+export interface IBudgetConfig {
+  guid: string;
+  tcg: string;
+  assignedAmount: number;
+  usedAmount: number;
+  utilization: number;
+  buyer: IBudgetBuyer;
+}
+
 export interface ISettings {
-  id: string;
-  geofence: IGeofenceConfig;
-  budgets: IBudgetConfig[];
+  guid: string;
+  geofence: IGeofenceConfig | null;
   thresholds: IThresholdConfig;
-  operatingHours: IOperatingHours;
-  updatedAt: string;
+  operatingHours: IOperatingHours | null;
+  createdDate: string;
+  updatedDate: string;
 }
 
 export type SettingsSection =

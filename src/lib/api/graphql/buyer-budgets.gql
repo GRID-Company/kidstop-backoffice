@@ -1,0 +1,33 @@
+query BuyerBudgets($tcg: String) {
+  buyerBudgets(tcg: $tcg) {
+    guid
+    tcg
+    assignedAmount
+    usedAmount
+    utilization
+    buyer {
+      guid
+      name
+      emailAddress
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation UpdateBuyerBudget($updateBuyerBudgetInput: UpdateBuyerBudgetInput!) {
+  updateBuyerBudget(updateBuyerBudgetInput: $updateBuyerBudgetInput) {
+    guid
+    tcg
+    assignedAmount
+    usedAmount
+    utilization
+    buyer {
+      guid
+      name
+      emailAddress
+    }
+    createdDate
+    updatedDate
+  }
+}

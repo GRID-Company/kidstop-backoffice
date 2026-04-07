@@ -9,10 +9,11 @@ import SettingsSection from './settings-section';
 
 interface ThresholdSectionProps {
   thresholds: IThresholdConfig;
+  isLoading?: boolean;
   onSave: (thresholds: IThresholdConfig) => void;
 }
 
-export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) {
+export function ThresholdContent({ thresholds, isLoading, onSave }: ThresholdSectionProps) {
   const { control, handleSubmit, formState, reset } = useThresholdForm(thresholds);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) 
         <h4 className="text-base font-semibold">Umbrales</h4>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <InputForm
           label="Límite de pedidos no concretados"
           placeholder="3"
@@ -48,6 +49,12 @@ export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) 
           type="number"
           controlProps={{ control, name: 'inventoryLimitPerCard' }}
         />
+        <InputForm
+          label="Porcentaje de compra (0–1)"
+          placeholder="0.5"
+          type="number"
+          controlProps={{ control, name: 'purchasePercentage' }}
+        />
       </div>
 
       <div className="flex justify-end">
@@ -55,6 +62,7 @@ export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) 
           variant="accent"
           type="submit"
           isDisabled={!formState.isDirty || !formState.isValid}
+          isLoading={isLoading}
         >
           Guardar Umbrales
         </KidstopButton>

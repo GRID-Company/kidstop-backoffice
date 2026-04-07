@@ -10,7 +10,6 @@ export function useGeofenceForm(defaults?: Partial<GeofenceSettingsFormData>) {
   return useForm<GeofenceSettingsFormData>({
     resolver: zodResolver(geofenceSettingsSchema) as Resolver<GeofenceSettingsFormData>,
     defaultValues: {
-      enabled: DEFAULT_GEOFENCE_CONFIG.enabled,
       center: DEFAULT_GEOFENCE_CONFIG.center,
       radiusKm: DEFAULT_GEOFENCE_CONFIG.radiusKm,
       ...defaults,
