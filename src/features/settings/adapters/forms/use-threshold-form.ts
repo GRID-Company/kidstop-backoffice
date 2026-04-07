@@ -12,6 +12,7 @@ export function useThresholdForm(defaults?: Partial<ThresholdSettingsFormData>) 
     defaultValues: {
       uncompletedOrdersLimit: DEFAULT_THRESHOLDS.uncompletedOrdersLimit,
       inventoryLimitPerCard: DEFAULT_THRESHOLDS.inventoryLimitPerCard,
+      purchasePercentage: DEFAULT_THRESHOLDS.purchasePercentage,
       ...defaults,
     },
     mode: 'all',

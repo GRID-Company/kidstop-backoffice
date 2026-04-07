@@ -6,15 +6,14 @@ export const SETTINGS_SECTIONS: Record<SettingsSection, string> = {
 };
 
 export const DEFAULT_GEOFENCE_CONFIG: IGeofenceConfig = {
-  enabled: false,
   center: { lat: 0, lng: 0 },
   radiusKm: 5,
-  polygon: [],
 };
 
 export const DEFAULT_THRESHOLDS: IThresholdConfig = {
   uncompletedOrdersLimit: 3,
   inventoryLimitPerCard: 20,
+  purchasePercentage: 0,
 };
 
 export const DEFAULT_OPERATING_HOURS: IOperatingHours = {

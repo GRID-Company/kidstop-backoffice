@@ -1,7 +1,5 @@
-import { Switch } from '@heroui/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { useEffect } from 'react';
-import { Controller } from 'react-hook-form';
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { useGeofenceForm } from '../../adapters/forms/use-geofence-form';
@@ -16,14 +14,12 @@ interface GeofenceSectionProps {
 
 export function GeofenceContent({ geofence, onSave }: GeofenceSectionProps) {
   const { control, handleSubmit, formState, reset } = useGeofenceForm({
-    enabled: geofence.enabled,
     center: geofence.center,
     radiusKm: geofence.radiusKm,
   });
 
   useEffect(() => {
     reset({
-      enabled: geofence.enabled,
       center: geofence.center,
       radiusKm: geofence.radiusKm,
     });
@@ -31,8 +27,6 @@ export function GeofenceContent({ geofence, onSave }: GeofenceSectionProps) {
 
   const onSubmit = (data: GeofenceSettingsFormData) => {
     onSave({
-      ...geofence,
-      enabled: data.enabled,
       center: data.center,
       radiusKm: data.radiusKm,
     });
@@ -49,20 +43,6 @@ export function GeofenceContent({ geofence, onSave }: GeofenceSectionProps) {
         <Icon icon="lucide:map-pin" className="text-lg text-accent" />
         <h4 className="text-base font-semibold">Geofence</h4>
       </div>
-
-      <Controller
-        control={control}
-        name="enabled"
-        render={({ field }) => (
-          <Switch
-            isSelected={field.value}
-            onValueChange={field.onChange}
-            classNames={{ wrapper: 'group-data-[selected=true]:bg-accent' }}
-          >
-            {field.value ? 'Habilitado' : 'Deshabilitado'}
-          </Switch>
-        )}
-      />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <InputForm

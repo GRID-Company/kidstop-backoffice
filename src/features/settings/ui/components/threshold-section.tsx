@@ -35,7 +35,7 @@ export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) 
         <h4 className="text-base font-semibold">Umbrales</h4>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <InputForm
           label="Límite de pedidos no concretados"
           placeholder="3"
@@ -47,6 +47,12 @@ export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) 
           placeholder="20"
           type="number"
           controlProps={{ control, name: 'inventoryLimitPerCard' }}
+        />
+        <InputForm
+          label="Porcentaje de compra (0–1)"
+          placeholder="0.5"
+          type="number"
+          controlProps={{ control, name: 'purchasePercentage' }}
         />
       </div>
 

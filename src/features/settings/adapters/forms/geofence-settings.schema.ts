@@ -10,7 +10,6 @@ const coordinateSchema = z.object({
 });
 
 export const geofenceSettingsSchema = z.object({
-  enabled: z.boolean(),
   center: coordinateSchema,
   radiusKm: z
     .coerce.number()

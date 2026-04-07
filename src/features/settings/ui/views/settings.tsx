@@ -1,28 +1,33 @@
 import { Tabs, Tab } from '@heroui/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { useSettings } from '../hooks/use-settings';
-import { SETTINGS_SECTIONS } from '../../domain/constants';
+import { SETTINGS_SECTIONS, DEFAULT_GEOFENCE_CONFIG, DEFAULT_OPERATING_HOURS, DEFAULT_THRESHOLDS } from '../../domain/constants';
 import GeneralSection from '../components/general-section';
 import BudgetSection from '../components/budget-section';
 
 export default function Settings() {
   const {
     settings,
+    budgets,
+    buyers,
     loading,
+    updatingBudget,
     updateGeofence,
-    updateBudgets,
     updateThresholds,
     updateOperatingHours,
+    updateBudget,
   } = useSettings();
 
-  if (loading) return null;
+  if (loading && !settings) return null;
 
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="Configuración">
-        <span className="text-sm text-default-400">
-          Última actualización: {new Date(settings.updatedAt).toLocaleString('es-MX')}
-        </span>
+        {settings && (
+          <span className="text-sm text-default-400">
+            Última actualización: {new Date(settings.updatedDate).toLocaleString('es-MX')}
+          </span>
+        )}
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
@@ -33,9 +38,9 @@ export default function Settings() {
         >
           <Tab key="general" title={SETTINGS_SECTIONS.general}>
             <GeneralSection
-              geofence={settings.geofence}
-              thresholds={settings.thresholds}
-              operatingHours={settings.operatingHours}
+              geofence={settings?.geofence ?? DEFAULT_GEOFENCE_CONFIG}
+              thresholds={settings?.thresholds ?? DEFAULT_THRESHOLDS}
+              operatingHours={settings?.operatingHours ?? DEFAULT_OPERATING_HOURS}
               onSaveGeofence={updateGeofence}
               onSaveThresholds={updateThresholds}
               onSaveOperatingHours={updateOperatingHours}
@@ -43,8 +48,10 @@ export default function Settings() {
           </Tab>
           <Tab key="budgets" title={SETTINGS_SECTIONS.budgets}>
             <BudgetSection
-              budgets={settings.budgets}
-              onSave={updateBudgets}
+              budgets={budgets}
+              buyers={buyers}
+              loading={updatingBudget}
+              onSave={updateBudget}
             />
           </Tab>
         </Tabs>

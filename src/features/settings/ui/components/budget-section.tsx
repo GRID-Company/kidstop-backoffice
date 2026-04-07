@@ -1,150 +1,222 @@
-import { Button, Divider } from '@heroui/react';
+import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import OverrideInput from '@/shared/base/heorui-overrides/input';
+import InputForm from '@/shared/base/form-controls/input-form';
+import { Controller } from 'react-hook-form';
 import { IBudgetConfig } from '../../domain/types';
-import { budgetSettingsSchema } from '../../adapters/forms/budget-settings.schema';
+import { BudgetFormData } from '../../adapters/forms/budget-settings.schema';
+import { useBudgetForm } from '../../adapters/forms/use-budget-form';
 import SettingsSection from './settings-section';
 
 interface BudgetSectionProps {
   budgets: IBudgetConfig[];
-  onSave: (budgets: IBudgetConfig[]) => void;
+  buyers: { guid: string; name: string | null }[];
+  loading: boolean;
+  onSave: (form: BudgetFormData) => Promise<void>;
 }
 
-export default function BudgetSection({ budgets, onSave }: BudgetSectionProps) {
-  const [localBudgets, setLocalBudgets] = useState<IBudgetConfig[]>(budgets);
-  const [isDirty, setIsDirty] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+function UtilizationBadge({ utilization }: { utilization: number }) {
+  const pct = Math.round(utilization * 100);
+  const color =
+    pct >= 90 ? 'text-danger' : pct >= 70 ? 'text-warning' : 'text-success';
+  return <span className={`text-sm font-medium ${color}`}>{pct}%</span>;
+}
 
-  useEffect(() => {
-    setLocalBudgets(budgets);
-    setIsDirty(false);
-    setErrors({});
-  }, [budgets]);
+function BudgetFormModal({
+  isOpen,
+  onClose,
+  buyers,
+  defaults,
+  loading,
+  onSave,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  buyers: { guid: string; name: string | null }[];
+  defaults?: Partial<BudgetFormData>;
+  loading: boolean;
+  onSave: (form: BudgetFormData) => Promise<void>;
+}) {
+  const { control, handleSubmit, formState, reset } = useBudgetForm(defaults);
 
-  const handleFieldChange = useCallback(
-    (index: number, field: keyof IBudgetConfig, value: string | number) => {
-      setLocalBudgets((prev) =>
-        prev.map((b, i) => (i === index ? { ...b, [field]: value } : b))
-      );
-      setIsDirty(true);
-    },
-    []
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const onSubmit = async (data: BudgetFormData) => {
+    await onSave(data);
+    handleClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} size="sm">
+      <ModalContent>
+        <ModalHeader>
+          {defaults?.buyerGuid ? 'Editar presupuesto' : 'Asignar presupuesto'}
+        </ModalHeader>
+        <ModalBody>
+          <form
+            id="budget-form"
+            onSubmit={(...args) => { void handleSubmit(onSubmit)(...args); }}
+            className="flex flex-col gap-4"
+          >
+            <Controller
+              control={control}
+              name="buyerGuid"
+              render={({ field, fieldState }) => (
+                <Select
+                  label="Comprador"
+                  selectedKeys={field.value ? [field.value] : []}
+                  onSelectionChange={(keys) => field.onChange([...keys][0] ?? '')}
+                  isDisabled={!!defaults?.buyerGuid}
+                  isInvalid={!!fieldState.error}
+                  errorMessage={fieldState.error?.message}
+                >
+                  {buyers.map((b) => (
+                    <SelectItem key={b.guid}>{b.name ?? b.guid}</SelectItem>
+                  ))}
+                </Select>
+              )}
+            />
+            <Controller
+              control={control}
+              name="tcg"
+              render={({ field, fieldState }) => (
+                <Select
+                  label="TCG"
+                  selectedKeys={field.value ? [field.value] : []}
+                  onSelectionChange={(keys) => field.onChange([...keys][0] ?? '')}
+                  isDisabled={!!defaults?.tcg}
+                  isInvalid={!!fieldState.error}
+                  errorMessage={fieldState.error?.message}
+                >
+                  <SelectItem key="POKEMON">Pokémon</SelectItem>
+                  <SelectItem key="MAGIC">Magic</SelectItem>
+                </Select>
+              )}
+            />
+            <InputForm
+              label="Monto mensual asignado"
+              placeholder="0"
+              type="number"
+              controlProps={{ control, name: 'assignedAmount' }}
+            />
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          <KidstopButton variant="bordered" onPress={handleClose}>
+            Cancelar
+          </KidstopButton>
+          <KidstopButton
+            variant="accent"
+            type="submit"
+            form="budget-form"
+            isDisabled={!formState.isValid}
+            isLoading={loading}
+          >
+            Guardar
+          </KidstopButton>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
+}
 
-  const handleRemove = useCallback((index: number) => {
-    setLocalBudgets((prev) => prev.filter((_, i) => i !== index));
-    setIsDirty(true);
-  }, []);
+export default function BudgetSection({ budgets, buyers, loading, onSave }: BudgetSectionProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editingBudget, setEditingBudget] = useState<IBudgetConfig | null>(null);
 
-  const handleAdd = useCallback(() => {
-    setLocalBudgets((prev) => [
-      ...prev,
-      {
-        buyerGuid: crypto.randomUUID(),
-        buyerName: '',
-        dailyLimit: 0,
-        weeklyLimit: 0,
-        monthlyLimit: 0,
-      },
-    ]);
-    setIsDirty(true);
-  }, []);
+  const handleEdit = (budget: IBudgetConfig) => {
+    setEditingBudget(budget);
+    onOpen();
+  };
 
-  const handleSave = useCallback(() => {
-    const result = budgetSettingsSchema.safeParse({ budgets: localBudgets });
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        fieldErrors[issue.path.join('.')] = issue.message;
-      });
-      setErrors(fieldErrors);
-      return;
-    }
-    setErrors({});
-    onSave(localBudgets);
-    setIsDirty(false);
-  }, [localBudgets, onSave]);
+  const handleAdd = () => {
+    setEditingBudget(null);
+    onOpen();
+  };
+
+  const handleClose = () => {
+    setEditingBudget(null);
+    onClose();
+  };
 
   return (
     <SettingsSection title="Presupuestos por Comprador" icon="lucide:wallet">
       <div className="flex flex-col gap-4">
-        {localBudgets.map((budget, index) => (
-          <div key={budget.buyerGuid}>
-            {index > 0 && <Divider className="mb-4" />}
-            <div className="flex items-start gap-4">
-              <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-4">
-                <OverrideInput
-                  label="Comprador"
-                  placeholder="Nombre del comprador"
-                  value={budget.buyerName}
-                  isInvalid={!!errors[`budgets.${index}.buyerName`]}
-                  errorMessage={errors[`budgets.${index}.buyerName`]}
-                  onChange={(e) =>
-                    handleFieldChange(index, 'buyerName', e.target.value)
-                  }
-                />
-                <OverrideInput
-                  label="Límite diario"
-                  placeholder="0"
-                  type="number"
-                  value={String(budget.dailyLimit)}
-                  isInvalid={!!errors[`budgets.${index}.dailyLimit`]}
-                  errorMessage={errors[`budgets.${index}.dailyLimit`]}
-                  onChange={(e) =>
-                    handleFieldChange(index, 'dailyLimit', Number(e.target.value))
-                  }
-                />
-                <OverrideInput
-                  label="Límite semanal"
-                  placeholder="0"
-                  type="number"
-                  value={String(budget.weeklyLimit)}
-                  isInvalid={!!errors[`budgets.${index}.weeklyLimit`]}
-                  errorMessage={errors[`budgets.${index}.weeklyLimit`]}
-                  onChange={(e) =>
-                    handleFieldChange(index, 'weeklyLimit', Number(e.target.value))
-                  }
-                />
-                <OverrideInput
-                  label="Límite mensual"
-                  placeholder="0"
-                  type="number"
-                  value={String(budget.monthlyLimit)}
-                  isInvalid={!!errors[`budgets.${index}.monthlyLimit`]}
-                  errorMessage={errors[`budgets.${index}.monthlyLimit`]}
-                  onChange={(e) =>
-                    handleFieldChange(index, 'monthlyLimit', Number(e.target.value))
-                  }
-                />
+        {budgets.length === 0 && !loading && (
+          <p className="text-sm text-default-400">
+            No hay presupuestos asignados.
+          </p>
+        )}
+
+        {budgets.map((budget) => (
+          <div
+            key={budget.guid}
+            className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3"
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium">{budget.buyer.name}</span>
+              <span className="text-xs text-default-400">{budget.tcg}</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex flex-col items-end">
+                <span className="text-xs text-default-400">Asignado</span>
+                <span className="font-medium">
+                  ${budget.assignedAmount.toLocaleString('es-MX')}
+                </span>
               </div>
-              <Button
+              <div className="flex flex-col items-end">
+                <span className="text-xs text-default-400">Usado</span>
+                <span className="font-medium">
+                  ${budget.usedAmount.toLocaleString('es-MX')}
+                </span>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-xs text-default-400">Uso</span>
+                <UtilizationBadge utilization={budget.utilization} />
+              </div>
+              <KidstopButton
                 isIconOnly
-                variant="light"
-                color="danger"
-                className="mt-6"
-                onPress={() => handleRemove(index)}
+                variant="bordered"
+                size="sm"
+                onPress={() => handleEdit(budget)}
               >
-                <Icon icon="lucide:trash-2" />
-              </Button>
+                <Icon icon="lucide:pencil" className="text-sm" />
+              </KidstopButton>
             </div>
           </div>
         ))}
 
-        <div className="flex items-center justify-between">
+        <div className="flex justify-start">
           <KidstopButton
             variant="accent"
             startContent={<Icon icon="lucide:plus" />}
             onPress={handleAdd}
           >
-            Agregar comprador
-          </KidstopButton>
-          <KidstopButton variant="accent" isDisabled={!isDirty} onPress={handleSave}>
-            Guardar Presupuestos
+            Asignar presupuesto
           </KidstopButton>
         </div>
       </div>
+
+      <BudgetFormModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        buyers={buyers}
+        loading={loading}
+        onSave={onSave}
+        defaults={
+          editingBudget
+            ? {
+                buyerGuid: editingBudget.buyer.guid,
+                tcg: editingBudget.tcg as 'POKEMON' | 'MAGIC',
+                assignedAmount: editingBudget.assignedAmount,
+              }
+            : undefined
+        }
+      />
     </SettingsSection>
   );
 }
