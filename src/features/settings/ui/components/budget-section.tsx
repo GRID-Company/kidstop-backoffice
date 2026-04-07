@@ -1,6 +1,6 @@
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { Controller } from 'react-hook-form';
@@ -38,10 +38,17 @@ function BudgetFormModal({
   loading: boolean;
   onSave: (form: BudgetFormData) => Promise<void>;
 }) {
-  const { control, handleSubmit, formState, reset } = useBudgetForm(defaults);
+  const { control, handleSubmit, formState, reset } = useBudgetForm();
+
+  useEffect(() => {
+    if (isOpen) {
+      reset(defaults ?? { buyerGuid: '', tcg: 'POKEMON', assignedAmount: 0 });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleClose = () => {
-    reset();
+    reset({ buyerGuid: '', tcg: 'POKEMON', assignedAmount: 0 });
     onClose();
   };
 
