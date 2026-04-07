@@ -9,10 +9,11 @@ import SettingsSection from './settings-section';
 
 interface GeofenceSectionProps {
   geofence: IGeofenceConfig;
+  isLoading?: boolean;
   onSave: (geofence: IGeofenceConfig) => void;
 }
 
-export function GeofenceContent({ geofence, onSave }: GeofenceSectionProps) {
+export function GeofenceContent({ geofence, isLoading, onSave }: GeofenceSectionProps) {
   const { control, handleSubmit, formState, reset } = useGeofenceForm({
     center: geofence.center,
     radiusKm: geofence.radiusKm,
@@ -70,6 +71,7 @@ export function GeofenceContent({ geofence, onSave }: GeofenceSectionProps) {
           variant="accent"
           type="submit"
           isDisabled={!formState.isDirty || !formState.isValid}
+          isLoading={isLoading}
         >
           Guardar Geofence
         </KidstopButton>

@@ -9,11 +9,13 @@ import SettingsSection from './settings-section';
 
 interface OperatingHoursSectionProps {
   operatingHours: IOperatingHours;
+  isLoading?: boolean;
   onSave: (operatingHours: IOperatingHours) => void;
 }
 
 export function OperatingHoursContent({
   operatingHours,
+  isLoading,
   onSave,
 }: OperatingHoursSectionProps) {
   const [localHours, setLocalHours] = useState<IOperatingHours>(operatingHours);
@@ -104,7 +106,7 @@ export function OperatingHoursContent({
       })}
 
       <div className="flex justify-end">
-        <KidstopButton variant="accent" isDisabled={!isDirty} onPress={handleSave}>
+        <KidstopButton variant="accent" isDisabled={!isDirty} isLoading={isLoading} onPress={handleSave}>
           Guardar Horarios
         </KidstopButton>
       </div>

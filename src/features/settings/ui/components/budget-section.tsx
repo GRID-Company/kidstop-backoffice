@@ -1,6 +1,6 @@
 import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { Controller } from 'react-hook-form';
@@ -38,27 +38,15 @@ function BudgetFormModal({
   loading: boolean;
   onSave: (form: BudgetFormData) => Promise<void>;
 }) {
-  const { control, handleSubmit, formState, reset } = useBudgetForm();
-
-  useEffect(() => {
-    if (isOpen) {
-      reset(defaults ?? { buyerGuid: '', tcg: 'POKEMON', assignedAmount: 0 });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  const handleClose = () => {
-    reset({ buyerGuid: '', tcg: 'POKEMON', assignedAmount: 0 });
-    onClose();
-  };
+  const { control, handleSubmit, formState } = useBudgetForm(defaults);
 
   const onSubmit = async (data: BudgetFormData) => {
     await onSave(data);
-    handleClose();
+    onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalContent>
         <ModalHeader>
           {defaults?.buyerGuid ? 'Editar presupuesto' : 'Asignar presupuesto'}
@@ -113,7 +101,7 @@ function BudgetFormModal({
           </form>
         </ModalBody>
         <ModalFooter>
-          <KidstopButton variant="bordered" onPress={handleClose}>
+          <KidstopButton variant="bordered" onPress={onClose}>
             Cancelar
           </KidstopButton>
           <KidstopButton
@@ -209,6 +197,7 @@ export default function BudgetSection({ budgets, buyers, loading, onSave }: Budg
       </div>
 
       <BudgetFormModal
+        key={editingBudget?.guid ?? 'new'}
         isOpen={isOpen}
         onClose={handleClose}
         buyers={buyers}

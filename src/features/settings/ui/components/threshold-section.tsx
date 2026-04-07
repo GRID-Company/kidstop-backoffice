@@ -9,10 +9,11 @@ import SettingsSection from './settings-section';
 
 interface ThresholdSectionProps {
   thresholds: IThresholdConfig;
+  isLoading?: boolean;
   onSave: (thresholds: IThresholdConfig) => void;
 }
 
-export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) {
+export function ThresholdContent({ thresholds, isLoading, onSave }: ThresholdSectionProps) {
   const { control, handleSubmit, formState, reset } = useThresholdForm(thresholds);
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export function ThresholdContent({ thresholds, onSave }: ThresholdSectionProps) 
           variant="accent"
           type="submit"
           isDisabled={!formState.isDirty || !formState.isValid}
+          isLoading={isLoading}
         >
           Guardar Umbrales
         </KidstopButton>

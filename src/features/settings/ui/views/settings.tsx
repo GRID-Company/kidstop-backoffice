@@ -11,6 +11,7 @@ export default function Settings() {
     budgets,
     buyers,
     loading,
+    updatingConfig,
     updatingBudget,
     updateGeofence,
     updateThresholds,
@@ -41,6 +42,7 @@ export default function Settings() {
               geofence={settings?.geofence ?? DEFAULT_GEOFENCE_CONFIG}
               thresholds={settings?.thresholds ?? DEFAULT_THRESHOLDS}
               operatingHours={settings?.operatingHours ?? DEFAULT_OPERATING_HOURS}
+              isLoading={updatingConfig}
               onSaveGeofence={updateGeofence}
               onSaveThresholds={updateThresholds}
               onSaveOperatingHours={updateOperatingHours}
