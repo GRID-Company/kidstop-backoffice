@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
   CardBody,
+  Skeleton,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
@@ -27,14 +28,15 @@ interface MovementHistoryTableProps {
   page: number;
   totalPages: number;
   sortDescriptor?: SortDescriptor;
+  isLoading?: boolean;
   onPageChange: (page: number) => void;
   onSortChange: (descriptor: SortDescriptor) => void;
 }
 
 const COLUMNS = [
-  { key: 'createdAt', label: 'Fecha', allowsSorting: true },
+  { key: 'createdDate', label: 'Fecha', allowsSorting: true },
   { key: 'cardName', label: 'Carta', allowsSorting: true },
-  { key: 'type', label: 'Tipo', allowsSorting: true },
+  { key: 'movementType', label: 'Tipo', allowsSorting: true },
   { key: 'quantity', label: 'Cantidad', allowsSorting: true },
   { key: 'userName', label: 'Usuario', allowsSorting: true },
   { key: 'reference', label: 'Referencia', allowsSorting: true },
@@ -47,7 +49,7 @@ const MOVEMENT_TYPE_ICONS: Record<string, string> = {
 };
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-MX', {
+  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -61,8 +63,8 @@ function formatQuantity(movement: IInventoryMovement): {
   className: string;
 } {
   const isPositive =
-    movement.type === 'PURCHASE_ENTRY' ||
-    (movement.type === 'MANUAL_ADJUSTMENT' && movement.quantity > 0);
+    movement.movementType === 'PURCHASE_ENTRY' ||
+    (movement.movementType === 'MANUAL_ADJUSTMENT' && movement.quantity > 0);
 
   return {
     text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,
@@ -72,10 +74,10 @@ function formatQuantity(movement: IInventoryMovement): {
 
 function renderCell(item: IInventoryMovement, columnKey: string) {
   switch (columnKey) {
-    case 'createdAt':
+    case 'createdDate':
       return (
         <span className="text-sm text-default-500">
-          {formatDate(item.createdAt)}
+          {formatDate(item.createdDate)}
         </span>
       );
     case 'cardName':
@@ -99,25 +101,25 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{item.cardName}</p>
             <p className="truncate text-xs text-default-400">
-              {item.setName} ({item.setCode}) · #{item.cardNumber}
+              {item.setName} ({item.setCode}) · {item.cardNumber}
             </p>
           </div>
         </div>
       );
-    case 'type':
+    case 'movementType':
       return (
         <Chip
           size="sm"
           variant="flat"
-          color={MOVEMENT_TYPE_COLORS[item.type] ?? 'default'}
+          color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
           startContent={
             <Icon
-              icon={MOVEMENT_TYPE_ICONS[item.type] ?? 'lucide:circle'}
+              icon={MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'}
               className="ml-1 text-sm"
             />
           }
         >
-          {MOVEMENT_TYPE_LABELS[item.type] ?? item.type}
+          {MOVEMENT_TYPE_LABELS[item.movementType] ?? item.movementType}
         </Chip>
       );
     case 'quantity': {
@@ -168,27 +170,27 @@ function MovementMobileCard({ item }: { item: IInventoryMovement }) {
           </div>
 
           <p className="truncate text-xs text-default-500">
-            {item.setName} ({item.setCode}) · #{item.cardNumber}
+            {item.setName} ({item.setCode}) · {item.cardNumber}
           </p>
 
           <div className="flex flex-wrap items-center gap-2">
             <Chip
               size="sm"
               variant="flat"
-              color={MOVEMENT_TYPE_COLORS[item.type] ?? 'default'}
+              color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
               startContent={
                 <Icon
-                  icon={MOVEMENT_TYPE_ICONS[item.type] ?? 'lucide:circle'}
+                  icon={MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'}
                   className="ml-1 text-xs"
                 />
               }
             >
-              {MOVEMENT_TYPE_LABELS[item.type] ?? item.type}
+              {MOVEMENT_TYPE_LABELS[item.movementType] ?? item.movementType}
             </Chip>
           </div>
 
           <div className="flex items-center gap-3 text-[11px] text-default-400">
-            <span>{formatDate(item.createdAt)}</span>
+            <span>{formatDate(item.createdDate)}</span>
             <span>{item.userName}</span>
             {item.reference && <span>{item.reference}</span>}
           </div>
@@ -204,9 +206,20 @@ export default function MovementHistoryTable({
   page,
   totalPages,
   sortDescriptor,
+  isLoading = false,
   onPageChange,
   onSortChange,
 }: MovementHistoryTableProps) {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-14 w-full rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
   if (totalItems === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-default-400">
@@ -238,7 +251,7 @@ export default function MovementHistoryTable({
           </TableHeader>
           <TableBody items={items}>
             {(item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.guid}>
                 {COLUMNS.map((col) => (
                   <TableCell key={col.key} className="text-center">
                     {renderCell(item, col.key)}
@@ -252,7 +265,7 @@ export default function MovementHistoryTable({
 
       <div className="flex flex-col gap-3 lg:hidden">
         {items.map((item) => (
-          <MovementMobileCard key={item.id} item={item} />
+          <MovementMobileCard key={item.guid} item={item} />
         ))}
       </div>
 

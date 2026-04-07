@@ -75,7 +75,7 @@ export default function MovementFilters({
           placeholder="Todos los tipos"
           label="Tipo de movimiento"
           items={MOVEMENT_TYPE_OPTIONS}
-          onChange={(e) => onFilterChange('type', e.target.value)}
+          onChange={(e) => onFilterChange('movementType', e.target.value)}
           aria-label="Filtrar por tipo de movimiento"
         />
         <DateRangePicker

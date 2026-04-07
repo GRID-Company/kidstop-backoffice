@@ -1,14 +1,25 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Button, Tab, Tabs } from '@heroui/react';
+import { useMutation } from '@apollo/client/react';
+import toast from 'react-hot-toast';
+import { Button, Tab, Tabs, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { Key } from 'react';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
+import {
+  CreateInventoryMovementDocument,
+  InventoryItemsDocument,
+  InventoryMovementsDocument,
+  IndicatorsInventoryItemsDocument,
+} from '@/lib/api/generated/inventory.generated';
+import { toAdjustInventoryPayload } from '../../adapters/mappers/inventory.mapper';
 import { useInventorySearch } from '../hooks/use-inventory-search';
+import { useInventoryIndicators } from '../hooks/use-inventory-indicators';
 import InventoryMetrics from '../components/inventory-metrics';
 import InventoryFilters from '../components/inventory-filters';
 import InventoryGrid from '../components/inventory-grid';
@@ -29,8 +40,7 @@ export default function Inventory() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
-    results,
-    paginatedResults,
+    items,
     hasActiveFilters,
     selectedTCG,
     sortDescriptor,
@@ -38,7 +48,11 @@ export default function Inventory() {
     page,
     setPage,
     totalPages,
+    totalCount,
+    loading,
   } = useInventorySearch();
+
+  const indicators = useInventoryIndicators(selectedTCG);
 
   const [selectedItem, setSelectedItem] = useState<IInventoryItem | null>(null);
   const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
@@ -53,11 +67,28 @@ export default function Inventory() {
     setSelectedItem(null);
   }, []);
 
+  const [createMovement, { loading: adjusting }] = useMutation(
+    CreateInventoryMovementDocument,
+    {
+      refetchQueries: [
+        InventoryItemsDocument,
+        InventoryMovementsDocument,
+        IndicatorsInventoryItemsDocument,
+      ],
+    }
+  );
+
   const handleAdjustmentSubmit = useCallback(
-    (data: InventoryAdjustmentFormData) => {
-      console.info('[mock] Adjustment submitted:', data);
+    async (data: InventoryAdjustmentFormData) => {
+      try {
+        await createMovement({ variables: toAdjustInventoryPayload(data) });
+        toast.success('Movimiento registrado correctamente');
+        handleCloseAdjustment();
+      } catch {
+        toast.error('Error al registrar el movimiento');
+      }
     },
-    []
+    [createMovement, handleCloseAdjustment]
   );
 
   const handleTabChange = useCallback((key: Key) => {
@@ -69,14 +100,25 @@ export default function Inventory() {
       <EntitiesPage>
         <EntitiesPage.Toolbar label="Inventario de Cartas">
           {activeTab === INVENTORY_TABS.STOCK && (
-            <Button
-              className="text-white"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-              startContent={<Icon icon="lucide:plus" />}
-              onPress={() => setIsAdjustmentOpen(true)}
+            <Tooltip
+              content="Los ajustes manuales solo están disponibles para Pokémon TCG"
+              isDisabled={selectedTCG !== TCG_TYPES.MAGIC}
             >
-              Ajuste manual
-            </Button>
+              <Button
+                className="text-white"
+                style={{
+                  backgroundColor:
+                    selectedTCG === TCG_TYPES.MAGIC
+                      ? 'var(--heroui-default-400)'
+                      : 'var(--color-accent)',
+                }}
+                startContent={<Icon icon="lucide:plus" />}
+                isDisabled={selectedTCG === TCG_TYPES.MAGIC}
+                onPress={() => setIsAdjustmentOpen(true)}
+              >
+                Ajuste manual
+              </Button>
+            </Tooltip>
           )}
         </EntitiesPage.Toolbar>
 
@@ -117,7 +159,12 @@ export default function Inventory() {
           {activeTab === INVENTORY_TABS.STOCK && (
             <>
               <div className="mb-6">
-                <InventoryMetrics items={results} />
+                <InventoryMetrics
+                  totalStock={indicators.totalStock}
+                  lastSellDate={indicators.lastSellDate}
+                  avgDaysInInventory={indicators.avgDaysInInventory}
+                  loading={indicators.loading}
+                />
               </div>
 
               <div className="mb-6">
@@ -127,15 +174,16 @@ export default function Inventory() {
                   onDateRangeChange={handleDateRangeChange}
                   onReset={resetFilters}
                   hasActiveFilters={hasActiveFilters}
-                  resultCount={results.length}
+                  resultCount={totalCount}
                   selectedTCG={selectedTCG}
                   dateRange={dateRange}
                 />
               </div>
 
               <InventoryGrid
-                items={paginatedResults}
-                totalItems={results.length}
+                items={items}
+                totalItems={totalCount}
+                isLoading={loading}
                 page={page}
                 totalPages={totalPages}
                 sortDescriptor={sortDescriptor}
@@ -153,6 +201,7 @@ export default function Inventory() {
       <AdjustmentModal
         item={selectedItem}
         isOpen={isAdjustmentOpen}
+        isSubmitting={adjusting}
         onClose={handleCloseAdjustment}
         onSubmit={handleAdjustmentSubmit}
       />

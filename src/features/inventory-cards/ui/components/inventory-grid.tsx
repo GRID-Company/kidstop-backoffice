@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import {
   Pagination,
+  Skeleton,
   SortDescriptor,
   TableBody,
   TableCell,
@@ -23,6 +24,7 @@ interface InventoryGridProps {
   page: number;
   totalPages: number;
   sortDescriptor?: SortDescriptor;
+  isLoading?: boolean;
   onPageChange: (page: number) => void;
   onSortChange: (descriptor: SortDescriptor) => void;
   onItemPress?: (item: IInventoryItem) => void;
@@ -35,13 +37,13 @@ const COLUMNS = [
   { key: 'stock', label: 'Stock', allowsSorting: true },
   { key: 'stockStatus', label: 'Estado', allowsSorting: true },
   { key: 'sellPrice', label: 'Precio', allowsSorting: true },
-  { key: 'lastSoldAt', label: 'Última venta', allowsSorting: true },
+  { key: 'lastSellDate', label: 'Última venta', allowsSorting: true },
   { key: 'avgDaysInInventory', label: 'Días en inv.', allowsSorting: true },
 ];
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('es-MX', {
+  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -76,7 +78,7 @@ function renderCell(item: IInventoryItem, columnKey: string) {
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{item.name}</p>
             <p className="truncate text-xs text-default-400">
-              #{item.number} · {item.rarity}
+              {item.number} · {item.rarity}
             </p>
           </div>
         </div>
@@ -99,8 +101,8 @@ function renderCell(item: IInventoryItem, columnKey: string) {
       return <StockIndicator stockStatus={item.stockStatus} stock={item.stock} />;
     case 'sellPrice':
       return <span className="text-sm font-semibold text-success">${item.sellPrice.toFixed(2)}</span>;
-    case 'lastSoldAt':
-      return <span className="text-sm text-default-500">{formatDate(item.lastSoldAt)}</span>;
+    case 'lastSellDate':
+      return <span className="text-sm text-default-500">{formatDate(item.lastSellDate)}</span>;
     case 'avgDaysInInventory':
       return <span className="text-sm text-default-500">{formatDays(item.avgDaysInInventory)}</span>;
     default:
@@ -146,7 +148,7 @@ function InventoryMobileCard({
           </div>
 
           <p className="truncate text-xs text-default-500">
-            {item.setName} ({item.setCode}) · #{item.number}
+            {item.setName} ({item.setCode}) · {item.number}
           </p>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -157,7 +159,7 @@ function InventoryMobileCard({
           </div>
 
           <div className="flex items-center gap-3 text-[11px] text-default-400">
-            <span>Venta: {formatDate(item.lastSoldAt)}</span>
+            <span>Venta: {formatDate(item.lastSellDate)}</span>
             <span>Inv: {formatDays(item.avgDaysInInventory)}</span>
           </div>
         </div>
@@ -172,10 +174,21 @@ export default function InventoryGrid({
   page,
   totalPages,
   sortDescriptor,
+  isLoading = false,
   onPageChange,
   onSortChange,
   onItemPress,
 }: InventoryGridProps) {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-14 w-full rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
   if (totalItems === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-default-400">
@@ -208,7 +221,7 @@ export default function InventoryGrid({
           <TableBody items={items}>
             {(item) => (
               <TableRow
-                key={item.id}
+                key={item.guid}
                 className="cursor-pointer"
                 onClick={() => onItemPress?.(item)}
               >
@@ -226,7 +239,7 @@ export default function InventoryGrid({
       <div className="flex flex-col gap-3 lg:hidden">
         {items.map((item) => (
           <InventoryMobileCard
-            key={item.id}
+            key={item.guid}
             item={item}
             onPress={onItemPress}
           />

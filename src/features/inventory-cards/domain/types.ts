@@ -8,44 +8,43 @@ export type MovementType = (typeof MOVEMENT_TYPES)[keyof typeof MOVEMENT_TYPES];
 export type StockStatus = (typeof STOCK_STATUSES)[keyof typeof STOCK_STATUSES];
 
 export interface IInventoryItem {
-  id: string;
-  cardId: string;
+  guid: string;
+  cardGuid: string;
   name: string;
   setName: string;
   setCode: string;
   number: string;
   rarity: string;
   imageUrl: string;
-  tcgType: TCGType;
+  tcg: string;
   condition: CardCondition;
   stock: number;
   stockStatus: StockStatus;
-  buyPrice: number;
+  purchasePrice: number;
   sellPrice: number;
-  lastSoldAt: string | null;
+  lastSellDate: string | null;
   avgDaysInInventory: number | null;
 }
 
 export interface IInventoryMovement {
-  id: string;
-  inventoryItemId: string;
+  guid: string;
+  inventoryItemGuid: string;
   cardName: string;
   cardImageUrl: string;
   setName: string;
   setCode: string;
   cardNumber: string;
-  tcgType: TCGType;
-  type: MovementType;
+  tcg: string;
+  movementType: MovementType;
   quantity: number;
-  reason: string;
+  notes: string;
   userName: string;
   reference: string | null;
-  createdAt: string;
+  createdDate: string;
 }
 
 export interface MovementFilters {
-  tcgType?: TCGType;
-  type?: MovementType;
+  movementType?: MovementType;
   search?: string;
   dateRange?: DateRange;
 }
@@ -53,7 +52,6 @@ export interface MovementFilters {
 export type { DateRange };
 
 export interface InventoryFilters {
-  tcgType?: TCGType;
   condition?: CardCondition;
   stockStatus?: StockStatus;
   rarity?: string;

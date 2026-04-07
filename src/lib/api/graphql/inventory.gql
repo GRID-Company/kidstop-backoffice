@@ -1,0 +1,91 @@
+query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
+  inventoryItems(findInventoryItemsArgs: $findInventoryItemsArgs) {
+    data {
+      guid
+      tcg
+      condition
+      stock
+      purchasePrice
+      sellPrice
+      lastSellDate
+      avgDaysInInventory
+      pokemonCardSummary {
+        guid
+        name
+        cardNumber
+        setName
+        setCode
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    count
+  }
+}
+
+query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs!) {
+  inventoryMovements(findInventoryMovementsArgs: $findInventoryMovementsArgs) {
+    data {
+      guid
+      movementType
+      quantity
+      reference
+      notes
+      createdDate
+      createdBy {
+        name
+      }
+      inventoryItem {
+        guid
+        tcg
+        condition
+        stock
+        pokemonCardSummary {
+          guid
+          name
+          cardNumber
+          setName
+          setCode
+          imageUri
+        }
+        magicCardSummary {
+          guid
+          name
+          edition
+          collectorNumber
+          imageUri
+          isFoil
+        }
+      }
+    }
+    count
+  }
+}
+
+query IndicatorsInventoryItems($tcg: String, $forceRefresh: Boolean) {
+  indicatorsInventoryItems(tcg: $tcg, forceRefresh: $forceRefresh) {
+    totalStock
+    lastSellDate
+    avgDaysInInventory
+  }
+}
+
+mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryMovementInput!) {
+  createInventoryMovement(createInventoryMovementInput: $createInventoryMovementInput) {
+    guid
+    movementType
+    quantity
+    reference
+    notes
+    createdDate
+  }
+}

@@ -935,6 +935,7 @@ export type PokemonCardInternalDetail = {
 
 export type PokemonCardInternalItem = {
   availableStock: Scalars['Boolean']['output'];
+  cardNumber?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
@@ -973,6 +974,7 @@ export type PokemonCardPublicDetail = {
 
 export type PokemonCardPublicItem = {
   availableStock: Scalars['Boolean']['output'];
+  cardNumber?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
