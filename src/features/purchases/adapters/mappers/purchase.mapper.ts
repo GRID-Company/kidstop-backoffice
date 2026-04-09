@@ -9,7 +9,10 @@ export function toCreatePurchasePayload(data: PurchaseFormData, tcgType: string)
       sellerGuid: data.sellerGuid,
       notes: data.notes || undefined,
       items: data.items.map((item) => ({
-        pokemonCardGuid: item.cardGuid,
+        ...(tcgType === 'POKEMON' 
+          ? { pokemonCardGuid: item.cardGuid }
+          : { magicCardGuid: item.cardGuid }
+        ),
         condition: item.condition,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
