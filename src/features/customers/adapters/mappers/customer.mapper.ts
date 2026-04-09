@@ -42,7 +42,7 @@ export function toCreateCustomerInput(data: CustomerFormData) {
       name: data.name,
       emailAddress: data.emailAddress,
       phone: data.phone || undefined,
-      role: 'CLIENT',
+      role: CUSTOMER_ROLES.CLIENT,
     },
   };
 }
