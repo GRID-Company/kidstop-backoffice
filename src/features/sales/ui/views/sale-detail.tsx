@@ -8,6 +8,7 @@ import {
   CardBody,
   Chip,
   Divider,
+  Spinner,
   Tooltip,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
@@ -16,9 +17,9 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import {
+  CancelReason,
   ISale,
   SALE_STATUS,
-  SaleStatus,
 } from '../../domain/types';
 import {
   NEXT_STATUS,
@@ -26,6 +27,7 @@ import {
   NEXT_STATUS_LABELS,
   SALE_STATUS_LABELS,
 } from '../../domain/constants';
+import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
 import { useSaleDetail } from '../hooks/use-sale-detail';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
@@ -33,8 +35,8 @@ import SaleItemsTable from '../components/sale-items-table';
 import GeneratePdfButton from '../components/generate-pdf-button';
 import SendReadyEmailButton from '../components/send-ready-email-button';
 import CompleteSaleModal from '../components/complete-sale-modal';
+import CancelSaleModal from '../components/cancel-sale-modal';
 import SaleTimeline from '../components/sale-timeline';
-import { CompleteSaleFormData } from '../../adapters/forms/complete-sale.form.schema';
 
 interface SaleDetailProps {
   saleId: string;
@@ -45,15 +47,16 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
   const {
     sale,
     total,
-    adjustedTotal,
     itemCount,
     isTerminal,
+    loading,
+    mutating,
     updateStatus,
-    updateFoundQuantity,
     cancelSale,
   } = useSaleDetail(saleId);
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
   const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
@@ -61,29 +64,35 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
   const handleNextStatusPress = useCallback(() => {
     if (!sale) return;
-    if (sale.status === SALE_STATUS.READY_FOR_PICKUP) {
+    if (sale.status === SALE_STATUS.READY) {
       setIsCompleteModalOpen(true);
       return;
     }
     if (nextStatus) {
-      updateStatus(nextStatus);
+      void updateStatus(nextStatus);
     }
   }, [sale, nextStatus, updateStatus]);
 
-  const handleCompleteSaleConfirm = useCallback(
-    (data: CompleteSaleFormData, generatedCode: string) => {
-      updateStatus(SALE_STATUS.COMPLETED);
-      setIsCompleteModalOpen(false);
+  const handleCompleteConfirm = useCallback(() => {
+    void updateStatus(SALE_STATUS.COMPLETED);
+  }, [updateStatus]);
+
+  const handleCancelConfirm = useCallback(
+    (reason: CancelReason) => {
+      void cancelSale(reason);
     },
-    [updateStatus]
+    [cancelSale]
   );
 
-  const handleFoundQuantityChange = useCallback(
-    (itemId: string, delta: number) => {
-      updateFoundQuantity(itemId, delta);
-    },
-    [updateFoundQuantity]
-  );
+  if (loading) {
+    return (
+      <EntitiesPage>
+        <div className="flex items-center justify-center py-20">
+          <Spinner size="lg" color="primary" />
+        </div>
+      </EntitiesPage>
+    );
+  }
 
   if (!sale) {
     return (
@@ -119,7 +128,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
             </Button>
             <div className="flex items-center gap-3">
               <span className="text-lg font-semibold text-accent">
-                {sale.code}
+                {sale.saleCode}
               </span>
               <SaleStatusBadge status={sale.status} />
             </div>
@@ -148,12 +157,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 {formatCurrency(total)}
               </span>
             </div>
-            <SaleItemsTable
-              items={sale.items}
-              onFoundQuantityChange={
-                !isTerminal ? handleFoundQuantityChange : undefined
-              }
-            />
+            <SaleItemsTable items={sale.items} />
           </div>
         </EntitiesPage.CardContainer>
 
@@ -171,6 +175,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                     <Tooltip content={nextStatusLabel}>
                       <Button
                         className="bg-accent text-white"
+                        isLoading={mutating}
                         startContent={<Icon icon={nextStatusIcon} width={18} />}
                         onPress={handleNextStatusPress}
                       >
@@ -187,8 +192,9 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 <Button
                   color="danger"
                   variant="flat"
+                  isDisabled={mutating}
                   startContent={<Icon icon="lucide:x-circle" width={18} />}
-                  onPress={cancelSale}
+                  onPress={() => setIsCancelModalOpen(true)}
                 >
                   Cancelar pedido
                 </Button>
@@ -210,7 +216,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               />
               <span className="text-sm font-medium">
                 Pedido {SALE_STATUS_LABELS[sale.status].toLowerCase()} el{' '}
-                {formatDateTime(sale.updatedAt)}
+                {formatDateTime(sale.updatedDate)}
               </span>
             </div>
           </div>
@@ -221,13 +227,30 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
         sale={sale}
         isOpen={isCompleteModalOpen}
         onClose={() => setIsCompleteModalOpen(false)}
-        onConfirm={handleCompleteSaleConfirm}
+        onConfirm={handleCompleteConfirm}
+        loading={mutating}
+      />
+
+      <CancelSaleModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={handleCancelConfirm}
+        loading={mutating}
       />
     </EntitiesPage>
   );
 }
 
 function SaleInfoCard({ sale }: { sale: ISale }) {
+  const customerName = getCustomerDisplayName(
+    sale.customer?.name,
+    sale.kioskCustomerName
+  );
+  const customerEmail = getCustomerDisplayEmail(
+    sale.customer?.emailAddress,
+    sale.kioskCustomerEmail
+  );
+
   return (
     <Card>
       <CardBody className="flex flex-col gap-4">
@@ -239,32 +262,32 @@ function SaleInfoCard({ sale }: { sale: ISale }) {
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Código</span>
-            <SaleCodeDisplay code={sale.code} />
+            <SaleCodeDisplay code={sale.saleCode} />
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Cliente</span>
-            <span className="font-medium">{sale.customerName}</span>
+            <span className="font-medium">{customerName}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Email</span>
-            <span className="font-medium">{sale.customerEmail}</span>
+            <span className="font-medium">{customerEmail ?? '—'}</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">TCG</span>
             <Chip size="sm" variant="flat" className="w-fit">
-              {sale.tcgType}
+              {sale.tcg}
             </Chip>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Creado</span>
             <span className="font-medium">
-              {formatDateTime(sale.createdAt)}
+              {formatDateTime(sale.createdDate)}
             </span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-400">Actualizado</span>
             <span className="font-medium">
-              {formatDateTime(sale.updatedAt)}
+              {formatDateTime(sale.updatedDate)}
             </span>
           </div>
         </div>
@@ -275,6 +298,18 @@ function SaleInfoCard({ sale }: { sale: ISale }) {
             <div className="flex flex-col gap-1">
               <span className="text-xs text-default-400">Notas</span>
               <span className="text-sm text-default-600">{sale.notes}</span>
+            </div>
+          </>
+        )}
+
+        {sale.cancelReason && (
+          <>
+            <Divider />
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-default-400">Motivo de cancelación</span>
+              <span className="text-sm font-medium text-danger">
+                {sale.cancelReason}
+              </span>
             </div>
           </>
         )}

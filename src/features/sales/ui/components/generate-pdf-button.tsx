@@ -9,10 +9,34 @@ import {
   PickingListData,
 } from '@/lib/utils/pdf-generator';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
-import { ISale } from '../../domain/types';
+import { ISale, ISaleItem } from '../../domain/types';
+import {
+  getCustomerDisplayEmail,
+  getCustomerDisplayName,
+} from '../../adapters/mappers/sale.mapper';
 
 interface GeneratePdfButtonProps {
   sale: ISale;
+}
+
+function mapItemForPdf(item: ISaleItem) {
+  const cardName =
+    item.pokemonCardSummary?.name ?? item.magicCardSummary?.name ?? '—';
+  const cardImageUrl =
+    item.pokemonCardSummary?.imageUri ?? item.magicCardSummary?.imageUri ?? undefined;
+  const setName =
+    item.pokemonCardSummary?.setName ?? item.magicCardSummary?.edition ?? '—';
+  const setCode =
+    item.pokemonCardSummary?.setCode ?? item.magicCardSummary?.collectorNumber ?? '—';
+  return {
+    cardName,
+    cardImageUrl: cardImageUrl ?? undefined,
+    setName: setName ?? '—',
+    setCode: setCode ?? '—',
+    condition: CARD_CONDITION_SHORT_LABELS[item.condition],
+    quantity: item.quantity,
+    unitPrice: item.price,
+  };
 }
 
 export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
@@ -22,21 +46,20 @@ export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
     setIsGenerating(true);
     try {
       const data: PickingListData = {
-        code: sale.code,
-        customerName: sale.customerName,
-        customerEmail: sale.customerEmail,
-        tcgType: sale.tcgType,
-        createdAt: sale.createdAt,
-        notes: sale.notes,
-        items: sale.items.map((item) => ({
-          cardName: item.cardName,
-          cardImageUrl: item.cardImageUrl,
-          setName: item.setName,
-          setCode: item.setCode,
-          condition: CARD_CONDITION_SHORT_LABELS[item.condition],
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-        })),
+        code: sale.saleCode,
+        customerName: getCustomerDisplayName(
+          sale.customer?.name,
+          sale.kioskCustomerName
+        ),
+        customerEmail:
+          getCustomerDisplayEmail(
+            sale.customer?.emailAddress,
+            sale.kioskCustomerEmail
+          ) ?? '',
+        tcgType: sale.tcg,
+        createdAt: sale.createdDate,
+        notes: sale.notes ?? undefined,
+        items: sale.items.map(mapItemForPdf),
       };
       await generatePickingListPdf(data);
     } finally {

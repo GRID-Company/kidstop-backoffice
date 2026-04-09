@@ -21,7 +21,7 @@ import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { ISale, SaleStatus } from '../../domain/types';
 import { SALE_STATUS_OPTIONS } from '../../domain/constants';
-import { calculateTotal } from '../../domain/sales.domain';
+import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
 import { useSales } from '../hooks/use-sales';
 import SaleStatusBadge from '../components/sale-status-badge';
 
@@ -40,12 +40,12 @@ export default function Sales() {
     setDateTo,
     resetFilters,
     hasActiveFilters,
+    loading,
   } = useSales();
 
   const handleStatusChange = useCallback(
-    (keys: Set<string> | 'all') => {
-      if (keys === 'all') return;
-      const selected = Array.from(keys)[0] as SaleStatus | undefined;
+    (keys: unknown) => {
+      const selected = Array.from(keys as Set<string>)[0] as SaleStatus | undefined;
       setStatusFilter(selected || undefined);
     },
     [setStatusFilter]
@@ -68,11 +68,11 @@ export default function Sales() {
   const columns: ITableColumn[] = useMemo(
     () => [
       {
-        key: 'code',
+        key: 'saleCode',
         label: 'Código',
         className: '!text-left min-w-[140px]',
         customCol: (row: ISale) => (
-          <span className="text-sm font-semibold text-accent">{row.code}</span>
+          <span className="text-sm font-semibold text-accent">{row.saleCode}</span>
         ),
       },
       {
@@ -87,9 +87,11 @@ export default function Sales() {
         className: '!text-left min-w-[160px]',
         customCol: (row: ISale) => (
           <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">{row.customerName}</span>
+            <span className="text-sm font-medium">
+              {getCustomerDisplayName(row.customer?.name, row.kioskCustomerName)}
+            </span>
             <span className="text-xs text-default-400">
-              {row.customerEmail}
+              {getCustomerDisplayEmail(row.customer?.emailAddress, row.kioskCustomerEmail)}
             </span>
           </div>
         ),
@@ -113,17 +115,17 @@ export default function Sales() {
         className: 'min-w-[120px]',
         customCol: (row: ISale) => (
           <span className="text-sm font-semibold">
-            {formatCurrency(calculateTotal(row.items))}
+            {formatCurrency(row.total)}
           </span>
         ),
       },
       {
-        key: 'createdAt',
+        key: 'createdDate',
         label: 'Fecha',
         className: 'min-w-[120px]',
         customCol: (row: ISale) => (
           <span className="text-sm text-default-500">
-            {formatDate(row.createdAt)}
+            {formatDate(row.createdDate)}
           </span>
         ),
       },
@@ -137,8 +139,8 @@ export default function Sales() {
               isIconOnly
               size="sm"
               variant="light"
-              aria-label={`Ver pedido ${row.code}`}
-              onPress={() => router.push(`/ventas/${row.id}`)}
+              aria-label={`Ver pedido ${row.saleCode}`}
+              onPress={() => router.push(`/ventas/${row.guid}`)}
             >
               <Icon icon="lucide:eye" width={16} />
             </Button>
@@ -242,7 +244,7 @@ export default function Sales() {
         </div>
 
         <div className="mt-4">
-          <DataTable cols={columns} data={sales} isLoading={false} />
+          <DataTable cols={columns} data={sales} isLoading={loading} />
         </div>
 
         {sales.length === 0 && (
