@@ -100,25 +100,14 @@ export default function Inventory() {
       <EntitiesPage>
         <EntitiesPage.Toolbar label="Inventario de Cartas">
           {activeTab === INVENTORY_TABS.STOCK && (
-            <Tooltip
-              content="Los ajustes manuales solo están disponibles para Pokémon TCG"
-              isDisabled={selectedTCG !== TCG_TYPES.MAGIC}
+            <Button
+              className="text-white"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+              startContent={<Icon icon="lucide:plus" />}
+              onPress={() => setIsAdjustmentOpen(true)}
             >
-              <Button
-                className="text-white"
-                style={{
-                  backgroundColor:
-                    selectedTCG === TCG_TYPES.MAGIC
-                      ? 'var(--heroui-default-400)'
-                      : 'var(--color-accent)',
-                }}
-                startContent={<Icon icon="lucide:plus" />}
-                isDisabled={selectedTCG === TCG_TYPES.MAGIC}
-                onPress={() => setIsAdjustmentOpen(true)}
-              >
-                Ajuste manual
-              </Button>
-            </Tooltip>
+              Ajuste manual
+            </Button>
           )}
         </EntitiesPage.Toolbar>
 
