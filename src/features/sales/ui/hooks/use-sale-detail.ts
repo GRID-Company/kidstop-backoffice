@@ -9,12 +9,11 @@ import {
   CancelSaleDocument,
 } from '@/lib/api/generated/sales.generated';
 import { CancelReason, ISale, SALE_STATUS, SaleStatus } from '../../domain/types';
-import { calculateTotal, formatSaleTotal } from '../../domain/sales.domain';
+import { calculateTotal } from '../../domain/sales.domain';
 
 interface UseSaleDetailReturn {
   sale: ISale | undefined;
   total: number;
-  formattedTotal: string;
   itemCount: number;
   isTerminal: boolean;
   loading: boolean;
@@ -46,11 +45,6 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
 
   const total = useMemo(
     () => (sale ? calculateTotal(sale.items) : 0),
-    [sale]
-  );
-
-  const formattedTotal = useMemo(
-    () => (sale ? formatSaleTotal(sale.items) : ''),
     [sale]
   );
 
@@ -102,7 +96,6 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
   return {
     sale,
     total,
-    formattedTotal,
     itemCount,
     isTerminal,
     loading,
