@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
         hostname: 'www.pricecharting.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.cardkingdom.com',
+        pathname: '/**',
+      },
     ],
   },
   async redirects() {
