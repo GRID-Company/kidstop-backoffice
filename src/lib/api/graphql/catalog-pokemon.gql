@@ -62,7 +62,7 @@ query PokemonCardGenres {
 }
 
 mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
-  updatePokemonCardPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+  updateInventoryItemPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
     guid
     purchasePrice
     sellPrice
