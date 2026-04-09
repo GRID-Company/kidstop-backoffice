@@ -6,12 +6,16 @@ import {
   UpdateInventoryItemPricesDocument,
   PokemonCardInternalDetailDocument,
 } from '@/lib/api/generated/catalog-pokemon.generated';
+import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
+import { TCGType } from '@/lib/types/tcg.types';
 
 interface UpdatePriceParams {
-  pokemonCardGuid: string;
+  cardGuid: string;
+  inventoryItemGuid?: string;
   condition: string;
   purchasePrice: number;
   sellPrice: number;
+  tcgType: TCGType;
 }
 
 export function useUpdateInventoryPrice() {
@@ -20,36 +24,46 @@ export function useUpdateInventoryPrice() {
   });
 
   const [updatePrice, { loading }] = useMutation(UpdateInventoryItemPricesDocument, {
-    refetchQueries: [PokemonCardInternalDetailDocument],
+    refetchQueries: [PokemonCardInternalDetailDocument, MagicCardInternalDetailDocument],
   });
 
   const handleUpdatePrice = useCallback(
     async (params: UpdatePriceParams) => {
-      const { data } = await fetchInventoryItems({
-        variables: {
-          findInventoryItemsArgs: {
-            skip: 0,
-            limit: 200,
-            sort: { column: 'createdDate', order: 'DESC' },
-            filters: { tcg: 'POKEMON', condition: params.condition },
+      let inventoryItemGuid = params.inventoryItemGuid;
+
+      if (!inventoryItemGuid) {
+        const { data } = await fetchInventoryItems({
+          variables: {
+            findInventoryItemsArgs: {
+              skip: 0,
+              limit: 200,
+              sort: { column: 'createdDate', order: 'DESC' },
+              filters: { tcg: params.tcgType, condition: params.condition },
+            },
           },
-        },
-      });
+        });
 
-      const inventoryItems = data?.inventoryItems?.data ?? [];
-      const match = inventoryItems.find(
-        (item) => item?.pokemonCardSummary?.guid === params.pokemonCardGuid
-      );
+        const inventoryItems = data?.inventoryItems?.data ?? [];
+        const match = inventoryItems.find((item) => {
+          if (params.tcgType === 'POKEMON') {
+            return item?.pokemonCardSummary?.guid === params.cardGuid;
+          } else {
+            return item?.magicCardSummary?.guid === params.cardGuid;
+          }
+        });
 
-      if (!match) {
-        toast.error('No se encontró el item en inventario');
-        return;
+        if (!match) {
+          toast.error('No se encontró el item en inventario');
+          return;
+        }
+
+        inventoryItemGuid = match.guid;
       }
 
       await updatePrice({
         variables: {
           updateInventoryItemPricesInput: {
-            inventoryItemGuid: match.guid,
+            inventoryItemGuid,
             purchasePrice: params.purchasePrice,
             sellPrice: params.sellPrice,
           },
