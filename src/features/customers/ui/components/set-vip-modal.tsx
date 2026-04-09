@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback } from 'react';
 import {
   Drawer,
   DrawerContent,
@@ -11,13 +11,10 @@ import {
   Divider,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { SubmitHandler } from 'react-hook-form';
 
-import TextareaForm from '@/shared/base/form-controls/textarea-form';
+import { formatDate } from '@/lib/utils/format-date';
 import { ICustomer } from '../../domain/types';
 import { CLIENT_STATUSES } from '../../domain/constants';
-import { useSetVipForm } from '../../adapters/forms/use-set-vip-form';
-import { SetVipFormData } from '../../adapters/forms/set-vip-form.schema';
 import CustomerTypeBadge from './customer-type-badge';
 import CustomerStatusBadge from './customer-status-badge';
 
@@ -25,18 +22,9 @@ interface SetVipModalProps {
   customer: ICustomer | null;
   isOpen: boolean;
   onClose: () => void;
-  onSetVip?: (customerId: string, data: SetVipFormData) => void;
-  onRemoveVip?: (customerId: string, data: SetVipFormData) => void;
+  onSetVip?: (customerId: string) => void;
+  onRemoveVip?: (customerId: string) => void;
   loading?: boolean;
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  return new Intl.DateTimeFormat('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(dateStr));
 }
 
 export default function SetVipModal({
@@ -47,27 +35,16 @@ export default function SetVipModal({
   onRemoveVip,
   loading = false,
 }: SetVipModalProps) {
-  const { control, handleSubmit, reset } = useSetVipForm();
-
   const isVip = customer?.clientStatus === CLIENT_STATUSES.VIP;
 
-  useEffect(() => {
-    if (isOpen) {
-      reset({ notes: '' });
+  const handleConfirm = useCallback(() => {
+    if (!customer) return;
+    if (isVip) {
+      onRemoveVip?.(customer.guid);
+    } else {
+      onSetVip?.(customer.guid);
     }
-  }, [isOpen, reset]);
-
-  const handleConfirm: SubmitHandler<SetVipFormData> = useCallback(
-    (data) => {
-      if (!customer) return;
-      if (isVip) {
-        onRemoveVip?.(customer.guid, data);
-      } else {
-        onSetVip?.(customer.guid, data);
-      }
-    },
-    [customer, isVip, onSetVip, onRemoveVip]
-  );
+  }, [customer, isVip, onSetVip, onRemoveVip]);
 
   if (!customer) return null;
 
@@ -115,7 +92,7 @@ export default function SetVipModal({
               <div className="flex flex-col items-center gap-1">
                 <span className="text-default-500">Último pedido</span>
                 <span className="text-sm font-bold">
-                  {formatDate(customer.lastOrderDate ?? null)}
+                  {formatDate(customer.lastOrderDate, '—')}
                 </span>
               </div>
             </div>
@@ -138,22 +115,6 @@ export default function SetVipModal({
             </div>
           </div>
 
-          <form
-            id="set-vip-form"
-            onSubmit={(...args) => {
-              void handleSubmit(handleConfirm)(...args);
-            }}
-            className="flex flex-col gap-4"
-          >
-            <TextareaForm
-              label="Notas (opcional)"
-              placeholder="Agrega notas sobre el cambio de tipo"
-              controlProps={{ control, name: 'notes' }}
-              minRows={3}
-              maxRows={5}
-              aria-label="Notas sobre el cambio de tipo de cliente"
-            />
-          </form>
         </DrawerBody>
 
         <DrawerFooter className="flex justify-between">
@@ -163,21 +124,19 @@ export default function SetVipModal({
 
           {isVip ? (
             <Button
-              type="submit"
-              form="set-vip-form"
               color="default"
               isLoading={loading}
               startContent={<Icon icon="lucide:user-minus" />}
+              onPress={handleConfirm}
             >
               Quitar VIP
             </Button>
           ) : (
             <Button
-              type="submit"
-              form="set-vip-form"
               color="warning"
               isLoading={loading}
               startContent={<Icon icon="lucide:crown" />}
+              onPress={handleConfirm}
             >
               Promover a VIP
             </Button>
