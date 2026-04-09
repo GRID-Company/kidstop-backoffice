@@ -3,60 +3,86 @@ import { CardCondition } from '@/lib/types/card.types';
 
 export type { CardCondition };
 
-export const FULFILLMENT_STATUS = {
-  PENDING: 'PENDING',
-  FOUND: 'FOUND',
-  PARTIAL: 'PARTIAL',
-  NOT_AVAILABLE: 'NOT_AVAILABLE',
-} as const;
-
-export type FulfillmentStatus =
-  (typeof FULFILLMENT_STATUS)[keyof typeof FULFILLMENT_STATUS];
-
 export const SALE_STATUS = {
   NEW: 'NEW',
   IN_PROGRESS: 'IN_PROGRESS',
-  READY_FOR_PICKUP: 'READY_FOR_PICKUP',
+  READY: 'READY',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED',
 } as const;
 
 export type SaleStatus = (typeof SALE_STATUS)[keyof typeof SALE_STATUS];
 
+export const CANCEL_REASON = {
+  CLIENT_UNREACHABLE: 'CLIENT_UNREACHABLE',
+  NO_STOCK: 'NO_STOCK',
+  OTHER: 'OTHER',
+} as const;
+
+export type CancelReason = (typeof CANCEL_REASON)[keyof typeof CANCEL_REASON];
+
 export type SaleCode = string;
 
+export interface IPokemonCardSummary {
+  guid: string;
+  name: string;
+  setName: string | null;
+  setCode: string | null;
+  cardNumber: string | null;
+  rarity: string | null;
+  imageUri: string | null;
+}
+
+export interface IMagicCardSummary {
+  guid: string;
+  name: string;
+  edition: string | null;
+  collectorNumber: string | null;
+  rarity: string | null;
+  imageUri: string | null;
+  isFoil: boolean;
+}
+
 export interface ISaleItem {
-  id: string;
-  cardId: string;
-  cardName: string;
-  cardImageUrl: string;
-  setName: string;
-  setCode: string;
-  tcgType: TCGType;
+  guid: string;
+  tcg: TCGType;
   condition: CardCondition;
   quantity: number;
-  foundQuantity: number;
-  unitPrice: number;
-  fulfillmentStatus: FulfillmentStatus;
+  price: number;
+  pokemonCardSummary: IPokemonCardSummary | null;
+  magicCardSummary: IMagicCardSummary | null;
+}
+
+export interface ISaleCustomer {
+  guid: string;
+  name: string | null;
+  emailAddress: string;
+  phone: string | null;
 }
 
 export interface ISale {
-  id: string;
-  code: SaleCode;
+  guid: string;
+  saleCode: SaleCode;
   status: SaleStatus;
+  tcg: TCGType;
+  total: number;
+  notes: string | null;
+  cancelReason: CancelReason | null;
+  emailNotificationSent: boolean;
+  customer: ISaleCustomer | null;
+  kioskCustomerName: string | null;
+  kioskCustomerEmail: string | null;
   items: ISaleItem[];
-  customerId: string;
-  customerName: string;
-  customerEmail: string;
-  tcgType: TCGType;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  statusTimestamps: Record<string, string> | null;
+  createdDate: string;
+  updatedDate: string;
 }
 
 export interface SaleFilters {
-  tcgType?: TCGType;
+  tcg?: TCGType;
   status?: SaleStatus;
-  customerId?: string;
+  customer?: string;
   search?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }

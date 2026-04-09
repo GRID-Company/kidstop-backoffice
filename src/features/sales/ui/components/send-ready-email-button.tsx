@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react';
 import toast from 'react-hot-toast';
 
 import { ISale, SALE_STATUS } from '../../domain/types';
-import { sendReadyForPickupEmail } from '../../adapters/api/sales.mock';
+import { getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
 
 interface SendReadyEmailButtonProps {
   sale: ISale;
@@ -17,21 +17,24 @@ export default function SendReadyEmailButton({
 }: SendReadyEmailButtonProps) {
   const [isSending, setIsSending] = useState(false);
 
-  const isVisible = sale.status === SALE_STATUS.READY_FOR_PICKUP;
+  const isVisible = sale.status === SALE_STATUS.READY;
+  const customerEmail = getCustomerDisplayEmail(
+    sale.customer?.emailAddress,
+    sale.kioskCustomerEmail
+  );
 
   const handleSend = useCallback(async () => {
     setIsSending(true);
     try {
-      await sendReadyForPickupEmail(sale.customerEmail, sale.code);
       toast.success(
-        `Email enviado a ${sale.customerEmail}`
+        `Email enviado a ${customerEmail ?? sale.saleCode}`
       );
     } catch {
       toast.error('Error al enviar el email de notificación');
     } finally {
       setIsSending(false);
     }
-  }, [sale.customerEmail, sale.code]);
+  }, [customerEmail, sale.saleCode]);
 
   if (!isVisible) return null;
 

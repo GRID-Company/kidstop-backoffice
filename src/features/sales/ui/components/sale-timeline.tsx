@@ -12,14 +12,14 @@ interface SaleTimelineProps {
 const TIMELINE_STEPS: { status: SaleStatus; icon: string }[] = [
   { status: SALE_STATUS.NEW, icon: 'lucide:inbox' },
   { status: SALE_STATUS.IN_PROGRESS, icon: 'lucide:search' },
-  { status: SALE_STATUS.READY_FOR_PICKUP, icon: 'lucide:package-check' },
+  { status: SALE_STATUS.READY, icon: 'lucide:package-check' },
   { status: SALE_STATUS.COMPLETED, icon: 'lucide:check-circle' },
 ];
 
 const STATUS_ORDER: Record<string, number> = {
   [SALE_STATUS.NEW]: 0,
   [SALE_STATUS.IN_PROGRESS]: 1,
-  [SALE_STATUS.READY_FOR_PICKUP]: 2,
+  [SALE_STATUS.READY]: 2,
   [SALE_STATUS.COMPLETED]: 3,
 };
 
