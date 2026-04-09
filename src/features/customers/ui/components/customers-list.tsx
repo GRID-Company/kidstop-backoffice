@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Pagination } from '@heroui/react';
+import { Button, Pagination, SortDescriptor } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
@@ -25,6 +25,8 @@ interface CustomersListProps {
   onReset: () => void;
   onCustomerPress?: (customer: ICustomer) => void;
   pageSize?: number;
+  sortDescriptor?: SortDescriptor;
+  onSortChange?: (descriptor: SortDescriptor) => void;
 }
 
 const COLUMNS: ITableColumn[] = [
@@ -53,6 +55,8 @@ export default function CustomersList({
   onReset,
   onCustomerPress,
   pageSize = DEFAULT_PAGE_SIZE,
+  sortDescriptor,
+  onSortChange,
 }: CustomersListProps) {
   const [page, setPage] = useState(1);
 
@@ -117,6 +121,8 @@ export default function CustomersList({
               cols={COLUMNS}
               data={paginatedCustomers}
               isLoading={loading}
+              sortDescriptor={sortDescriptor}
+              onSortChange={onSortChange}
               onRowAction={
                 onCustomerPress
                   ? (key) => {
