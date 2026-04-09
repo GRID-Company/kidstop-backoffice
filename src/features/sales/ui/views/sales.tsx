@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Button,
@@ -12,6 +12,8 @@ import {
   Tooltip,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
+
+import toast from 'react-hot-toast';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -41,7 +43,14 @@ export default function Sales() {
     resetFilters,
     hasActiveFilters,
     loading,
+    error,
   } = useSales();
+
+  useEffect(() => {
+    if (error) {
+      toast.error('Error al cargar los pedidos');
+    }
+  }, [error]);
 
   const handleStatusChange = useCallback(
     (keys: unknown) => {

@@ -30,7 +30,7 @@ function mapItemForPdf(item: ISaleItem) {
     item.pokemonCardSummary?.setCode ?? item.magicCardSummary?.collectorNumber ?? '—';
   return {
     cardName,
-    cardImageUrl: cardImageUrl ?? undefined,
+    cardImageUrl,
     setName: setName ?? '—',
     setCode: setCode ?? '—',
     condition: CARD_CONDITION_SHORT_LABELS[item.condition],
