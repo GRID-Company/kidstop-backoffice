@@ -10,6 +10,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       totalStock
       imageUri
       inventoryCards {
+        guid
         condition
         stock
         purchasePrice
@@ -33,6 +34,7 @@ query PokemonCardInternalDetail($guid: String!) {
     totalStock
     imageUri
     inventoryCards {
+      guid
       condition
       stock
       purchasePrice
@@ -62,7 +64,7 @@ query PokemonCardGenres {
 }
 
 mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
-  updatePokemonCardPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+  updateInventoryItemPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
     guid
     purchasePrice
     sellPrice

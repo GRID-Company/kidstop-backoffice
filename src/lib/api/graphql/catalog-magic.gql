@@ -1,0 +1,70 @@
+query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) {
+  magicCardInternalList(findMagicCardsPublicArgs: $findMagicCardsPublicArgs) {
+    data {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+    }
+    count
+  }
+}
+
+query MagicCardInternalDetail($guid: String!) {
+  magicCardInternalDetail(guid: $guid) {
+    guid
+    name
+    edition
+    collectorNumber
+    isFoil
+    rarity
+    sellPrice
+    totalStock
+    imageUri
+    inventoryCards {
+      guid
+      condition
+      stock
+      purchasePrice
+      sellPrice
+    }
+  }
+}
+
+query MagicCardCollections {
+  magicCardCollections {
+    guid
+    name
+    editionIconUri
+  }
+}
+
+query MagicCardRarities {
+  magicCardRarities
+}
+
+query MagicCardWithMetrics($guid: String!) {
+  magicCardWithMetrics(guid: $guid) {
+    variantsMetrics {
+      condition
+      stock
+      lastSellDate
+      avgDaysInInventory
+      wishlistCount
+    }
+    priceRetail
+    priceBuy
+  }
+}

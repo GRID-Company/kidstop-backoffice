@@ -5,13 +5,12 @@ import { useCallback, useState } from 'react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
-import { ICard, IPokemonCard } from '../../domain/types';
-import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
-import { useCardSearch } from '../hooks/use-card-search';
+import { IMagicCard, IPokemonCard } from '../../domain/types';
+import { useMagicCatalog } from '../hooks/use-magic-catalog';
 import { usePokemonCatalog } from '../hooks/use-pokemon-catalog';
 import CardSearch from '../components/card-search';
-import CardGrid from '../components/card-grid';
-import CardDetailModal from '../components/card-detail-modal';
+import MagicCardGrid from '../components/magic-card-grid';
+import MagicCardDetailModal from '../components/magic-card-detail-modal';
 import PokemonCardGrid from '../components/pokemon-card-grid';
 import PokemonCardDetailModal from '../components/pokemon-card-detail-modal';
 
@@ -19,16 +18,16 @@ export default function Catalog() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
 
-  const magic = useCardSearch();
+  const magic = useMagicCatalog(isPokemon);
   const pokemon = usePokemonCatalog(!isPokemon);
 
-  const [selectedMagicCard, setSelectedMagicCard] = useState<ICard | null>(null);
+  const [selectedMagicCard, setSelectedMagicCard] = useState<IMagicCard | null>(null);
   const [isMagicDetailOpen, setIsMagicDetailOpen] = useState(false);
 
   const [selectedPokemonCard, setSelectedPokemonCard] = useState<IPokemonCard | null>(null);
   const [isPokemonDetailOpen, setIsPokemonDetailOpen] = useState(false);
 
-  const handleMagicCardPress = useCallback((card: ICard) => {
+  const handleMagicCardPress = useCallback((card: IMagicCard) => {
     setSelectedMagicCard(card);
     setIsMagicDetailOpen(true);
   }, []);
@@ -47,13 +46,6 @@ export default function Catalog() {
     setIsPokemonDetailOpen(false);
     setSelectedPokemonCard(null);
   }, []);
-
-  const handleUpdatePrice = useCallback(
-    (variantId: string, data: CardPriceFormData) => {
-      console.info(`[mock] Update price for variant: ${variantId}`, data);
-    },
-    []
-  );
 
   return (
     <>
@@ -89,10 +81,12 @@ export default function Catalog() {
                 onReset={magic.resetFilters}
                 hasActiveFilters={magic.hasActiveFilters}
                 activeFilterCount={magic.activeFilterCount}
-                resultCount={magic.results.length}
+                resultCount={magic.totalCount}
                 selectedTCG={selectedTCG}
                 resetKey={magic.resetKey}
                 filters={magic.filters}
+                collections={magic.collections}
+                rarities={magic.rarities}
               />
             )}
           </div>
@@ -107,19 +101,22 @@ export default function Catalog() {
               onCardPress={handlePokemonCardPress}
             />
           ) : (
-            <CardGrid
-              cards={magic.results}
+            <MagicCardGrid
+              cards={magic.cards}
+              loading={magic.loading}
+              page={magic.page}
+              totalPages={magic.totalPages}
+              onPageChange={magic.setPage}
               onCardPress={handleMagicCardPress}
             />
           )}
         </EntitiesPage.CardContainer>
       </EntitiesPage>
 
-      <CardDetailModal
+      <MagicCardDetailModal
         card={selectedMagicCard}
         isOpen={isMagicDetailOpen}
         onClose={handleCloseMagicDetail}
-        onUpdatePrice={handleUpdatePrice}
       />
 
       <PokemonCardDetailModal

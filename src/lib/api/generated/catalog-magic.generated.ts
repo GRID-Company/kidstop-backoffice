@@ -1,18 +1,19 @@
 import type * as Types from '../schema-types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type PokemonCardInternalListQueryVariables = Types.Exact<{
-  findPokemonCardsPublicArgs: Types.FindPokemonCardsPublicArgs;
+export type MagicCardInternalListQueryVariables = Types.Exact<{
+  findMagicCardsPublicArgs: Types.FindMagicCardsPublicArgs;
 }>;
 
-export type PokemonCardInternalListQuery = {
-  pokemonCardInternalList: {
+export type MagicCardInternalListQuery = {
+  magicCardInternalList: {
     count: number | null;
     data: Array<{
       guid: string;
       name: string;
-      setName: string | null;
-      setCode: string | null;
+      edition: string | null;
+      collectorNumber: string | null;
+      isFoil: boolean;
       sellPrice: number | null;
       availableStock: boolean;
       totalStock: number;
@@ -28,19 +29,18 @@ export type PokemonCardInternalListQuery = {
   };
 };
 
-export type PokemonCardInternalDetailQueryVariables = Types.Exact<{
+export type MagicCardInternalDetailQueryVariables = Types.Exact<{
   guid: Types.Scalars['String']['input'];
 }>;
 
-export type PokemonCardInternalDetailQuery = {
-  pokemonCardInternalDetail: {
+export type MagicCardInternalDetailQuery = {
+  magicCardInternalDetail: {
     guid: string;
     name: string;
-    cardNumber: string | null;
+    edition: string | null;
+    collectorNumber: string | null;
+    isFoil: boolean;
     rarity: string | null;
-    variant: string | null;
-    setName: string | null;
-    setCode: string | null;
     sellPrice: number | null;
     totalStock: number;
     imageUri: string | null;
@@ -54,57 +54,32 @@ export type PokemonCardInternalDetailQuery = {
   };
 };
 
-export type PokemonCardCollectionsQueryVariables = Types.Exact<{
+export type MagicCardCollectionsQueryVariables = Types.Exact<{
   [key: string]: never;
 }>;
 
-export type PokemonCardCollectionsQuery = {
-  pokemonCardCollections: Array<{
+export type MagicCardCollectionsQuery = {
+  magicCardCollections: Array<{
     guid: string;
     name: string;
-    code: string | null;
+    editionIconUri: string | null;
   }>;
 };
 
-export type PokemonCardRaritiesQueryVariables = Types.Exact<{
+export type MagicCardRaritiesQueryVariables = Types.Exact<{
   [key: string]: never;
 }>;
 
-export type PokemonCardRaritiesQuery = { pokemonCardRarities: Array<string> };
+export type MagicCardRaritiesQuery = { magicCardRarities: Array<string> };
 
-export type PokemonCardVariantsQueryVariables = Types.Exact<{
-  [key: string]: never;
-}>;
-
-export type PokemonCardVariantsQuery = { pokemonCardVariants: Array<string> };
-
-export type PokemonCardGenresQueryVariables = Types.Exact<{
-  [key: string]: never;
-}>;
-
-export type PokemonCardGenresQuery = { pokemonCardGenres: Array<string> };
-
-export type UpdateInventoryItemPricesMutationVariables = Types.Exact<{
-  updateInventoryItemPricesInput: Types.UpdateInventoryItemPricesInput;
-}>;
-
-export type UpdateInventoryItemPricesMutation = {
-  updateInventoryItemPrices: {
-    guid: string;
-    purchasePrice: number | null;
-    sellPrice: number | null;
-  };
-};
-
-export type PokemonCardWithMetricsQueryVariables = Types.Exact<{
+export type MagicCardWithMetricsQueryVariables = Types.Exact<{
   guid: Types.Scalars['String']['input'];
 }>;
 
-export type PokemonCardWithMetricsQuery = {
-  pokemonCardWithMetrics: {
-    ungradedPrice: number | null;
-    gradedPriceSeven: number | null;
-    gradedPriceEightOrAbove: number | null;
+export type MagicCardWithMetricsQuery = {
+  magicCardWithMetrics: {
+    priceRetail: number | null;
+    priceBuy: number | null;
     variantsMetrics: Array<{
       condition: string;
       stock: number;
@@ -115,25 +90,25 @@ export type PokemonCardWithMetricsQuery = {
   };
 };
 
-export const PokemonCardInternalListDocument = {
+export const MagicCardInternalListDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardInternalList' },
+      name: { kind: 'Name', value: 'MagicCardInternalList' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'findPokemonCardsPublicArgs' },
+            name: { kind: 'Name', value: 'findMagicCardsPublicArgs' },
           },
           type: {
             kind: 'NonNullType',
             type: {
               kind: 'NamedType',
-              name: { kind: 'Name', value: 'FindPokemonCardsPublicArgs' },
+              name: { kind: 'Name', value: 'FindMagicCardsPublicArgs' },
             },
           },
         },
@@ -143,14 +118,14 @@ export const PokemonCardInternalListDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'pokemonCardInternalList' },
+            name: { kind: 'Name', value: 'magicCardInternalList' },
             arguments: [
               {
                 kind: 'Argument',
-                name: { kind: 'Name', value: 'findPokemonCardsPublicArgs' },
+                name: { kind: 'Name', value: 'findMagicCardsPublicArgs' },
                 value: {
                   kind: 'Variable',
-                  name: { kind: 'Name', value: 'findPokemonCardsPublicArgs' },
+                  name: { kind: 'Name', value: 'findMagicCardsPublicArgs' },
                 },
               },
             ],
@@ -167,11 +142,15 @@ export const PokemonCardInternalListDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'setName' },
+                        name: { kind: 'Name', value: 'edition' },
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'setCode' },
+                        name: { kind: 'Name', value: 'collectorNumber' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'isFoil' },
                       },
                       {
                         kind: 'Field',
@@ -230,16 +209,16 @@ export const PokemonCardInternalListDocument = {
     },
   ],
 } as unknown as DocumentNode<
-  PokemonCardInternalListQuery,
-  PokemonCardInternalListQueryVariables
+  MagicCardInternalListQuery,
+  MagicCardInternalListQueryVariables
 >;
-export const PokemonCardInternalDetailDocument = {
+export const MagicCardInternalDetailDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardInternalDetail' },
+      name: { kind: 'Name', value: 'MagicCardInternalDetail' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
@@ -258,7 +237,7 @@ export const PokemonCardInternalDetailDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'pokemonCardInternalDetail' },
+            name: { kind: 'Name', value: 'magicCardInternalDetail' },
             arguments: [
               {
                 kind: 'Argument',
@@ -274,11 +253,13 @@ export const PokemonCardInternalDetailDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'cardNumber' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'edition' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'collectorNumber' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'isFoil' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'rarity' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'variant' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'setName' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'setCode' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'totalStock' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'imageUri' } },
@@ -313,153 +294,31 @@ export const PokemonCardInternalDetailDocument = {
     },
   ],
 } as unknown as DocumentNode<
-  PokemonCardInternalDetailQuery,
-  PokemonCardInternalDetailQueryVariables
+  MagicCardInternalDetailQuery,
+  MagicCardInternalDetailQueryVariables
 >;
-export const PokemonCardCollectionsDocument = {
+export const MagicCardCollectionsDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardCollections' },
+      name: { kind: 'Name', value: 'MagicCardCollections' },
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'pokemonCardCollections' },
+            name: { kind: 'Name', value: 'magicCardCollections' },
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  PokemonCardCollectionsQuery,
-  PokemonCardCollectionsQueryVariables
->;
-export const PokemonCardRaritiesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardRarities' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'pokemonCardRarities' },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  PokemonCardRaritiesQuery,
-  PokemonCardRaritiesQueryVariables
->;
-export const PokemonCardVariantsDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardVariants' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'pokemonCardVariants' },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  PokemonCardVariantsQuery,
-  PokemonCardVariantsQueryVariables
->;
-export const PokemonCardGenresDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardGenres' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'pokemonCardGenres' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  PokemonCardGenresQuery,
-  PokemonCardGenresQueryVariables
->;
-export const UpdateInventoryItemPricesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdateInventoryItemPrices' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'updateInventoryItemPricesInput' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'UpdateInventoryItemPricesInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updateInventoryItemPrices' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'updateInventoryItemPricesInput' },
-                value: {
-                  kind: 'Variable',
-                  name: {
-                    kind: 'Name',
-                    value: 'updateInventoryItemPricesInput',
-                  },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'purchasePrice' },
+                  name: { kind: 'Name', value: 'editionIconUri' },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
               ],
             },
           },
@@ -468,16 +327,35 @@ export const UpdateInventoryItemPricesDocument = {
     },
   ],
 } as unknown as DocumentNode<
-  UpdateInventoryItemPricesMutation,
-  UpdateInventoryItemPricesMutationVariables
+  MagicCardCollectionsQuery,
+  MagicCardCollectionsQueryVariables
 >;
-export const PokemonCardWithMetricsDocument = {
+export const MagicCardRaritiesDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'PokemonCardWithMetrics' },
+      name: { kind: 'Name', value: 'MagicCardRarities' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'magicCardRarities' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MagicCardRaritiesQuery,
+  MagicCardRaritiesQueryVariables
+>;
+export const MagicCardWithMetricsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'MagicCardWithMetrics' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
@@ -496,7 +374,7 @@ export const PokemonCardWithMetricsDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'pokemonCardWithMetrics' },
+            name: { kind: 'Name', value: 'magicCardWithMetrics' },
             arguments: [
               {
                 kind: 'Argument',
@@ -536,18 +414,8 @@ export const PokemonCardWithMetricsDocument = {
                     ],
                   },
                 },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'ungradedPrice' },
-                },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'gradedPriceSeven' },
-                },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'gradedPriceEightOrAbove' },
-                },
+                { kind: 'Field', name: { kind: 'Name', value: 'priceRetail' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'priceBuy' } },
               ],
             },
           },
@@ -556,6 +424,6 @@ export const PokemonCardWithMetricsDocument = {
     },
   ],
 } as unknown as DocumentNode<
-  PokemonCardWithMetricsQuery,
-  PokemonCardWithMetricsQueryVariables
+  MagicCardWithMetricsQuery,
+  MagicCardWithMetricsQueryVariables
 >;

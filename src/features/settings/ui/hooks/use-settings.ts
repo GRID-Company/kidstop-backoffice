@@ -39,7 +39,7 @@ export function useSettings() {
         skip: 0,
         limit: 100,
         sort: { column: 'name', order: 'ASC' },
-        filters: { role: 'BUYER' },
+        filters: { role: { filterType: ':multiple_values:', values: ['BUYER'] } },
       },
     },
     fetchPolicy: 'cache-and-network',

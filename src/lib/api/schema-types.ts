@@ -119,12 +119,13 @@ export type ChangePasswordOutput = {
 };
 
 export type CreateInventoryMovementInput = {
+  cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
   movementType: Scalars['String']['input'];
   notes: Scalars['String']['input'];
-  pokemonCardGuid: Scalars['String']['input'];
   quantity: Scalars['Int']['input'];
   reference?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
 };
 
 export type CreatePurchaseInput = {
@@ -227,6 +228,7 @@ export type FindInventoryItemsArgs = {
 export type FindInventoryItemsFilter = {
   condition?: InputMaybe<Scalars['String']['input']>;
   lastSellDate?: InputMaybe<DateRangeFilter>;
+  magicFilters?: InputMaybe<MagicFilters>;
   pokemonFilters?: InputMaybe<PokemonFilters>;
   stockStatus?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
@@ -243,6 +245,25 @@ export type FindInventoryMovementsArgs = {
 export type FindInventoryMovementsFilter = {
   createdDate?: InputMaybe<DateRangeFilter>;
   movementType?: InputMaybe<Scalars['String']['input']>;
+  tcg: Scalars['String']['input'];
+};
+
+export type FindMagicCardsPublicArgs = {
+  filters?: InputMaybe<FindMagicCardsPublicFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindMagicCardsPublicFilter = {
+  condition?: InputMaybe<Scalars['String']['input']>;
+  /** Edition/Collection guid */
+  edition?: InputMaybe<Scalars['String']['input']>;
+  isFoil?: InputMaybe<Scalars['Boolean']['input']>;
+  rarity?: InputMaybe<Scalars['String']['input']>;
+  sellPrice?: InputMaybe<NumericRangeFilter>;
+  stockStatus?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FindMostWantedCardsArgs = {
@@ -345,9 +366,8 @@ export type FindUsersArgs = {
 export type FindUsersFilter = {
   active?: InputMaybe<Scalars['Boolean']['input']>;
   clientStatus?: InputMaybe<Scalars['String']['input']>;
-  role?: InputMaybe<Scalars['String']['input']>;
-  /** Filter by multiple roles using :multiple_values: filter type */
-  roles?: InputMaybe<MultipleValuesFilter>;
+  /** Filter by multiple role values using :multiple_values: filter type */
+  role?: InputMaybe<MultipleValuesFilter>;
 };
 
 export type GenericOutput = {
@@ -496,6 +516,75 @@ export type MagicCardCollection = {
   updatedDate: Scalars['Timestamp']['output'];
 };
 
+export type MagicCardCollectionOutput = {
+  editionIconUri?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type MagicCardInternalDetail = {
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryCards?: Maybe<Array<MagicCardInventoryItemInternal>>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  totalStock: Scalars['Int']['output'];
+};
+
+export type MagicCardInternalItem = {
+  availableStock: Scalars['Boolean']['output'];
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryCards?: Maybe<Array<MagicCardInventoryItemInternal>>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  totalStock: Scalars['Int']['output'];
+};
+
+export type MagicCardInventoryItemInternal = {
+  condition: Scalars['String']['output'];
+  guid: Scalars['String']['output'];
+  purchasePrice?: Maybe<Scalars['Float']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  stock: Scalars['Int']['output'];
+};
+
+export type MagicCardInventoryItemPublic = {
+  condition: Scalars['String']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  stock: Scalars['Int']['output'];
+};
+
+export type MagicCardPublicDetail = {
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  inventoryCards?: Maybe<Array<MagicCardInventoryItemPublic>>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+};
+
+export type MagicCardPublicItem = {
+  availableStock: Scalars['Boolean']['output'];
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+};
+
 export type MagicCardSummary = {
   collectorNumber?: Maybe<Scalars['String']['output']>;
   edition?: Maybe<Scalars['String']['output']>;
@@ -504,6 +593,27 @@ export type MagicCardSummary = {
   isFoil: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+};
+
+export type MagicCardVariantMetrics = {
+  avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
+  condition: Scalars['String']['output'];
+  lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
+  stock: Scalars['Int']['output'];
+  wishlistCount: Scalars['Int']['output'];
+};
+
+export type MagicCardWithMetrics = {
+  priceBuy?: Maybe<Scalars['Float']['output']>;
+  priceRetail?: Maybe<Scalars['Float']['output']>;
+  variantsMetrics: Array<MagicCardVariantMetrics>;
+};
+
+export type MagicFilters = {
+  /** Collection guid to filter by edition */
+  edition?: InputMaybe<Scalars['String']['input']>;
+  isFoil?: InputMaybe<Scalars['Boolean']['input']>;
+  rarity?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type MostWantedCard = {
@@ -584,10 +694,10 @@ export type Mutation = {
   /** Update cart item quantity (carpeta digital) */
   updateCartItem: Cart;
   updateGlobalConfig: GenericOutput;
+  /** Update inventory item prices (internal only) */
+  updateInventoryItemPrices: InventoryItem;
   /** Update a most wanted card (admin only) */
   updateMostWantedCard: MostWantedCard;
-  /** Update inventory item prices (internal only) */
-  updatePokemonCardPrices: InventoryItem;
   /** Update purchase details (client, notes, payments) */
   updatePurchase: Purchase;
   /** Add, remove, or update purchase items (DRAFT only) */
@@ -719,12 +829,12 @@ export type MutationUpdateGlobalConfigArgs = {
   updateGlobalConfigInput: UpdateGlobalConfigInput;
 };
 
-export type MutationUpdateMostWantedCardArgs = {
-  updateMostWantedCardInput: UpdateMostWantedCardInput;
+export type MutationUpdateInventoryItemPricesArgs = {
+  updateInventoryItemPricesInput: UpdateInventoryItemPricesInput;
 };
 
-export type MutationUpdatePokemonCardPricesArgs = {
-  updateInventoryItemPricesInput: UpdateInventoryItemPricesInput;
+export type MutationUpdateMostWantedCardArgs = {
+  updateMostWantedCardInput: UpdateMostWantedCardInput;
 };
 
 export type MutationUpdatePurchaseArgs = {
@@ -822,6 +932,16 @@ export type PaginatedInventoryItems = {
 export type PaginatedInventoryMovements = {
   count?: Maybe<Scalars['Float']['output']>;
   data?: Maybe<Array<InventoryMovement>>;
+};
+
+export type PaginatedMagicCardsInternal = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<MagicCardInternalItem>>;
+};
+
+export type PaginatedMagicCardsPublic = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<MagicCardPublicItem>>;
 };
 
 export type PaginatedMostWantedCards = {
@@ -1068,6 +1188,20 @@ export type Query = {
   /** Get paginated list of inventory movements */
   inventoryMovements: PaginatedInventoryMovements;
   isValidToken: IsValidTokenOutput;
+  /** Get all Magic card collections/editions (public) */
+  magicCardCollections: Array<MagicCardCollectionOutput>;
+  /** Get internal detail of a single Magic card with inventory data */
+  magicCardInternalDetail: MagicCardInternalDetail;
+  /** Get paginated internal list of Magic cards with inventory data */
+  magicCardInternalList: PaginatedMagicCardsInternal;
+  /** Get public detail of a single Magic card */
+  magicCardPublicDetail: MagicCardPublicDetail;
+  /** Get paginated public list of Magic cards with filters and search */
+  magicCardPublicList: PaginatedMagicCardsPublic;
+  /** Get all unique card rarities available in the Magic catalog (cached 1hr) */
+  magicCardRarities: Array<Scalars['String']['output']>;
+  /** Get inventory variants with metrics for a Magic card (authenticated) */
+  magicCardWithMetrics: MagicCardWithMetrics;
   /** Get most wanted card detail (admin only) */
   mostWantedCard: MostWantedCard;
   /** Get paginated most wanted cards list (admin only) */
@@ -1148,6 +1282,26 @@ export type QueryInventoryItemsArgs = {
 
 export type QueryInventoryMovementsArgs = {
   findInventoryMovementsArgs: FindInventoryMovementsArgs;
+};
+
+export type QueryMagicCardInternalDetailArgs = {
+  guid: Scalars['String']['input'];
+};
+
+export type QueryMagicCardInternalListArgs = {
+  findMagicCardsPublicArgs: FindMagicCardsPublicArgs;
+};
+
+export type QueryMagicCardPublicDetailArgs = {
+  guid: Scalars['String']['input'];
+};
+
+export type QueryMagicCardPublicListArgs = {
+  findMagicCardsPublicArgs: FindMagicCardsPublicArgs;
+};
+
+export type QueryMagicCardWithMetricsArgs = {
+  guid: Scalars['String']['input'];
 };
 
 export type QueryMostWantedCardArgs = {

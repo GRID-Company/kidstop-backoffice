@@ -1,9 +1,14 @@
 import { PokemonCardInternalListQuery } from '@/lib/api/generated/catalog-pokemon.generated';
-import { ICardVariant, IPokemonCard } from '../../domain/types';
+import { MagicCardInternalListQuery } from '@/lib/api/generated/catalog-magic.generated';
+import { ICardVariant, IPokemonCard, IMagicCard } from '../../domain/types';
 import { CardPriceFormData } from '../forms/card-price.form.schema';
 
 type PokemonCardInternalItem = NonNullable<
   NonNullable<PokemonCardInternalListQuery['pokemonCardInternalList']['data']>[number]
+>;
+
+type MagicCardInternalItem = NonNullable<
+  NonNullable<MagicCardInternalListQuery['magicCardInternalList']['data']>[number]
 >;
 
 export function toUpdateCardPricePayload(data: CardPriceFormData, variantId: string) {
@@ -36,6 +41,29 @@ export function toPokemonCard(item: PokemonCardInternalItem): IPokemonCard {
     totalStock: item.totalStock,
     imageUri: item.imageUri ?? null,
     variants: (item.inventoryCards ?? []).map((ic) => ({
+      guid: ic.guid,
+      condition: ic.condition,
+      stock: ic.stock,
+      purchasePrice: ic.purchasePrice ?? null,
+      sellPrice: ic.sellPrice ?? null,
+    })),
+  };
+}
+
+export function toMagicCard(item: MagicCardInternalItem): IMagicCard {
+  return {
+    guid: item.guid,
+    name: item.name,
+    edition: item.edition ?? null,
+    collectorNumber: item.collectorNumber ?? null,
+    isFoil: item.isFoil,
+    rarity: null,
+    sellPrice: item.sellPrice ?? null,
+    availableStock: item.availableStock,
+    totalStock: item.totalStock,
+    imageUri: item.imageUri ?? null,
+    variants: (item.inventoryCards ?? []).map((ic) => ({
+      guid: ic.guid,
       condition: ic.condition,
       stock: ic.stock,
       purchasePrice: ic.purchasePrice ?? null,

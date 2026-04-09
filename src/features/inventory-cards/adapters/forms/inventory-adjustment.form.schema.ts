@@ -7,6 +7,7 @@ const movementTypeValues = Object.values(MOVEMENT_TYPES) as [string, ...string[]
 
 export const inventoryAdjustmentFormSchema = z.object({
   cardGuid: z.string().min(1, 'La carta es obligatoria'),
+  tcg: z.string().min(1, 'El TCG es obligatorio'),
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),

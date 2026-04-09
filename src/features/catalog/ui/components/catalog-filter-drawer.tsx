@@ -14,8 +14,13 @@ import Select from '@/shared/base/heorui-overrides/select';
 import AutocompleteFilter from '@/shared/base/heorui-overrides/autocomplete-filter';
 import { FilterFn } from '@/lib/types/paginated-datatable.types';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
-import { CARD_CONDITION_OPTIONS, MAGIC_RARITY_OPTIONS } from '../../domain/constants';
-import { IPokemonCollection, PokemonCatalogFilters } from '../../domain/types';
+import { CARD_CONDITION_OPTIONS, MAGIC_RARITY_OPTIONS, STOCK_STATUS_OPTIONS } from '../../domain/constants';
+import {
+  IPokemonCollection,
+  IMagicCollection,
+  PokemonCatalogFilters,
+  MagicCatalogFilters,
+} from '../../domain/types';
 
 interface CatalogFilterDrawerProps {
   isOpen: boolean;
@@ -25,8 +30,8 @@ interface CatalogFilterDrawerProps {
   hasActiveFilters: boolean;
   selectedTCG: TCGType;
   resetKey?: number;
-  filters?: PokemonCatalogFilters;
-  collections?: IPokemonCollection[];
+  filters?: PokemonCatalogFilters | MagicCatalogFilters;
+  collections?: IPokemonCollection[] | IMagicCollection[];
   rarities?: string[];
   variants?: string[];
   genres?: string[];
@@ -125,7 +130,7 @@ export default function CatalogFilterDrawer({
               items={collectionOptions}
               onSelectionChange={(value) => onFilterChange('set', value)}
               resetKey={resetKey}
-              selectedValue={filters?.set}
+              selectedValue={(filters as PokemonCatalogFilters)?.set}
               aria-label="Filtrar por colección"
             />
           )}
@@ -137,7 +142,7 @@ export default function CatalogFilterDrawer({
               items={variantOptions}
               onSelectionChange={(value) => onFilterChange('variant', value)}
               resetKey={resetKey}
-              selectedValue={filters?.variant}
+              selectedValue={(filters as PokemonCatalogFilters)?.variant}
               aria-label="Filtrar por variante"
             />
           )}
@@ -149,8 +154,45 @@ export default function CatalogFilterDrawer({
               items={genreOptions}
               onSelectionChange={(value) => onFilterChange('genre', value)}
               resetKey={resetKey}
-              selectedValue={filters?.genre}
+              selectedValue={(filters as PokemonCatalogFilters)?.genre}
               aria-label="Filtrar por género"
+            />
+          )}
+
+          {!isPokemon && collectionOptions.length > 0 && (
+            <AutocompleteFilter
+              placeholder="Todas las ediciones"
+              label="Edición"
+              items={collectionOptions}
+              onSelectionChange={(value) => onFilterChange('edition', value)}
+              resetKey={resetKey}
+              selectedValue={(filters as MagicCatalogFilters)?.edition}
+              aria-label="Filtrar por edición"
+            />
+          )}
+
+          {!isPokemon && (
+            <Select
+              placeholder="Todos los estados"
+              label="Estado de stock"
+              items={STOCK_STATUS_OPTIONS}
+              selectedKeys={(filters as MagicCatalogFilters)?.stockStatus ? [(filters as MagicCatalogFilters).stockStatus!] : []}
+              onChange={(e) => onFilterChange('stockStatus', e.target.value)}
+              aria-label="Filtrar por estado de stock"
+            />
+          )}
+
+          {!isPokemon && (
+            <Select
+              placeholder="Todas"
+              label="Foil"
+              items={[
+                { label: 'Solo Foil', value: 'true' },
+                { label: 'Solo No-Foil', value: 'false' },
+              ]}
+              selectedKeys={(filters as MagicCatalogFilters)?.isFoil !== undefined ? [String((filters as MagicCatalogFilters).isFoil)] : []}
+              onChange={(e) => onFilterChange('isFoil', e.target.value === 'true')}
+              aria-label="Filtrar por foil"
             />
           )}
         </DrawerBody>

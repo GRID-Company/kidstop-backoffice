@@ -5,8 +5,10 @@ import { InventoryMovementsDocument } from '@/lib/api/generated/inventory.genera
 import { fromApiInventoryMovement } from '../../adapters/mappers/inventory.mapper';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 import { DateRange, IInventoryMovement, MovementFilters } from '../../domain/types';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 
 export function useMovementSearch() {
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<Omit<MovementFilters, 'search' | 'dateRange'>>({});
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -61,6 +63,7 @@ export function useMovementSearch() {
         sort: { column: sortColumn ?? 'createdDate', order: sortOrder },
         search: search.trim() || undefined,
         filters: {
+          tcg: selectedTCG,
           movementType: filters.movementType || undefined,
           ...(dateRange && {
             createdDate: {

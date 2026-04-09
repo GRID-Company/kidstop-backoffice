@@ -16,10 +16,12 @@ import { Icon } from '@iconify/react';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import { IPokemonCard } from '@/features/catalog/domain/types';
+import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
 import CardPrioritySelector from './card-priority-selector';
 import { useAddCardModal } from '../hooks/use-add-card-modal';
+
+type CardType = IPokemonCard | IMagicCard;
 
 interface AddCardModalProps {
   isOpen: boolean;
@@ -27,9 +29,9 @@ interface AddCardModalProps {
   onAdd?: (data: MostWantedCardFormData) => void | Promise<void>;
   search: string;
   onSearchChange: (value: string) => void;
-  searchResults: IPokemonCard[];
-  selectedCard: IPokemonCard | null;
-  onSelectCard: (card: IPokemonCard | null) => void;
+  searchResults: CardType[];
+  selectedCard: CardType | null;
+  onSelectCard: (card: CardType | null) => void;
   form: ReturnType<typeof useAddCardModal>['form'];
   onSubmit: ReturnType<typeof useAddCardModal>['handleSubmit'];
   loading?: boolean;
@@ -40,10 +42,13 @@ function CardSearchResult({
   isSelected,
   onPress,
 }: {
-  card: IPokemonCard;
+  card: CardType;
   isSelected: boolean;
   onPress: () => void;
 }) {
+  const isPokemon = 'setCode' in card;
+  const cardSet = isPokemon ? (card as IPokemonCard).setName : (card as IMagicCard).edition;
+  const cardCode = isPokemon ? (card as IPokemonCard).setCode : (card as IMagicCard).collectorNumber;
   return (
     <Button
       variant={isSelected ? 'flat' : 'light'}
@@ -71,7 +76,7 @@ function CardSearchResult({
       <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
         <span className="truncate text-sm font-semibold">{card.name}</span>
         <span className="truncate text-xs text-default-500">
-          {card.setName} · {card.setCode}
+          {cardSet} · {cardCode}
         </span>
         <div className="flex items-center gap-2">
           <span className="text-xs text-default-500">Stock: {card.totalStock}</span>
@@ -81,7 +86,10 @@ function CardSearchResult({
   );
 }
 
-function SelectedCardPreview({ card }: { card: IPokemonCard }) {
+function SelectedCardPreview({ card }: { card: CardType }) {
+  const isPokemon = 'setCode' in card;
+  const cardSet = isPokemon ? (card as IPokemonCard).setName : (card as IMagicCard).edition;
+  const cardCode = isPokemon ? (card as IPokemonCard).setCode : (card as IMagicCard).collectorNumber;
   return (
     <div className="flex gap-4 rounded-lg bg-default-50 p-4">
       <div className="relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-lg bg-default-100">
@@ -103,7 +111,7 @@ function SelectedCardPreview({ card }: { card: IPokemonCard }) {
       <div className="flex flex-col gap-1.5">
         <p className="text-sm font-semibold text-accent">{card.name}</p>
         <p className="text-xs text-default-500">
-          {card.setName} · {card.setCode}
+          {cardSet} · {cardCode}
         </p>
 
         <div className="flex items-center gap-2">
@@ -115,7 +123,7 @@ function SelectedCardPreview({ card }: { card: IPokemonCard }) {
               content: 'text-accent font-medium',
             }}
           >
-            POKEMON
+            {isPokemon ? 'POKEMON' : 'MAGIC'}
           </Chip>
         </div>
 

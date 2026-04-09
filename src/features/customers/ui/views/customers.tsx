@@ -20,6 +20,8 @@ export default function Customers() {
     loading,
     error,
     hasActiveFilters,
+    sortDescriptor,
+    setSortDescriptor,
   } = useCustomerSearch();
 
   const handleCustomerPress = useCallback(
@@ -57,6 +59,8 @@ export default function Customers() {
           onFilterChange={handleFilterChange}
           onReset={resetFilters}
           onCustomerPress={handleCustomerPress}
+          sortDescriptor={sortDescriptor}
+          onSortChange={setSortDescriptor}
         />
       </EntitiesPage.CardContainer>
     </EntitiesPage>

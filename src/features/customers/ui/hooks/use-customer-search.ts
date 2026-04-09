@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@apollo/client/react';
+import { SortDescriptor } from '@heroui/react';
 import { CustomersDocument } from '@/lib/api/generated/customers.generated';
 import { toCustomerDomain } from '../../adapters/mappers/customer.mapper';
 import { CLIENT_STATUSES, DEFAULT_CUSTOMERS_SORT, DEFAULT_PAGE_SIZE } from '../../domain/constants';
@@ -8,22 +9,29 @@ import { ClientStatus } from '../../domain/types';
 export function useCustomerSearch() {
   const [search, setSearch] = useState('');
   const [clientStatus, setClientStatus] = useState<ClientStatus | ''>('');
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'name',
+    direction: 'ascending',
+  });
+
+  const sortColumn = sortDescriptor.column as string;
+  const sortOrder = sortDescriptor.direction === 'descending' ? 'DESC' : 'ASC';
 
   const { data, loading, error, refetch } = useQuery(CustomersDocument, {
     variables: {
       findUsersArgs: {
         skip: 0,
         limit: DEFAULT_PAGE_SIZE,
-        sort: DEFAULT_CUSTOMERS_SORT,
+        sort: { column: sortColumn, order: sortOrder },
         ...(search.trim() ? { search: search.trim() } : {}),
         filters: {
-          roles: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
+          role: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
           active: true,
           ...(clientStatus ? { clientStatus } : {}),
         },
       },
     },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
 
   const handleFilterChange = useCallback(
@@ -57,5 +65,7 @@ export function useCustomerSearch() {
     error,
     refetch,
     hasActiveFilters,
+    sortDescriptor,
+    setSortDescriptor,
   };
 }

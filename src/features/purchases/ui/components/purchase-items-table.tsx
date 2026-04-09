@@ -78,7 +78,7 @@ export default function PurchaseItemsTable({
         customCol: (item: IPurchaseItem) => (
           <div className="flex items-center gap-3">
             <Image
-              src={item.cardImageUrl}
+              src={item.cardImageUrl || undefined}
               alt={item.cardName}
               className="h-12 w-9 rounded object-cover"
               fallbackSrc="https://placehold.co/36x48?text=Card"
