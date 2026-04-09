@@ -13,8 +13,8 @@ import {
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
-import { CancelReason, CANCEL_REASON } from '../../domain/types';
-import { CANCEL_REASON_LABELS } from '../../domain/constants';
+import { CancelReason } from '../../domain/types';
+import { CANCEL_REASON_OPTIONS } from '../../domain/constants';
 
 interface CancelSaleModalProps {
   isOpen: boolean;
@@ -22,11 +22,6 @@ interface CancelSaleModalProps {
   onConfirm: (reason: CancelReason) => void;
   loading?: boolean;
 }
-
-const CANCEL_REASON_OPTIONS = Object.values(CANCEL_REASON).map((reason) => ({
-  value: reason,
-  label: CANCEL_REASON_LABELS[reason],
-}));
 
 export default function CancelSaleModal({
   isOpen,
@@ -41,8 +36,7 @@ export default function CancelSaleModal({
   const handleConfirm = useCallback(() => {
     if (!selectedReason) return;
     onConfirm(selectedReason);
-    onClose();
-  }, [selectedReason, onConfirm, onClose]);
+  }, [selectedReason, onConfirm]);
 
   const handleClose = useCallback(() => {
     setSelectedReason(null);

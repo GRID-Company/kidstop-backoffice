@@ -67,7 +67,7 @@ export interface ISale {
   tcg: TCGType;
   total: number;
   notes: string | null;
-  cancelReason: string | null;
+  cancelReason: CancelReason | null;
   emailNotificationSent: boolean;
   customer: ISaleCustomer | null;
   kioskCustomerName: string | null;

@@ -40,6 +40,13 @@ export const CANCEL_REASON_LABELS: Record<CancelReason, string> = {
   [CANCEL_REASON.OTHER]: 'Otro motivo',
 };
 
+export const CANCEL_REASON_OPTIONS = Object.values(CANCEL_REASON).map(
+  (reason) => ({
+    value: reason,
+    label: CANCEL_REASON_LABELS[reason],
+  })
+);
+
 export const DEFAULT_SALES_SORT: ITableSort = {
   column: 'createdDate',
   order: 'DESC',

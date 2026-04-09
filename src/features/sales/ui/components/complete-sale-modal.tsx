@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import {
   Modal,
   ModalContent,
@@ -18,6 +18,7 @@ import { getCustomerDisplayName } from '../../adapters/mappers/sale.mapper';
 
 interface CompleteSaleModalProps {
   sale: ISale | null;
+  itemCount: number;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -26,20 +27,15 @@ interface CompleteSaleModalProps {
 
 export default function CompleteSaleModal({
   sale,
+  itemCount,
   isOpen,
   onClose,
   onConfirm,
   loading = false,
 }: CompleteSaleModalProps) {
-  const itemCount = useMemo(
-    () => (sale ? sale.items.reduce((sum, item) => sum + item.quantity, 0) : 0),
-    [sale]
-  );
-
   const handleConfirm = useCallback(() => {
     onConfirm();
-    onClose();
-  }, [onConfirm, onClose]);
+  }, [onConfirm]);
 
   if (!sale) return null;
 

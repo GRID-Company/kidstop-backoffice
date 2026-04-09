@@ -22,6 +22,7 @@ import {
   SALE_STATUS,
 } from '../../domain/types';
 import {
+  CANCEL_REASON_LABELS,
   NEXT_STATUS,
   NEXT_STATUS_ICONS,
   NEXT_STATUS_LABELS,
@@ -73,13 +74,15 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
     }
   }, [sale, nextStatus, updateStatus]);
 
-  const handleCompleteConfirm = useCallback(() => {
-    void updateStatus(SALE_STATUS.COMPLETED);
+  const handleCompleteConfirm = useCallback(async () => {
+    await updateStatus(SALE_STATUS.COMPLETED);
+    setIsCompleteModalOpen(false);
   }, [updateStatus]);
 
   const handleCancelConfirm = useCallback(
-    (reason: CancelReason) => {
-      void cancelSale(reason);
+    async (reason: CancelReason) => {
+      await cancelSale(reason);
+      setIsCancelModalOpen(false);
     },
     [cancelSale]
   );
@@ -225,6 +228,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
       <CompleteSaleModal
         sale={sale}
+        itemCount={itemCount}
         isOpen={isCompleteModalOpen}
         onClose={() => setIsCompleteModalOpen(false)}
         onConfirm={handleCompleteConfirm}
@@ -308,7 +312,7 @@ function SaleInfoCard({ sale }: { sale: ISale }) {
             <div className="flex flex-col gap-1">
               <span className="text-xs text-default-400">Motivo de cancelación</span>
               <span className="text-sm font-medium text-danger">
-                {sale.cancelReason}
+                {CANCEL_REASON_LABELS[sale.cancelReason]}
               </span>
             </div>
           </>
