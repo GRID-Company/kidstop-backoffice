@@ -7,6 +7,8 @@ import { Icon } from '@iconify/react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
+import { formatDate } from '@/lib/utils/format-date';
+
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { CLIENT_STATUSES } from '../../domain/constants';
 import {
@@ -26,15 +28,6 @@ import CustomerEditModal from '../components/customer-edit-modal';
 
 interface CustomerDetailProps {
   customerId: string;
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '—';
-  return new Intl.DateTimeFormat('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(dateStr));
 }
 
 export default function CustomerDetail({ customerId }: CustomerDetailProps) {
@@ -249,7 +242,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     Último pedido
                   </span>
                   <span className="text-sm font-semibold">
-                    {formatDate(customer.lastOrderDate)}
+                    {formatDate(customer.lastOrderDate, '—')}
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -257,7 +250,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     Cliente desde
                   </span>
                   <span className="text-sm font-semibold">
-                    {formatDate(customer.createdDate)}
+                    {formatDate(customer.createdDate, '—')}
                   </span>
                 </div>
               </div>

@@ -36,15 +36,6 @@ interface BlockCustomerModalProps {
   loading?: boolean;
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  return new Intl.DateTimeFormat('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(dateStr));
-}
-
 export default function BlockCustomerModal({
   customer,
   isOpen,
