@@ -77,10 +77,11 @@ export default function PokemonCardDetailModal({
     async (data) => {
       if (!detail || !selectedVariant) return;
       await handleUpdatePrice({
-        pokemonCardGuid: detail.guid,
+        cardGuid: detail.guid,
         condition: selectedVariant.condition,
         purchasePrice: data.buyPrice,
         sellPrice: data.sellPrice,
+        tcgType: 'POKEMON',
       });
     },
     [detail, selectedVariant, handleUpdatePrice]
