@@ -11,7 +11,7 @@ export const getCustomersVars = (
       ...args,
       ...(filters.search ? { search: filters.search } : {}),
       filters: {
-        roles: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
+        role: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
         active: true,
         ...(filters.clientStatus ? { clientStatus: filters.clientStatus } : {}),
       },

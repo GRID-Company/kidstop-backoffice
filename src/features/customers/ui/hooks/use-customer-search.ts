@@ -17,13 +17,13 @@ export function useCustomerSearch() {
         sort: DEFAULT_CUSTOMERS_SORT,
         ...(search.trim() ? { search: search.trim() } : {}),
         filters: {
-          roles: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
+          role: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
           active: true,
           ...(clientStatus ? { clientStatus } : {}),
         },
       },
     },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
 
   const handleFilterChange = useCallback(
