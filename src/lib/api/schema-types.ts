@@ -948,6 +948,7 @@ export type PokemonCardInternalItem = {
 
 export type PokemonCardInventoryItemInternal = {
   condition: Scalars['String']['output'];
+  guid: Scalars['String']['output'];
   purchasePrice?: Maybe<Scalars['Float']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Int']['output'];
