@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { usePokemonCatalog } from '@/features/catalog/ui/hooks/use-pokemon-catalog';
-import { IPokemonCard } from '@/features/catalog/domain/types';
+import { useMagicCatalog } from '@/features/catalog/ui/hooks/use-magic-catalog';
+import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { useMostWantedForm } from '../../adapters/forms/use-most-wanted-form';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
 
@@ -13,19 +14,25 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(null);
+  const [selectedCard, setSelectedCard] = useState<IPokemonCard | IMagicCard | null>(null);
 
   const form = useMostWantedForm();
 
-  const { cards, loading, setSearch: setPokemonSearch } = usePokemonCatalog(
+  const { cards: pokemonCards, loading: pokemonLoading, setSearch: setPokemonSearch } = usePokemonCatalog(
     selectedTCG !== 'POKEMON'
+  );
+
+  const { cards: magicCards, loading: magicLoading, setSearch: setMagicSearch } = useMagicCatalog(
+    selectedTCG !== 'MAGIC'
   );
 
   useEffect(() => {
     if (selectedTCG === 'POKEMON') {
       setPokemonSearch(search);
+    } else if (selectedTCG === 'MAGIC') {
+      setMagicSearch(search);
     }
-  }, [search, setPokemonSearch, selectedTCG]);
+  }, [search, setPokemonSearch, setMagicSearch, selectedTCG]);
 
   const existingCardGuids = useMemo(
     () => new Set(existingCards.map((card) => card.guid)),
@@ -33,9 +40,13 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
   );
 
   const searchResults = useMemo(() => {
-    if (selectedTCG !== 'POKEMON') return [];
-    return cards.filter((card) => !existingCardGuids.has(card.guid));
-  }, [cards, existingCardGuids, selectedTCG]);
+    if (selectedTCG === 'POKEMON') {
+      return pokemonCards.filter((card) => !existingCardGuids.has(card.guid));
+    } else if (selectedTCG === 'MAGIC') {
+      return magicCards.filter((card) => !existingCardGuids.has(card.guid));
+    }
+    return [];
+  }, [pokemonCards, magicCards, existingCardGuids, selectedTCG]);
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -52,7 +63,7 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
   }, [form]);
 
   const selectCard = useCallback(
-    (card: IPokemonCard | null) => {
+    (card: IPokemonCard | IMagicCard | null) => {
       setSelectedCard(card);
       if (card) {
         form.setValue('cardId', card.guid, { shouldValidate: true });
@@ -70,6 +81,8 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
     },
     [form, closeModal]
   );
+
+  const loading = selectedTCG === 'POKEMON' ? pokemonLoading : magicLoading;
 
   return {
     isOpen,
