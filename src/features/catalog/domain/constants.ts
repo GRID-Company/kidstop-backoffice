@@ -35,3 +35,9 @@ export const MAGIC_SORT_OPTIONS = [
 
 export const MIN_PRICE = 0;
 export const DEFAULT_MARGIN_PERCENTAGE = 30;
+
+export const STOCK_STATUS_OPTIONS = [
+  { label: 'Disponible', value: 'AVAILABLE' },
+  { label: 'No disponible', value: 'UNAVAILABLE' },
+  { label: 'Esperando recolección', value: 'AWAITING_PICKUP' },
+];

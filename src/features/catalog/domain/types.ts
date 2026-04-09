@@ -80,3 +80,43 @@ export interface IPokemonCollection {
   name: string;
   code: string | null;
 }
+
+export interface IMagicCardVariant {
+  guid: string;
+  condition: string;
+  stock: number;
+  purchasePrice: number | null;
+  sellPrice: number | null;
+}
+
+export interface IMagicCard {
+  guid: string;
+  name: string;
+  edition: string | null;
+  collectorNumber: string | null;
+  isFoil: boolean;
+  rarity: string | null;
+  sellPrice: number | null;
+  availableStock: boolean;
+  totalStock: number;
+  imageUri: string | null;
+  variants: IMagicCardVariant[];
+}
+
+export interface MagicCatalogFilters {
+  edition?: string;
+  rarity?: string;
+  isFoil?: boolean;
+  condition?: string;
+  stockStatus?: string;
+  sellPriceMin?: number;
+  sellPriceMax?: number;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+export interface IMagicCollection {
+  guid: string;
+  name: string;
+  editionIconUri: string | null;
+}
