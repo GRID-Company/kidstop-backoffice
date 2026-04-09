@@ -47,6 +47,7 @@ export interface CardListProps<T> {
 }
 
 export interface IPokemonCardVariant {
+  guid: string;
   condition: string;
   stock: number;
   purchasePrice: number | null;

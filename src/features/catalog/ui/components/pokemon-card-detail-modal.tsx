@@ -25,6 +25,7 @@ import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
 
 interface InventoryCard {
+  guid: string;
   condition: string;
   stock: number;
   purchasePrice: number | null;
@@ -78,6 +79,7 @@ export default function PokemonCardDetailModal({
       if (!detail || !selectedVariant) return;
       await handleUpdatePrice({
         cardGuid: detail.guid,
+        inventoryItemGuid: selectedVariant.guid,
         condition: selectedVariant.condition,
         purchasePrice: data.buyPrice,
         sellPrice: data.sellPrice,

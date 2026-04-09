@@ -10,6 +10,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       totalStock
       imageUri
       inventoryCards {
+        guid
         condition
         stock
         purchasePrice
@@ -33,6 +34,7 @@ query PokemonCardInternalDetail($guid: String!) {
     totalStock
     imageUri
     inventoryCards {
+      guid
       condition
       stock
       purchasePrice
