@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { SortDescriptor } from '@heroui/react';
 import { useQuery } from '@apollo/client/react';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -52,6 +52,13 @@ export function useInventorySearch() {
   const sortColumn = sortDescriptor?.column as string | undefined;
   const sortOrder = sortDescriptor?.direction === 'descending' ? 'DESC' : 'ASC';
 
+  useEffect(() => {
+    setPage(1);
+    setFilters({});
+    setSearch('');
+    setDateRange(undefined);
+  }, [selectedTCG]);
+
   const { data, loading, error, refetch } = useQuery(InventoryItemsDocument, {
     variables: {
       findInventoryItemsArgs: {
@@ -76,6 +83,7 @@ export function useInventorySearch() {
       },
     },
     fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
   });
 
   const items = useMemo<IInventoryItem[]>(() => {
