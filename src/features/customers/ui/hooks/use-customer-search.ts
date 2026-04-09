@@ -1,64 +1,60 @@
-import { useMemo, useState, useCallback } from 'react';
-import { MOCK_CUSTOMERS } from '../../adapters/api/customers.mock';
-import { CustomerFilters, ICustomer } from '../../domain/types';
+import { useState, useCallback } from 'react';
+import { useQuery } from '@apollo/client/react';
+import { CustomersDocument } from '@/lib/api/generated/customers.generated';
+import { toCustomerDomain } from '../../adapters/mappers/customer.mapper';
+import { CLIENT_STATUSES, DEFAULT_CUSTOMERS_SORT, DEFAULT_PAGE_SIZE } from '../../domain/constants';
+import { ClientStatus } from '../../domain/types';
 
 export function useCustomerSearch() {
   const [search, setSearch] = useState('');
-  const [filters, setFilters] = useState<Omit<CustomerFilters, 'search'>>({});
+  const [clientStatus, setClientStatus] = useState<ClientStatus | ''>('');
+
+  const { data, loading, error, refetch } = useQuery(CustomersDocument, {
+    variables: {
+      findUsersArgs: {
+        skip: 0,
+        limit: DEFAULT_PAGE_SIZE,
+        sort: DEFAULT_CUSTOMERS_SORT,
+        ...(search.trim() ? { search: search.trim() } : {}),
+        filters: {
+          roles: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
+          active: true,
+          ...(clientStatus ? { clientStatus } : {}),
+        },
+      },
+    },
+    fetchPolicy: 'cache-and-network',
+  });
 
   const handleFilterChange = useCallback(
-    (key: string, value: string | boolean) => {
-      if (value === '') {
-        setFilters((prev) => {
-          const next = { ...prev };
-          delete next[key as keyof typeof prev];
-          return next;
-        });
-        return;
-      }
-      setFilters((prev) => ({ ...prev, [key]: value }));
+    (_key: string, value: string | boolean) => {
+      const strValue = typeof value === 'boolean' ? '' : value;
+      const isValidStatus = Object.values(CLIENT_STATUSES).includes(strValue as ClientStatus);
+      setClientStatus(isValidStatus ? (strValue as ClientStatus) : '');
     },
     []
   );
 
   const resetFilters = useCallback(() => {
     setSearch('');
-    setFilters({});
+    setClientStatus('');
   }, []);
 
-  const results = useMemo(() => {
-    let customers: ICustomer[] = [...MOCK_CUSTOMERS];
-
-    if (search.trim()) {
-      const term = search.toLowerCase();
-      customers = customers.filter(
-        (c) =>
-          c.name.toLowerCase().includes(term) ||
-          c.email.toLowerCase().includes(term) ||
-          (c.phone && c.phone.toLowerCase().includes(term))
-      );
-    }
-
-    if (filters.type) {
-      customers = customers.filter((c) => c.type === filters.type);
-    }
-
-    if (filters.status) {
-      customers = customers.filter((c) => c.status === filters.status);
-    }
-
-    return customers;
-  }, [search, filters]);
-
-  const hasActiveFilters = search.trim() !== '' || Object.keys(filters).length > 0;
+  const results = (data?.users.data ?? []).map(toCustomerDomain);
+  const totalCount = data?.users.count ?? 0;
+  const hasActiveFilters = search.trim() !== '' || clientStatus !== '';
 
   return {
     search,
     setSearch,
-    filters,
+    clientStatus,
     handleFilterChange,
     resetFilters,
     results,
+    totalCount,
+    loading,
+    error,
+    refetch,
     hasActiveFilters,
   };
 }

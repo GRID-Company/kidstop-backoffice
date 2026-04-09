@@ -15,10 +15,7 @@ import { SubmitHandler } from 'react-hook-form';
 
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
 import { ICustomer } from '../../domain/types';
-import {
-  CUSTOMER_TYPES,
-  CUSTOMER_TYPE_LABELS,
-} from '../../domain/constants';
+import { CLIENT_STATUSES } from '../../domain/constants';
 import { useSetVipForm } from '../../adapters/forms/use-set-vip-form';
 import { SetVipFormData } from '../../adapters/forms/set-vip-form.schema';
 import CustomerTypeBadge from './customer-type-badge';
@@ -52,14 +49,7 @@ export default function SetVipModal({
 }: SetVipModalProps) {
   const { control, handleSubmit, reset } = useSetVipForm();
 
-  const isVip = customer?.type === CUSTOMER_TYPES.VIP;
-
-  const targetTypeLabel = useMemo(() => {
-    if (!customer) return '';
-    return isVip
-      ? CUSTOMER_TYPE_LABELS[CUSTOMER_TYPES.REGULAR]
-      : CUSTOMER_TYPE_LABELS[CUSTOMER_TYPES.VIP];
-  }, [customer, isVip]);
+  const isVip = customer?.clientStatus === CLIENT_STATUSES.VIP;
 
   useEffect(() => {
     if (isOpen) {
@@ -71,9 +61,9 @@ export default function SetVipModal({
     (data) => {
       if (!customer) return;
       if (isVip) {
-        onRemoveVip?.(customer.id, data);
+        onRemoveVip?.(customer.guid, data);
       } else {
-        onSetVip?.(customer.id, data);
+        onSetVip?.(customer.guid, data);
       }
     },
     [customer, isVip, onSetVip, onRemoveVip]
@@ -90,8 +80,8 @@ export default function SetVipModal({
           </span>
           <span className="text-sm font-normal text-default-500">
             {isVip
-              ? `Confirma que deseas regresar a este cliente a ${CUSTOMER_TYPE_LABELS[CUSTOMER_TYPES.REGULAR]}`
-              : `Confirma que deseas promover a este cliente a ${CUSTOMER_TYPE_LABELS[CUSTOMER_TYPES.VIP]}`}
+              ? 'Confirma que deseas regresar a este cliente a estado Estándar'
+              : 'Confirma que deseas promover a este cliente a VIP'}
           </span>
         </DrawerHeader>
 
@@ -100,16 +90,16 @@ export default function SetVipModal({
             <div className="flex items-start justify-between gap-2">
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="truncate text-sm font-semibold">{customer.name}</p>
-                <p className="truncate text-xs text-default-500">{customer.email}</p>
+                <p className="truncate text-xs text-default-500">{customer.emailAddress}</p>
                 {customer.phone && (
                   <p className="truncate text-xs text-default-400">{customer.phone}</p>
                 )}
               </div>
-              <CustomerTypeBadge type={customer.type} />
+              <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
             </div>
 
             <div className="flex items-center gap-2">
-              <CustomerStatusBadge status={customer.status} />
+              <CustomerStatusBadge clientStatus={customer.clientStatus} />
             </div>
           </div>
 
@@ -120,12 +110,12 @@ export default function SetVipModal({
             <div className="grid grid-cols-2 gap-4 rounded-lg bg-default-50 p-4 text-sm">
               <div className="flex flex-col items-center gap-1">
                 <span className="text-default-500">Total</span>
-                <span className="text-lg font-bold">{customer.totalOrders}</span>
+                <span className="text-lg font-bold">{customer.totalOrders ?? '—'}</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <span className="text-default-500">Último pedido</span>
                 <span className="text-sm font-bold">
-                  {formatDate(customer.lastOrderDate)}
+                  {formatDate(customer.lastOrderDate ?? null)}
                 </span>
               </div>
             </div>
@@ -143,7 +133,7 @@ export default function SetVipModal({
                 Cambio de tipo
               </span>
               <span className="text-xs text-default-500">
-                {CUSTOMER_TYPE_LABELS[customer.type]} → {targetTypeLabel}
+                {isVip ? 'VIP → Estándar' : 'Estándar → VIP'}
               </span>
             </div>
           </div>

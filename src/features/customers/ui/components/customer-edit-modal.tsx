@@ -8,16 +8,12 @@ import {
   DrawerBody,
   DrawerFooter,
   Button,
-  Divider,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
-import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import SelectForm from '@/shared/base/form-controls/select-form';
 import { ICustomer } from '../../domain/types';
-import { CUSTOMER_TYPE_OPTIONS } from '../../domain/constants';
 import { useCustomerForm } from '../../adapters/forms/use-customer-form';
 import { CustomerFormData } from '../../adapters/forms/customer-form.schema';
 import { toCustomerFormDefaults } from '../../adapters/mappers/customer.mapper';
@@ -48,7 +44,7 @@ export default function CustomerEditModal({
   const handleConfirm: SubmitHandler<CustomerFormData> = useCallback(
     (data) => {
       if (!customer || !onConfirm) return;
-      onConfirm(customer.id, data);
+      onConfirm(customer.guid, data);
     },
     [customer, onConfirm]
   );
@@ -86,7 +82,7 @@ export default function CustomerEditModal({
             <InputForm
               label="Email"
               placeholder="correo@ejemplo.com"
-              controlProps={{ control, name: 'email' }}
+              controlProps={{ control, name: 'emailAddress' }}
               isRequired
               aria-label="Email del cliente"
             />
@@ -98,25 +94,6 @@ export default function CustomerEditModal({
               aria-label="Teléfono del cliente"
             />
 
-            <SelectForm
-              label="Tipo de cliente"
-              placeholder="Selecciona un tipo"
-              controlProps={{ control, name: 'type' }}
-              items={CUSTOMER_TYPE_OPTIONS}
-              isRequired
-              aria-label="Tipo de cliente"
-            />
-
-            <Divider />
-
-            <TextareaForm
-              label="Notas (opcional)"
-              placeholder="Notas sobre el cliente"
-              controlProps={{ control, name: 'notes' }}
-              minRows={3}
-              maxRows={5}
-              aria-label="Notas del cliente"
-            />
           </form>
         </DrawerBody>
 

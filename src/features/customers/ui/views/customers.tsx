@@ -2,8 +2,6 @@
 
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@heroui/react';
-import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ICustomer } from '../../domain/types';
@@ -18,35 +16,25 @@ export default function Customers() {
     handleFilterChange,
     resetFilters,
     results,
+    loading,
     hasActiveFilters,
   } = useCustomerSearch();
 
   const handleCustomerPress = useCallback(
     (customer: ICustomer) => {
-      router.push(`/clientes/${customer.id}`);
+      router.push(`/clientes/${customer.guid}`);
     },
     [router]
   );
 
-  const handleCreateCustomer = useCallback(() => {
-    console.info('[mock] Create new customer');
-  }, []);
-
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="Clientes">
-        <Button
-          color="primary"
-          startContent={<Icon icon="lucide:user-plus" />}
-          onPress={handleCreateCustomer}
-        >
-          Nuevo cliente
-        </Button>
-      </EntitiesPage.Toolbar>
+      <EntitiesPage.Toolbar label="Clientes">{null}</EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
         <CustomersList
           customers={results}
+          loading={loading}
           hasActiveFilters={hasActiveFilters}
           onSearchChange={setSearch}
           onFilterChange={handleFilterChange}

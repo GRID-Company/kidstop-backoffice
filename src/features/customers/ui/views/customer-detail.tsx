@@ -1,21 +1,25 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { useQuery, useMutation } from '@apollo/client/react';
+import toast from 'react-hot-toast';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
-import { ICustomer } from '../../domain/types';
-import { CUSTOMER_STATUSES, CUSTOMER_TYPES } from '../../domain/constants';
-import { MOCK_CUSTOMERS } from '../../adapters/api/customers.mock';
-import { getMockCustomerOrdersSummary } from '../../adapters/api/customer-orders.mock';
+import { CLIENT_STATUSES } from '../../domain/constants';
+import {
+  CustomerDocument,
+  CustomersDocument,
+  SetClientStatusDocument,
+  UpdateCustomerDocument,
+} from '@/lib/api/generated/customers.generated';
+import { toCustomerDomain, toUpdateCustomerInput } from '../../adapters/mappers/customer.mapper';
 import { BlockCustomerFormData } from '../../adapters/forms/block-customer-form.schema';
-import { SetVipFormData } from '../../adapters/forms/set-vip-form.schema';
 import { CustomerFormData } from '../../adapters/forms/customer-form.schema';
 import CustomerTypeBadge from '../components/customer-type-badge';
 import CustomerStatusBadge from '../components/customer-status-badge';
-import CustomerOrdersSummary from '../components/customer-orders-summary';
 import BlockCustomerModal from '../components/block-customer-modal';
 import SetVipModal from '../components/set-vip-modal';
 import CustomerEditModal from '../components/customer-edit-modal';
@@ -24,7 +28,7 @@ interface CustomerDetailProps {
   customerId: string;
 }
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—';
   return new Intl.DateTimeFormat('es-MX', {
     day: '2-digit',
@@ -36,15 +40,18 @@ function formatDate(dateStr: string | null): string {
 export default function CustomerDetail({ customerId }: CustomerDetailProps) {
   const router = useRouter();
 
-  const customer = useMemo<ICustomer | null>(
-    () => MOCK_CUSTOMERS.find((c) => c.id === customerId) ?? null,
-    [customerId]
-  );
+  const { data, loading } = useQuery(CustomerDocument, {
+    variables: { guid: customerId },
+    fetchPolicy: 'cache-and-network',
+  });
 
-  const ordersSummary = useMemo(() => {
-    if (!customer) return null;
-    return getMockCustomerOrdersSummary(customer.id);
-  }, [customer]);
+  const [setClientStatus, { loading: settingStatus }] = useMutation(SetClientStatusDocument, {
+    refetchQueries: [CustomerDocument, CustomersDocument],
+  });
+
+  const [updateCustomer, { loading: updating }] = useMutation(UpdateCustomerDocument, {
+    refetchQueries: [CustomerDocument, CustomersDocument],
+  });
 
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
@@ -55,41 +62,102 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
   }, [router]);
 
   const handleBlockConfirm = useCallback(
-    (id: string, data: BlockCustomerFormData) => {
-      console.info(`[mock] Block customer: ${id}`, data);
-      setIsBlockModalOpen(false);
+    async (guid: string, _data: BlockCustomerFormData) => {
+      try {
+        await setClientStatus({
+          variables: { setClientStatusInput: { guid, clientStatus: CLIENT_STATUSES.BLOCKED } },
+        });
+        toast.success('Cliente bloqueado');
+        setIsBlockModalOpen(false);
+      } catch {
+        toast.error('Error al bloquear el cliente');
+      }
     },
-    []
+    [setClientStatus]
   );
 
-  const handleUnblock = useCallback((id: string) => {
-    console.info(`[mock] Unblock customer: ${id}`);
-    setIsBlockModalOpen(false);
-  }, []);
+  const handleUnblock = useCallback(
+    async (guid: string) => {
+      try {
+        await setClientStatus({
+          variables: { setClientStatusInput: { guid, clientStatus: CLIENT_STATUSES.STANDARD } },
+        });
+        toast.success('Cliente desbloqueado');
+        setIsBlockModalOpen(false);
+      } catch {
+        toast.error('Error al desbloquear el cliente');
+      }
+    },
+    [setClientStatus]
+  );
 
-  const handleSetVip = useCallback((id: string, data: SetVipFormData) => {
-    console.info(`[mock] Set VIP: ${id}`, data);
-    setIsVipModalOpen(false);
-  }, []);
+  const handleSetVip = useCallback(
+    async (guid: string) => {
+      try {
+        await setClientStatus({
+          variables: { setClientStatusInput: { guid, clientStatus: CLIENT_STATUSES.VIP } },
+        });
+        toast.success('Cliente promovido a VIP');
+        setIsVipModalOpen(false);
+      } catch {
+        toast.error('Error al promover a VIP');
+      }
+    },
+    [setClientStatus]
+  );
 
-  const handleRemoveVip = useCallback((id: string, data: SetVipFormData) => {
-    console.info(`[mock] Remove VIP: ${id}`, data);
-    setIsVipModalOpen(false);
-  }, []);
+  const handleRemoveVip = useCallback(
+    async (guid: string) => {
+      try {
+        await setClientStatus({
+          variables: { setClientStatusInput: { guid, clientStatus: CLIENT_STATUSES.STANDARD } },
+        });
+        toast.success('Estatus VIP removido');
+        setIsVipModalOpen(false);
+      } catch {
+        toast.error('Error al remover estatus VIP');
+      }
+    },
+    [setClientStatus]
+  );
 
   const handleEditConfirm = useCallback(
-    (id: string, data: CustomerFormData) => {
-      console.info(`[mock] Edit customer: ${id}`, data);
-      setIsEditModalOpen(false);
+    async (guid: string, formData: CustomerFormData) => {
+      try {
+        const { updateUserInput } = toUpdateCustomerInput(formData, guid);
+        await updateCustomer({ variables: { updateUserInput } });
+        toast.success('Cliente actualizado');
+        setIsEditModalOpen(false);
+      } catch {
+        toast.error('Error al actualizar el cliente');
+      }
     },
-    []
+    [updateCustomer]
   );
 
-  const handleViewOrder = useCallback((orderId: string) => {
-    console.info(`[mock] View order: ${orderId}`);
-  }, []);
+  if (loading && !data) {
+    return (
+      <EntitiesPage>
+        <EntitiesPage.Toolbar label="Detalle del cliente">
+          <Button
+            variant="light"
+            startContent={<Icon icon="lucide:arrow-left" />}
+            onPress={handleBack}
+            className="text-accent"
+          >
+            Volver
+          </Button>
+        </EntitiesPage.Toolbar>
+        <EntitiesPage.CardContainer>
+          <div className="flex flex-col items-center justify-center py-16 text-default-400">
+            <Icon icon="lucide:loader" className="animate-spin text-5xl" />
+          </div>
+        </EntitiesPage.CardContainer>
+      </EntitiesPage>
+    );
+  }
 
-  if (!customer) {
+  if (!data?.user) {
     return (
       <EntitiesPage>
         <EntitiesPage.Toolbar label="Detalle del cliente">
@@ -112,8 +180,10 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
     );
   }
 
-  const isBlocked = customer.status === CUSTOMER_STATUSES.BLOCKED;
-  const isVip = customer.type === CUSTOMER_TYPES.VIP;
+  const customer = toCustomerDomain(data.user);
+  const isBlocked = customer.clientStatus === CLIENT_STATUSES.BLOCKED;
+  const isVip = customer.clientStatus === CLIENT_STATUSES.VIP;
+  const mutating = settingStatus || updating;
 
   return (
     <>
@@ -139,7 +209,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                   <h2 className="text-xl font-bold">{customer.name}</h2>
                   <div className="flex items-center gap-2">
                     <Icon icon="lucide:mail" className="text-sm text-default-400" />
-                    <span className="text-sm text-default-600">{customer.email}</span>
+                    <span className="text-sm text-default-600">{customer.emailAddress}</span>
                   </div>
                   {customer.phone && (
                     <div className="flex items-center gap-2">
@@ -150,8 +220,8 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <CustomerTypeBadge type={customer.type} />
-                  <CustomerStatusBadge status={customer.status} />
+                  <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
+                  <CustomerStatusBadge clientStatus={customer.clientStatus} />
                 </div>
               </div>
 
@@ -162,16 +232,16 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                   <span className="text-[10px] uppercase tracking-wide text-default-400">
                     Total pedidos
                   </span>
-                  <span className="text-sm font-semibold">{customer.totalOrders}</span>
+                  <span className="text-sm font-semibold">{customer.totalOrders ?? '—'}</span>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] uppercase tracking-wide text-default-400">
                     No concretados
                   </span>
                   <span
-                    className={`text-sm font-semibold ${customer.uncompletedOrders > 0 ? 'text-danger' : ''}`}
+                    className={`text-sm font-semibold ${(customer.uncompletedOrders ?? 0) > 0 ? 'text-danger' : ''}`}
                   >
-                    {customer.uncompletedOrders}
+                    {customer.uncompletedOrders ?? '—'}
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -187,12 +257,12 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     Cliente desde
                   </span>
                   <span className="text-sm font-semibold">
-                    {formatDate(customer.createdAt)}
+                    {formatDate(customer.createdDate)}
                   </span>
                 </div>
               </div>
 
-              {isBlocked && customer.blockedAt && (
+              {isBlocked && (
                 <>
                   <Divider />
                   <div className="flex items-center gap-2 rounded-lg bg-danger-50 p-3">
@@ -200,10 +270,6 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     <div className="flex flex-col gap-0.5">
                       <span className="text-sm font-semibold text-danger">
                         Cliente bloqueado
-                      </span>
-                      <span className="text-xs text-danger-600">
-                        Desde {formatDate(customer.blockedAt)}
-                        {customer.notes && ` — ${customer.notes}`}
                       </span>
                     </div>
                   </div>
@@ -226,6 +292,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                   <Icon icon={isVip ? 'lucide:user-minus' : 'lucide:crown'} />
                 }
                 onPress={() => setIsVipModalOpen(true)}
+                isDisabled={isBlocked}
               >
                 {isVip ? 'Quitar VIP' : 'Promover VIP'}
               </Button>
@@ -240,15 +307,6 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                 {isBlocked ? 'Desbloquear' : 'Bloquear'}
               </Button>
             </div>
-
-            <Divider />
-
-            {ordersSummary && (
-              <CustomerOrdersSummary
-                summary={ordersSummary}
-                onViewOrder={handleViewOrder}
-              />
-            )}
           </div>
         </EntitiesPage.CardContainer>
       </EntitiesPage>
@@ -259,6 +317,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
         onClose={() => setIsBlockModalOpen(false)}
         onConfirm={handleBlockConfirm}
         onUnblock={handleUnblock}
+        loading={mutating}
       />
 
       <SetVipModal
@@ -267,6 +326,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
         onClose={() => setIsVipModalOpen(false)}
         onSetVip={handleSetVip}
         onRemoveVip={handleRemoveVip}
+        loading={mutating}
       />
 
       <CustomerEditModal
@@ -274,6 +334,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onConfirm={handleEditConfirm}
+        loading={updating}
       />
     </>
   );

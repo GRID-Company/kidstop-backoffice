@@ -4,7 +4,7 @@ import { Button, CardBody, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { ICustomer } from '../../domain/types';
-import { CUSTOMER_STATUSES } from '../../domain/constants';
+import { CLIENT_STATUSES } from '../../domain/constants';
 import CustomerTypeBadge from './customer-type-badge';
 import CustomerStatusBadge from './customer-status-badge';
 
@@ -14,7 +14,7 @@ interface CustomerCardProps {
   onToggleBlock?: (customer: ICustomer) => void;
 }
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return 'Sin pedidos';
   return new Intl.DateTimeFormat('es-MX', {
     day: '2-digit',
@@ -28,7 +28,7 @@ export default function CustomerCard({
   onViewDetail,
   onToggleBlock,
 }: CustomerCardProps) {
-  const isBlocked = customer.status === CUSTOMER_STATUSES.BLOCKED;
+  const isBlocked = customer.clientStatus === CLIENT_STATUSES.BLOCKED;
 
   return (
     <KidstopCard className="h-full">
@@ -36,13 +36,13 @@ export default function CustomerCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-col gap-0.5">
             <p className="truncate text-sm font-semibold">{customer.name}</p>
-            <p className="truncate text-xs text-default-500">{customer.email}</p>
+            <p className="truncate text-xs text-default-500">{customer.emailAddress}</p>
           </div>
-          <CustomerTypeBadge type={customer.type} />
+          <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
         </div>
 
         <div className="flex items-center gap-2">
-          <CustomerStatusBadge status={customer.status} />
+          <CustomerStatusBadge clientStatus={customer.clientStatus} />
         </div>
 
         <div className="flex items-center justify-between border-t border-default-100 pt-2">
@@ -51,7 +51,7 @@ export default function CustomerCard({
               Último pedido
             </span>
             <span className="text-xs font-medium text-default-700">
-              {formatDate(customer.lastOrderDate)}
+              {formatDate(customer.lastOrderDate ?? null)}
             </span>
           </div>
           <div className="flex flex-col items-end gap-0.5">
@@ -59,7 +59,7 @@ export default function CustomerCard({
               Pedidos
             </span>
             <span className="text-xs font-medium text-default-700">
-              {customer.totalOrders}
+              {customer.totalOrders ?? '—'}
             </span>
           </div>
         </div>
