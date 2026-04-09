@@ -1,27 +1,27 @@
-import { CUSTOMER_TYPES, CUSTOMER_STATUSES, ORDER_STATUSES } from './constants';
+import { CLIENT_STATUSES, CUSTOMER_ROLES, ORDER_STATUSES } from './constants';
 
-export type CustomerType = (typeof CUSTOMER_TYPES)[keyof typeof CUSTOMER_TYPES];
-
-export type CustomerStatus = (typeof CUSTOMER_STATUSES)[keyof typeof CUSTOMER_STATUSES];
+export type ClientStatus = (typeof CLIENT_STATUSES)[keyof typeof CLIENT_STATUSES];
+export type CustomerRole = (typeof CUSTOMER_ROLES)[keyof typeof CUSTOMER_ROLES];
 
 export interface ICustomer {
-  id: string;
+  guid: string;
   name: string;
-  email: string;
+  emailAddress: string;
   phone: string | null;
-  type: CustomerType;
-  status: CustomerStatus;
-  notes: string | null;
-  totalOrders: number;
-  lastOrderDate: string | null;
-  uncompletedOrders: number;
-  blockedAt: string | null;
-  createdAt: string;
+  role: CustomerRole;
+  clientStatus: ClientStatus;
+  active: boolean;
+  createdDate: string;
+  updatedDate?: string;
+  totalOrders?: number;
+  lastOrderDate?: string | null;
+  uncompletedOrders?: number;
+  blockedAt?: string | null;
+  notes?: string | null;
 }
 
 export interface CustomerFilters {
-  type?: CustomerType;
-  status?: CustomerStatus;
+  clientStatus?: ClientStatus;
   search?: string;
 }
 

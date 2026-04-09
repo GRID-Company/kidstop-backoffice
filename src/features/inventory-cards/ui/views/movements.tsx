@@ -1,10 +1,17 @@
 'use client';
 
+import { useCallback, useState } from 'react';
+
 import { useMovementSearch } from '../hooks/use-movement-search';
 import MovementFilters from '../components/movement-filters';
 import MovementHistoryTable from '../components/movement-history-table';
+import MovementDetailDrawer from '../components/movement-detail-drawer';
+import { IInventoryMovement } from '../../domain/types';
 
 export default function MovementsContent() {
+  const [selectedMovement, setSelectedMovement] = useState<IInventoryMovement | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const {
     setSearch,
     handleFilterChange,
@@ -21,6 +28,15 @@ export default function MovementsContent() {
     totalCount,
     loading,
   } = useMovementSearch();
+
+  const handleMovementPress = useCallback((item: IInventoryMovement) => {
+    setSelectedMovement(item);
+    setIsDrawerOpen(true);
+  }, []);
+
+  const handleDrawerClose = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
 
   return (
     <>
@@ -45,6 +61,13 @@ export default function MovementsContent() {
         sortDescriptor={sortDescriptor}
         onPageChange={setPage}
         onSortChange={setSortDescriptor}
+        onMovementPress={handleMovementPress}
+      />
+
+      <MovementDetailDrawer
+        item={selectedMovement}
+        isOpen={isDrawerOpen}
+        onClose={handleDrawerClose}
       />
     </>
   );

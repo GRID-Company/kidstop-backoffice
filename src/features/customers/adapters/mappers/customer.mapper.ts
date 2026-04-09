@@ -1,37 +1,59 @@
-import { ICustomer } from '../../domain/types';
+import { CLIENT_STATUSES, CUSTOMER_ROLES } from '../../domain/constants';
+import { ClientStatus, CustomerRole, ICustomer } from '../../domain/types';
 import { CustomerFormData } from '../forms/customer-form.schema';
+
+type ApiCustomerFragment = {
+  guid: string;
+  name: string | null;
+  emailAddress: string;
+  phone: string | null;
+  role: string;
+  clientStatus: string | null;
+  active: boolean;
+  createdDate: unknown;
+  updatedDate?: unknown;
+};
+
+export function toCustomerDomain(raw: ApiCustomerFragment): ICustomer {
+  return {
+    guid: raw.guid,
+    name: raw.name ?? '',
+    emailAddress: raw.emailAddress,
+    phone: raw.phone,
+    role: (raw.role as CustomerRole) ?? CUSTOMER_ROLES.CLIENT,
+    clientStatus: (raw.clientStatus as ClientStatus) ?? CLIENT_STATUSES.STANDARD,
+    active: raw.active,
+    createdDate: String(raw.createdDate ?? ''),
+    updatedDate: raw.updatedDate ? String(raw.updatedDate) : undefined,
+  };
+}
 
 export function toCustomerFormDefaults(customer: ICustomer): CustomerFormData {
   return {
     name: customer.name,
-    email: customer.email,
+    emailAddress: customer.emailAddress,
     phone: customer.phone ?? '',
-    type: customer.type,
-    notes: customer.notes ?? '',
   };
 }
 
-export function toCreateCustomerPayload(data: CustomerFormData) {
+export function toCreateCustomerInput(data: CustomerFormData) {
   return {
-    createCustomerInput: {
+    createUserInput: {
       name: data.name,
-      email: data.email,
-      phone: data.phone || null,
-      type: data.type,
-      notes: data.notes || null,
+      emailAddress: data.emailAddress,
+      phone: data.phone || undefined,
+      role: CUSTOMER_ROLES.CLIENT,
     },
   };
 }
 
-export function toUpdateCustomerPayload(data: CustomerFormData, customerId: string) {
+export function toUpdateCustomerInput(data: CustomerFormData, guid: string) {
   return {
-    updateCustomerInput: {
-      id: customerId,
+    updateUserInput: {
+      guid,
       name: data.name,
-      email: data.email,
-      phone: data.phone || null,
-      type: data.type,
-      notes: data.notes || null,
+      emailAddress: data.emailAddress,
+      phone: data.phone || undefined,
     },
   };
 }

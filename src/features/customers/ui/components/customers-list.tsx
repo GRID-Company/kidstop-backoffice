@@ -9,8 +9,7 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { ICustomer } from '../../domain/types';
 import {
-  CUSTOMER_TYPE_OPTIONS,
-  CUSTOMER_STATUS_OPTIONS,
+  CLIENT_STATUS_FILTER_OPTIONS,
   DEFAULT_PAGE_SIZE,
 } from '../../domain/constants';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
@@ -30,17 +29,17 @@ interface CustomersListProps {
 
 const COLUMNS: ITableColumn[] = [
   { key: 'name', label: 'Nombre', allowSorting: true },
-  { key: 'email', label: 'Email' },
+  { key: 'emailAddress', label: 'Email' },
   { key: 'phone', label: 'Teléfono' },
   {
-    key: 'type',
+    key: 'clientStatus',
     label: 'Tipo',
-    customCol: (row: ICustomer) => <CustomerTypeBadge type={row.type} />,
+    customCol: (row: ICustomer) => <CustomerTypeBadge role={row.role} clientStatus={row.clientStatus} />,
   },
   {
-    key: 'status',
+    key: 'clientStatus',
     label: 'Estado',
-    customCol: (row: ICustomer) => <CustomerStatusBadge status={row.status} />,
+    customCol: (row: ICustomer) => <CustomerStatusBadge clientStatus={row.clientStatus} />,
   },
   { key: 'totalOrders', label: 'Pedidos' },
 ];
@@ -81,18 +80,11 @@ export default function CustomersList({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Select
-          placeholder="Todos los tipos"
-          label="Tipo"
-          items={CUSTOMER_TYPE_OPTIONS}
-          onChange={(e) => onFilterChange('type', e.target.value)}
-          aria-label="Filtrar por tipo de cliente"
-        />
-        <Select
           placeholder="Todos los estados"
           label="Estado"
-          items={CUSTOMER_STATUS_OPTIONS}
-          onChange={(e) => onFilterChange('status', e.target.value)}
-          aria-label="Filtrar por estado"
+          items={CLIENT_STATUS_FILTER_OPTIONS}
+          onChange={(e) => onFilterChange('clientStatus', e.target.value)}
+          aria-label="Filtrar por estado del cliente"
         />
       </div>
 
@@ -128,7 +120,7 @@ export default function CustomersList({
               onRowAction={
                 onCustomerPress
                   ? (key) => {
-                      const customer = paginatedCustomers.find((c) => c.id === key);
+                      const customer = paginatedCustomers.find((c) => c.guid === key);
                       if (customer) onCustomerPress(customer);
                     }
                   : undefined
@@ -139,23 +131,23 @@ export default function CustomersList({
           <div className="flex flex-col gap-3 md:hidden">
             {paginatedCustomers.map((customer) => (
               <button
-                key={customer.id}
+                key={customer.guid}
                 type="button"
                 className="flex flex-col gap-2 rounded-lg border border-default-200 bg-white p-4 text-left shadow-sm transition-shadow hover:shadow-md"
                 onClick={() => onCustomerPress?.(customer)}
               >
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold">{customer.name}</p>
-                  <CustomerTypeBadge type={customer.type} />
+                  <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
                 </div>
-                <p className="text-xs text-default-500">{customer.email}</p>
+                <p className="text-xs text-default-500">{customer.emailAddress}</p>
                 {customer.phone && (
                   <p className="text-xs text-default-400">{customer.phone}</p>
                 )}
                 <div className="flex items-center justify-between">
-                  <CustomerStatusBadge status={customer.status} />
+                  <CustomerStatusBadge clientStatus={customer.clientStatus} />
                   <span className="text-xs text-default-400">
-                    {customer.totalOrders} pedidos
+                    {customer.totalOrders ?? 0} pedidos
                   </span>
                 </div>
               </button>

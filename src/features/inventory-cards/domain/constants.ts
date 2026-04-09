@@ -61,3 +61,22 @@ export const DEFAULT_MOVEMENTS_SORT: ITableSort = {
 export const DEFAULT_PAGE_SIZE = 20;
 
 export const DEFAULT_INVENTORY_LIMIT = 20;
+
+export const MOVEMENT_TYPE_ICONS: Record<string, string> = {
+  [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'lucide:arrow-down-circle',
+  [MOVEMENT_TYPES.SALE_EXIT]: 'lucide:arrow-up-circle',
+  [MOVEMENT_TYPES.MANUAL_ADJUSTMENT]: 'lucide:settings-2',
+};
+
+export function formatMovementQuantity(movement: { movementType: string; quantity: number }): {
+  text: string;
+  className: string;
+} {
+  const isPositive =
+    movement.movementType === MOVEMENT_TYPES.PURCHASE_ENTRY ||
+    (movement.movementType === MOVEMENT_TYPES.MANUAL_ADJUSTMENT && movement.quantity > 0);
+  return {
+    text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,
+    className: isPositive ? 'text-success' : 'text-danger',
+  };
+}

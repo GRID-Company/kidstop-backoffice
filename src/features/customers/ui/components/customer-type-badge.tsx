@@ -1,21 +1,34 @@
 import { Chip } from '@heroui/react';
-import { CUSTOMER_TYPE_LABELS, CUSTOMER_TYPE_COLORS } from '../../domain/constants';
-import { CustomerType } from '../../domain/types';
+import {
+  CUSTOMER_ROLE_LABELS,
+  CUSTOMER_ROLE_COLORS,
+  CUSTOMER_ROLES,
+  CLIENT_STATUSES,
+} from '../../domain/constants';
+import { ClientStatus, CustomerRole } from '../../domain/types';
 
 interface CustomerTypeBadgeProps {
-  type: CustomerType;
+  role: CustomerRole;
+  clientStatus: ClientStatus;
   className?: string;
 }
 
-export default function CustomerTypeBadge({ type, className }: CustomerTypeBadgeProps) {
-  return (
-    <Chip
-      size="sm"
-      color={CUSTOMER_TYPE_COLORS[type] ?? 'default'}
-      variant="flat"
-      className={className}
-    >
-      {CUSTOMER_TYPE_LABELS[type] ?? type}
-    </Chip>
-  );
+export default function CustomerTypeBadge({ role, clientStatus, className }: CustomerTypeBadgeProps) {
+  if (role === CUSTOMER_ROLES.CLIENT_KIOSK) {
+    return (
+      <Chip size="sm" color={CUSTOMER_ROLE_COLORS[role]} variant="flat" className={className}>
+        {CUSTOMER_ROLE_LABELS[role]}
+      </Chip>
+    );
+  }
+
+  if (clientStatus === CLIENT_STATUSES.VIP) {
+    return (
+      <Chip size="sm" color="warning" variant="flat" className={className}>
+        VIP
+      </Chip>
+    );
+  }
+
+  return null;
 }

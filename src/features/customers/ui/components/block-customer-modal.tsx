@@ -17,10 +17,7 @@ import { SubmitHandler } from 'react-hook-form';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
 import { ICustomer } from '../../domain/types';
 import {
-  CUSTOMER_STATUSES,
-  CUSTOMER_STATUS_LABELS,
-  CUSTOMER_STATUS_COLORS,
-  CUSTOMER_TYPE_LABELS,
+  CLIENT_STATUSES,
   DEFAULT_UNCOMPLETED_ORDERS_THRESHOLD,
 } from '../../domain/constants';
 import { checkBlockThreshold } from '../../domain/customers.domain';
@@ -39,15 +36,6 @@ interface BlockCustomerModalProps {
   loading?: boolean;
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  return new Intl.DateTimeFormat('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(dateStr));
-}
-
 export default function BlockCustomerModal({
   customer,
   isOpen,
@@ -59,7 +47,7 @@ export default function BlockCustomerModal({
 }: BlockCustomerModalProps) {
   const { control, handleSubmit, formState, reset } = useBlockCustomerForm();
 
-  const isBlocked = customer?.status === CUSTOMER_STATUSES.BLOCKED;
+  const isBlocked = customer?.clientStatus === CLIENT_STATUSES.BLOCKED;
 
   const exceedsThreshold = useMemo(() => {
     if (!customer) return false;
@@ -75,14 +63,14 @@ export default function BlockCustomerModal({
   const handleBlock: SubmitHandler<BlockCustomerFormData> = useCallback(
     (data) => {
       if (!customer || !onConfirm) return;
-      onConfirm(customer.id, data);
+      onConfirm(customer.guid, data);
     },
     [customer, onConfirm]
   );
 
   const handleUnblock = useCallback(() => {
     if (!customer || !onUnblock) return;
-    onUnblock(customer.id);
+    onUnblock(customer.guid);
   }, [customer, onUnblock]);
 
   if (!customer) return null;
@@ -106,21 +94,16 @@ export default function BlockCustomerModal({
             <div className="flex items-start justify-between gap-2">
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="truncate text-sm font-semibold">{customer.name}</p>
-                <p className="truncate text-xs text-default-500">{customer.email}</p>
+                <p className="truncate text-xs text-default-500">{customer.emailAddress}</p>
                 {customer.phone && (
                   <p className="truncate text-xs text-default-400">{customer.phone}</p>
                 )}
               </div>
-              <CustomerTypeBadge type={customer.type} />
+              <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
             </div>
 
             <div className="flex items-center gap-2">
-              <CustomerStatusBadge status={customer.status} />
-              {customer.blockedAt && (
-                <span className="text-xs text-default-400">
-                  desde {formatDate(customer.blockedAt)}
-                </span>
-              )}
+              <CustomerStatusBadge clientStatus={customer.clientStatus} />
             </div>
           </div>
 
@@ -131,14 +114,14 @@ export default function BlockCustomerModal({
             <div className="grid grid-cols-3 gap-4 rounded-lg bg-default-50 p-4 text-sm">
               <div className="flex flex-col items-center gap-1">
                 <span className="text-default-500">Total</span>
-                <span className="text-lg font-bold">{customer.totalOrders}</span>
+                <span className="text-lg font-bold">{customer.totalOrders ?? '—'}</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <span className="text-default-500">No concretados</span>
                 <span
                   className={`text-lg font-bold ${exceedsThreshold ? 'text-danger' : ''}`}
                 >
-                  {customer.uncompletedOrders}
+                  {customer.uncompletedOrders ?? '—'}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-1">
@@ -183,17 +166,6 @@ export default function BlockCustomerModal({
             </>
           )}
 
-          {isBlocked && customer.notes && (
-            <>
-              <Divider />
-              <div className="flex flex-col gap-2">
-                <h4 className="text-sm font-semibold">Razón del bloqueo</h4>
-                <p className="rounded-lg bg-danger-50 p-3 text-sm text-danger-700">
-                  {customer.notes}
-                </p>
-              </div>
-            </>
-          )}
         </DrawerBody>
 
         <DrawerFooter className="flex justify-between">
