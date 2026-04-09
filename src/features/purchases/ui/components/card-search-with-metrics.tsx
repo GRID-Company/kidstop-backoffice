@@ -61,25 +61,26 @@ function CardResultItem({
   });
   const [isAdding, setIsAdding] = useState(false);
 
-  const { metrics: variantMetrics, ungradedPrice, loading: metricsLoading } = useCardVariantMetrics(
+  const { metrics: variantMetrics, referencePrice, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
-    addState.condition
+    addState.condition,
+    card.tcgType
   );
 
   useEffect(() => {
-    if (ungradedPrice !== null) {
-      const calculatedPrice = Math.round(ungradedPrice * 0.6 * 100) / 100;
+    if (referencePrice !== null) {
+      const calculatedPrice = Math.round(referencePrice * 0.6 * 100) / 100;
       setAddState((s) => ({ ...s, unitBuyPrice: calculatedPrice }));
     }
-  }, [ungradedPrice, addState.condition]);
+  }, [referencePrice, addState.condition]);
 
   const handleAdd = useCallback(async () => {
     if (addState.unitBuyPrice <= 0 || addState.quantity < 1) return;
     setIsAdding(true);
     try {
       await onAdd(card, addState);
-      const resetPrice = ungradedPrice !== null 
-        ? Math.round(ungradedPrice * 0.6 * 100) / 100
+      const resetPrice = referencePrice !== null 
+        ? Math.round(referencePrice * 0.6 * 100) / 100
         : Math.round(card.metrics.referencePrice * 0.6 * 100) / 100;
       setAddState({
         ...DEFAULT_ADD_STATE,
@@ -88,7 +89,7 @@ function CardResultItem({
     } finally {
       setIsAdding(false);
     }
-  }, [card, addState, onAdd, ungradedPrice]);
+  }, [card, addState, onAdd, referencePrice]);
 
   const displayMetrics = variantMetrics || card.metrics;
 
@@ -140,7 +141,7 @@ function CardResultItem({
               <MetricItem
                 icon="lucide:tag"
                 label="Precio ref."
-                value={formatCurrency(ungradedPrice ?? card.metrics.referencePrice)}
+                value={formatCurrency(referencePrice ?? card.metrics.referencePrice)}
                 valueClassName="text-accent font-semibold"
               />
               <MetricItem

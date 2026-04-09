@@ -5,8 +5,8 @@ import { useDebounce } from '@/lib/hooks/use-debounce';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
+import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { ICardSearchResult } from '../../domain/types';
-import { MOCK_CARD_SEARCH_RESULTS } from '../../adapters/api/card-search.mock';
 
 export function useCardSearch() {
   const [search, setSearch] = useState('');
@@ -25,6 +25,21 @@ export function useCardSearch() {
         },
       },
       skip: selectedTCG !== TCG_TYPES.POKEMON || !debouncedSearch.trim(),
+    }
+  );
+
+  const { data: magicData, loading: magicLoading } = useQuery(
+    MagicCardInternalListDocument,
+    {
+      variables: {
+        findMagicCardsPublicArgs: {
+          skip: 0,
+          limit: 5,
+          sort: { column: 'name', order: 'ASC' },
+          search: debouncedSearch.trim() || undefined,
+        },
+      },
+      skip: selectedTCG !== TCG_TYPES.MAGIC || !debouncedSearch.trim(),
     }
   );
 
@@ -53,19 +68,30 @@ export function useCardSearch() {
       }));
     }
 
-    const filtered = MOCK_CARD_SEARCH_RESULTS.filter(
-      (card) => card.tcgType === selectedTCG
-    );
+    if (selectedTCG === TCG_TYPES.MAGIC) {
+      if (!magicData?.magicCardInternalList?.data) return [];
+      
+      return magicData.magicCardInternalList.data.map((card): ICardSearchResult => ({
+        guid: card.guid,
+        name: card.name,
+        setName: card.edition || '',
+        setCode: '',
+        number: card.collectorNumber || '',
+        rarity: '',
+        imageUrl: card.imageUri || '',
+        tcgType: TCG_TYPES.MAGIC,
+        metrics: {
+          referencePrice: card.sellPrice || 0,
+          currentStock: card.availableStock ? 1 : 0,
+          lastSaleDate: null,
+          daysInInventory: 0,
+          wishlistCount: 0,
+        },
+      }));
+    }
 
-    const term = debouncedSearch.toLowerCase().trim();
-    return filtered.filter(
-      (card) =>
-        card.name.toLowerCase().includes(term) ||
-        card.setName.toLowerCase().includes(term) ||
-        card.setCode.toLowerCase().includes(term) ||
-        card.number.includes(term)
-    ).slice(0, 5);
-  }, [debouncedSearch, selectedTCG, pokemonData]);
+    return [];
+  }, [debouncedSearch, selectedTCG, pokemonData, magicData]);
 
   const resetSearch = () => setSearch('');
 
@@ -75,6 +101,6 @@ export function useCardSearch() {
     results,
     resetSearch,
     selectedTCG,
-    loading: selectedTCG === TCG_TYPES.POKEMON ? pokemonLoading : false,
+    loading: selectedTCG === TCG_TYPES.POKEMON ? pokemonLoading : magicLoading,
   };
 }
