@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import {
   Chip,
@@ -16,10 +17,13 @@ import {
 import { Icon } from '@iconify/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { formatUnixDateTime } from '@/lib/utils/format-date';
 import { IInventoryMovement } from '../../domain/types';
 import {
   MOVEMENT_TYPE_LABELS,
   MOVEMENT_TYPE_COLORS,
+  MOVEMENT_TYPE_ICONS,
+  formatMovementQuantity,
 } from '../../domain/constants';
 
 interface MovementHistoryTableProps {
@@ -43,42 +47,13 @@ const COLUMNS = [
   { key: 'reference', label: 'Referencia', allowsSorting: true },
 ];
 
-const MOVEMENT_TYPE_ICONS: Record<string, string> = {
-  PURCHASE_ENTRY: 'lucide:arrow-down-circle',
-  SALE_EXIT: 'lucide:arrow-up-circle',
-  MANUAL_ADJUSTMENT: 'lucide:settings-2',
-};
-
-function formatDate(dateStr: string): string {
-  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatQuantity(movement: IInventoryMovement): {
-  text: string;
-  className: string;
-} {
-  const isPositive =
-    movement.movementType === 'PURCHASE_ENTRY' ||
-    (movement.movementType === 'MANUAL_ADJUSTMENT' && movement.quantity > 0);
-
-  return {
-    text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,
-    className: isPositive ? 'text-success' : 'text-danger',
-  };
-}
 
 function renderCell(item: IInventoryMovement, columnKey: string) {
   switch (columnKey) {
     case 'createdDate':
       return (
         <span className="text-sm text-default-500">
-          {formatDate(item.createdDate)}
+          {formatUnixDateTime(item.createdDate)}
         </span>
       );
     case 'cardName':
@@ -124,7 +99,7 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
         </Chip>
       );
     case 'quantity': {
-      const { text, className } = formatQuantity(item);
+      const { text, className } = formatMovementQuantity(item);
       return <span className={`text-sm font-semibold ${className}`}>{text}</span>;
     }
     case 'userName':
@@ -147,7 +122,7 @@ function MovementMobileCard({
   item: IInventoryMovement;
   onPress?: (item: IInventoryMovement) => void;
 }) {
-  const { text: qtyText, className: qtyClass } = formatQuantity(item);
+  const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
 
   return (
     <KidstopCard
@@ -200,7 +175,7 @@ function MovementMobileCard({
           </div>
 
           <div className="flex items-center gap-3 text-[11px] text-default-400">
-            <span>{formatDate(item.createdDate)}</span>
+            <span>{formatUnixDateTime(item.createdDate)}</span>
             <span>{item.userName}</span>
             {item.reference && <span>{item.reference}</span>}
           </div>
@@ -248,6 +223,15 @@ export default function MovementHistoryTable({
           aria-label="Historial de movimientos"
           sortDescriptor={sortDescriptor}
           onSortChange={onSortChange}
+          onRowAction={
+            onMovementPress
+              ? (key: React.Key) => {
+                  const item = items.find((i) => i.guid === String(key));
+                  if (item) onMovementPress(item);
+                }
+              : undefined
+          }
+          className={onMovementPress ? '[&_tr]:cursor-pointer' : ''}
         >
           <TableHeader columns={COLUMNS}>
             {(column) => (
@@ -262,11 +246,7 @@ export default function MovementHistoryTable({
           </TableHeader>
           <TableBody items={items}>
             {(item) => (
-              <TableRow
-                key={item.guid}
-                className={onMovementPress ? 'cursor-pointer' : ''}
-                onClick={() => onMovementPress?.(item)}
-              >
+              <TableRow key={item.guid}>
                 {COLUMNS.map((col) => (
                   <TableCell key={col.key} className="text-center">
                     {renderCell(item, col.key)}

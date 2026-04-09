@@ -13,40 +13,19 @@ import {
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
+import { formatUnixDateTime } from '@/lib/utils/format-date';
 import { IInventoryMovement } from '../../domain/types';
-import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '../../domain/constants';
+import {
+  MOVEMENT_TYPE_LABELS,
+  MOVEMENT_TYPE_COLORS,
+  MOVEMENT_TYPE_ICONS,
+  formatMovementQuantity,
+} from '../../domain/constants';
 
 interface MovementDetailDrawerProps {
   item: IInventoryMovement | null;
   isOpen: boolean;
   onClose: () => void;
-}
-
-const MOVEMENT_TYPE_ICONS: Record<string, string> = {
-  PURCHASE_ENTRY: 'lucide:arrow-down-circle',
-  SALE_EXIT: 'lucide:arrow-up-circle',
-  MANUAL_ADJUSTMENT: 'lucide:settings-2',
-};
-
-function formatDate(dateStr: string): string {
-  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatQuantity(item: IInventoryMovement): { text: string; className: string } {
-  const isPositive =
-    item.movementType === 'PURCHASE_ENTRY' ||
-    (item.movementType === 'MANUAL_ADJUSTMENT' && item.quantity > 0);
-
-  return {
-    text: isPositive ? `+${item.quantity}` : `${item.quantity}`,
-    className: isPositive ? 'text-success' : 'text-danger',
-  };
 }
 
 export default function MovementDetailDrawer({
@@ -56,7 +35,7 @@ export default function MovementDetailDrawer({
 }: MovementDetailDrawerProps) {
   if (!item) return null;
 
-  const { text: qtyText, className: qtyClass } = formatQuantity(item);
+  const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose} size="md">
@@ -64,7 +43,7 @@ export default function MovementDetailDrawer({
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">Detalle del movimiento</span>
           <span className="text-sm font-normal text-default-500">
-            {formatDate(item.createdDate)}
+            {formatUnixDateTime(item.createdDate)}
           </span>
         </DrawerHeader>
 
