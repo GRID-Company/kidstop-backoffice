@@ -51,7 +51,7 @@ const ClickUp = {
   icon: 'simple-icons:clickup',
 };
 
-const ADMIN_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings, ClickUp];
+const ADMIN_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
