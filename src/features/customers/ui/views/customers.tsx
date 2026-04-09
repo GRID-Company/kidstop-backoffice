@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ICustomer } from '../../domain/types';
@@ -17,6 +18,7 @@ export default function Customers() {
     resetFilters,
     results,
     loading,
+    error,
     hasActiveFilters,
   } = useCustomerSearch();
 
@@ -26,6 +28,21 @@ export default function Customers() {
     },
     [router]
   );
+
+  if (error) {
+    return (
+      <EntitiesPage>
+        <EntitiesPage.Toolbar label="Clientes">{null}</EntitiesPage.Toolbar>
+        <EntitiesPage.CardContainer>
+          <div className="flex flex-col items-center justify-center py-16 text-default-400">
+            <Icon icon="lucide:wifi-off" className="text-5xl" />
+            <p className="mt-4 text-lg font-medium">Error al cargar clientes</p>
+            <p className="text-sm">Verifica tu conexión e intenta de nuevo</p>
+          </div>
+        </EntitiesPage.CardContainer>
+      </EntitiesPage>
+    );
+  }
 
   return (
     <EntitiesPage>

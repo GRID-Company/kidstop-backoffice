@@ -27,7 +27,8 @@ export function useCustomerSearch() {
   });
 
   const handleFilterChange = useCallback(
-    (_key: string, value: string | boolean) => {
+    (key: string, value: string | boolean) => {
+      if (key !== 'clientStatus') return;
       const strValue = typeof value === 'boolean' ? '' : value;
       const isValidStatus = Object.values(CLIENT_STATUSES).includes(strValue as ClientStatus);
       setClientStatus(isValidStatus ? (strValue as ClientStatus) : '');
