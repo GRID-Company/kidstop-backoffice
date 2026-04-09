@@ -31,6 +31,7 @@ interface MovementHistoryTableProps {
   isLoading?: boolean;
   onPageChange: (page: number) => void;
   onSortChange: (descriptor: SortDescriptor) => void;
+  onMovementPress?: (item: IInventoryMovement) => void;
 }
 
 const COLUMNS = [
@@ -139,11 +140,20 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
   }
 }
 
-function MovementMobileCard({ item }: { item: IInventoryMovement }) {
+function MovementMobileCard({
+  item,
+  onPress,
+}: {
+  item: IInventoryMovement;
+  onPress?: (item: IInventoryMovement) => void;
+}) {
   const { text: qtyText, className: qtyClass } = formatQuantity(item);
 
   return (
-    <KidstopCard>
+    <KidstopCard
+      isPressable={!!onPress}
+      onPress={() => onPress?.(item)}
+    >
       <CardBody className="flex flex-row gap-3 !p-4">
         <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100">
           {item.cardImageUrl ? (
@@ -209,6 +219,7 @@ export default function MovementHistoryTable({
   isLoading = false,
   onPageChange,
   onSortChange,
+  onMovementPress,
 }: MovementHistoryTableProps) {
   if (isLoading) {
     return (
@@ -251,7 +262,11 @@ export default function MovementHistoryTable({
           </TableHeader>
           <TableBody items={items}>
             {(item) => (
-              <TableRow key={item.guid}>
+              <TableRow
+                key={item.guid}
+                className={onMovementPress ? 'cursor-pointer' : ''}
+                onClick={() => onMovementPress?.(item)}
+              >
                 {COLUMNS.map((col) => (
                   <TableCell key={col.key} className="text-center">
                     {renderCell(item, col.key)}
@@ -265,7 +280,7 @@ export default function MovementHistoryTable({
 
       <div className="flex flex-col gap-3 lg:hidden">
         {items.map((item) => (
-          <MovementMobileCard key={item.guid} item={item} />
+          <MovementMobileCard key={item.guid} item={item} onPress={onMovementPress} />
         ))}
       </div>
 
