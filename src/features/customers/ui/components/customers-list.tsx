@@ -32,7 +32,7 @@ const COLUMNS: ITableColumn[] = [
   { key: 'emailAddress', label: 'Email' },
   { key: 'phone', label: 'Teléfono' },
   {
-    key: 'clientStatus',
+    key: 'clientType',
     label: 'Tipo',
     customCol: (row: ICustomer) => <CustomerTypeBadge role={row.role} clientStatus={row.clientStatus} />,
   },
