@@ -1,43 +1,57 @@
 import { ITableSort } from '@/lib/types/datatable.types';
 
-export const CUSTOMER_TYPES = {
-  REGULAR: 'REGULAR',
-  VIP: 'VIP',
+export const CUSTOMER_ROLES = {
+  CLIENT: 'CLIENT',
+  CLIENT_KIOSK: 'CLIENT_KIOSK',
 } as const;
 
-export const CUSTOMER_TYPE_LABELS: Record<string, string> = {
-  [CUSTOMER_TYPES.REGULAR]: 'Cliente',
-  [CUSTOMER_TYPES.VIP]: 'Cliente VIP',
+export const CUSTOMER_ROLE_LABELS: Record<string, string> = {
+  [CUSTOMER_ROLES.CLIENT]: 'Cliente',
+  [CUSTOMER_ROLES.CLIENT_KIOSK]: 'Kiosk',
 };
 
-export const CUSTOMER_TYPE_COLORS: Record<string, 'default' | 'warning'> = {
-  [CUSTOMER_TYPES.REGULAR]: 'default',
-  [CUSTOMER_TYPES.VIP]: 'warning',
+export const CUSTOMER_ROLE_COLORS: Record<string, 'default' | 'secondary'> = {
+  [CUSTOMER_ROLES.CLIENT]: 'default',
+  [CUSTOMER_ROLES.CLIENT_KIOSK]: 'secondary',
 };
 
-export const CUSTOMER_TYPE_OPTIONS = Object.values(CUSTOMER_TYPES).map((type) => ({
-  value: type,
-  label: CUSTOMER_TYPE_LABELS[type],
-}));
-
-export const CUSTOMER_STATUSES = {
-  ACTIVE: 'ACTIVE',
+export const CLIENT_STATUSES = {
+  STANDARD: 'STANDARD',
+  VIP: 'VIP',
   BLOCKED: 'BLOCKED',
 } as const;
 
-export const CUSTOMER_STATUS_LABELS: Record<string, string> = {
-  [CUSTOMER_STATUSES.ACTIVE]: 'Activo',
-  [CUSTOMER_STATUSES.BLOCKED]: 'Bloqueado',
+export const CLIENT_STATUS_TYPE_LABELS: Record<string, string> = {
+  [CLIENT_STATUSES.STANDARD]: 'Cliente',
+  [CLIENT_STATUSES.VIP]: 'VIP',
+  [CLIENT_STATUSES.BLOCKED]: 'Cliente',
 };
 
-export const CUSTOMER_STATUS_COLORS: Record<string, 'success' | 'danger'> = {
-  [CUSTOMER_STATUSES.ACTIVE]: 'success',
-  [CUSTOMER_STATUSES.BLOCKED]: 'danger',
+export const CLIENT_STATUS_TYPE_COLORS: Record<string, 'default' | 'warning'> = {
+  [CLIENT_STATUSES.STANDARD]: 'default',
+  [CLIENT_STATUSES.VIP]: 'warning',
+  [CLIENT_STATUSES.BLOCKED]: 'default',
 };
 
-export const CUSTOMER_STATUS_OPTIONS = Object.values(CUSTOMER_STATUSES).map((status) => ({
+export const CLIENT_STATUS_LABELS: Record<string, string> = {
+  [CLIENT_STATUSES.STANDARD]: 'Activo',
+  [CLIENT_STATUSES.VIP]: 'Activo',
+  [CLIENT_STATUSES.BLOCKED]: 'Bloqueado',
+};
+
+export const CLIENT_STATUS_COLORS: Record<string, 'success' | 'danger'> = {
+  [CLIENT_STATUSES.STANDARD]: 'success',
+  [CLIENT_STATUSES.VIP]: 'success',
+  [CLIENT_STATUSES.BLOCKED]: 'danger',
+};
+
+export const CLIENT_STATUS_FILTER_OPTIONS = Object.values(CLIENT_STATUSES).map((status) => ({
   value: status,
-  label: CUSTOMER_STATUS_LABELS[status],
+  label: {
+    [CLIENT_STATUSES.STANDARD]: 'Estándar',
+    [CLIENT_STATUSES.VIP]: 'VIP',
+    [CLIENT_STATUSES.BLOCKED]: 'Bloqueado',
+  }[status],
 }));
 
 export const DEFAULT_CUSTOMERS_SORT: ITableSort = {

@@ -7,12 +7,13 @@ export const getCustomersVars = (
   filters: CustomerFilters
 ) => {
   return {
-    findCustomersArgs: {
+    findUsersArgs: {
       ...args,
+      ...(filters.search ? { search: filters.search } : {}),
       filters: {
-        type: filters.type || undefined,
-        status: filters.status || undefined,
-        search: filters.search || undefined,
+        roles: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
+        active: true,
+        ...(filters.clientStatus ? { clientStatus: filters.clientStatus } : {}),
       },
     },
   };
@@ -22,7 +23,7 @@ export const checkBlockThreshold = (
   customer: ICustomer,
   threshold: number = DEFAULT_UNCOMPLETED_ORDERS_THRESHOLD
 ): boolean => {
-  return customer.uncompletedOrders >= threshold;
+  return (customer.uncompletedOrders ?? 0) >= threshold;
 };
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
