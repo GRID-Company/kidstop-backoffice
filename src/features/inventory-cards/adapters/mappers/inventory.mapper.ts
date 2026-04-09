@@ -55,7 +55,8 @@ export function fromApiInventoryMovement(movement: ApiInventoryMovement): IInven
 export function toAdjustInventoryPayload(data: InventoryAdjustmentFormData) {
   return {
     createInventoryMovementInput: {
-      pokemonCardGuid: data.cardGuid,
+      cardGuid: data.cardGuid,
+      tcg: data.tcg,
       condition: data.condition,
       quantity: data.quantity,
       movementType: data.movementType,
@@ -69,6 +70,7 @@ export function toAdjustmentFormDefaults(
 ): Partial<InventoryAdjustmentFormData> {
   return {
     cardGuid: item.cardGuid,
+    tcg: item.tcg,
     condition: item.condition,
   };
 }

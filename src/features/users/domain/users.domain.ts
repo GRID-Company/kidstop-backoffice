@@ -9,15 +9,12 @@ export const getUsersVars = (
 ): { findUsersArgs: FindUsersArgs } => {
   return {
     findUsersArgs: {
-      skip: args.skip,
-      limit: args.limit,
-      sort: {
-        column: args.sort.column,
-        order: args.sort.order,
-      },
+      ...args,
       search: args.search,
       filters: {
-        role: filters?.role,
+        role: filters?.role 
+          ? { filterType: ':multiple_values:' as const, values: [filters.role] }
+          : undefined,
         active: filters?.active,
       },
     },
