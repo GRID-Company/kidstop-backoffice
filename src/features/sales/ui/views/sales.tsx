@@ -6,7 +6,6 @@ import {
   Button,
   Chip,
   Input,
-  Pagination,
   Select,
   SelectItem,
   Tooltip,
@@ -24,6 +23,7 @@ import { formatDate } from '@/lib/utils/format-date';
 import { ISale, SaleStatus } from '../../domain/types';
 import { SALE_STATUS_OPTIONS } from '../../domain/constants';
 import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 import { useSales } from '../hooks/use-sales';
 import SaleStatusBadge from '../components/sale-status-badge';
 
@@ -269,13 +269,11 @@ export default function Sales() {
 
         {totalPages > 1 && (
           <div className="mt-4 flex justify-center">
-            <Pagination
+            <KidstopPagination
               total={totalPages}
               page={page}
               onChange={setPage}
               showControls
-              size="sm"
-              color="primary"
             />
           </div>
         )}

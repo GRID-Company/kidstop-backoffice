@@ -41,7 +41,7 @@ export const DEFAULT_PURCHASES_SORT: ITableSort = {
   order: 'DESC',
 };
 
-export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 10;
 
 export const DEFAULT_BUDGET_LIMIT = 50000;
 

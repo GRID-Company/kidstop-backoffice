@@ -59,7 +59,7 @@ export const DEFAULT_CUSTOMERS_SORT: ITableSort = {
   order: 'ASC',
 };
 
-export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 10;
 
 export const DEFAULT_UNCOMPLETED_ORDERS_THRESHOLD = 3;
 

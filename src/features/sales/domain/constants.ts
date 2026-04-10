@@ -52,7 +52,7 @@ export const DEFAULT_SALES_SORT: ITableSort = {
   order: 'DESC',
 };
 
-export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 10;
 
 export const NEXT_STATUS: Partial<Record<SaleStatus, SaleStatus>> = {
   [SALE_STATUS.NEW]: SALE_STATUS.IN_PROGRESS,

@@ -6,7 +6,6 @@ import {
   Button,
   Chip,
   Input,
-  Pagination,
   Select,
   SelectItem,
   Tooltip,
@@ -22,6 +21,7 @@ import { PURCHASE_STATUS_OPTIONS } from '../../domain/constants';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { calculateTotal } from '../../domain/purchases.domain';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 import { usePurchases } from '../hooks/use-purchases';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
 
@@ -260,13 +260,11 @@ export default function Purchases() {
 
         {totalPages > 1 && (
           <div className="mt-4 flex justify-center">
-            <Pagination
+            <KidstopPagination
               total={totalPages}
               page={page}
               onChange={setPage}
               showControls
-              size="sm"
-              color="primary"
             />
           </div>
         )}

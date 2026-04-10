@@ -1,17 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { Button, Pagination, SortDescriptor } from '@heroui/react';
+import { Button, SortDescriptor } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { ICustomer } from '../../domain/types';
-import {
-  CLIENT_STATUS_FILTER_OPTIONS,
-  DEFAULT_PAGE_SIZE,
-} from '../../domain/constants';
+import { CLIENT_STATUS_FILTER_OPTIONS } from '../../domain/constants';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import CustomerTypeBadge from './customer-type-badge';
 import CustomerStatusBadge from './customer-status-badge';
@@ -24,9 +21,11 @@ interface CustomersListProps {
   onFilterChange: FilterFn;
   onReset: () => void;
   onCustomerPress?: (customer: ICustomer) => void;
-  pageSize?: number;
   sortDescriptor?: SortDescriptor;
   onSortChange?: (descriptor: SortDescriptor) => void;
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 const COLUMNS: ITableColumn[] = [
@@ -54,25 +53,12 @@ export default function CustomersList({
   onFilterChange,
   onReset,
   onCustomerPress,
-  pageSize = DEFAULT_PAGE_SIZE,
   sortDescriptor,
   onSortChange,
+  page,
+  totalPages,
+  onPageChange,
 }: CustomersListProps) {
-  const [page, setPage] = useState(1);
-
-  const totalPages = Math.max(1, Math.ceil(customers.length / pageSize));
-
-  const paginatedCustomers = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return customers.slice(start, start + pageSize);
-  }, [customers, page, pageSize]);
-
-  useEffect(() => {
-    if (page > totalPages) {
-      setPage(1);
-    }
-  }, [page, totalPages]);
-
   return (
     <div className="flex flex-col gap-4">
       <Search
@@ -119,14 +105,14 @@ export default function CustomersList({
           <div className="hidden md:block">
             <DataTable
               cols={COLUMNS}
-              data={paginatedCustomers}
+              data={customers}
               isLoading={loading}
               sortDescriptor={sortDescriptor}
               onSortChange={onSortChange}
               onRowAction={
                 onCustomerPress
                   ? (key) => {
-                      const customer = paginatedCustomers.find((c) => c.guid === key);
+                      const customer = customers.find((c) => c.guid === key);
                       if (customer) onCustomerPress(customer);
                     }
                   : undefined
@@ -135,7 +121,7 @@ export default function CustomersList({
           </div>
 
           <div className="flex flex-col gap-3 md:hidden">
-            {paginatedCustomers.map((customer) => (
+            {customers.map((customer) => (
               <button
                 key={customer.guid}
                 type="button"
@@ -162,10 +148,10 @@ export default function CustomersList({
 
           {totalPages > 1 && (
             <div className="flex justify-center">
-              <Pagination
+              <KidstopPagination
                 total={totalPages}
                 page={page}
-                onChange={setPage}
+                onChange={onPageChange}
                 showControls
               />
             </div>

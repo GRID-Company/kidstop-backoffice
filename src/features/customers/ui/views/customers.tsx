@@ -22,6 +22,9 @@ export default function Customers() {
     hasActiveFilters,
     sortDescriptor,
     setSortDescriptor,
+    page,
+    setPage,
+    totalPages,
   } = useCustomerSearch();
 
   const handleCustomerPress = useCallback(
@@ -61,6 +64,9 @@ export default function Customers() {
           onCustomerPress={handleCustomerPress}
           sortDescriptor={sortDescriptor}
           onSortChange={setSortDescriptor}
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
         />
       </EntitiesPage.CardContainer>
     </EntitiesPage>
