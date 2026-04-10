@@ -46,7 +46,7 @@ export default function PokemonCardGridItem({ card, onPress }: PokemonCardGridIt
                 size="sm"
                 variant="solid"
                 className="absolute top-2 right-2 z-10 bg-white/90 backdrop-blur-sm shadow-md hover:bg-white"
-                onPress={() => onPress?.(card)}
+                onPress={() => onPress(card)}
               >
                 <Icon icon="lucide:eye" className="text-default-700" />
               </Button>

@@ -43,7 +43,6 @@ export default function UserPresenter() {
             void logout();
           }}
           className="text-danger"
-          style={{ color: tcgColor }}
         >
           <span style={{ color: tcgColor }}>Cerrar sesión</span>
         </DropdownItem>

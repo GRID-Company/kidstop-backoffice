@@ -15,7 +15,6 @@ interface BudgetIndicatorProps {
   items: IPurchaseItem[];
   currentSpent: number;
   budgetLimit: number;
-  utilization?: number;
 }
 
 const getUsagePercentage = (result: BudgetCheckResult): number => {
@@ -47,7 +46,6 @@ export default function BudgetIndicator({
   items,
   currentSpent,
   budgetLimit,
-  utilization,
 }: BudgetIndicatorProps) {
   const budgetResult = useMemo(
     () => checkBudget(items, currentSpent, budgetLimit),
