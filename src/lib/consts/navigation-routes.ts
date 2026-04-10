@@ -57,7 +57,7 @@ const RECEPTION_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales
 
 const BUYER_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases];
 
-export const MENU_ROUTES = {
+export const MENU_ROUTES: Partial<Record<UserRole, { label: string; route: string; icon: string }[]>> = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
   [UserRole.ADMIN]: ADMIN_ROUTES,
   [UserRole.RECEPTION]: RECEPTION_ROUTES,
