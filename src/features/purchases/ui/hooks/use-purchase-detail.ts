@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { 
   PurchaseDocument,
   UpdatePurchaseStatusDocument,
+  UpdatePurchaseItemsDocument,
 } from '@/lib/api/generated/purchases.generated';
 import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated';
 import {
@@ -58,6 +59,12 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     },
     onError: (error) => {
       toast.error(`Error al actualizar estado: ${error.message}`);
+    },
+  });
+
+  const [updatePurchaseItemsMutation] = useMutation(UpdatePurchaseItemsDocument, {
+    onError: (error) => {
+      toast.error(`Error al guardar items: ${error.message}`);
     },
   });
 
@@ -163,7 +170,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     status === PURCHASE_STATUS.WAITING_PRICE && payments.length > 0 && allPricesAdjusted;
 
   const canReject =
-    status !== PURCHASE_STATUS.FINALIZED && status !== PURCHASE_STATUS.REJECTED;
+    status === PURCHASE_STATUS.DRAFT || status === PURCHASE_STATUS.QUOTED;
 
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),
@@ -197,6 +204,29 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const updateStatus = useCallback(async (newStatus: PurchaseStatus) => {
     try {
+      const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
+      const pendingItems = items.filter((i) => !serverItemGuids.has(i.guid));
+
+      if (pendingItems.length > 0) {
+        const tcgType = basePurchase?.tcgType ?? 'POKEMON';
+        await updatePurchaseItemsMutation({
+          variables: {
+            updatePurchaseItemsInput: {
+              purchaseGuid: purchaseId,
+              addItems: pendingItems.map((item) => ({
+                ...(tcgType === 'POKEMON'
+                  ? { pokemonCardGuid: item.cardGuid }
+                  : { magicCardGuid: item.cardGuid }),
+                condition: item.condition,
+                quantity: item.quantity,
+                offerPrice: item.offerPrice,
+                referencePrice: item.referencePrice,
+              })),
+            },
+          },
+        });
+      }
+
       await updatePurchaseStatusMutation({
         variables: {
           updatePurchaseStatusInput: {
@@ -209,7 +239,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       void refetchBudget();
     } catch {
     }
-  }, [purchaseId, updatePurchaseStatusMutation, refetchBudget]);
+  }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, updatePurchaseStatusMutation, refetchBudget]);
 
   return {
     purchase,

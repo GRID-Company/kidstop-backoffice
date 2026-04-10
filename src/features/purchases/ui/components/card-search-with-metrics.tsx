@@ -2,6 +2,7 @@
 
 import { useCallback, useState, useEffect } from 'react';
 import {
+  Badge,
   Button,
   CardBody,
   Chip,
@@ -15,6 +16,7 @@ import { Icon } from '@iconify/react';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter-drawer';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
@@ -307,7 +309,26 @@ export default function CardSearchWithMetrics({
   onAddItem,
   existingItemIds,
 }: CardSearchWithMetricsProps) {
-  const { search, setSearch, results, resetSearch, loading } = useCardSearch();
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  const {
+    search,
+    setSearch,
+    results,
+    resetSearch,
+    loading,
+    selectedTCG,
+    filters,
+    handleFilterChange,
+    resetFilters,
+    hasActiveFilters,
+    activeFilterCount,
+    resetKey,
+    collections,
+    rarities,
+    variants,
+    genres,
+  } = useCardSearch();
 
   const handleAddCard = useCallback(
     (card: ICardSearchResult, state: AddToCartState) => {
@@ -345,12 +366,44 @@ export default function CardSearchWithMetrics({
             onClear={resetSearch}
           />
         </div>
+        <Badge
+          content={activeFilterCount > 0 ? String(activeFilterCount) : undefined}
+          color="primary"
+          size="sm"
+          isInvisible={activeFilterCount === 0}
+          className="shrink-0"
+        >
+          <Button
+            isIconOnly
+            variant="bordered"
+            aria-label="Filtros avanzados"
+            onPress={() => setIsFilterDrawerOpen(true)}
+            className={hasActiveFilters ? 'border-primary text-primary' : ''}
+          >
+            <Icon icon="lucide:sliders-horizontal" width={18} />
+          </Button>
+        </Badge>
         {search && (
           <Chip size="sm" variant="flat" className="shrink-0">
             {results.length} {results.length === 1 ? 'resultado' : 'resultados'}
           </Chip>
         )}
       </div>
+
+      <CatalogFilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        onFilterChange={handleFilterChange}
+        onReset={resetFilters}
+        hasActiveFilters={hasActiveFilters}
+        selectedTCG={selectedTCG}
+        resetKey={resetKey}
+        filters={filters}
+        collections={collections}
+        rarities={rarities}
+        variants={variants}
+        genres={genres}
+      />
 
       {loading ? (
         <div className="flex flex-col gap-3">

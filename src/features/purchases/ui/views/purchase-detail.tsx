@@ -206,7 +206,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         </Card>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className={assignedBudget > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
             <SellerInfoCard
               seller={purchase.seller}
               createdAt={purchase.createdDate}

@@ -106,7 +106,7 @@ export default function PurchaseNew() {
 
       <div className="flex flex-col gap-6 px-4">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className={assignedBudget > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
             <Card>
               <CardBody className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
