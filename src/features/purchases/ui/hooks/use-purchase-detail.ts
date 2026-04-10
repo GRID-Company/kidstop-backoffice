@@ -16,6 +16,7 @@ import {
   PurchaseStatus,
   PURCHASE_STATUS,
   ISeller,
+  CardCondition,
 } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 
@@ -94,7 +95,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         setName: item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '',
         setCode: item.pokemonCardSummary?.setCode || '',
         tcgType: p.tcg === 'POKEMON' ? 'POKEMON' : 'MAGIC',
-        condition: item.condition as any,
+        condition: item.condition as CardCondition,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice || undefined,
@@ -156,8 +157,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const canAdjustPrices = status === PURCHASE_STATUS.WAITING_PRICE;
 
+  const allPricesAdjusted = items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
+
   const canFinalize =
-    status === PURCHASE_STATUS.WAITING_PRICE && payments.length > 0;
+    status === PURCHASE_STATUS.WAITING_PRICE && payments.length > 0 && allPricesAdjusted;
 
   const canReject =
     status !== PURCHASE_STATUS.FINALIZED && status !== PURCHASE_STATUS.REJECTED;
@@ -204,8 +207,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       });
       setStatus(newStatus);
       void refetchBudget();
-    } catch (error) {
-      // Error already handled by onError callback in mutation
+    } catch {
     }
   }, [purchaseId, updatePurchaseStatusMutation, refetchBudget]);
 
