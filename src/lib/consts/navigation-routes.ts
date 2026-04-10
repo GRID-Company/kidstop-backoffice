@@ -55,7 +55,7 @@ const ADMIN_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Cu
 
 const RECEPTION_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted];
 
-const BUYER_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, MostWanted];
+const BUYER_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases];
 
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
