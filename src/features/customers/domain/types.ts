@@ -43,3 +43,11 @@ export interface ICustomerOrdersSummary {
   cancelledOrders: number;
   orders: ICustomerOrder[];
 }
+
+export interface IClientDetails {
+  orderCount: number;
+  totalOrdersAmount: number;
+  completedOrdersAmount: number;
+  unreachableCancellations: number;
+  lastOrderDate: string | null;
+}

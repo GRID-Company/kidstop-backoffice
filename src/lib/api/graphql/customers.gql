@@ -51,3 +51,13 @@ mutation SetClientStatus($setClientStatusInput: SetClientStatusInput!) {
     message
   }
 }
+
+query ClientDetails($clientGuid: String!) {
+  clientDetails(clientGuid: $clientGuid) {
+    orderCount
+    totalOrdersAmount
+    completedOrdersAmount
+    unreachableCancellations
+    lastOrderDate
+  }
+}

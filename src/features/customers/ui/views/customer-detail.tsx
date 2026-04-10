@@ -18,6 +18,8 @@ import {
   UpdateCustomerDocument,
 } from '@/lib/api/generated/customers.generated';
 import { toCustomerDomain, toUpdateCustomerInput } from '../../adapters/mappers/customer.mapper';
+import { useClientDetails } from '../hooks/use-client-details';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { BlockCustomerFormData } from '../../adapters/forms/block-customer-form.schema';
 import { CustomerFormData } from '../../adapters/forms/customer-form.schema';
 import CustomerTypeBadge from '../components/customer-type-badge';
@@ -128,6 +130,8 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
     [updateCustomer]
   );
 
+  const { details, loading: detailsLoading } = useClientDetails(customerId);
+
   if (loading && !data) {
     return (
       <EntitiesPage>
@@ -220,21 +224,39 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
 
               <Divider />
 
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] uppercase tracking-wide text-default-400">
                     Total pedidos
                   </span>
-                  <span className="text-sm font-semibold">{customer.totalOrders ?? '—'}</span>
+                  <span className="text-sm font-semibold">
+                    {detailsLoading ? '…' : (details?.orderCount ?? '—')}
+                  </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[10px] uppercase tracking-wide text-default-400">
-                    No concretados
+                    Monto total
+                  </span>
+                  <span className="text-sm font-semibold">
+                    {detailsLoading ? '…' : details ? formatCurrency(details.totalOrdersAmount) : '—'}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] uppercase tracking-wide text-default-400">
+                    Monto completado
+                  </span>
+                  <span className="text-sm font-semibold text-success">
+                    {detailsLoading ? '…' : details ? formatCurrency(details.completedOrdersAmount) : '—'}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] uppercase tracking-wide text-default-400">
+                    Inalcanzable
                   </span>
                   <span
-                    className={`text-sm font-semibold ${(customer.uncompletedOrders ?? 0) > 0 ? 'text-danger' : ''}`}
+                    className={`text-sm font-semibold ${(details?.unreachableCancellations ?? 0) > 0 ? 'text-danger' : ''}`}
                   >
-                    {customer.uncompletedOrders ?? '—'}
+                    {detailsLoading ? '…' : (details?.unreachableCancellations ?? '—')}
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -242,7 +264,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     Último pedido
                   </span>
                   <span className="text-sm font-semibold">
-                    {formatFlexibleDate(customer.lastOrderDate, '—')}
+                    {detailsLoading ? '…' : formatFlexibleDate(details?.lastOrderDate, '—')}
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">

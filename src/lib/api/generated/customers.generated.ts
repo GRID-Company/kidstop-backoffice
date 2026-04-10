@@ -329,6 +329,20 @@ export const UpdateCustomerDocument = {
   UpdateCustomerMutation,
   UpdateCustomerMutationVariables
 >;
+export type ClientDetailsQueryVariables = Types.Exact<{
+  clientGuid: Types.Scalars['String']['input'];
+}>;
+
+export type ClientDetailsQuery = {
+  clientDetails: {
+    orderCount: number;
+    totalOrdersAmount: number;
+    completedOrdersAmount: number;
+    unreachableCancellations: number;
+    lastOrderDate: unknown | null;
+  };
+};
+
 export const SetClientStatusDocument = {
   kind: 'Document',
   definitions: [
@@ -383,3 +397,58 @@ export const SetClientStatusDocument = {
   SetClientStatusMutation,
   SetClientStatusMutationVariables
 >;
+export const ClientDetailsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'ClientDetails' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'clientGuid' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'clientDetails' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'clientGuid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'clientGuid' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'orderCount' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'totalOrdersAmount' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'completedOrdersAmount' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'unreachableCancellations' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'lastOrderDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ClientDetailsQuery, ClientDetailsQueryVariables>;
