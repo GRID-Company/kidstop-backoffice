@@ -2,10 +2,13 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
+import { useAuthStore } from '@/lib/store/auth';
+
 import { 
   PurchaseDocument,
   UpdatePurchaseStatusDocument,
 } from '@/lib/api/generated/purchases.generated';
+import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated';
 import {
   IPurchase,
   IPurchaseItem,
@@ -13,6 +16,7 @@ import {
   PurchaseStatus,
   PURCHASE_STATUS,
   ISeller,
+  CardCondition,
 } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 
@@ -29,6 +33,8 @@ interface UsePurchaseDetailReturn {
   canReject: boolean;
   total: number;
   currentBuyerSpent: number;
+  assignedBudget: number;
+  budgetUtilization: number;
   loading: boolean;
   error: Error | undefined;
   updateItem: (itemId: string, updates: Partial<IPurchaseItem>) => void;
@@ -89,7 +95,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         setName: item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '',
         setCode: item.pokemonCardSummary?.setCode || '',
         tcgType: p.tcg === 'POKEMON' ? 'POKEMON' : 'MAGIC',
-        condition: item.condition as any,
+        condition: item.condition as CardCondition,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice || undefined,
@@ -124,7 +130,21 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const total = useMemo(() => calculateTotal(items), [items]);
 
-  const currentBuyerSpent = 0;
+  const currentUser = useAuthStore((state) => state.user);
+  const buyerGuid = currentUser?.guid;
+  const tcg = basePurchase?.tcgType;
+
+  const { data: budgetData, refetch: refetchBudget } = useQuery(BuyerBudgetDocument, {
+    variables: {
+      buyerGuid: buyerGuid || '',
+      tcg: tcg || '',
+    },
+    skip: !buyerGuid || !tcg,
+  });
+
+  const currentBuyerSpent = budgetData?.buyerBudget?.usedAmount || 0;
+  const assignedBudget = budgetData?.buyerBudget?.assignedAmount || 0;
+  const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
   const isEditable = status === PURCHASE_STATUS.DRAFT;
 
@@ -137,8 +157,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const canAdjustPrices = status === PURCHASE_STATUS.WAITING_PRICE;
 
+  const allPricesAdjusted = items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
+
   const canFinalize =
-    status === PURCHASE_STATUS.WAITING_PRICE && payments.length > 0;
+    status === PURCHASE_STATUS.WAITING_PRICE && payments.length > 0 && allPricesAdjusted;
 
   const canReject =
     status !== PURCHASE_STATUS.FINALIZED && status !== PURCHASE_STATUS.REJECTED;
@@ -184,10 +206,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         },
       });
       setStatus(newStatus);
-    } catch (error) {
-      // Error already handled by onError callback in mutation
+      void refetchBudget();
+    } catch {
     }
-  }, [purchaseId, updatePurchaseStatusMutation]);
+  }, [purchaseId, updatePurchaseStatusMutation, refetchBudget]);
 
   return {
     purchase,
@@ -202,6 +224,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     canReject,
     total,
     currentBuyerSpent,
+    assignedBudget,
+    budgetUtilization,
     loading,
     error,
     updateItem,

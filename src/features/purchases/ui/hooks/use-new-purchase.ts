@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { CreatePurchaseDocument } from '@/lib/api/generated/purchases.generated';
+import { useAuthStore } from '@/lib/store/auth';
+import { CreatePurchaseDocument, PurchasesDocument } from '@/lib/api/generated/purchases.generated';
+import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated';
 import { IPurchaseItem, ISeller } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { toCreatePurchasePayload } from '../../adapters/mappers/purchase.mapper';
@@ -13,6 +15,8 @@ interface UseNewPurchaseReturn {
   items: IPurchaseItem[];
   total: number;
   currentBuyerSpent: number;
+  assignedBudget: number;
+  budgetUtilization: number;
   existingItemIds: Set<string>;
   setSeller: (seller: ISeller | null) => void;
   addItem: (item: IPurchaseItem) => void;
@@ -25,11 +29,21 @@ interface UseNewPurchaseReturn {
 
 export function useNewPurchase(): UseNewPurchaseReturn {
   const { selectedTCG } = useSelectedTCGStore();
+  const currentUser = useAuthStore((state) => state.user);
 
   const [seller, setSeller] = useState<ISeller | null>(null);
   const [items, setItems] = useState<IPurchaseItem[]>([]);
 
+  const { data: budgetData } = useQuery(BuyerBudgetDocument, {
+    variables: {
+      buyerGuid: currentUser?.guid || '',
+      tcg: selectedTCG || '',
+    },
+    skip: !currentUser?.guid || !selectedTCG,
+  });
+
   const [createPurchase, { loading: saving }] = useMutation(CreatePurchaseDocument, {
+    refetchQueries: [PurchasesDocument],
     onCompleted: () => {
       toast.success('Compra creada exitosamente');
     },
@@ -39,6 +53,10 @@ export function useNewPurchase(): UseNewPurchaseReturn {
   });
 
   const total = useMemo(() => calculateTotal(items), [items]);
+
+  const currentBuyerSpent = budgetData?.buyerBudget?.usedAmount || 0;
+  const assignedBudget = budgetData?.buyerBudget?.assignedAmount || 0;
+  const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),
@@ -100,7 +118,9 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     seller,
     items,
     total,
-    currentBuyerSpent: 0,
+    currentBuyerSpent,
+    assignedBudget,
+    budgetUtilization,
     existingItemIds,
     setSeller,
     addItem,

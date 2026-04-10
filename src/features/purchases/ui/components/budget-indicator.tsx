@@ -8,14 +8,13 @@ import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { checkBudget, BudgetCheckResult } from '../../domain/purchases.domain';
-import { DEFAULT_BUDGET_LIMIT } from '../../domain/constants';
 
 const REDACTED_VALUE = '$••••••';
 
 interface BudgetIndicatorProps {
   items: IPurchaseItem[];
   currentSpent: number;
-  budgetLimit?: number;
+  budgetLimit: number;
 }
 
 const getUsagePercentage = (result: BudgetCheckResult): number => {
@@ -46,7 +45,7 @@ const LEVEL_CONFIG: Record<BudgetLevel, { icon: string; label: string; progressC
 export default function BudgetIndicator({
   items,
   currentSpent,
-  budgetLimit = DEFAULT_BUDGET_LIMIT,
+  budgetLimit,
 }: BudgetIndicatorProps) {
   const budgetResult = useMemo(
     () => checkBudget(items, currentSpent, budgetLimit),

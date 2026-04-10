@@ -51,8 +51,17 @@ function getTcgColors(tcgType: string) {
   return TCG_COLORS[tcgType] ?? TCG_COLORS.POKEMON;
 }
 
+function getProxiedImageUrl(url: string): string {
+  if (typeof window === 'undefined') return url;
+  const baseUrl = window.location.origin;
+  return `${baseUrl}/api/image-proxy?url=${encodeURIComponent(url)}`;
+}
+
 async function loadImageAsBase64(url: string): Promise<string | null> {
   if (typeof window === 'undefined') return null;
+
+  const proxiedUrl = getProxiedImageUrl(url);
+
   try {
     return await new Promise<string | null>((resolve) => {
       const img = new window.Image();
@@ -67,7 +76,7 @@ async function loadImageAsBase64(url: string): Promise<string | null> {
         resolve(canvas.toDataURL('image/jpeg', 0.85));
       };
       img.onerror = () => resolve(null);
-      img.src = url;
+      img.src = proxiedUrl;
     });
   } catch {
     return null;

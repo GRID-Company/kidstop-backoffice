@@ -1,11 +1,16 @@
+import { useCallback } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { IndicatorsInventoryItemsDocument } from '@/lib/api/generated/inventory.generated';
 
 export function useInventoryIndicators(tcg: string) {
-  const { data, loading } = useQuery(IndicatorsInventoryItemsDocument, {
+  const { data, loading, refetch } = useQuery(IndicatorsInventoryItemsDocument, {
     variables: { tcg, forceRefresh: false },
     fetchPolicy: 'network-only',
   });
+
+  const refresh = useCallback(() => {
+    void refetch({ tcg, forceRefresh: true });
+  }, [refetch, tcg]);
 
   return {
     totalStock: data?.indicatorsInventoryItems?.totalStock ?? 0,
@@ -14,5 +19,6 @@ export function useInventoryIndicators(tcg: string) {
       : null,
     avgDaysInInventory: data?.indicatorsInventoryItems?.avgDaysInInventory ?? null,
     loading,
+    refresh,
   };
 }

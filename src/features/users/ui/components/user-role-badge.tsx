@@ -7,10 +7,11 @@ interface UserRoleBadgeProps {
   className?: string;
 }
 
-const ROLE_COLOR_MAP: Record<UserRole, 'primary' | 'secondary' | 'warning'> = {
+const ROLE_COLOR_MAP: Record<UserRole, 'primary' | 'secondary' | 'warning' | 'success'> = {
   [USER_ROLES.ADMIN]: 'primary',
   [USER_ROLES.RECEPTION]: 'secondary',
   [USER_ROLES.BUYER]: 'warning',
+  [USER_ROLES.CLIENT_KIOSK]: 'success',
 };
 
 export default function UserRoleBadge({ role, className }: UserRoleBadgeProps) {

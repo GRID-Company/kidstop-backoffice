@@ -329,8 +329,9 @@ export default function CardSearchWithMetrics({
         sellPrice: card.metrics.referencePrice,
       };
       onAddItem(item);
+      resetSearch();
     },
-    [onAddItem]
+    [onAddItem, resetSearch]
   );
 
   return (

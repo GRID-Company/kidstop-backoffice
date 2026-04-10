@@ -7,7 +7,7 @@ import { Icon } from '@iconify/react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
-import { formatDate } from '@/lib/utils/format-date';
+import { formatFlexibleDate } from '@/lib/utils/format-date';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { CLIENT_STATUSES } from '../../domain/constants';
@@ -242,7 +242,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     Último pedido
                   </span>
                   <span className="text-sm font-semibold">
-                    {formatDate(customer.lastOrderDate, '—')}
+                    {formatFlexibleDate(customer.lastOrderDate, '—')}
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -250,7 +250,7 @@ export default function CustomerDetail({ customerId }: CustomerDetailProps) {
                     Cliente desde
                   </span>
                   <span className="text-sm font-semibold">
-                    {formatDate(customer.createdDate, '—')}
+                    {formatFlexibleDate(customer.createdDate, '—')}
                   </span>
                 </div>
               </div>

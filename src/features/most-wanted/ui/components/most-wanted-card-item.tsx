@@ -85,7 +85,7 @@ export default function MostWantedCardItem({
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-sm font-semibold">{cardName}</span>
         <span className="truncate text-xs text-default-500">
-          {cardSet} {cardNumber ? `· #${cardNumber}` : ''}
+          {cardSet} {cardNumber ? `· ${cardNumber}` : ''}
         </span>
         {item.notes && (
           <span className="truncate text-xs italic text-default-400">

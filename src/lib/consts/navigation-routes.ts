@@ -53,9 +53,13 @@ const ClickUp = {
 
 const ADMIN_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings];
 
+const RECEPTION_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted];
+
+const BUYER_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases];
+
 export const MENU_ROUTES = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
   [UserRole.ADMIN]: ADMIN_ROUTES,
-  [UserRole.RECEPTION]: [],
-  [UserRole.BUYER]: [],
+  [UserRole.RECEPTION]: RECEPTION_ROUTES,
+  [UserRole.BUYER]: BUYER_ROUTES,
 };

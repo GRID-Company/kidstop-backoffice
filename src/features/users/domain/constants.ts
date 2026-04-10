@@ -6,6 +6,7 @@ export const USER_ROLES = {
   ADMIN: UserRole.ADMIN,
   RECEPTION: UserRole.RECEPTION,
   BUYER: UserRole.BUYER,
+  CLIENT_KIOSK: UserRole.CLIENT_KIOSK,
 } as const;
 
 export const USER_STATUS = {

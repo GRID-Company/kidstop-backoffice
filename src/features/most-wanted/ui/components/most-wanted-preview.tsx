@@ -122,7 +122,7 @@ function PreviewCardItem({
           {cardName}
         </span>
         <span className="truncate text-base text-amber-800/70">
-          {cardSet} {cardNumber ? `— #${cardNumber}` : ''}
+          {cardSet} {cardNumber ? `— ${cardNumber}` : ''}
         </span>
         {item.notes && (
           <span className="truncate text-sm italic text-amber-700/60">

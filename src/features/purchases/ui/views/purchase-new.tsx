@@ -32,6 +32,7 @@ export default function PurchaseNew() {
     seller,
     items,
     currentBuyerSpent,
+    assignedBudget,
     existingItemIds,
     setSeller,
     addItem,
@@ -165,12 +166,15 @@ export default function PurchaseNew() {
               </CardBody>
             </Card>
           </div>
-          <div>
-            <BudgetIndicator
-              items={items}
-              currentSpent={currentBuyerSpent}
-            />
-          </div>
+          {assignedBudget > 0 && (
+            <div>
+              <BudgetIndicator
+                items={items}
+                currentSpent={currentBuyerSpent}
+                budgetLimit={assignedBudget}
+              />
+            </div>
+          )}
         </div>
 
         {isSellerConfirmed && (

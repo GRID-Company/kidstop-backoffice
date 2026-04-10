@@ -69,6 +69,16 @@ export default function PurchaseItemsTable({
     [onUpdateItem]
   );
 
+  const handleOfferPriceChange = useCallback(
+    (itemId: string, value: string) => {
+      const price = parseFloat(value);
+      if (!isNaN(price) && price > 0) {
+        onUpdateItem(itemId, { offerPrice: price });
+      }
+    },
+    [onUpdateItem]
+  );
+
   const columns: ITableColumn[] = useMemo(() => {
     const baseCols: ITableColumn[] = [
       {
@@ -147,11 +157,30 @@ export default function PurchaseItemsTable({
       {
         key: 'unitBuyPrice',
         label: 'Precio oferta',
-        customCol: (item: IPurchaseItem) => (
-          <span className="text-sm font-medium">
-            {displayCurrency(item.offerPrice)}
-          </span>
-        ),
+        customCol: (item: IPurchaseItem) =>
+          isReadOnly ? (
+            <span className="text-sm font-medium">
+              {displayCurrency(item.offerPrice)}
+            </span>
+          ) : (
+            <Input
+              aria-label="Precio oferta"
+              type="number"
+              size="sm"
+              variant="bordered"
+              min={0.01}
+              step={0.01}
+              value={String(item.offerPrice)}
+              onValueChange={(val) => handleOfferPriceChange(item.guid, val)}
+              startContent={
+                <span className="text-xs text-default-400">$</span>
+              }
+              classNames={{
+                inputWrapper: 'border-[1px] bg-white w-[100px]',
+                input: 'text-right',
+              }}
+            />
+          ),
       },
       {
         key: 'subtotal',
@@ -193,6 +222,7 @@ export default function PurchaseItemsTable({
     displayCurrency,
     handleQuantityChange,
     handleConditionChange,
+    handleOfferPriceChange,
     onRemoveItem,
   ]);
 
