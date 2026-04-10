@@ -19,7 +19,7 @@ export type SalesQuery = {
       emailNotificationSent: boolean;
       kioskCustomerName: string | null;
       kioskCustomerEmail: string | null;
-      statusTimestamps: string | null;
+      statusTimestamps: unknown | null;
       createdDate: unknown;
       updatedDate: unknown;
       customer: {
@@ -73,7 +73,7 @@ export type SaleQuery = {
     emailNotificationSent: boolean;
     kioskCustomerName: string | null;
     kioskCustomerEmail: string | null;
-    statusTimestamps: string | null;
+    statusTimestamps: unknown | null;
     createdDate: unknown;
     updatedDate: unknown;
     customer: {
@@ -120,7 +120,7 @@ export type UpdateSaleStatusMutation = {
     guid: string;
     saleCode: string;
     status: string;
-    statusTimestamps: string | null;
+    statusTimestamps: unknown | null;
     emailNotificationSent: boolean;
     updatedDate: unknown;
   };

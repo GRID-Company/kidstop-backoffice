@@ -7,7 +7,7 @@ import {
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { useEffect } from 'react';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useWatch } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
@@ -34,11 +34,14 @@ export default function UserFormModal({
   title = 'Nuevo usuario',
   submitLabel = 'Guardar',
 }: UserFormModalProps) {
-  const { control, handleSubmit, formState, reset } = useUserForm(defaults);
+  const isEditing = !!defaults;
+  const { control, handleSubmit, formState, reset } = useUserForm(defaults, isEditing);
+  const selectedRole = useWatch({ control, name: 'role' });
+  const isKioskRole = selectedRole === USER_ROLES.CLIENT_KIOSK;
 
   useEffect(() => {
     if (!isOpen) return;
-    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION });
+    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION, password: '' });
   }, [isOpen, defaults, reset]);
 
   return (
@@ -70,6 +73,15 @@ export default function UserFormModal({
               controlProps={{ control, name: 'role' }}
               items={USER_ROLE_OPTIONS}
             />
+
+            {isKioskRole && (
+              <InputForm
+                label="Contraseña"
+                placeholder="Ingresa la contraseña (mínimo 6 caracteres)"
+                controlProps={{ control, name: 'password' }}
+                type="password"
+              />
+            )}
           </DrawerBody>
 
           <DrawerFooter>

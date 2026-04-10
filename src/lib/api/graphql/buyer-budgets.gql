@@ -1,3 +1,20 @@
+query BuyerBudget($buyerGuid: String!, $tcg: String!) {
+  buyerBudget(buyerGuid: $buyerGuid, tcg: $tcg) {
+    guid
+    tcg
+    assignedAmount
+    usedAmount
+    utilization
+    buyer {
+      guid
+      name
+      emailAddress
+    }
+    createdDate
+    updatedDate
+  }
+}
+
 query BuyerBudgets($tcg: String) {
   buyerBudgets(tcg: $tcg) {
     guid

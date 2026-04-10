@@ -34,6 +34,7 @@ import WhatsAppQuoteButton from '../components/whatsapp-quote-button';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
+import PurchaseTimeline from '../components/purchase-timeline';
 
 const REDACTED_VALUE = '$••••••';
 
@@ -58,6 +59,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canReject,
     total,
     currentBuyerSpent,
+    assignedBudget,
     loading,
     updateItem,
     removeItem,
@@ -199,6 +201,10 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       </EntitiesPage.Toolbar>
 
       <div className="flex flex-col gap-6 px-4">
+        <Card className="p-4">
+          <PurchaseTimeline currentStatus={purchase.status} />
+        </Card>
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <SellerInfoCard
@@ -208,12 +214,15 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               notes={purchase.notes}
             />
           </div>
-          <div>
-            <BudgetIndicator
-              items={items}
-              currentSpent={currentBuyerSpent}
-            />
-          </div>
+          {assignedBudget > 0 && (
+            <div>
+              <BudgetIndicator
+                items={items}
+                currentSpent={currentBuyerSpent}
+                budgetLimit={assignedBudget}
+              />
+            </div>
+          )}
         </div>
 
         {isEditable && (

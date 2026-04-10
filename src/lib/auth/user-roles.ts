@@ -3,6 +3,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   RECEPTION = 'RECEPTION',
   BUYER = 'BUYER',
+  CLIENT_KIOSK = 'CLIENT_KIOSK',
 }
 
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
@@ -10,4 +11,5 @@ export const USER_ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.ADMIN]: 'Administrador',
   [UserRole.RECEPTION]: 'Recepción',
   [UserRole.BUYER]: 'Comprador',
+  [UserRole.CLIENT_KIOSK]: 'Kiosk',
 };

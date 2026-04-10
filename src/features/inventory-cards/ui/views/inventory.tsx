@@ -52,7 +52,7 @@ export default function Inventory() {
     loading,
   } = useInventorySearch();
 
-  const indicators = useInventoryIndicators(selectedTCG);
+  const { refresh: refreshIndicators, ...indicators } = useInventoryIndicators(selectedTCG);
 
   const [selectedItem, setSelectedItem] = useState<IInventoryItem | null>(null);
   const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
@@ -112,7 +112,7 @@ export default function Inventory() {
         </EntitiesPage.Toolbar>
 
         <EntitiesPage.CardContainer>
-          <div className="mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <Tabs
               selectedKey={activeTab}
               onSelectionChange={handleTabChange}
@@ -143,6 +143,18 @@ export default function Inventory() {
                 }
               />
             </Tabs>
+
+            <Tooltip content="Actualizar indicadores">
+              <Button
+                variant="light"
+                isIconOnly
+                size="sm"
+                onPress={refreshIndicators}
+                isLoading={indicators.loading}
+              >
+                <Icon icon="lucide:refresh-cw" className="text-default-500" />
+              </Button>
+            </Tooltip>
           </div>
 
           {activeTab === INVENTORY_TABS.STOCK && (

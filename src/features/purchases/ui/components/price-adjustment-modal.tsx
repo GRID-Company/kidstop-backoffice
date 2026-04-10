@@ -80,6 +80,12 @@ export default function PriceAdjustmentModal({
     [items, adjustedPrices]
   );
 
+  const profitTotal = useMemo(() => sellTotal - buyTotal, [sellTotal, buyTotal]);
+  const profitMargin = useMemo(
+    () => (buyTotal > 0 ? (profitTotal / buyTotal) * 100 : 0),
+    [profitTotal, buyTotal]
+  );
+
   useEffect(() => {
     if (isOpen) {
       reset({
@@ -141,6 +147,28 @@ export default function PriceAdjustmentModal({
               <span className="text-lg font-bold text-success">
                 {displayCurrency(sellTotal)}
               </span>
+            </div>
+            <div className="flex flex-1 flex-col gap-1 rounded-lg bg-default-50 p-4">
+              <span className="text-xs text-default-500">
+                Proyección ganancia
+              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-lg font-bold ${
+                    profitTotal >= 0 ? 'text-success' : 'text-danger'
+                  }`}
+                >
+                  {profitTotal >= 0 ? '+' : '-'}
+                  {displayCurrency(Math.abs(profitTotal))}
+                </span>
+                <span
+                  className={`text-xs ${
+                    profitTotal >= 0 ? 'text-success' : 'text-danger'
+                  }`}
+                >
+                  ({profitMargin.toFixed(1)}%)
+                </span>
+              </div>
             </div>
           </div>
 

@@ -2,10 +2,13 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
+import { useAuthStore } from '@/lib/store/auth';
+
 import { 
   PurchaseDocument,
   UpdatePurchaseStatusDocument,
 } from '@/lib/api/generated/purchases.generated';
+import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated';
 import {
   IPurchase,
   IPurchaseItem,
@@ -29,6 +32,8 @@ interface UsePurchaseDetailReturn {
   canReject: boolean;
   total: number;
   currentBuyerSpent: number;
+  assignedBudget: number;
+  budgetUtilization: number;
   loading: boolean;
   error: Error | undefined;
   updateItem: (itemId: string, updates: Partial<IPurchaseItem>) => void;
@@ -124,7 +129,21 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const total = useMemo(() => calculateTotal(items), [items]);
 
-  const currentBuyerSpent = 0;
+  const currentUser = useAuthStore((state) => state.user);
+  const buyerGuid = currentUser?.guid;
+  const tcg = basePurchase?.tcgType;
+
+  const { data: budgetData, refetch: refetchBudget } = useQuery(BuyerBudgetDocument, {
+    variables: {
+      buyerGuid: buyerGuid || '',
+      tcg: tcg || '',
+    },
+    skip: !buyerGuid || !tcg,
+  });
+
+  const currentBuyerSpent = budgetData?.buyerBudget?.usedAmount || 0;
+  const assignedBudget = budgetData?.buyerBudget?.assignedAmount || 0;
+  const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
   const isEditable = status === PURCHASE_STATUS.DRAFT;
 
@@ -184,10 +203,11 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         },
       });
       setStatus(newStatus);
+      void refetchBudget();
     } catch (error) {
       // Error already handled by onError callback in mutation
     }
-  }, [purchaseId, updatePurchaseStatusMutation]);
+  }, [purchaseId, updatePurchaseStatusMutation, refetchBudget]);
 
   return {
     purchase,
@@ -202,6 +222,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     canReject,
     total,
     currentBuyerSpent,
+    assignedBudget,
+    budgetUtilization,
     loading,
     error,
     updateItem,

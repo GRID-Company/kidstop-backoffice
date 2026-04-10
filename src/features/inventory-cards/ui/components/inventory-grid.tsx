@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import NextLink from 'next/link';
 import {
   Pagination,
   Skeleton,
@@ -11,7 +12,10 @@ import {
   TableHeader,
   TableRow,
   CardBody,
+  Tooltip,
+  Button,
 } from '@heroui/react';
+import { Icon } from '@iconify/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
@@ -43,7 +47,9 @@ const COLUMNS = [
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
-  return new Date(Number(dateStr)).toLocaleDateString('es-MX', {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString('es-MX', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

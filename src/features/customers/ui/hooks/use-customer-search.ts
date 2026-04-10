@@ -25,7 +25,7 @@ export function useCustomerSearch() {
         sort: { column: sortColumn, order: sortOrder },
         ...(search.trim() ? { search: search.trim() } : {}),
         filters: {
-          role: { filterType: ':multiple_values:', values: ['CLIENT', 'CLIENT_KIOSK'] },
+          role: { filterType: ':multiple_values:', values: ['CLIENT'] },
           active: true,
           ...(clientStatus ? { clientStatus } : {}),
         },
