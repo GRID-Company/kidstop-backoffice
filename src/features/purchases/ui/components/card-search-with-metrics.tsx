@@ -307,7 +307,7 @@ export default function CardSearchWithMetrics({
   onAddItem,
   existingItemIds,
 }: CardSearchWithMetricsProps) {
-  const { search, setSearch, results, resetSearch } = useCardSearch();
+  const { search, setSearch, results, resetSearch, loading } = useCardSearch();
 
   const handleAddCard = useCallback(
     (card: ICardSearchResult, state: AddToCartState) => {
@@ -352,7 +352,24 @@ export default function CardSearchWithMetrics({
         )}
       </div>
 
-      {results.length > 0 ? (
+      {loading ? (
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex gap-3 rounded-xl border border-default-200 p-3 xl:p-4">
+              <Skeleton className="h-[90px] w-[65px] shrink-0 rounded-md xl:h-[100px] xl:w-[72px]" />
+              <div className="flex flex-1 flex-col justify-center gap-2">
+                <Skeleton className="h-4 w-2/3 rounded-md" />
+                <Skeleton className="h-3 w-1/2 rounded-md" />
+                <div className="flex gap-4 pt-1">
+                  <Skeleton className="h-3 w-16 rounded-md" />
+                  <Skeleton className="h-3 w-16 rounded-md" />
+                  <Skeleton className="h-3 w-16 rounded-md" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : results.length > 0 ? (
         <div className="flex flex-col gap-3">
           {results.map((card) => (
             <CardResultItem

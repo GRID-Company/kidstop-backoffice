@@ -10,6 +10,7 @@ import {
   Chip,
   Divider,
   ScrollShadow,
+  Skeleton,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
@@ -141,6 +142,7 @@ export default function AddCardModal({
   onSelectCard,
   form,
   onSubmit,
+  loading = false,
 }: AddCardModalProps) {
   const { control, formState } = form;
 
@@ -166,7 +168,7 @@ export default function AddCardModal({
               aria-label="Buscar carta del catálogo"
             />
 
-            {search.trim() && (
+            {search.trim() && !loading && (
               <p className="text-xs text-default-400">
                 {searchResults.length}{' '}
                 {searchResults.length === 1
@@ -175,7 +177,21 @@ export default function AddCardModal({
               </p>
             )}
 
-            {searchResults.length > 0 && !selectedCard && (
+            {loading && search.trim() && (
+              <div className="flex flex-col gap-1">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg border border-default-200 p-2">
+                    <Skeleton className="h-14 w-10 shrink-0 rounded" />
+                    <div className="flex flex-1 flex-col gap-1.5">
+                      <Skeleton className="h-3.5 w-2/3 rounded-md" />
+                      <Skeleton className="h-3 w-1/2 rounded-md" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {searchResults.length > 0 && !selectedCard && !loading && (
               <ScrollShadow className="max-h-60">
                 <div className="flex flex-col gap-1">
                   {searchResults.map((card) => (

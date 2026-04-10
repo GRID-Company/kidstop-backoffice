@@ -1,6 +1,7 @@
 'use client';
 
-import { Pagination } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 import { IMagicCard } from '../../domain/types';
 import MagicCardGridItem from './magic-card-grid-item';
 
@@ -25,7 +26,17 @@ export default function MagicCardGrid({
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="h-80 animate-pulse rounded-lg bg-default-100" />
+          <div key={i} className="overflow-hidden rounded-lg border border-default-200">
+            <Skeleton className="aspect-3/4 w-full rounded-none" />
+            <div className="flex flex-col gap-2 p-3">
+              <Skeleton className="h-4 w-3/4 rounded-md" />
+              <Skeleton className="h-3 w-1/2 rounded-md" />
+              <div className="flex items-center justify-between pt-1">
+                <Skeleton className="h-4 w-12 rounded-md" />
+                <Skeleton className="h-3 w-14 rounded-md" />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     );
@@ -49,14 +60,11 @@ export default function MagicCardGrid({
 
       {totalPages > 1 && (
         <div className="flex justify-center">
-          <Pagination
+          <KidstopPagination
             total={totalPages}
             page={page}
             onChange={onPageChange}
             showControls
-            classNames={{
-              cursor: 'bg-accent text-white',
-            }}
           />
         </div>
       )}
