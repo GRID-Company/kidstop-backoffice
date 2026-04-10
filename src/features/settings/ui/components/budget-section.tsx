@@ -17,10 +17,9 @@ interface BudgetSectionProps {
 }
 
 function UtilizationBadge({ utilization }: { utilization: number }) {
-  const pct = Math.round(utilization * 100);
   const color =
-    pct >= 90 ? 'text-danger' : pct >= 70 ? 'text-warning' : 'text-success';
-  return <span className={`text-sm font-medium ${color}`}>{pct}%</span>;
+    utilization >= 90 ? 'text-danger' : utilization >= 70 ? 'text-warning' : 'text-success';
+  return <span className={`text-sm font-medium ${color}`}>{utilization}%</span>;
 }
 
 function BudgetFormModal({
