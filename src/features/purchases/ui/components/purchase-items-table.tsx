@@ -3,7 +3,6 @@
 import { useCallback, useMemo } from 'react';
 import {
   Button,
-  Image,
   Tooltip,
   Select,
   SelectItem,
@@ -87,11 +86,11 @@ export default function PurchaseItemsTable({
         className: '!text-left min-w-[220px]',
         customCol: (item: IPurchaseItem) => (
           <div className="flex items-center gap-3">
-            <Image
-              src={item.cardImageUrl || undefined}
+            <img
+              src={item.cardImageUrl || 'https://placehold.co/36x48?text=Card'}
               alt={item.cardName}
               className="h-12 w-9 rounded object-cover"
-              fallbackSrc="https://placehold.co/36x48?text=Card"
+              onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/36x48?text=Card'; }}
             />
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{item.cardName}</span>

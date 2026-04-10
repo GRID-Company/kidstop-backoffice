@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
 import {
   Drawer,
   DrawerContent,
@@ -166,12 +165,10 @@ export default function AdjustmentModal({
                     >
                       <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
                         {result.imageUrl ? (
-                          <Image
+                          <img
                             src={result.imageUrl}
                             alt={result.name}
-                            fill
-                            sizes="32px"
-                            className="object-contain"
+                            className="absolute inset-0 h-full w-full object-contain"
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center text-default-400">
@@ -208,12 +205,10 @@ export default function AdjustmentModal({
               <div className="flex gap-4 rounded-lg bg-default-50 p-4">
                 <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
                   {resolvedItem.imageUrl ? (
-                    <Image
+                    <img
                       src={resolvedItem.imageUrl}
                       alt={resolvedItem.name}
-                      fill
-                      sizes="48px"
-                      className="object-contain"
+                      className="absolute inset-0 h-full w-full object-contain"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-default-400">

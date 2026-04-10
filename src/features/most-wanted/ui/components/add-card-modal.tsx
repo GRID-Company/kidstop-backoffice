@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import {
   Drawer,
   DrawerContent,
@@ -59,12 +58,10 @@ function CardSearchResult({
     >
       <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded bg-default-100">
         {card.imageUri ? (
-          <Image
+          <img
             src={card.imageUri}
             alt={card.name}
-            fill
-            sizes="40px"
-            className="object-contain"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-default-400">
@@ -94,12 +91,10 @@ function SelectedCardPreview({ card }: { card: CardType }) {
     <div className="flex gap-4 rounded-lg bg-default-50 p-4">
       <div className="relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-lg bg-default-100">
         {card.imageUri ? (
-          <Image
+          <img
             src={card.imageUri}
             alt={card.name}
-            fill
-            sizes="96px"
-            className="object-contain p-1"
+            className="absolute inset-0 h-full w-full object-contain p-1"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-default-400">

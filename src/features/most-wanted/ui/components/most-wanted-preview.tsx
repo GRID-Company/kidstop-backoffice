@@ -103,12 +103,10 @@ function PreviewCardItem({
         }}
       >
         {cardImage ? (
-          <Image
+          <img
             src={cardImage}
             alt={cardName}
-            fill
-            sizes="96px"
-            className="object-contain p-0.5"
+            className="absolute inset-0 h-full w-full object-contain p-0.5"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-amber-700/40">

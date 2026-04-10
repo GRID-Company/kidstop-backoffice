@@ -12,7 +12,6 @@ import {
   Skeleton,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
@@ -99,12 +98,10 @@ function CardResultItem({
         <div className="flex gap-3 xl:w-[200px] xl:shrink-0">
           <div className="relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md bg-default-100 xl:h-[100px] xl:w-[72px]">
             {card.imageUrl ? (
-              <Image
+              <img
                 src={card.imageUrl}
                 alt={card.name}
-                fill
-                sizes="72px"
-                className="object-contain p-1"
+                className="absolute inset-0 h-full w-full object-contain p-1"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-default-400">

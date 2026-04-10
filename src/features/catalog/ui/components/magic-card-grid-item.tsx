@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { Card, CardBody, CardFooter, Chip, Tooltip, Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { IMagicCard } from '../../domain/types';
@@ -22,12 +21,10 @@ export default function MagicCardGridItem({ card, onPress }: MagicCardGridItemPr
       <CardBody className="p-0">
         <div className="relative aspect-[3/4] w-full overflow-hidden bg-default-100">
           {card.imageUri ? (
-            <Image
+            <img
               src={card.imageUri}
               alt={card.name}
-              fill
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              className="object-contain p-2"
+              className="absolute inset-0 h-full w-full object-contain p-2"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-default-400">

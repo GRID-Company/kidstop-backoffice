@@ -10,7 +10,6 @@ import {
   DrawerFooter,
   Button,
   Divider,
-  Image,
   Chip,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
@@ -201,11 +200,11 @@ export default function PriceAdjustmentModal({
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Image
-                      src={item.cardImageUrl}
+                    <img
+                      src={item.cardImageUrl || 'https://placehold.co/48x64?text=Card'}
                       alt={item.cardName}
                       className="h-16 w-12 rounded object-cover"
-                      fallbackSrc="https://placehold.co/48x64?text=Card"
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/48x64?text=Card'; }}
                     />
                     <div className="flex flex-1 flex-col gap-1">
                       <div className="flex items-center gap-2">

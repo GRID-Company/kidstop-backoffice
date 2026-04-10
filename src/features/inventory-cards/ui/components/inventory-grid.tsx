@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import NextLink from 'next/link';
 import {
   Pagination,
@@ -68,12 +67,10 @@ function renderCell(item: IInventoryItem, columnKey: string) {
         <div className="flex items-center gap-3">
           <div className="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100">
             {item.imageUrl ? (
-              <Image
+              <img
                 src={item.imageUrl}
                 alt={item.name}
-                fill
-                sizes="32px"
-                className="object-contain"
+                className="absolute inset-0 h-full w-full object-contain"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-default-400 text-xs">
@@ -131,12 +128,10 @@ function InventoryMobileCard({
       <CardBody className="flex flex-row gap-3 !p-4">
         <div className="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded bg-default-100">
           {item.imageUrl ? (
-            <Image
+            <img
               src={item.imageUrl}
               alt={item.name}
-              fill
-              sizes="48px"
-              className="object-contain"
+              className="absolute inset-0 h-full w-full object-contain"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-default-400">

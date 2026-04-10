@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Chip } from '@heroui/react';
 
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -56,12 +55,10 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
     return (
       <div className="relative mx-auto h-10 w-10 overflow-hidden rounded bg-default-100">
         {imageUri ? (
-          <Image
+          <img
             src={imageUri}
             alt={cardName}
-            fill
-            sizes="40px"
-            className="object-contain"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         ) : (
           <span className="flex h-full items-center justify-center text-lg">

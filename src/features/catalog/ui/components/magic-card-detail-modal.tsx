@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import Image from 'next/image';
 import {
   Drawer,
   DrawerContent,
@@ -123,12 +122,10 @@ export default function MagicCardDetailModal({
           <div className="flex gap-6">
             <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
               {imageUri ? (
-                <Image
+                <img
                   src={imageUri}
                   alt={name}
-                  fill
-                  sizes="160px"
-                  className="object-contain p-1"
+                  className="absolute inset-0 h-full w-full object-contain p-1"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-default-400">

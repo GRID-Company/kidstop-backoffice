@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(url, {
       headers: {
-        'Accept': 'image/*',
+        'Accept': 'image/webp,image/*,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (compatible; ImageProxy/1.0)',
+        'Referer': new URL(url).origin,
       },
     });
 

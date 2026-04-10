@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import {
   Drawer,
   DrawerContent,
@@ -51,12 +50,10 @@ export default function MovementDetailDrawer({
           <div className="flex items-center gap-4 rounded-lg bg-default-50 p-4">
             <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
               {item.cardImageUrl ? (
-                <Image
+                <img
                   src={item.cardImageUrl}
                   alt={item.cardName}
-                  fill
-                  sizes="48px"
-                  className="object-contain"
+                  className="absolute inset-0 h-full w-full object-contain"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-2xl">🃏</div>

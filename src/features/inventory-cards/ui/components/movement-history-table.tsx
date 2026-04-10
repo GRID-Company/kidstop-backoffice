@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import {
   Chip,
   Pagination,
@@ -61,12 +60,10 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
         <div className="flex items-center gap-3">
           <div className="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100">
             {item.cardImageUrl ? (
-              <Image
+              <img
                 src={item.cardImageUrl}
                 alt={item.cardName}
-                fill
-                sizes="32px"
-                className="object-contain"
+                className="absolute inset-0 h-full w-full object-contain"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-default-400 text-xs">
@@ -132,12 +129,10 @@ function MovementMobileCard({
       <CardBody className="flex flex-row gap-3 !p-4">
         <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100">
           {item.cardImageUrl ? (
-            <Image
+            <img
               src={item.cardImageUrl}
               alt={item.cardName}
-              fill
-              sizes="40px"
-              className="object-contain"
+              className="absolute inset-0 h-full w-full object-contain"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-default-400">

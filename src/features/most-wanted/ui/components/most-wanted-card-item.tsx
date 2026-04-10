@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Chip, Switch, Tooltip } from '@heroui/react';
@@ -68,12 +67,10 @@ export default function MostWantedCardItem({
 
       <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded bg-default-100">
         {cardImage ? (
-          <Image
+          <img
             src={cardImage}
             alt={cardName}
-            fill
-            sizes="36px"
-            className="object-contain"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-default-400">
