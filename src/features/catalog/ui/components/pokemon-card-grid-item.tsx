@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { CardBody, Button, Tooltip } from '@heroui/react';
-import { Icon } from '@iconify/react';
+import { CardBody } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
@@ -38,19 +37,6 @@ export default function PokemonCardGridItem({ card, onPress }: PokemonCardGridIt
             <div className="flex h-full items-center justify-center text-default-400">
               <span className="text-4xl">🃏</span>
             </div>
-          )}
-          {onPress && (
-            <Tooltip content="Ver detalle" placement="top" delay={100}>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="solid"
-                className="absolute top-2 right-2 z-10 bg-white/90 backdrop-blur-sm shadow-md hover:bg-white"
-                onPress={() => onPress(card)}
-              >
-                <Icon icon="lucide:eye" className="text-default-700" />
-              </Button>
-            </Tooltip>
           )}
         </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardBody, CardFooter, Chip, Tooltip, Button } from '@heroui/react';
+import { Card, CardBody, CardFooter, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { IMagicCard } from '../../domain/types';
 
@@ -31,20 +31,6 @@ export default function MagicCardGridItem({ card, onPress }: MagicCardGridItemPr
               <span className="text-6xl">🃏</span>
             </div>
           )}
-
-          <div className="absolute left-2 top-2 z-10">
-            <Tooltip content="Ver detalle" placement="top" delay={100}>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="solid"
-                className="bg-white/90 backdrop-blur-sm shadow-md hover:bg-white"
-                onPress={() => onPress(card)}
-              >
-                <Icon icon="lucide:eye" className="text-default-700" />
-              </Button>
-            </Tooltip>
-          </div>
 
           {card.isFoil && (
             <div className="absolute right-2 top-2">
