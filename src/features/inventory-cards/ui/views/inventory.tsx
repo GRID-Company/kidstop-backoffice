@@ -9,6 +9,7 @@ import { Key } from 'react';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
+import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import {
@@ -143,18 +144,25 @@ export default function Inventory() {
                 }
               />
             </Tabs>
-
-            <Tooltip content="Actualizar indicadores">
-              <Button
-                variant="light"
-                isIconOnly
-                size="sm"
-                onPress={refreshIndicators}
-                isLoading={indicators.loading}
-              >
-                <Icon icon="lucide:refresh-cw" className="text-default-500" />
-              </Button>
-            </Tooltip>
+            
+            <div className="flex items-center gap-1">
+              {indicators.lastRefresh && (
+                <span className="text-[11px] text-default-400">
+                  Act.: {formatDateTime(indicators.lastRefresh, '—')}
+                </span>
+              )}
+              <Tooltip content="Actualizar indicadores">
+                <Button
+                  variant="light"
+                  isIconOnly
+                  size="sm"
+                  onPress={refreshIndicators}
+                  isLoading={indicators.loading}
+                >
+                  <Icon icon="lucide:refresh-cw" className="text-default-500" />
+                </Button>
+              </Tooltip>
+            </div>
           </div>
 
           {activeTab === INVENTORY_TABS.STOCK && (

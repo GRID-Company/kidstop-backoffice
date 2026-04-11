@@ -90,6 +90,7 @@ export type IndicatorsInventoryItemsQuery = {
     totalStock: number;
     lastSellDate: unknown | null;
     avgDaysInInventory: number | null;
+    lastRefresh: unknown;
   };
 };
 
@@ -514,6 +515,7 @@ export const IndicatorsInventoryItemsDocument = {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'avgDaysInInventory' },
                 },
+                { kind: 'Field', name: { kind: 'Name', value: 'lastRefresh' } },
               ],
             },
           },

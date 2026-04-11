@@ -18,6 +18,9 @@ export function useInventoryIndicators(tcg: string) {
       ? String(data.indicatorsInventoryItems.lastSellDate)
       : null,
     avgDaysInInventory: data?.indicatorsInventoryItems?.avgDaysInInventory ?? null,
+    lastRefresh: data?.indicatorsInventoryItems?.lastRefresh
+      ? String(data.indicatorsInventoryItems.lastRefresh)
+      : null,
     loading,
     refresh,
   };

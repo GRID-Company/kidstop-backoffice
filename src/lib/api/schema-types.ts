@@ -62,6 +62,20 @@ export type AddWishlistItemInput = {
   tcg: Scalars['String']['input'];
 };
 
+export type BannerGuids = {
+  /** GUID of the Magic banner */
+  magic?: Maybe<Scalars['String']['output']>;
+  /** GUID of the Pokemon banner */
+  pokemon?: Maybe<Scalars['String']['output']>;
+};
+
+export type BannerGuidsInput = {
+  /** GUID of the Magic banner */
+  magic?: InputMaybe<Scalars['String']['input']>;
+  /** GUID of the Pokemon banner */
+  pokemon?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type BuyerBudgetWithUsage = {
   assignedAmount: Scalars['Float']['output'];
   buyer: User;
@@ -117,6 +131,19 @@ export type ChangePasswordInput = {
 
 export type ChangePasswordOutput = {
   success: Scalars['Boolean']['output'];
+};
+
+export type ClientDetailsOutput = {
+  /** Total amount of only completed orders */
+  completedOrdersAmount: Scalars['Float']['output'];
+  /** Date of the most recent order */
+  lastOrderDate?: Maybe<Scalars['TimestampScalar']['output']>;
+  /** Number of all orders (sales) for the client */
+  orderCount: Scalars['Int']['output'];
+  /** Total amount of all orders (any status) */
+  totalOrdersAmount: Scalars['Float']['output'];
+  /** Number of orders cancelled due to client unreachable */
+  unreachableCancellations: Scalars['Int']['output'];
 };
 
 export type CreateInventoryMovementInput = {
@@ -403,6 +430,8 @@ export type GlobalConfig = {
 };
 
 export type GlobalConfigData = {
+  /** Banner GUIDs for each TCG */
+  bannerGuids?: Maybe<BannerGuids>;
   /** Geofence configuration for location-based features */
   geofence?: Maybe<GeofenceData>;
   /** Maximum units per card in inventory (frontend warning) */
@@ -422,6 +451,7 @@ export type IndicatorsDataOutput = {
 
 export type InventoryIndicatorsOutput = {
   avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
+  lastRefresh: Scalars['TimestampScalar']['output'];
   lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
   totalStock: Scalars['Int']['output'];
 };
@@ -526,6 +556,7 @@ export type MagicCardCollectionOutput = {
 export type MagicCardInternalDetail = {
   collectorNumber?: Maybe<Scalars['String']['output']>;
   edition?: Maybe<Scalars['String']['output']>;
+  editionGuid?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<MagicCardInventoryItemInternal>>;
@@ -566,6 +597,7 @@ export type MagicCardInventoryItemPublic = {
 export type MagicCardPublicDetail = {
   collectorNumber?: Maybe<Scalars['String']['output']>;
   edition?: Maybe<Scalars['String']['output']>;
+  editionGuid?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<MagicCardInventoryItemPublic>>;
@@ -583,7 +615,21 @@ export type MagicCardPublicItem = {
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
+};
+
+export type MagicCardRecommended = {
+  availableStock: Scalars['Boolean']['output'];
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  totalStock: Scalars['Int']['output'];
 };
 
 export type MagicCardSummary = {
@@ -594,6 +640,20 @@ export type MagicCardSummary = {
   isFoil: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+};
+
+export type MagicCardTopSold = {
+  availableStock: Scalars['Boolean']['output'];
+  collectorNumber?: Maybe<Scalars['String']['output']>;
+  edition?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  isFoil: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  totalSold: Scalars['Int']['output'];
+  totalStock: Scalars['Int']['output'];
 };
 
 export type MagicCardVariantMetrics = {
@@ -1090,6 +1150,7 @@ export type PokemonCardPublicDetail = {
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
+  setGuid?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
   variant?: Maybe<Scalars['String']['output']>;
 };
@@ -1100,9 +1161,23 @@ export type PokemonCardPublicItem = {
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+};
+
+export type PokemonCardRecommended = {
+  availableStock: Scalars['Boolean']['output'];
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+  totalStock: Scalars['Int']['output'];
 };
 
 export type PokemonCardSummary = {
@@ -1113,6 +1188,20 @@ export type PokemonCardSummary = {
   rarity?: Maybe<Scalars['String']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+};
+
+export type PokemonCardTopSold = {
+  availableStock: Scalars['Boolean']['output'];
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  guid: Scalars['String']['output'];
+  imageUri?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  rarity?: Maybe<Scalars['String']['output']>;
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
+  setName?: Maybe<Scalars['String']['output']>;
+  totalSold: Scalars['Int']['output'];
+  totalStock: Scalars['Int']['output'];
 };
 
 export type PokemonCardVariantMetrics = {
@@ -1178,6 +1267,10 @@ export type Query = {
   buyerBudget: BuyerBudgetWithUsage;
   /** Get all buyer budgets with usage (ADMIN only) */
   buyerBudgets: Array<BuyerBudgetWithUsage>;
+  /** Get client sales statistics (orders count, totals, cancellations, last order date) */
+  clientDetails: ClientDetailsOutput;
+  /** Get banner file for a specific TCG */
+  getBanner?: Maybe<File>;
   /** Query to get the global config */
   globalConfig: GlobalConfig;
   /** Get aggregated inventory indicators */
@@ -1203,6 +1296,8 @@ export type Query = {
   magicCardRarities: Array<Scalars['String']['output']>;
   /** Get inventory variants with metrics for a Magic card (authenticated) */
   magicCardWithMetrics: MagicCardWithMetrics;
+  /** Get top 5 best-selling Magic cards of all time (public) */
+  magicTopSoldCards: Array<MagicCardTopSold>;
   /** Get most wanted card detail (admin only) */
   mostWantedCard: MostWantedCard;
   /** Get paginated most wanted cards list (admin only) */
@@ -1237,10 +1332,16 @@ export type Query = {
   pokemonCardVariants: Array<Scalars['String']['output']>;
   /** Get inventory variants with metrics for a Pokemon card (authenticated) */
   pokemonCardWithMetrics: PokemonCardWithMetrics;
+  /** Get top 5 best-selling Pokemon cards of all time (public) */
+  pokemonTopSoldCards: Array<PokemonCardTopSold>;
   /** Get purchase detail by guid */
   purchase: Purchase;
   /** Get paginated list of purchases */
   purchases: PaginatedPurchases;
+  /** Get 5 recommended Magic cards with highest stock (public) */
+  recommendedMagicCards: Array<MagicCardRecommended>;
+  /** Get 5 recommended Pokemon cards with highest stock (public) */
+  recommendedPokemonCards: Array<PokemonCardRecommended>;
   /** Get sale detail by guid (backoffice) */
   sale: Sale;
   /** Get paginated list of sales (backoffice) */
@@ -1266,6 +1367,14 @@ export type QueryBuyerBudgetArgs = {
 
 export type QueryBuyerBudgetsArgs = {
   tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueryClientDetailsArgs = {
+  clientGuid: Scalars['String']['input'];
+};
+
+export type QueryGetBannerArgs = {
+  tcg: TcgType;
 };
 
 export type QueryIndicatorsInventoryItemsArgs = {
@@ -1476,6 +1585,12 @@ export type SyncMetricsOutput = {
   totalCards: Scalars['Int']['output'];
 };
 
+/** Trading card game type (Pokemon or Magic) */
+export enum TcgType {
+  Magic = 'MAGIC',
+  Pokemon = 'POKEMON',
+}
+
 export type Time = {
   /** Hour (1-12) */
   hour?: Maybe<Scalars['Int']['output']>;
@@ -1512,6 +1627,8 @@ export type UpdateCartItemInput = {
 };
 
 export type UpdateGlobalConfigInput = {
+  /** Banner GUIDs for each TCG */
+  bannerGuids?: InputMaybe<BannerGuidsInput>;
   /** Geofence configuration for location-based features */
   geofence?: InputMaybe<GeofenceInput>;
   /** Maximum units per card in inventory (frontend warning) */

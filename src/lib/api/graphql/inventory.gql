@@ -76,6 +76,7 @@ query IndicatorsInventoryItems($tcg: String, $forceRefresh: Boolean) {
     totalStock
     lastSellDate
     avgDaysInInventory
+    lastRefresh
   }
 }
 

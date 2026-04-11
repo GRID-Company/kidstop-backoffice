@@ -67,6 +67,20 @@ export type SetClientStatusMutationVariables = Types.Exact<{
 
 export type SetClientStatusMutation = { setClientStatus: { message: string } };
 
+export type ClientDetailsQueryVariables = Types.Exact<{
+  clientGuid: Types.Scalars['String']['input'];
+}>;
+
+export type ClientDetailsQuery = {
+  clientDetails: {
+    orderCount: number;
+    totalOrdersAmount: number;
+    completedOrdersAmount: number;
+    unreachableCancellations: number;
+    lastOrderDate: unknown | null;
+  };
+};
+
 export const CustomersDocument = {
   kind: 'Document',
   definitions: [
@@ -329,20 +343,6 @@ export const UpdateCustomerDocument = {
   UpdateCustomerMutation,
   UpdateCustomerMutationVariables
 >;
-export type ClientDetailsQueryVariables = Types.Exact<{
-  clientGuid: Types.Scalars['String']['input'];
-}>;
-
-export type ClientDetailsQuery = {
-  clientDetails: {
-    orderCount: number;
-    totalOrdersAmount: number;
-    completedOrdersAmount: number;
-    unreachableCancellations: number;
-    lastOrderDate: unknown | null;
-  };
-};
-
 export const SetClientStatusDocument = {
   kind: 'Document',
   definitions: [
@@ -440,10 +440,22 @@ export const ClientDetailsDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'orderCount' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'totalOrdersAmount' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'completedOrdersAmount' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'unreachableCancellations' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'lastOrderDate' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'totalOrdersAmount' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'completedOrdersAmount' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'unreachableCancellations' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'lastOrderDate' },
+                },
               ],
             },
           },
