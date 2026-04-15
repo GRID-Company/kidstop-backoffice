@@ -12,8 +12,8 @@ export {
 } from '@/lib/types/card.types';
 
 export const DEFAULT_CARDS_SORT: ITableSort = {
-  column: 'name',
-  order: 'ASC',
+  column: 'releaseDate',
+  order: 'DESC',
 };
 
 export const DEFAULT_PAGE_SIZE = 20;

@@ -47,14 +47,6 @@ export default function MagicCardGridItem({ card, onPress }: MagicCardGridItemPr
               </Chip>
             </div>
           )}
-
-          {!hasStock && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-              <Chip color="danger" variant="flat" size="sm">
-                Sin stock
-              </Chip>
-            </div>
-          )}
         </div>
       </CardBody>
 
