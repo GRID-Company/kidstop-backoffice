@@ -28,6 +28,8 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
       };
     });
 
+    let isRedirecting = false;
+
     const errorLink = new ErrorLink(({ error, operation }) => {
       if (CombinedGraphQLErrors.is(error)) {
         const isAuthError =
@@ -35,8 +37,10 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
           error.extensions?.code === 'FORBIDDEN' ||
           error.extensions?.code === 401;
 
-        if (isAuthError && !window.location.href.includes('/login')) {
-          logout();
+        if (isAuthError && !window.location.href.includes('/login') && !isRedirecting) {
+          isRedirecting = true;
+          logout('Sesión expirada. Por favor inicia sesión nuevamente.', false);
+          window.location.href = '/login';
         }
       }
     });
