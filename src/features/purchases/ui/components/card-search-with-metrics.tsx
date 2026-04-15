@@ -23,6 +23,7 @@ import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/ty
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
+import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 
 interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
@@ -61,6 +62,7 @@ function CardResultItem({
     unitBuyPrice: Math.round(card.metrics.referencePrice * 0.6 * 100) / 100,
   });
   const [isAdding, setIsAdding] = useState(false);
+  const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
   const { metrics: variantMetrics, referencePrice, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
@@ -140,7 +142,7 @@ function CardResultItem({
               <MetricItem
                 icon="lucide:tag"
                 label="Precio ref."
-                value={formatCurrency(referencePrice ?? card.metrics.referencePrice)}
+                value={isPrivacyMode ? '***' : formatCurrency(referencePrice ?? card.metrics.referencePrice)}
                 valueClassName="text-accent font-semibold"
               />
               <MetricItem
