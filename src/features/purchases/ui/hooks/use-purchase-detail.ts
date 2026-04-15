@@ -27,6 +27,8 @@ interface UsePurchaseDetailReturn {
   payments: IPaymentDetail[];
   isEditable: boolean;
   canSendQuote: boolean;
+  canQuote: boolean;
+  canResendQuote: boolean;
   canAcceptQuote: boolean;
   canRegisterPayment: boolean;
   canAdjustPrices: boolean;
@@ -158,6 +160,11 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const canSendQuote =
     status === PURCHASE_STATUS.DRAFT && items.length > 0;
 
+  const canQuote = status === PURCHASE_STATUS.DRAFT && items.length > 0;
+
+  const canResendQuote =
+    (status === PURCHASE_STATUS.QUOTED || status === PURCHASE_STATUS.WAITING_PRICE) && items.length > 0;
+
   const canAcceptQuote = status === PURCHASE_STATUS.QUOTED;
 
   const canRegisterPayment = status === PURCHASE_STATUS.WAITING_PRICE;
@@ -247,6 +254,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     payments,
     isEditable,
     canSendQuote,
+    canQuote,
+    canResendQuote,
     canAcceptQuote,
     canRegisterPayment,
     canAdjustPrices,

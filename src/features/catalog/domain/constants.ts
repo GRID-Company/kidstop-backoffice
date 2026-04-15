@@ -1,4 +1,5 @@
 import { ITableSort } from '@/lib/types/datatable.types';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 
 export {
   CARD_CONDITIONS,
@@ -11,9 +12,17 @@ export {
   MAGIC_RARITY_OPTIONS,
 } from '@/lib/types/card.types';
 
+export const DEFAULT_CARD_CONDITION = CARD_CONDITIONS.NEAR_MINT;
+
+export function getDefaultVariant<T extends { condition: string }>(
+  variants: T[]
+): T {
+  return variants.find((v) => v.condition === DEFAULT_CARD_CONDITION) ?? variants[0];
+}
+
 export const DEFAULT_CARDS_SORT: ITableSort = {
-  column: 'name',
-  order: 'ASC',
+  column: 'releaseDate',
+  order: 'DESC',
 };
 
 export const DEFAULT_PAGE_SIZE = 20;

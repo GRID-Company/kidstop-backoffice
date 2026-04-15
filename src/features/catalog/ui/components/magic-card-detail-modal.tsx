@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import {
   Drawer,
   DrawerContent,
@@ -10,18 +9,16 @@ import {
   Button,
   Chip,
   Divider,
+  Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { SubmitHandler } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
-import { IMagicCard, IMagicCardVariant } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
-import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
-import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
+import { IMagicCard } from '../../domain/types';
+import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS } from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
-import { useUpdateInventoryPrice } from '../hooks/use-update-inventory-price';
+import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
 
 interface MagicCardDetailModalProps {
@@ -35,57 +32,32 @@ export default function MagicCardDetailModal({
   isOpen,
   onClose,
 }: MagicCardDetailModalProps) {
-  const [selectedVariant, setSelectedVariant] = useState<IMagicCardVariant | null>(null);
+  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (card?.guid ?? null) : null);
 
-  const { detail, loading: detailLoading } = useMagicCardDetail(card?.guid ?? null);
-  const { handleUpdatePrice, loading: updateLoading } = useUpdateInventoryPrice();
+  const {
+    selectedVariant,
+    stockAdjustment,
+    setStockAdjustment,
+    handleVariantSelect,
+    handlePriceSubmit,
+    handleStockAdjust,
+    control,
+    handleSubmit,
+    formState,
+    updatingPrice,
+    adjustLoading,
+  } = useCardDetailModal({
+    detail,
+    card,
+    tcgType: 'MAGIC',
+    onRefetch: refetch,
+  });
 
   const { data: metricsData } = useQuery(MagicCardWithMetricsDocument, {
     variables: { guid: card?.guid ?? '' },
-    skip: !card?.guid,
+    skip: !card?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
-
-  const { control, handleSubmit, formState, reset } = useCardPriceForm();
-
-  useEffect(() => {
-    if (detail?.inventoryCards && detail.inventoryCards.length > 0) {
-      setSelectedVariant(detail.inventoryCards[0]);
-    } else if (card?.variants && card.variants.length > 0) {
-      setSelectedVariant(card.variants[0]);
-    } else {
-      setSelectedVariant(null);
-    }
-  }, [detail, card]);
-
-  useEffect(() => {
-    if (selectedVariant) {
-      reset({
-        condition: selectedVariant.condition,
-        buyPrice: selectedVariant.purchasePrice ?? 0,
-        sellPrice: selectedVariant.sellPrice ?? 0,
-      });
-    }
-  }, [selectedVariant, reset]);
-
-  const handleVariantSelect = useCallback((variant: IMagicCardVariant) => {
-    setSelectedVariant(variant);
-  }, []);
-
-  const handlePriceSubmit: SubmitHandler<CardPriceFormData> = useCallback(
-    async (data) => {
-      if (!detail || !selectedVariant) return;
-      await handleUpdatePrice({
-        cardGuid: detail.guid,
-        inventoryItemGuid: selectedVariant.guid,
-        condition: selectedVariant.condition,
-        purchasePrice: data.buyPrice,
-        sellPrice: data.sellPrice,
-        tcgType: 'MAGIC',
-      });
-    },
-    [detail, selectedVariant, handleUpdatePrice]
-  );
 
   if (!card) return null;
 
@@ -192,25 +164,33 @@ export default function MagicCardDetailModal({
           <div className="flex flex-col gap-3">
             <h4 className="text-sm font-semibold">Variantes por condición</h4>
             <div className="flex flex-wrap gap-2">
-              {variants.map((variant) => (
-                <Button
-                  key={variant.guid}
-                  size="sm"
-                  variant={selectedVariant?.guid === variant.guid ? 'solid' : 'bordered'}
-                  color="default"
-                  className={
-                    selectedVariant?.guid === variant.guid ? 'border-none text-white' : ''
-                  }
-                  style={
-                    selectedVariant?.guid === variant.guid
-                      ? { backgroundColor: 'var(--color-accent)' }
-                      : undefined
-                  }
-                  onPress={() => handleVariantSelect(variant)}
-                >
-                  {CARD_CONDITION_SHORT_LABELS[variant.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]} ({variant.stock})
-                </Button>
-              ))}
+              {Object.values(CARD_CONDITIONS).map((condition) => {
+                const existing = variants.find((v) => v.condition === condition);
+                const variant: InventoryCard = existing ?? {
+                  guid: `${card?.guid}-${condition}`,
+                  isNew: true,
+                  condition,
+                  stock: 0,
+                  purchasePrice: null,
+                  sellPrice: null,
+                };
+                const isSelected = selectedVariant?.condition === condition;
+                return (
+                  <Button
+                    key={condition}
+                    size="sm"
+                    variant={isSelected ? 'solid' : 'bordered'}
+                    color="default"
+                    className={isSelected ? 'border-none text-white' : ''}
+                    style={
+                      isSelected ? { backgroundColor: 'var(--color-accent)' } : undefined
+                    }
+                    onPress={() => handleVariantSelect(variant)}
+                  >
+                    {CARD_CONDITION_SHORT_LABELS[condition as keyof typeof CARD_CONDITION_SHORT_LABELS]} ({variant.stock})
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
@@ -271,7 +251,7 @@ export default function MagicCardDetailModal({
                   <Divider />
                   <div className="flex flex-col gap-3">
                     <h4 className="text-sm font-semibold">Precios de mercado (MXN)</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="flex flex-col gap-1">
                         <span className="text-default-500">Precio retail</span>
                         <span className="font-bold text-green-600">
@@ -288,10 +268,44 @@ export default function MagicCardDetailModal({
                             : 'N/A'}
                         </span>
                       </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">Precio referencia</span>
+                        <span className="font-bold text-accent">
+                          {metricsData.magicCardWithMetrics.priceBuy
+                            ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
+                            : 'N/A'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </>
               )}
+
+              <Divider />
+
+              <div className="flex flex-col gap-4">
+                <h4 className="text-sm font-semibold">Ajustar stock</h4>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    size="sm"
+                    label="Cantidad (+/-)"
+                    value={String(stockAdjustment)}
+                    onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
+                    classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                  />
+                  <Button
+                    size="sm"
+                    color="primary"
+                    isDisabled={stockAdjustment === 0}
+                    isLoading={adjustLoading}
+                    onPress={handleStockAdjust}
+                    startContent={<Icon icon="lucide:package-plus" />}
+                  >
+                    Aplicar
+                  </Button>
+                </div>
+              </div>
 
               <Divider />
 
@@ -320,7 +334,7 @@ export default function MagicCardDetailModal({
                   type="submit"
                   size="sm"
                   isDisabled={!formState.isDirty || !formState.isValid}
-                  isLoading={updateLoading}
+                  isLoading={updatingPrice}
                   startContent={<Icon icon="lucide:save" />}
                   className="text-white"
                   style={{ backgroundColor: 'var(--color-accent)' }}

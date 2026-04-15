@@ -52,6 +52,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     payments,
     isEditable,
     canSendQuote,
+    canQuote,
+    canResendQuote,
     canAcceptQuote,
     canRegisterPayment,
     canAdjustPrices,
@@ -88,10 +90,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
     [isPrivacyMode]
   );
-
-  const handleQuoteSent = useCallback(() => {
-    updateStatus(PURCHASE_STATUS.QUOTED);
-  }, [updateStatus]);
 
   const handlePaymentsConfirm = useCallback(
     (newPayments: IPaymentDetail[]) => {
@@ -319,12 +317,31 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               </div>
               <Divider />
               <div className="flex flex-wrap gap-3">
+                {canQuote && (
+                  <Button
+                    color="primary"
+                    variant="solid"
+                    startContent={<Icon icon="lucide:file-check" width={18} />}
+                    onPress={() => updateStatus(PURCHASE_STATUS.QUOTED)}
+                  >
+                    Cotizar
+                  </Button>
+                )}
+
                 {canSendQuote && (
                   <WhatsAppQuoteButton
                     seller={purchase.seller}
                     items={items}
                     tcgType={purchase.tcgType}
-                    onQuoteSent={handleQuoteSent}
+                  />
+                )}
+
+                {canResendQuote && (
+                  <WhatsAppQuoteButton
+                    seller={purchase.seller}
+                    items={items}
+                    tcgType={purchase.tcgType}
+                    label="Reenviar cotización"
                   />
                 )}
 

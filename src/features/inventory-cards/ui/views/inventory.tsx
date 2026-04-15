@@ -12,6 +12,7 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
+import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import {
   CreateInventoryMovementDocument,
   InventoryItemsDocument,
@@ -26,6 +27,8 @@ import InventoryFilters from '../components/inventory-filters';
 import InventoryGrid from '../components/inventory-grid';
 import AdjustmentModal from '../components/adjustment-modal';
 import MovementsContent from './movements';
+import PokemonCardDetailModal from '@/features/catalog/ui/components/pokemon-card-detail-modal';
+import MagicCardDetailModal from '@/features/catalog/ui/components/magic-card-detail-modal';
 
 const INVENTORY_TABS = {
   STOCK: 'stock',
@@ -51,17 +54,69 @@ export default function Inventory() {
     totalPages,
     totalCount,
     loading,
+    refetch,
   } = useInventorySearch();
 
   const { refresh: refreshIndicators, ...indicators } = useInventoryIndicators(selectedTCG);
 
   const [selectedItem, setSelectedItem] = useState<IInventoryItem | null>(null);
   const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
+  const [detailModalItem, setDetailModalItem] = useState<IPokemonCard | IMagicCard | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const toCatalogCard = useCallback((item: IInventoryItem): IPokemonCard | IMagicCard => {
+    if (item.tcg === 'MAGIC') {
+      return {
+        guid: item.cardGuid,
+        name: item.name,
+        edition: item.setName,
+        collectorNumber: item.number,
+        isFoil: false,
+        rarity: item.rarity,
+        sellPrice: item.sellPrice,
+        availableStock: item.stock > 0,
+        totalStock: item.stock,
+        imageUri: item.imageUrl,
+        variants: [{
+          guid: item.guid,
+          condition: item.condition,
+          stock: item.stock,
+          purchasePrice: item.purchasePrice,
+          sellPrice: item.sellPrice,
+        }],
+      };
+    }
+    return {
+      guid: item.cardGuid,
+      name: item.name,
+      setName: item.setName,
+      setCode: item.setCode,
+      sellPrice: item.sellPrice,
+      availableStock: item.stock > 0,
+      totalStock: item.stock,
+      imageUri: item.imageUrl,
+      variants: [{
+        guid: item.guid,
+        condition: item.condition,
+        stock: item.stock,
+        purchasePrice: item.purchasePrice,
+        sellPrice: item.sellPrice,
+      }],
+    };
+  }, []);
 
   const handleItemPress = useCallback((item: IInventoryItem) => {
-    setSelectedItem(item);
-    setIsAdjustmentOpen(true);
-  }, []);
+    const catalogCard = toCatalogCard(item);
+    setDetailModalItem(catalogCard);
+    setIsDetailModalOpen(true);
+  }, [toCatalogCard]);
+
+  const handleCloseDetailModal = useCallback(() => {
+    setIsDetailModalOpen(false);
+    setDetailModalItem(null);
+    void refetch();
+    void refreshIndicators();
+  }, [refetch, refreshIndicators]);
 
   const handleCloseAdjustment = useCallback(() => {
     setIsAdjustmentOpen(false);
@@ -213,6 +268,18 @@ export default function Inventory() {
         isSubmitting={adjusting}
         onClose={handleCloseAdjustment}
         onSubmit={handleAdjustmentSubmit}
+      />
+
+      <PokemonCardDetailModal
+        card={detailModalItem && 'setName' in detailModalItem ? detailModalItem : null}
+        isOpen={isDetailModalOpen && detailModalItem !== null && 'setName' in detailModalItem}
+        onClose={handleCloseDetailModal}
+      />
+
+      <MagicCardDetailModal
+        card={detailModalItem && 'edition' in detailModalItem ? detailModalItem : null}
+        isOpen={isDetailModalOpen && detailModalItem !== null && 'edition' in detailModalItem}
+        onClose={handleCloseDetailModal}
       />
     </>
   );

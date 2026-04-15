@@ -17,6 +17,7 @@ interface WhatsAppQuoteButtonProps {
   tcgType: TCGType;
   onQuoteSent?: () => void;
   isDisabled?: boolean;
+  label?: string;
 }
 
 export default function WhatsAppQuoteButton({
@@ -25,6 +26,7 @@ export default function WhatsAppQuoteButton({
   tcgType,
   onQuoteSent,
   isDisabled = false,
+  label = 'Enviar cotización',
 }: WhatsAppQuoteButtonProps) {
   const validation = useMemo(
     () =>
@@ -60,7 +62,7 @@ export default function WhatsAppQuoteButton({
           isDisabled={isDisabled || !validation.valid}
           className="font-medium"
         >
-          Enviar cotización
+          {label}
         </Button>
       </div>
     </Tooltip>
