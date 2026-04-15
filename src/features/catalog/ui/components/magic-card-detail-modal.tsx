@@ -10,6 +10,7 @@ import {
   Button,
   Chip,
   Divider,
+  Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
@@ -18,10 +19,12 @@ import { useQuery } from '@apollo/client/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { IMagicCard, IMagicCardVariant } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
 import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
 import { useUpdateInventoryPrice } from '../hooks/use-update-inventory-price';
+import { useAdjustInventoryStock } from '../hooks/use-adjust-inventory-stock';
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
 
 interface MagicCardDetailModalProps {
@@ -36,9 +39,11 @@ export default function MagicCardDetailModal({
   onClose,
 }: MagicCardDetailModalProps) {
   const [selectedVariant, setSelectedVariant] = useState<IMagicCardVariant | null>(null);
+  const [stockAdjustment, setStockAdjustment] = useState<number>(0);
 
-  const { detail, loading: detailLoading } = useMagicCardDetail(card?.guid ?? null);
+  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(card?.guid ?? null);
   const { handleUpdatePrice, loading: updateLoading } = useUpdateInventoryPrice();
+  const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
 
   const { data: metricsData } = useQuery(MagicCardWithMetricsDocument, {
     variables: { guid: card?.guid ?? '' },
@@ -49,10 +54,18 @@ export default function MagicCardDetailModal({
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
 
   useEffect(() => {
-    if (detail?.inventoryCards && detail.inventoryCards.length > 0) {
-      setSelectedVariant(detail.inventoryCards[0]);
-    } else if (card?.variants && card.variants.length > 0) {
-      setSelectedVariant(card.variants[0]);
+    const variants = detail?.inventoryCards ?? card?.variants ?? [];
+    if (variants.length > 0) {
+      const nmVariant = variants.find((v) => v.condition === CARD_CONDITIONS.NEAR_MINT);
+      setSelectedVariant(nmVariant ?? variants[0]);
+    } else if (card?.guid) {
+      setSelectedVariant({
+        guid: `${card.guid}-${CARD_CONDITIONS.NEAR_MINT}`,
+        condition: CARD_CONDITIONS.NEAR_MINT,
+        stock: 0,
+        purchasePrice: null,
+        sellPrice: null,
+      });
     } else {
       setSelectedVariant(null);
     }
@@ -75,17 +88,34 @@ export default function MagicCardDetailModal({
   const handlePriceSubmit: SubmitHandler<CardPriceFormData> = useCallback(
     async (data) => {
       if (!detail || !selectedVariant) return;
+
+      const isFakeGuid = selectedVariant.guid.includes('-') && selectedVariant.guid.length > 36;
+      const existingInventoryItemGuid = isFakeGuid ? undefined : selectedVariant.guid;
+
       await handleUpdatePrice({
         cardGuid: detail.guid,
-        inventoryItemGuid: selectedVariant.guid,
+        inventoryItemGuid: existingInventoryItemGuid,
         condition: selectedVariant.condition,
         purchasePrice: data.buyPrice,
         sellPrice: data.sellPrice,
         tcgType: 'MAGIC',
       });
+      void refetch();
     },
-    [detail, selectedVariant, handleUpdatePrice]
+    [detail, selectedVariant, handleUpdatePrice, refetch]
   );
+
+  const handleStockAdjust = useCallback(async () => {
+    if (!detail || !selectedVariant || stockAdjustment === 0) return;
+    await handleAdjustStock({
+      cardGuid: detail.guid,
+      condition: selectedVariant.condition,
+      quantity: stockAdjustment,
+      tcgType: 'MAGIC',
+    });
+    setStockAdjustment(0);
+    void refetch();
+  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, refetch]);
 
   if (!card) return null;
 
@@ -192,25 +222,32 @@ export default function MagicCardDetailModal({
           <div className="flex flex-col gap-3">
             <h4 className="text-sm font-semibold">Variantes por condición</h4>
             <div className="flex flex-wrap gap-2">
-              {variants.map((variant) => (
-                <Button
-                  key={variant.guid}
-                  size="sm"
-                  variant={selectedVariant?.guid === variant.guid ? 'solid' : 'bordered'}
-                  color="default"
-                  className={
-                    selectedVariant?.guid === variant.guid ? 'border-none text-white' : ''
-                  }
-                  style={
-                    selectedVariant?.guid === variant.guid
-                      ? { backgroundColor: 'var(--color-accent)' }
-                      : undefined
-                  }
-                  onPress={() => handleVariantSelect(variant)}
-                >
-                  {CARD_CONDITION_SHORT_LABELS[variant.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]} ({variant.stock})
-                </Button>
-              ))}
+              {Object.values(CARD_CONDITIONS).map((condition) => {
+                const existing = variants.find((v) => v.condition === condition);
+                const variant: IMagicCardVariant = existing ?? {
+                  guid: `${card?.guid}-${condition}`,
+                  condition,
+                  stock: 0,
+                  purchasePrice: null,
+                  sellPrice: null,
+                };
+                const isSelected = selectedVariant?.condition === condition;
+                return (
+                  <Button
+                    key={condition}
+                    size="sm"
+                    variant={isSelected ? 'solid' : 'bordered'}
+                    color="default"
+                    className={isSelected ? 'border-none text-white' : ''}
+                    style={
+                      isSelected ? { backgroundColor: 'var(--color-accent)' } : undefined
+                    }
+                    onPress={() => handleVariantSelect(variant)}
+                  >
+                    {CARD_CONDITION_SHORT_LABELS[condition as keyof typeof CARD_CONDITION_SHORT_LABELS]} ({variant.stock})
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
@@ -271,7 +308,7 @@ export default function MagicCardDetailModal({
                   <Divider />
                   <div className="flex flex-col gap-3">
                     <h4 className="text-sm font-semibold">Precios de mercado (MXN)</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="flex flex-col gap-1">
                         <span className="text-default-500">Precio retail</span>
                         <span className="font-bold text-green-600">
@@ -288,10 +325,44 @@ export default function MagicCardDetailModal({
                             : 'N/A'}
                         </span>
                       </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">Precio referencia</span>
+                        <span className="font-bold text-accent">
+                          {metricsData.magicCardWithMetrics.priceBuy
+                            ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
+                            : 'N/A'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </>
               )}
+
+              <Divider />
+
+              <div className="flex flex-col gap-4">
+                <h4 className="text-sm font-semibold">Ajustar stock</h4>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    size="sm"
+                    label="Cantidad (+/-)"
+                    value={String(stockAdjustment)}
+                    onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
+                    classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                  />
+                  <Button
+                    size="sm"
+                    color="primary"
+                    isDisabled={stockAdjustment === 0}
+                    isLoading={adjustLoading}
+                    onPress={handleStockAdjust}
+                    startContent={<Icon icon="lucide:package-plus" />}
+                  >
+                    Aplicar
+                  </Button>
+                </div>
+              </div>
 
               <Divider />
 

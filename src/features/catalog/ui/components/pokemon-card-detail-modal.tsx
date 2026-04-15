@@ -12,17 +12,22 @@ import {
   Chip,
   Divider,
   Skeleton,
+  Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
 import { useUpdateInventoryPrice } from '../hooks/use-update-inventory-price';
+import { useAdjustInventoryStock } from '../hooks/use-adjust-inventory-stock';
 import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
 import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
+import { useQuery } from '@apollo/client/react';
+import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 
 interface InventoryCard {
   guid: string;
@@ -43,18 +48,35 @@ export default function PokemonCardDetailModal({
   isOpen,
   onClose,
 }: PokemonCardDetailModalProps) {
-  const { detail, loading } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
+  const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
   const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
+  const [stockAdjustment, setStockAdjustment] = useState<number>(0);
   const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
+  const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
+
+  const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
+    variables: { guid: card?.guid ?? '' },
+    skip: !card?.guid,
+    fetchPolicy: 'cache-and-network',
+  });
 
   useEffect(() => {
     if (detail?.inventoryCards && detail.inventoryCards.length > 0) {
-      setSelectedVariant(detail.inventoryCards[0]);
+      const nmVariant = detail.inventoryCards.find((v) => v.condition === CARD_CONDITIONS.NEAR_MINT);
+      setSelectedVariant(nmVariant ?? detail.inventoryCards[0]);
+    } else if (card?.guid) {
+      setSelectedVariant({
+        guid: `${card.guid}-${CARD_CONDITIONS.NEAR_MINT}`,
+        condition: CARD_CONDITIONS.NEAR_MINT,
+        stock: 0,
+        purchasePrice: null,
+        sellPrice: null,
+      });
     } else {
       setSelectedVariant(null);
     }
-  }, [detail]);
+  }, [detail, card]);
 
   useEffect(() => {
     if (selectedVariant) {
@@ -77,17 +99,34 @@ export default function PokemonCardDetailModal({
   const handlePriceSubmit: SubmitHandler<CardPriceFormData> = useCallback(
     async (data) => {
       if (!detail || !selectedVariant) return;
+
+      const isFakeGuid = selectedVariant.guid.includes('-') && selectedVariant.guid.length > 36;
+      const existingInventoryItemGuid = isFakeGuid ? undefined : selectedVariant.guid;
+
       await handleUpdatePrice({
         cardGuid: detail.guid,
-        inventoryItemGuid: selectedVariant.guid,
+        inventoryItemGuid: existingInventoryItemGuid,
         condition: selectedVariant.condition,
         purchasePrice: data.buyPrice,
         sellPrice: data.sellPrice,
         tcgType: 'POKEMON',
       });
+      void refetch();
     },
-    [detail, selectedVariant, handleUpdatePrice]
+    [detail, selectedVariant, handleUpdatePrice, refetch]
   );
+
+  const handleStockAdjust = useCallback(async () => {
+    if (!detail || !selectedVariant || stockAdjustment === 0) return;
+    await handleAdjustStock({
+      cardGuid: detail.guid,
+      condition: selectedVariant.condition,
+      quantity: stockAdjustment,
+      tcgType: 'POKEMON',
+    });
+    setStockAdjustment(0);
+    void refetch();
+  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, refetch]);
 
   if (!card) return null;
 
@@ -192,36 +231,41 @@ export default function PokemonCardDetailModal({
           <Divider />
 
           <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-semibold">Variantes</h4>
+            <h4 className="text-sm font-semibold">Variantes por condición</h4>
             {loading ? (
               <div className="flex gap-2">
                 <Skeleton className="h-8 w-20 rounded-lg" />
                 <Skeleton className="h-8 w-20 rounded-lg" />
               </div>
-            ) : detail?.inventoryCards && detail.inventoryCards.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {detail.inventoryCards.map((variant, idx) => (
-                  <Button
-                    key={idx}
-                    size="sm"
-                    variant={selectedVariant === variant ? 'solid' : 'bordered'}
-                    color="default"
-                    className={selectedVariant === variant ? 'border-none text-white' : ''}
-                    style={
-                      selectedVariant === variant
-                        ? { backgroundColor: 'var(--color-accent)' }
-                        : undefined
-                    }
-                    onPress={() => handleVariantSelect(variant)}
-                  >
-                    {CARD_CONDITION_SHORT_LABELS[variant.condition as CardCondition] ??
-                      variant.condition}{' '}
-                    ({variant.stock})
-                  </Button>
-                ))}
-              </div>
             ) : (
-              <p className="text-sm text-default-400">Sin variantes registradas</p>
+              <div className="flex flex-wrap gap-2">
+                {Object.values(CARD_CONDITIONS).map((condition) => {
+                  const existing = detail?.inventoryCards?.find((v) => v.condition === condition);
+                  const variant: InventoryCard = existing ?? {
+                    guid: `${card?.guid}-${condition}`,
+                    condition,
+                    stock: 0,
+                    purchasePrice: null,
+                    sellPrice: null,
+                  };
+                  const isSelected = selectedVariant?.condition === condition;
+                  return (
+                    <Button
+                      key={condition}
+                      size="sm"
+                      variant={isSelected ? 'solid' : 'bordered'}
+                      color="default"
+                      className={isSelected ? 'border-none text-white' : ''}
+                      style={
+                        isSelected ? { backgroundColor: 'var(--color-accent)' } : undefined
+                      }
+                      onPress={() => handleVariantSelect(variant)}
+                    >
+                      {CARD_CONDITION_SHORT_LABELS[condition]} ({variant.stock})
+                    </Button>
+                  );
+                })}
+              </div>
             )}
           </div>
 
@@ -257,6 +301,59 @@ export default function PokemonCardDetailModal({
                         : '—'}
                     </span>
                   </div>
+                </div>
+              </div>
+
+              {metricsData?.pokemonCardWithMetrics && (
+                <>
+                  <Divider />
+                  <div className="flex flex-col gap-3">
+                    <h4 className="text-sm font-semibold">Precios de mercado (MXN)</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">Precio referencia (Ungraded)</span>
+                        <span className="font-bold text-accent">
+                          {metricsData.pokemonCardWithMetrics.ungradedPrice
+                            ? `$${metricsData.pokemonCardWithMetrics.ungradedPrice.toFixed(2)}`
+                            : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">Precio PSA 7</span>
+                        <span className="font-bold text-blue-600">
+                          {metricsData.pokemonCardWithMetrics.gradedPriceSeven
+                            ? `$${metricsData.pokemonCardWithMetrics.gradedPriceSeven.toFixed(2)}`
+                            : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <Divider />
+
+              <div className="flex flex-col gap-4">
+                <h4 className="text-sm font-semibold">Ajustar stock</h4>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    size="sm"
+                    label="Cantidad (+/-)"
+                    value={String(stockAdjustment)}
+                    onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
+                    classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                  />
+                  <Button
+                    size="sm"
+                    color="primary"
+                    isDisabled={stockAdjustment === 0}
+                    isLoading={adjustLoading}
+                    onPress={handleStockAdjust}
+                    startContent={<Icon icon="lucide:package-plus" />}
+                  >
+                    Aplicar
+                  </Button>
                 </div>
               </div>
 
