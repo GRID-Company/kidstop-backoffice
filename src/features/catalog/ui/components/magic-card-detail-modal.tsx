@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import {
   Drawer,
   DrawerContent,
@@ -13,18 +12,13 @@ import {
   Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { SubmitHandler } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
-import { IMagicCard, IMagicCardVariant } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
-import { CARD_CONDITIONS } from '@/lib/types/card.types';
-import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
-import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
+import { IMagicCard } from '../../domain/types';
+import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS } from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
-import { useUpdateInventoryPrice } from '../hooks/use-update-inventory-price';
-import { useAdjustInventoryStock } from '../hooks/use-adjust-inventory-stock';
+import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
 
 interface MagicCardDetailModalProps {
@@ -38,84 +32,32 @@ export default function MagicCardDetailModal({
   isOpen,
   onClose,
 }: MagicCardDetailModalProps) {
-  const [selectedVariant, setSelectedVariant] = useState<IMagicCardVariant | null>(null);
-  const [stockAdjustment, setStockAdjustment] = useState<number>(0);
+  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (card?.guid ?? null) : null);
 
-  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(card?.guid ?? null);
-  const { handleUpdatePrice, loading: updateLoading } = useUpdateInventoryPrice();
-  const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
+  const {
+    selectedVariant,
+    stockAdjustment,
+    setStockAdjustment,
+    handleVariantSelect,
+    handlePriceSubmit,
+    handleStockAdjust,
+    control,
+    handleSubmit,
+    formState,
+    updatingPrice,
+    adjustLoading,
+  } = useCardDetailModal({
+    detail,
+    card,
+    tcgType: 'MAGIC',
+    onRefetch: refetch,
+  });
 
   const { data: metricsData } = useQuery(MagicCardWithMetricsDocument, {
     variables: { guid: card?.guid ?? '' },
-    skip: !card?.guid,
+    skip: !card?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
-
-  const { control, handleSubmit, formState, reset } = useCardPriceForm();
-
-  useEffect(() => {
-    const variants = detail?.inventoryCards ?? card?.variants ?? [];
-    if (variants.length > 0) {
-      const nmVariant = variants.find((v) => v.condition === CARD_CONDITIONS.NEAR_MINT);
-      setSelectedVariant(nmVariant ?? variants[0]);
-    } else if (card?.guid) {
-      setSelectedVariant({
-        guid: `${card.guid}-${CARD_CONDITIONS.NEAR_MINT}`,
-        condition: CARD_CONDITIONS.NEAR_MINT,
-        stock: 0,
-        purchasePrice: null,
-        sellPrice: null,
-      });
-    } else {
-      setSelectedVariant(null);
-    }
-  }, [detail, card]);
-
-  useEffect(() => {
-    if (selectedVariant) {
-      reset({
-        condition: selectedVariant.condition,
-        buyPrice: selectedVariant.purchasePrice ?? 0,
-        sellPrice: selectedVariant.sellPrice ?? 0,
-      });
-    }
-  }, [selectedVariant, reset]);
-
-  const handleVariantSelect = useCallback((variant: IMagicCardVariant) => {
-    setSelectedVariant(variant);
-  }, []);
-
-  const handlePriceSubmit: SubmitHandler<CardPriceFormData> = useCallback(
-    async (data) => {
-      if (!detail || !selectedVariant) return;
-
-      const isFakeGuid = selectedVariant.guid.includes('-') && selectedVariant.guid.length > 36;
-      const existingInventoryItemGuid = isFakeGuid ? undefined : selectedVariant.guid;
-
-      await handleUpdatePrice({
-        cardGuid: detail.guid,
-        inventoryItemGuid: existingInventoryItemGuid,
-        condition: selectedVariant.condition,
-        purchasePrice: data.buyPrice,
-        sellPrice: data.sellPrice,
-        tcgType: 'MAGIC',
-      });
-      void refetch();
-    },
-    [detail, selectedVariant, handleUpdatePrice, refetch]
-  );
-
-  const handleStockAdjust = useCallback(async () => {
-    if (!detail || !selectedVariant || stockAdjustment === 0) return;
-    await handleAdjustStock({
-      cardGuid: detail.guid,
-      condition: selectedVariant.condition,
-      quantity: stockAdjustment,
-      tcgType: 'MAGIC',
-    });
-    setStockAdjustment(0);
-    void refetch();
-  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, refetch]);
 
   if (!card) return null;
 
@@ -224,8 +166,9 @@ export default function MagicCardDetailModal({
             <div className="flex flex-wrap gap-2">
               {Object.values(CARD_CONDITIONS).map((condition) => {
                 const existing = variants.find((v) => v.condition === condition);
-                const variant: IMagicCardVariant = existing ?? {
+                const variant: InventoryCard = existing ?? {
                   guid: `${card?.guid}-${condition}`,
+                  isNew: true,
                   condition,
                   stock: 0,
                   purchasePrice: null,
@@ -391,7 +334,7 @@ export default function MagicCardDetailModal({
                   type="submit"
                   size="sm"
                   isDisabled={!formState.isDirty || !formState.isValid}
-                  isLoading={updateLoading}
+                  isLoading={updatingPrice}
                   startContent={<Icon icon="lucide:save" />}
                   className="text-white"
                   style={{ backgroundColor: 'var(--color-accent)' }}

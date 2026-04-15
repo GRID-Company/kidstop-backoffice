@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import Image from 'next/image';
 import {
   Drawer,
@@ -15,27 +15,14 @@ import {
   Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { SubmitHandler } from 'react-hook-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
-import { useUpdateInventoryPrice } from '../hooks/use-update-inventory-price';
-import { useAdjustInventoryStock } from '../hooks/use-adjust-inventory-stock';
-import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
-import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
-import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
+import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { useQuery } from '@apollo/client/react';
 import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
-
-interface InventoryCard {
-  guid: string;
-  condition: string;
-  stock: number;
-  purchasePrice: number | null;
-  sellPrice: number | null;
-}
 
 interface PokemonCardDetailModalProps {
   card: IPokemonCard | null;
@@ -49,84 +36,31 @@ export default function PokemonCardDetailModal({
   onClose,
 }: PokemonCardDetailModalProps) {
   const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
-  const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
-  const [stockAdjustment, setStockAdjustment] = useState<number>(0);
-  const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
-  const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
-  const { control, handleSubmit, formState, reset } = useCardPriceForm();
+
+  const {
+    selectedVariant,
+    stockAdjustment,
+    setStockAdjustment,
+    handleVariantSelect,
+    handlePriceSubmit,
+    handleStockAdjust,
+    control,
+    handleSubmit,
+    formState,
+    updatingPrice,
+    adjustLoading,
+  } = useCardDetailModal({
+    detail,
+    card,
+    tcgType: 'POKEMON',
+    onRefetch: refetch,
+  });
 
   const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
     variables: { guid: card?.guid ?? '' },
-    skip: !card?.guid,
+    skip: !card?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
-
-  useEffect(() => {
-    if (detail?.inventoryCards && detail.inventoryCards.length > 0) {
-      const nmVariant = detail.inventoryCards.find((v) => v.condition === CARD_CONDITIONS.NEAR_MINT);
-      setSelectedVariant(nmVariant ?? detail.inventoryCards[0]);
-    } else if (card?.guid) {
-      setSelectedVariant({
-        guid: `${card.guid}-${CARD_CONDITIONS.NEAR_MINT}`,
-        condition: CARD_CONDITIONS.NEAR_MINT,
-        stock: 0,
-        purchasePrice: null,
-        sellPrice: null,
-      });
-    } else {
-      setSelectedVariant(null);
-    }
-  }, [detail, card]);
-
-  useEffect(() => {
-    if (selectedVariant) {
-      reset(
-        toCardPriceFormDefaults({
-          id: selectedVariant.condition,
-          condition: selectedVariant.condition as CardCondition,
-          stock: selectedVariant.stock,
-          buyPrice: selectedVariant.purchasePrice ?? 0,
-          sellPrice: selectedVariant.sellPrice ?? 0,
-        })
-      );
-    }
-  }, [selectedVariant, reset]);
-
-  const handleVariantSelect = useCallback((variant: InventoryCard) => {
-    setSelectedVariant(variant);
-  }, []);
-
-  const handlePriceSubmit: SubmitHandler<CardPriceFormData> = useCallback(
-    async (data) => {
-      if (!detail || !selectedVariant) return;
-
-      const isFakeGuid = selectedVariant.guid.includes('-') && selectedVariant.guid.length > 36;
-      const existingInventoryItemGuid = isFakeGuid ? undefined : selectedVariant.guid;
-
-      await handleUpdatePrice({
-        cardGuid: detail.guid,
-        inventoryItemGuid: existingInventoryItemGuid,
-        condition: selectedVariant.condition,
-        purchasePrice: data.buyPrice,
-        sellPrice: data.sellPrice,
-        tcgType: 'POKEMON',
-      });
-      void refetch();
-    },
-    [detail, selectedVariant, handleUpdatePrice, refetch]
-  );
-
-  const handleStockAdjust = useCallback(async () => {
-    if (!detail || !selectedVariant || stockAdjustment === 0) return;
-    await handleAdjustStock({
-      cardGuid: detail.guid,
-      condition: selectedVariant.condition,
-      quantity: stockAdjustment,
-      tcgType: 'POKEMON',
-    });
-    setStockAdjustment(0);
-    void refetch();
-  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, refetch]);
 
   if (!card) return null;
 
@@ -243,6 +177,7 @@ export default function PokemonCardDetailModal({
                   const existing = detail?.inventoryCards?.find((v) => v.condition === condition);
                   const variant: InventoryCard = existing ?? {
                     guid: `${card?.guid}-${condition}`,
+                    isNew: true,
                     condition,
                     stock: 0,
                     purchasePrice: null,

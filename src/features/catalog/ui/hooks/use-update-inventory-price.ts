@@ -36,41 +36,8 @@ export function useUpdateInventoryPrice() {
       let inventoryItemGuid = params.inventoryItemGuid;
 
       if (!inventoryItemGuid) {
-        const { data } = await fetchInventoryItems({
-          variables: {
-            findInventoryItemsArgs: {
-              skip: 0,
-              limit: 200,
-              sort: { column: 'createdDate', order: 'DESC' },
-              filters: { tcg: params.tcgType, condition: params.condition },
-            },
-          },
-        });
-
-        const inventoryItems = data?.inventoryItems?.data ?? [];
-        const match = inventoryItems.find((item) => {
-          if (params.tcgType === 'POKEMON') {
-            return item?.pokemonCardSummary?.guid === params.cardGuid;
-          } else {
-            return item?.magicCardSummary?.guid === params.cardGuid;
-          }
-        });
-
-        if (!match) {
-          await createMovement({
-            variables: {
-              createInventoryMovementInput: {
-                cardGuid: params.cardGuid,
-                condition: params.condition,
-                tcg: params.tcgType,
-                movementType: 'MANUAL_ADJUSTMENT',
-                quantity: 0,
-                notes: 'Creación automática para establecer precios',
-              },
-            },
-          });
-
-          const { data: newData } = await fetchInventoryItems({
+        try {
+          const { data } = await fetchInventoryItems({
             variables: {
               findInventoryItemsArgs: {
                 skip: 0,
@@ -81,8 +48,8 @@ export function useUpdateInventoryPrice() {
             },
           });
 
-          const newInventoryItems = newData?.inventoryItems?.data ?? [];
-          const newMatch = newInventoryItems.find((item) => {
+          const inventoryItems = data?.inventoryItems?.data ?? [];
+          const match = inventoryItems.find((item) => {
             if (params.tcgType === 'POKEMON') {
               return item?.pokemonCardSummary?.guid === params.cardGuid;
             } else {
@@ -90,28 +57,79 @@ export function useUpdateInventoryPrice() {
             }
           });
 
-          if (!newMatch) {
-            toast.error('Error al crear el item en inventario');
+          if (!match) {
+            try {
+              await createMovement({
+                variables: {
+                  createInventoryMovementInput: {
+                    cardGuid: params.cardGuid,
+                    condition: params.condition,
+                    tcg: params.tcgType,
+                    movementType: 'MANUAL_ADJUSTMENT',
+                    quantity: 0,
+                    notes: 'Creación automática para establecer precios',
+                  },
+                },
+              });
+            } catch (error) {
+              toast.error('Error al crear el item en inventario. Por favor intenta de nuevo.');
+              throw error;
+            }
+
+            const { data: newData } = await fetchInventoryItems({
+              variables: {
+                findInventoryItemsArgs: {
+                  skip: 0,
+                  limit: 200,
+                  sort: { column: 'createdDate', order: 'DESC' },
+                  filters: { tcg: params.tcgType, condition: params.condition },
+                },
+              },
+            });
+
+            const newInventoryItems = newData?.inventoryItems?.data ?? [];
+            const newMatch = newInventoryItems.find((item) => {
+              if (params.tcgType === 'POKEMON') {
+                return item?.pokemonCardSummary?.guid === params.cardGuid;
+              } else {
+                return item?.magicCardSummary?.guid === params.cardGuid;
+              }
+            });
+
+            if (!newMatch) {
+              toast.error('No se pudo crear el item en inventario. Por favor intenta de nuevo.');
+              throw new Error('Inventory item creation failed');
+            }
+
+            inventoryItemGuid = newMatch.guid;
+          } else {
+            inventoryItemGuid = match.guid;
+          }
+        } catch (error) {
+          if (error instanceof Error && error.message === 'Inventory item creation failed') {
             return;
           }
-
-          inventoryItemGuid = newMatch.guid;
-        } else {
-          inventoryItemGuid = match.guid;
+          toast.error('Error al buscar items en inventario');
+          throw error;
         }
       }
 
-      await updatePrice({
-        variables: {
-          updateInventoryItemPricesInput: {
-            inventoryItemGuid,
-            purchasePrice: params.purchasePrice,
-            sellPrice: params.sellPrice,
+      try {
+        await updatePrice({
+          variables: {
+            updateInventoryItemPricesInput: {
+              inventoryItemGuid,
+              purchasePrice: params.purchasePrice,
+              sellPrice: params.sellPrice,
+            },
           },
-        },
-      });
+        });
 
-      toast.success('Precios actualizados correctamente');
+        toast.success('Precios actualizados correctamente');
+      } catch (error) {
+        toast.error('Error al actualizar precios. Por favor intenta de nuevo.');
+        throw error;
+      }
     },
     [fetchInventoryItems, createMovement, updatePrice]
   );
