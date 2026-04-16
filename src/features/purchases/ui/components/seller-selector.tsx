@@ -50,7 +50,7 @@ export default function SellerSelector<T extends FieldValues>({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-end gap-2">
+      <div className="flex items-center gap-2">
         <div className="flex-1">
           <FormAutocomplete
             items={sellerOptions}
