@@ -39,7 +39,7 @@ export function usePurchases(): UsePurchasesReturn {
       findPurchasesArgs: {
         skip: (page - 1) * DEFAULT_PAGE_SIZE,
         limit: DEFAULT_PAGE_SIZE,
-        sort: { column: 'releaseDate', order: 'DESC' },
+        sort: { column: 'createdDate', order: 'DESC' },
         filters: {
           tcg: selectedTCG,
           status: filters.status,
