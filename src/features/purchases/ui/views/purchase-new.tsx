@@ -3,17 +3,12 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Divider,
-} from '@heroui/react';
+import { Button, Card, CardBody, Chip, Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ISeller } from '../../domain/types';
+import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
@@ -21,6 +16,8 @@ import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
+import SellerEditDrawer from '../components/seller-edit-drawer';
+import SellerDeleteModal from '../components/seller-delete-modal';
 
 interface PurchaseFormData {
   sellerGuid: string;
@@ -43,13 +40,16 @@ export default function PurchaseNew() {
     saving,
   } = useNewPurchase();
 
-  const { getSellerById } = useSellers();
-  const { control, watch } = useForm<PurchaseFormData>({
+  const { getSellerById, updateSeller, deleteSeller, updating, deleting } =
+    useSellers();
+  const { control, watch, setValue } = useForm<PurchaseFormData>({
     defaultValues: { sellerGuid: '' },
   });
 
   const selectedSellerGuid = watch('sellerGuid');
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleConfirmSeller = useCallback(() => {
     if (!selectedSellerGuid) return;
@@ -60,14 +60,45 @@ export default function PurchaseNew() {
     }
   }, [selectedSellerGuid, getSellerById, setSeller]);
 
-  const handleSellerCreated = useCallback((newSeller: ISeller) => {
-    setSeller(newSeller);
-    setIsSellerConfirmed(true);
-  }, [setSeller]);
+  const handleSellerCreated = useCallback(
+    (newSeller: ISeller) => {
+      setSeller(newSeller);
+      setIsSellerConfirmed(true);
+    },
+    [setSeller]
+  );
 
   const handleEditSeller = useCallback(() => {
-    setIsSellerConfirmed(false);
+    setIsEditDrawerOpen(true);
   }, []);
+
+  const handleUpdateSeller = useCallback(
+    async (data: SellerFormData) => {
+      if (!seller) return;
+      const updatedSeller = await updateSeller(seller.guid, data);
+      if (updatedSeller) {
+        setSeller(updatedSeller);
+        setIsEditDrawerOpen(false);
+      }
+    },
+    [seller, updateSeller, setSeller]
+  );
+
+  const handleDeleteSeller = useCallback(async () => {
+    if (!seller) return;
+    const deleted = await deleteSeller(seller.guid);
+    if (deleted) {
+      setSeller(null);
+      setIsSellerConfirmed(false);
+      setIsDeleteModalOpen(false);
+      setValue('sellerGuid', '');
+    }
+  }, [seller, deleteSeller, setSeller, setValue]);
+
+  const handleDeselectSeller = useCallback(() => {
+    setIsSellerConfirmed(false);
+    setValue('sellerGuid', '');
+  }, [setValue]);
 
   const handleSave = useCallback(() => {
     savePurchase();
@@ -78,85 +109,117 @@ export default function PurchaseNew() {
 
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="">
-        <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-3">
+      <EntitiesPage.Toolbar label=''>
+        <div className='flex w-full items-center justify-between'>
+          <div className='flex items-center gap-3'>
             <Button
               isIconOnly
-              variant="light"
+              variant='light'
               onPress={() => router.push('/compras')}
-              aria-label="Volver a compras"
+              aria-label='Volver a compras'
             >
-              <Icon icon="lucide:arrow-left" width={20} />
+              <Icon icon='lucide:arrow-left' width={20} />
             </Button>
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-semibold text-accent">
+            <div className='flex items-center gap-3'>
+              <span className='text-accent text-lg font-semibold'>
                 Nueva compra
               </span>
-              <Chip size="sm" variant="flat" color="primary">
+              <Chip size='sm' variant='flat' color='primary'>
                 Borrador
               </Chip>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             <PrivacyModeToggle />
           </div>
         </div>
       </EntitiesPage.Toolbar>
 
-      <div className="flex flex-col gap-6 px-4">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className={assignedBudget > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
+      <div className='flex flex-col gap-6 px-4'>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+          <div
+            className={assignedBudget > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}
+          >
             <Card>
-              <CardBody className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Icon icon="lucide:user" width={18} className="text-accent" />
-                    <span className="text-sm font-semibold">Vendedor</span>
+              <CardBody className='flex flex-col gap-4'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <Icon
+                      icon='lucide:user'
+                      width={18}
+                      className='text-accent'
+                    />
+                    <span className='text-sm font-semibold'>Vendedor</span>
                   </div>
                   {isSellerConfirmed && (
-                    <Button
-                      size="sm"
-                      variant="light"
-                      className="text-accent"
-                      startContent={<Icon icon="lucide:pencil" width={14} />}
-                      onPress={handleEditSeller}
-                    >
-                      Editar
-                    </Button>
+                    <div className='flex gap-2'>
+                      <Button
+                        size='sm'
+                        variant='light'
+                        className='text-accent'
+                        startContent={<Icon icon='lucide:pencil' width={14} />}
+                        onPress={handleEditSeller}
+                        isDisabled={updating || deleting}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        size='sm'
+                        variant='light'
+                        className='text-danger'
+                        startContent={<Icon icon='lucide:trash-2' width={14} />}
+                        onPress={() => setIsDeleteModalOpen(true)}
+                        isDisabled={updating || deleting}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
                   )}
                 </div>
 
                 {isSellerConfirmed && seller ? (
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-default-400">Nombre</span>
-                      <span className="font-medium">{seller.name}</span>
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-default-400">Teléfono</span>
-                      <span className="font-medium">{seller.phone}</span>
-                    </div>
-                    {seller.email && (
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-default-400">Email</span>
-                        <span className="font-medium">{seller.email}</span>
+                  <div className='flex flex-col gap-4'>
+                    <div className='grid grid-cols-2 gap-x-6 gap-y-2 text-sm'>
+                      <div className='flex flex-col gap-0.5'>
+                        <span className='text-default-400'>Nombre</span>
+                        <span className='font-medium'>{seller.name}</span>
                       </div>
-                    )}
+                      <div className='flex flex-col gap-0.5'>
+                        <span className='text-default-400'>Teléfono</span>
+                        <span className='font-medium'>{seller.phone}</span>
+                      </div>
+                      {seller.email && (
+                        <div className='flex flex-col gap-0.5'>
+                          <span className='text-default-400'>Email</span>
+                          <span className='font-medium'>{seller.email}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className='flex justify-end'>
+                      <Button
+                        size='sm'
+                        variant='light'
+                        className='text-accent'
+                        onPress={handleDeselectSeller}
+                        isDisabled={updating || deleting}
+                      >
+                        Seleccionar otro vendedor
+                      </Button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3">
+                  <div className='flex flex-col gap-3'>
                     <SellerSelector
                       controlProps={{ control, name: 'sellerGuid' }}
                       onSellerCreated={handleSellerCreated}
                     />
-                    <div className="flex justify-end">
+                    <div className='flex justify-end'>
                       <Button
-                        size="sm"
-                        className="bg-accent text-white"
+                        size='sm'
+                        className='bg-accent text-white'
                         isDisabled={!isSellerFormValid}
                         onPress={handleConfirmSeller}
-                        startContent={<Icon icon="lucide:check" width={16} />}
+                        startContent={<Icon icon='lucide:check' width={16} />}
                       >
                         Confirmar vendedor
                       </Button>
@@ -179,8 +242,8 @@ export default function PurchaseNew() {
 
         {isSellerConfirmed && (
           <EntitiesPage.CardContainer>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold text-accent">
+            <div className='flex flex-col gap-2'>
+              <span className='text-accent text-sm font-semibold'>
                 Agregar cartas
               </span>
               <CardSearchWithMetrics
@@ -192,14 +255,14 @@ export default function PurchaseNew() {
         )}
 
         <EntitiesPage.CardContainer>
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon icon="lucide:list" width={18} className="text-accent" />
-                <span className="text-sm font-semibold">
+          <div className='flex flex-col gap-4'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                <Icon icon='lucide:list' width={18} className='text-accent' />
+                <span className='text-sm font-semibold'>
                   Items de la compra
                 </span>
-                <Chip size="sm" variant="flat">
+                <Chip size='sm' variant='flat'>
                   {items.length} {items.length === 1 ? 'carta' : 'cartas'}
                 </Chip>
               </div>
@@ -215,24 +278,37 @@ export default function PurchaseNew() {
 
         <Divider />
 
-        <div className="flex justify-end gap-3 pb-6">
-          <Button
-            variant="bordered"
-            onPress={() => router.push('/compras')}
-          >
+        <div className='flex justify-end gap-3 pb-6'>
+          <Button variant='bordered' onPress={() => router.push('/compras')}>
             Cancelar
           </Button>
           <Button
-            className="bg-accent text-white"
+            className='bg-accent text-white'
             isDisabled={!canSave}
             isLoading={saving}
             onPress={handleSave}
-            startContent={!saving && <Icon icon="lucide:save" width={18} />}
+            startContent={!saving && <Icon icon='lucide:save' width={18} />}
           >
             {saving ? 'Guardando...' : 'Guardar compra'}
           </Button>
         </div>
       </div>
+
+      <SellerEditDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => setIsEditDrawerOpen(false)}
+        onSubmit={handleUpdateSeller}
+        seller={seller}
+        isLoading={updating}
+      />
+
+      <SellerDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteSeller}
+        seller={seller}
+        isLoading={deleting}
+      />
     </EntitiesPage>
   );
 }

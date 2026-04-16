@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
-import { CreateSellerDocument, SellersDocument } from '@/lib/api/generated/purchases.generated';
+import { CreateSellerDocument, SellersDocument, UpdateSellerDocument, DeleteSellerDocument } from '@/lib/api/generated/purchases.generated';
 
 export function useSellers(search?: string) {
   const { data, loading, refetch } = useQuery(SellersDocument, {
@@ -22,6 +22,34 @@ export function useSellers(search?: string) {
       },
       onError: (error) => {
         toast.error(`Error al crear vendedor: ${error.message}`);
+      },
+    }
+  );
+
+  const [updateSellerMutation, { loading: updating }] = useMutation(
+    UpdateSellerDocument,
+    {
+      onCompleted: (data) => {
+        if (data.updateSeller) {
+          refetch();
+          toast.success('Vendedor actualizado exitosamente');
+        }
+      },
+      onError: (error) => {
+        toast.error(`Error al actualizar vendedor: ${error.message}`);
+      },
+    }
+  );
+
+  const [deleteSellerMutation, { loading: deleting }] = useMutation(
+    DeleteSellerDocument,
+    {
+      onCompleted: () => {
+        refetch();
+        toast.success('Vendedor eliminado exitosamente');
+      },
+      onError: (error) => {
+        toast.error(`Error al eliminar vendedor: ${error.message}`);
       },
     }
   );
@@ -69,12 +97,60 @@ export function useSellers(search?: string) {
             notes: result.data.createSeller.notes || undefined,
           };
         }
-      } catch (error) {
+      } catch {
         // Error already handled by onError callback
       }
       return undefined;
     },
     [createSellerMutation]
+  );
+
+  const updateSeller = useCallback(
+    async (guid: string, data: SellerFormData): Promise<ISeller | undefined> => {
+      try {
+        const result = await updateSellerMutation({
+          variables: {
+            updateSellerInput: {
+              guid,
+              name: data.name || undefined,
+              phone: data.phone || undefined,
+              email: data.email || undefined,
+              notes: data.notes || undefined,
+            },
+          },
+        });
+
+        if (result.data?.updateSeller) {
+          return {
+            guid: result.data.updateSeller.guid,
+            name: result.data.updateSeller.name,
+            phone: result.data.updateSeller.phone || '',
+            email: result.data.updateSeller.email || undefined,
+            notes: result.data.updateSeller.notes || undefined,
+          };
+        }
+      } catch {
+        // Error already handled by onError callback
+      }
+      return undefined;
+    },
+    [updateSellerMutation]
+  );
+
+  const deleteSeller = useCallback(
+    async (guid: string): Promise<boolean> => {
+      try {
+        const result = await deleteSellerMutation({
+          variables: { guid },
+        });
+
+        return result.data?.deleteSeller ?? false;
+      } catch {
+        // Error already handled by onError callback
+        return false;
+      }
+    },
+    [deleteSellerMutation]
   );
 
   const getSellerById = useCallback(
@@ -88,7 +164,11 @@ export function useSellers(search?: string) {
     sellers: filteredSellers,
     loading,
     createSeller,
+    updateSeller,
+    deleteSeller,
     getSellerById,
     creating,
+    updating,
+    deleting,
   };
 }

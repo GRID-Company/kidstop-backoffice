@@ -44,7 +44,7 @@ export function useCardSearch() {
         findPokemonCardsPublicArgs: {
           skip: 0,
           limit: 5,
-          sort: { column: 'name', order: 'ASC' },
+          sort: { column: 'releaseDate', order: 'DESC' },
           search: debouncedSearch.trim() || undefined,
           filters: {
             rarity: pokemonFilters?.rarity || undefined,
@@ -66,7 +66,7 @@ export function useCardSearch() {
         findMagicCardsPublicArgs: {
           skip: 0,
           limit: 5,
-          sort: { column: 'name', order: 'ASC' },
+          sort: { column: 'releaseDate', order: 'DESC' },
           search: debouncedSearch.trim() || undefined,
           filters: {
             edition: magicFilters?.edition || undefined,
