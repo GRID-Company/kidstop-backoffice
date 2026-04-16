@@ -37,7 +37,7 @@ export const PAYMENT_METHOD_OPTIONS = Object.values(PAYMENT_METHOD).map(
 );
 
 export const DEFAULT_PURCHASES_SORT: ITableSort = {
-  column: 'createdAt',
+  column: 'releaseDate',
   order: 'DESC',
 };
 
