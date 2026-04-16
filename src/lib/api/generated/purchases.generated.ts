@@ -265,7 +265,9 @@ export type FinalizePurchaseMutation = {
   };
 };
 
-export type SellersQueryVariables = Types.Exact<{ [key: string]: never }>;
+export type SellersQueryVariables = Types.Exact<{
+  findSellersArgs: Types.FindSellersArgs;
+}>;
 
 export type SellersQuery = {
   sellers: {
@@ -276,6 +278,8 @@ export type SellersQuery = {
       phone: string | null;
       email: string | null;
       notes: string | null;
+      createdDate: unknown;
+      updatedDate: unknown;
     }> | null;
   };
 };
@@ -1447,12 +1451,38 @@ export const SellersDocument = {
       kind: 'OperationDefinition',
       operation: 'query',
       name: { kind: 'Name', value: 'Sellers' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findSellersArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindSellersArgs' },
+            },
+          },
+        },
+      ],
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'sellers' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findSellersArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findSellersArgs' },
+                },
+              },
+            ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
@@ -1467,6 +1497,14 @@ export const SellersDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatedDate' },
+                      },
                     ],
                   },
                 },

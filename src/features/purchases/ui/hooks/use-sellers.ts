@@ -8,6 +8,17 @@ import { CreateSellerDocument, SellersDocument, UpdateSellerDocument, DeleteSell
 
 export function useSellers(search?: string) {
   const { data, loading, refetch } = useQuery(SellersDocument, {
+    variables: {
+      findSellersArgs: {
+        limit: 100,
+        skip: 0,
+        search: search || undefined,
+        sort: {
+          column: 'name',
+          order: 'ASC',
+        },
+      },
+    },
     fetchPolicy: 'cache-and-network',
   });
 

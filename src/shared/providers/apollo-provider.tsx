@@ -31,10 +31,13 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
 
     const errorLink = new ErrorLink(({ error, operation }) => {
       if (CombinedGraphQLErrors.is(error)) {
+        const code = error.extensions?.code;
+        const message = error.message;
         const isAuthError =
-          error.extensions?.code === 'UNAUTHENTICATED' ||
-          error.extensions?.code === 'FORBIDDEN' ||
-          error.extensions?.code === 401;
+          code === 'UNAUTHENTICATED' ||
+          code === 'FORBIDDEN' ||
+          code === 401 ||
+          message === 'Unauthorized';
 
         if (isAuthError && !redirectRef.current && !window.location.href.includes('/login')) {
           redirectRef.current = true;

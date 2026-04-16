@@ -383,6 +383,13 @@ export type FindSalesFilter = {
   tcg: Scalars['String']['input'];
 };
 
+export type FindSellersArgs = {
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
 export type FindUsersArgs = {
   filters?: InputMaybe<FindUsersFilter>;
   limit: Scalars['Int']['input'];
@@ -1476,6 +1483,10 @@ export type QuerySalesArgs = {
 
 export type QuerySellerArgs = {
   guid: Scalars['String']['input'];
+};
+
+export type QuerySellersArgs = {
+  findSellersArgs: FindSellersArgs;
 };
 
 export type QueryUserArgs = {

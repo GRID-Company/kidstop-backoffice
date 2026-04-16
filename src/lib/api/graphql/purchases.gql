@@ -254,14 +254,16 @@ mutation FinalizePurchase($purchaseGuid: String!) {
   }
 }
 
-query Sellers {
-  sellers {
+query Sellers($findSellersArgs: FindSellersArgs!) {
+  sellers(findSellersArgs: $findSellersArgs) {
     data {
       guid
       name
       phone
       email
       notes
+      createdDate
+      updatedDate
     }
     count
   }
