@@ -72,17 +72,19 @@ export function useCardVariantMetrics(
 
   const metrics = useMemo(() => {
     if (tcgType === TCG_TYPES.POKEMON) {
-      return extractVariantMetrics(
+      const variantMetrics = extractVariantMetrics(
         pokemonData?.pokemonCardWithMetrics?.variantsMetrics,
         condition
       );
+      return variantMetrics;
     }
 
     if (tcgType === TCG_TYPES.MAGIC) {
-      return extractVariantMetrics(
+      const variantMetrics = extractVariantMetrics(
         magicData?.magicCardWithMetrics?.variantsMetrics,
         condition
       );
+      return variantMetrics;
     }
 
     return null;

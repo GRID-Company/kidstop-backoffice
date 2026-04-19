@@ -24,6 +24,7 @@ import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants'
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
 
 interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
@@ -54,7 +55,7 @@ function CardResultItem({
   isAlreadyAdded,
 }: {
   card: ICardSearchResult;
-  onAdd: (card: ICardSearchResult, state: AddToCartState) => void;
+  onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: any, referencePrice: number | null) => void;
   isAlreadyAdded: boolean;
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
@@ -81,7 +82,7 @@ function CardResultItem({
     if (addState.unitBuyPrice <= 0 || addState.quantity < 1) return;
     setIsAdding(true);
     try {
-      await onAdd(card, addState);
+      await onAdd(card, addState, variantMetrics, referencePrice);
       const resetPrice = referencePrice !== null 
         ? Math.round(referencePrice * 0.6 * 100) / 100
         : Math.round(card.metrics.referencePrice * 0.6 * 100) / 100;
@@ -92,7 +93,7 @@ function CardResultItem({
     } finally {
       setIsAdding(false);
     }
-  }, [card, addState, onAdd, referencePrice]);
+  }, [card, addState, onAdd, referencePrice, variantMetrics]);
 
   const displayMetrics = variantMetrics || card.metrics;
 
@@ -119,7 +120,7 @@ function CardResultItem({
               {card.setName} · {card.setCode}
             </p>
             <p className="text-xs text-default-400">
-              #{card.number} · {card.rarity}
+              #{card.number} {card.rarity ? `· ${card.rarity}` : ''}
             </p>
           </div>
         </div>
@@ -219,8 +220,8 @@ function CardResultItem({
               min={1}
               value={String(addState.quantity)}
               onValueChange={(val) => {
-                const qty = parseInt(val, 10);
-                if (!isNaN(qty) && qty >= 1) {
+                const { isValid, quantity: qty } = validateQuantity(val);
+                if (isValid) {
                   setAddState((s) => ({ ...s, quantity: qty }));
                 }
               }}
@@ -241,8 +242,8 @@ function CardResultItem({
               step={0.01}
               value={String(addState.unitBuyPrice)}
               onValueChange={(val) => {
-                const price = parseFloat(val);
-                if (!isNaN(price) && price >= 0) {
+                const { isValid, price } = validateOfferPrice(val);
+                if (isValid) {
                   setAddState((s) => ({ ...s, unitBuyPrice: price }));
                 }
               }}
@@ -333,7 +334,8 @@ export default function CardSearchWithMetrics({
   } = useCardSearch();
 
   const handleAddCard = useCallback(
-    (card: ICardSearchResult, state: AddToCartState) => {
+    (card: ICardSearchResult, state: AddToCartState, variantMetrics: any, referencePrice: number | null) => {
+      const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
         guid: `${card.guid}-${state.condition}-${Date.now()}`,
         cardGuid: card.guid,
@@ -345,8 +347,8 @@ export default function CardSearchWithMetrics({
         condition: state.condition,
         quantity: state.quantity,
         offerPrice: state.unitBuyPrice,
-        referencePrice: card.metrics.referencePrice,
-        sellPrice: card.metrics.referencePrice,
+        referencePrice: finalReferencePrice,
+        sellPrice: finalReferencePrice,
       };
       onAddItem(item);
       resetSearch();

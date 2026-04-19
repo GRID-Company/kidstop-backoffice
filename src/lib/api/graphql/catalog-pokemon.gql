@@ -3,6 +3,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
     data {
       guid
       name
+      cardNumber
       setName
       setCode
       sellPrice

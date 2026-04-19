@@ -57,6 +57,7 @@ export interface IPokemonCardVariant {
 export interface IPokemonCard {
   guid: string;
   name: string;
+  cardNumber: string | null;
   setName: string | null;
   setCode: string | null;
   sellPrice: number | null;
