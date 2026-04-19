@@ -251,6 +251,13 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const updateItemsOnly = useCallback(async () => {
     try {
+      // Validate items before sending
+      const invalidItems = items.filter((item) => item.quantity < 1 || item.offerPrice < 0);
+      if (invalidItems.length > 0) {
+        toast.error('Hay items con valores inválidos (cantidad >= 1, precio >= 0)');
+        return;
+      }
+
       const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
       const currentItemGuids = new Set(items.map((i) => i.guid));
 

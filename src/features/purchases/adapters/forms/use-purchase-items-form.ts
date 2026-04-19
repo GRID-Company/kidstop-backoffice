@@ -1,4 +1,4 @@
-import { useForm, useFieldArray, Resolver } from 'react-hook-form';
+import { useForm, useFieldArray, Resolver, FieldArrayMethodProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMemo } from 'react';
@@ -26,7 +26,7 @@ interface UsePurchaseItemsFormOptions {
 
 interface UsePurchaseItemsFormReturn {
   form: ReturnType<typeof useForm<PurchaseItemsFormData>>;
-  fieldArray: any;
+  fieldArray: ReturnType<typeof useFieldArray<PurchaseItemsFormData>>;
   hasChanges: boolean;
 }
 

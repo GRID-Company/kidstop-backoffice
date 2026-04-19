@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
@@ -75,6 +75,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+  const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
 
   const [setPurchaseItemSellPrice] = useMutation(SetPurchaseItemSellPriceDocument, {
     onError: (error) => {
@@ -139,6 +140,13 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const handleReject = useCallback(() => {
     updateStatus(PURCHASE_STATUS.REJECTED);
   }, [updateStatus]);
+
+  const handleUpdateItemsOnly = useCallback(async () => {
+    await updateItemsOnly();
+    if (tableRefetchPricesRef.current) {
+      tableRefetchPricesRef.current(items);
+    }
+  }, [updateItemsOnly, items]);
 
   if (loading) {
     return (
@@ -256,6 +264,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               items={items}
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}
+              onRefetchPrices={(refetch) => {
+                tableRefetchPricesRef.current = refetch;
+              }}
               isReadOnly={!isEditable}
             />
           </div>
@@ -325,7 +336,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                     variant="bordered"
                     startContent={<Icon icon="lucide:save" width={18} />}
                     isDisabled={!hasItemChanges || items.length === 0 || loading}
-                    onPress={updateItemsOnly}
+                    onPress={handleUpdateItemsOnly}
                   >
                     Actualizar compra
                   </Button>

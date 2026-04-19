@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 
 import { IPurchaseItem } from '../../domain/types';
@@ -9,11 +9,13 @@ import { TCG_TYPES } from '@/lib/types/tcg.types';
 interface UseItemsReferencePricesReturn {
   itemsWithPrices: IPurchaseItem[];
   loading: boolean;
+  refetch: (itemsToRefetch?: IPurchaseItem[]) => void;
 }
 
 export function useItemsReferencePrices(items: IPurchaseItem[]): UseItemsReferencePricesReturn {
   const [pricesCache, setPricesCache] = useState<Record<string, number>>({});
   const fetchedGuidsRef = useRef<Set<string>>(new Set());
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const pokemonItems = useMemo(() => items.filter((i) => i.tcgType === TCG_TYPES.POKEMON), [items]);
   const magicItems = useMemo(() => items.filter((i) => i.tcgType === TCG_TYPES.MAGIC), [items]);
@@ -35,59 +37,68 @@ export function useItemsReferencePrices(items: IPurchaseItem[]): UseItemsReferen
     }
   );
 
-  const fetchPokemonPrices = useCallback(async () => {
-    for (const guid of pokemonCardGuids) {
-      if (fetchedGuidsRef.current.has(guid)) continue;
-      fetchedGuidsRef.current.add(guid);
-
-      try {
-        const result = await fetchPokemonMetrics({
-          variables: { guid },
-        });
-        if (result.data?.pokemonCardWithMetrics?.ungradedPrice != null) {
-          setPricesCache((prev) => ({
-            ...prev,
-            [guid]: result.data!.pokemonCardWithMetrics!.ungradedPrice!,
-          }));
-        }
-      } catch {
-        // Silently handle errors
-      }
-    }
-  }, [pokemonCardGuids, fetchPokemonMetrics]);
-
-  const fetchMagicPrices = useCallback(async () => {
-    for (const guid of magicCardGuids) {
-      if (fetchedGuidsRef.current.has(guid)) continue;
-      fetchedGuidsRef.current.add(guid);
-
-      try {
-        const result = await fetchMagicMetrics({
-          variables: { guid },
-        });
-        if (result.data?.magicCardWithMetrics?.priceRetail != null) {
-          setPricesCache((prev) => ({
-            ...prev,
-            [guid]: result.data!.magicCardWithMetrics!.priceRetail!,
-          }));
-        }
-      } catch {
-        // Silently handle errors
-      }
-    }
-  }, [magicCardGuids, fetchMagicMetrics]);
 
   useEffect(() => {
-    if (pokemonCardGuids.length > 0) {
-      fetchPokemonPrices();
-    }
-  }, [pokemonCardGuids, fetchPokemonPrices]);
+    // Only fetch on mount, not on dependency changes
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
-  useEffect(() => {
-    if (magicCardGuids.length > 0) {
-      fetchMagicPrices();
-    }
-  }, [magicCardGuids, fetchMagicPrices]);
+    const fetchInitial = async () => {
+      if (pokemonCardGuids.length > 0) {
+        for (const guid of pokemonCardGuids) {
+          if (controller.signal.aborted) break;
+          if (fetchedGuidsRef.current.has(guid)) continue;
+          fetchedGuidsRef.current.add(guid);
+
+          try {
+            const result = await fetchPokemonMetrics({
+              variables: { guid },
+            });
+            if (result.data?.pokemonCardWithMetrics?.ungradedPrice != null) {
+              setPricesCache((prev) => ({
+                ...prev,
+                [guid]: result.data!.pokemonCardWithMetrics!.ungradedPrice!,
+              }));
+            }
+          } catch (error) {
+            if (error instanceof Error && error.name !== 'AbortError') {
+              console.warn(`Failed to fetch Pokemon price for ${guid}:`, error);
+            }
+          }
+        }
+      }
+
+      if (magicCardGuids.length > 0) {
+        for (const guid of magicCardGuids) {
+          if (controller.signal.aborted) break;
+          if (fetchedGuidsRef.current.has(guid)) continue;
+          fetchedGuidsRef.current.add(guid);
+
+          try {
+            const result = await fetchMagicMetrics({
+              variables: { guid },
+            });
+            if (result.data?.magicCardWithMetrics?.priceRetail != null) {
+              setPricesCache((prev) => ({
+                ...prev,
+                [guid]: result.data!.magicCardWithMetrics!.priceRetail!,
+              }));
+            }
+          } catch (error) {
+            if (error instanceof Error && error.name !== 'AbortError') {
+              console.warn(`Failed to fetch Magic price for ${guid}:`, error);
+            }
+          }
+        }
+      }
+    };
+
+    fetchInitial();
+
+    return () => {
+      controller.abort();
+    };
+  }, [pokemonCardGuids, magicCardGuids, fetchPokemonMetrics, fetchMagicMetrics]);
 
   const itemsWithPrices = useMemo(() => {
     return items.map((item) => {
@@ -102,8 +113,75 @@ export function useItemsReferencePrices(items: IPurchaseItem[]): UseItemsReferen
     });
   }, [items, pricesCache]);
 
+  const refetch = useCallback((itemsToRefetch?: IPurchaseItem[]) => {
+    const itemsForRefetch = itemsToRefetch || items;
+    const pokemonGuids = [...new Set(itemsForRefetch.filter(i => i.tcgType === TCG_TYPES.POKEMON).map(i => i.cardGuid))];
+    const magicGuids = [...new Set(itemsForRefetch.filter(i => i.tcgType === TCG_TYPES.MAGIC).map(i => i.cardGuid))];
+    
+    // Cancel previous requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    
+    fetchedGuidsRef.current.clear();
+    setPricesCache({});
+    
+    // Re-fetch all Pokemon cards sequentially to avoid AbortError
+    const refetchPokemon = async () => {
+      for (const guid of pokemonGuids) {
+        if (abortControllerRef.current?.signal.aborted) break;
+        try {
+          const result = await fetchPokemonMetrics({
+            variables: { guid },
+          });
+          if (result.data?.pokemonCardWithMetrics?.ungradedPrice != null) {
+            setPricesCache((prev) => ({
+              ...prev,
+              [guid]: result.data!.pokemonCardWithMetrics!.ungradedPrice!,
+            }));
+          }
+        } catch (error) {
+          if (error instanceof Error && error.name !== 'AbortError') {
+            console.warn(`Failed to refetch Pokemon price for ${guid}:`, error);
+          }
+        }
+      }
+    };
+    
+    // Re-fetch all Magic cards sequentially to avoid AbortError
+    const refetchMagic = async () => {
+      for (const guid of magicGuids) {
+        if (abortControllerRef.current?.signal.aborted) break;
+        try {
+          const result = await fetchMagicMetrics({
+            variables: { guid },
+          });
+          if (result.data?.magicCardWithMetrics?.priceRetail != null) {
+            setPricesCache((prev) => ({
+              ...prev,
+              [guid]: result.data!.magicCardWithMetrics!.priceRetail!,
+            }));
+          }
+        } catch (error) {
+          if (error instanceof Error && error.name !== 'AbortError') {
+            console.warn(`Failed to refetch Magic price for ${guid}:`, error);
+          }
+        }
+      }
+    };
+    
+    // Execute both in parallel
+    Promise.all([refetchPokemon(), refetchMagic()]).catch((error) => {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.warn('Error during refetch:', error);
+      }
+    });
+  }, [items, fetchPokemonMetrics, fetchMagicMetrics]);
+
   return {
     itemsWithPrices,
     loading: pokemonLoading || magicLoading,
+    refetch,
   };
 }

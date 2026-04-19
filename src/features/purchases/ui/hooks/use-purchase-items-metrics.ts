@@ -107,11 +107,11 @@ export function usePurchaseItemsMetrics(items: IPurchaseItem[]): UseItemsMetrics
 
   useEffect(() => {
     fetchPokemonData();
-  }, [fetchPokemonData]);
+  }, [fetchPokemonData, pokemonCardGuids]);
 
   useEffect(() => {
     fetchMagicData();
-  }, [fetchMagicData]);
+  }, [fetchMagicData, magicCardGuids]);
 
   const itemsWithMetrics = useMemo(() => {
     return items.map((item) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import {
   Button,
   Tooltip,
@@ -32,6 +32,7 @@ interface PurchaseItemsTableProps {
   items: IPurchaseItem[];
   onUpdateItem: (itemId: string, updates: Partial<IPurchaseItem>) => void;
   onRemoveItem: (itemId: string) => void;
+  onRefetchPrices?: (refetch: (items?: IPurchaseItem[]) => void) => void;
   isReadOnly?: boolean;
 }
 
@@ -39,10 +40,18 @@ export default function PurchaseItemsTable({
   items,
   onUpdateItem,
   onRemoveItem,
+  onRefetchPrices,
   isReadOnly = false,
 }: PurchaseItemsTableProps) {
   const { isPrivacyMode } = usePrivacyModeStore();
-  const { itemsWithPrices } = useItemsReferencePrices(items);
+  const { itemsWithPrices, refetch: refetchPrices } = useItemsReferencePrices(items);
+
+  // Expose refetch to parent when requested
+  useEffect(() => {
+    if (onRefetchPrices) {
+      onRefetchPrices(refetchPrices);
+    }
+  }, [refetchPrices, onRefetchPrices]);
 
   const displayCurrency = useCallback(
     (value: number): string =>
