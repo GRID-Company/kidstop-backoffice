@@ -1,3 +1,13 @@
+/**
+ * Formatea un número de teléfono mexicano para visualización
+ * Soporta entrada en múltiples formatos y retorna formato legible: +52 XX XXXX XXXX
+ * @param phone - Teléfono en cualquier formato (con o sin símbolos, con o sin prefijo)
+ * @returns Teléfono formateado para visualización
+ * @example
+ * formatPhoneNumber('5512345678') => '+52 55 1234 5678'
+ * formatPhoneNumber('+525512345678') => '+52 55 1234 5678'
+ * formatPhoneNumber('55 1234 5678') => '+52 55 1234 5678'
+ */
 export const formatPhoneNumber = (phone: string): string => {
   if (!phone) return '';
 
