@@ -45,7 +45,9 @@ export interface IPurchaseItem {
   quantity: number;
   offerPrice: number;
   referencePrice?: number;
+  currentReferencePrice?: number;
   sellPrice?: number;
+  metrics?: ICardSearchMetrics;
 }
 
 export interface IPaymentDetail {

@@ -34,6 +34,7 @@ interface UsePurchaseDetailReturn {
   canAdjustPrices: boolean;
   canFinalize: boolean;
   canReject: boolean;
+  hasItemChanges: boolean;
   total: number;
   currentBuyerSpent: number;
   assignedBudget: number;
@@ -46,6 +47,7 @@ interface UsePurchaseDetailReturn {
   updatePayments: (payments: IPaymentDetail[]) => void;
   updateItems: (items: IPurchaseItem[]) => void;
   updateStatus: (status: PurchaseStatus) => void;
+  updateItemsOnly: () => Promise<void>;
 }
 
 export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
@@ -209,6 +211,87 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     setItems(newItems);
   }, []);
 
+  const hasItemChanges = useMemo(() => {
+    if (!basePurchase) return false;
+
+    const serverItemGuids = new Set(basePurchase.items.map((i) => i.guid));
+    const currentItemGuids = new Set(items.map((i) => i.guid));
+
+    // Check if length changed
+    if (items.length !== basePurchase.items.length) {
+      return true;
+    }
+
+    // Check if any item was added or removed
+    for (const guid of currentItemGuids) {
+      if (!serverItemGuids.has(guid)) {
+        return true;
+      }
+    }
+
+    for (const guid of serverItemGuids) {
+      if (!currentItemGuids.has(guid)) {
+        return true;
+      }
+    }
+
+    // Check if any existing item was modified
+    return items.some((currentItem) => {
+      const serverItem = basePurchase.items.find((i) => i.guid === currentItem.guid);
+      if (!serverItem) return true;
+
+      return (
+        currentItem.condition !== serverItem.condition ||
+        currentItem.quantity !== serverItem.quantity ||
+        currentItem.offerPrice !== serverItem.offerPrice ||
+        currentItem.referencePrice !== serverItem.referencePrice
+      );
+    });
+  }, [basePurchase, items]);
+
+  const updateItemsOnly = useCallback(async () => {
+    try {
+      const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
+      const currentItemGuids = new Set(items.map((i) => i.guid));
+
+      // Separate added, updated, and removed items
+      const addItems = items.filter((i) => !serverItemGuids.has(i.guid));
+      const removeItemGuids = Array.from(serverItemGuids).filter((guid) => !currentItemGuids.has(guid));
+      const updateItems = items.filter((i) => serverItemGuids.has(i.guid) && i.guid);
+
+      const tcgType = basePurchase?.tcgType ?? 'POKEMON';
+
+      await updatePurchaseItemsMutation({
+        variables: {
+          updatePurchaseItemsInput: {
+            purchaseGuid: purchaseId,
+            addItems: addItems.map((item) => ({
+              ...(tcgType === 'POKEMON'
+                ? { pokemonCardGuid: item.cardGuid }
+                : { magicCardGuid: item.cardGuid }),
+              condition: item.condition,
+              quantity: item.quantity,
+              offerPrice: item.offerPrice,
+              referencePrice: item.referencePrice,
+            })),
+            updateItems: updateItems.map((item) => ({
+              itemGuid: item.guid,
+              condition: item.condition,
+              quantity: item.quantity,
+              offerPrice: item.offerPrice,
+            })),
+            removeItemGuids,
+          },
+        },
+      });
+
+      toast.success('Items actualizados correctamente');
+      void refetch();
+    } catch (error) {
+      toast.error(`Error al actualizar items: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, refetch]);
+
   const updateStatus = useCallback(async (newStatus: PurchaseStatus) => {
     try {
       const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
@@ -261,6 +344,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     canAdjustPrices,
     canFinalize,
     canReject,
+    hasItemChanges,
     total,
     currentBuyerSpent,
     assignedBudget,
@@ -273,5 +357,6 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     updatePayments,
     updateItems,
     updateStatus,
+    updateItemsOnly,
   };
 }

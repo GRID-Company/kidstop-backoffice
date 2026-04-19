@@ -59,6 +59,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canAdjustPrices,
     canFinalize,
     canReject,
+    hasItemChanges,
     total,
     currentBuyerSpent,
     assignedBudget,
@@ -69,6 +70,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     updatePayments,
     updateItems,
     updateStatus,
+    updateItemsOnly,
   } = usePurchaseDetail(purchaseId);
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -317,6 +319,18 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               </div>
               <Divider />
               <div className="flex flex-wrap gap-3">
+                {isEditable && (
+                  <Button
+                    color="secondary"
+                    variant="bordered"
+                    startContent={<Icon icon="lucide:save" width={18} />}
+                    isDisabled={!hasItemChanges || items.length === 0 || loading}
+                    onPress={updateItemsOnly}
+                  >
+                    Actualizar compra
+                  </Button>
+                )}
+
                 {canQuote && (
                   <Button
                     color="primary"

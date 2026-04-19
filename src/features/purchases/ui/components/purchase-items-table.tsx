@@ -23,6 +23,8 @@ import {
   calculateItemSubtotal,
   calculateTotal,
 } from '../../domain/purchases.domain';
+import { useItemsReferencePrices } from '../hooks/use-items-reference-prices';
+import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
 
 const REDACTED_VALUE = '$••••••';
 
@@ -40,6 +42,7 @@ export default function PurchaseItemsTable({
   isReadOnly = false,
 }: PurchaseItemsTableProps) {
   const { isPrivacyMode } = usePrivacyModeStore();
+  const { itemsWithPrices } = useItemsReferencePrices(items);
 
   const displayCurrency = useCallback(
     (value: number): string =>
@@ -47,12 +50,12 @@ export default function PurchaseItemsTable({
     [isPrivacyMode]
   );
 
-  const total = useMemo(() => calculateTotal(items), [items]);
+  const total = useMemo(() => calculateTotal(itemsWithPrices), [itemsWithPrices]);
 
   const handleQuantityChange = useCallback(
     (itemId: string, value: string) => {
-      const quantity = parseInt(value, 10);
-      if (!isNaN(quantity) && quantity >= 1) {
+      const { isValid, quantity } = validateQuantity(value);
+      if (isValid) {
         onUpdateItem(itemId, { quantity });
       }
     },
@@ -70,8 +73,8 @@ export default function PurchaseItemsTable({
 
   const handleOfferPriceChange = useCallback(
     (itemId: string, value: string) => {
-      const price = parseFloat(value);
-      if (!isNaN(price) && price > 0) {
+      const { isValid, price } = validateOfferPrice(value);
+      if (isValid) {
         onUpdateItem(itemId, { offerPrice: price });
       }
     },
@@ -99,6 +102,26 @@ export default function PurchaseItemsTable({
               </span>
             </div>
           </div>
+        ),
+      },
+      {
+        key: 'referencePriceAdded',
+        label: 'Precio ref. al agregar',
+        className: 'w-[140px]',
+        customCol: (item: IPurchaseItem) => (
+          <span className="text-sm font-medium">
+            {displayCurrency(item.referencePrice ?? 0)}
+          </span>
+        ),
+      },
+      {
+        key: 'referencePriceCurrent',
+        label: 'Precio ref. actual',
+        className: 'w-[140px]',
+        customCol: (item: IPurchaseItem) => (
+          <span className="text-sm font-medium">
+            {displayCurrency(item.currentReferencePrice ?? 0)}
+          </span>
         ),
       },
       {
@@ -227,9 +250,9 @@ export default function PurchaseItemsTable({
 
   return (
     <div className="flex flex-col gap-3">
-      <DataTable cols={columns} data={items} isLoading={false} />
+      <DataTable cols={columns} data={itemsWithPrices} isLoading={false} />
 
-      {items.length > 0 && (
+      {itemsWithPrices.length > 0 && (
         <div className="flex justify-end border-t border-default-200 pt-3">
           <div className="flex items-center gap-2">
             <span className="text-sm text-default-500">Total compra:</span>
@@ -240,7 +263,7 @@ export default function PurchaseItemsTable({
         </div>
       )}
 
-      {items.length === 0 && (
+      {itemsWithPrices.length === 0 && (
         <div className="flex flex-col items-center justify-center py-8 text-default-400">
           <Icon icon="lucide:package-open" width={40} className="mb-2" />
           <span className="text-sm">No hay items en la compra</span>
