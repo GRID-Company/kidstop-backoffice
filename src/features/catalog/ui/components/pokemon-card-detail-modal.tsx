@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
   Drawer,
   DrawerContent,
@@ -94,9 +95,13 @@ export default function PokemonCardDetailModal({
                   className="object-contain p-1"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-default-400">
-                  <span className="text-5xl">🃏</span>
-                </div>
+                <Image
+                  src={pokemonCardPlaceholder}
+                  alt="Pokemon card placeholder"
+                  fill
+                  sizes="160px"
+                  className="object-contain p-1"
+                />
               )}
             </div>
 

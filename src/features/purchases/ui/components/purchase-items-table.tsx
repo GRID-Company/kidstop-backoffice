@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useMemo, useEffect } from 'react';
+import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
   Button,
   Tooltip,
@@ -98,12 +100,30 @@ export default function PurchaseItemsTable({
         className: '!text-left min-w-[220px]',
         customCol: (item: IPurchaseItem) => (
           <div className="flex items-center gap-3">
-            <img
-              src={item.cardImageUrl || 'https://placehold.co/36x48?text=Card'}
-              alt={item.cardName}
-              className="h-12 w-9 rounded object-cover"
-              onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/36x48?text=Card'; }}
-            />
+            {item.cardImageUrl ? (
+              <img
+                src={item.cardImageUrl}
+                alt={item.cardName}
+                className="h-12 w-9 rounded object-cover"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = 'none';
+                  const placeholder = img.nextElementSibling as HTMLElement;
+                  if (placeholder) placeholder.style.display = 'block';
+                }}
+              />
+            ) : null}
+            {!item.cardImageUrl && (
+              <div className="relative h-12 w-9 rounded overflow-hidden bg-default-100">
+                <Image
+                  src={pokemonCardPlaceholder}
+                  alt="Pokemon card placeholder"
+                  fill
+                  sizes="36px"
+                  className="object-cover"
+                />
+              </div>
+            )}
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{item.cardName}</span>
               <span className="text-xs text-default-400">
