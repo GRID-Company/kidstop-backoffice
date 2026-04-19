@@ -254,19 +254,20 @@ mutation FinalizePurchase($purchaseGuid: String!) {
   }
 }
 
-# TODO: Fix Sellers query - requires FindSellersArgs input type
-# query Sellers {
-#   sellers {
-#     data {
-#       guid
-#       name
-#       phone
-#       email
-#       notes
-#     }
-#     count
-#   }
-# }
+query Sellers($findSellersArgs: FindSellersArgs!) {
+  sellers(findSellersArgs: $findSellersArgs) {
+    data {
+      guid
+      name
+      phone
+      email
+      notes
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
 
 mutation CreateSeller($createSellerInput: CreateSellerInput!) {
   createSeller(createSellerInput: $createSellerInput) {

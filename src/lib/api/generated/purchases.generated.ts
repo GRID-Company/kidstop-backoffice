@@ -265,6 +265,25 @@ export type FinalizePurchaseMutation = {
   };
 };
 
+export type SellersQueryVariables = Types.Exact<{
+  findSellersArgs: Types.FindSellersArgs;
+}>;
+
+export type SellersQuery = {
+  sellers: {
+    count: number | null;
+    data: Array<{
+      guid: string;
+      name: string;
+      phone: string | null;
+      email: string | null;
+      notes: string | null;
+      createdDate: unknown;
+      updatedDate: unknown;
+    }> | null;
+  };
+};
+
 export type CreateSellerMutationVariables = Types.Exact<{
   createSellerInput: Types.CreateSellerInput;
 }>;
@@ -1403,6 +1422,79 @@ export const FinalizePurchaseDocument = {
   FinalizePurchaseMutation,
   FinalizePurchaseMutationVariables
 >;
+export const SellersDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'Sellers' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findSellersArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindSellersArgs' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sellers' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findSellersArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findSellersArgs' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'updatedDate' },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SellersQuery, SellersQueryVariables>;
 export const CreateSellerDocument = {
   kind: 'Document',
   definitions: [

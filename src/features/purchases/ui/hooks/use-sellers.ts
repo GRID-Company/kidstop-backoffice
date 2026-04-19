@@ -8,6 +8,14 @@ import { CreateSellerDocument, SellersDocument } from '@/lib/api/generated/purch
 
 export function useSellers(search?: string) {
   const { data, loading, refetch } = useQuery(SellersDocument, {
+    variables: {
+      findSellersArgs: {
+        skip: 0,
+        limit: 100,
+        sort: { column: 'name', order: 'ASC' },
+        search: search || undefined,
+      },
+    },
     fetchPolicy: 'cache-and-network',
   });
 
