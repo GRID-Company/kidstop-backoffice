@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
   Drawer,
   DrawerContent,

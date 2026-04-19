@@ -1,6 +1,9 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Chip,
   Pagination,
@@ -66,9 +69,13 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
                 className="absolute inset-0 h-full w-full object-contain"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-default-400 text-xs">
-                🃏
-              </div>
+              <Image
+                src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+                alt="Card placeholder"
+                fill
+                sizes="32px"
+                className="object-contain"
+              />
             )}
           </div>
           <div className="min-w-0">

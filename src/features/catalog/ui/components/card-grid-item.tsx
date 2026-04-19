@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import { CardBody } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { ICard } from '../../domain/types';
@@ -32,9 +33,13 @@ export default function CardGridItem({ card, onPress }: CardGridItemProps) {
               className="object-contain p-2"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-default-400">
-              <span className="text-4xl">🃏</span>
-            </div>
+            <Image
+              src={pokemonCardPlaceholder}
+              alt="Pokemon card placeholder"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-contain p-2"
+            />
           )}
         </div>
 
