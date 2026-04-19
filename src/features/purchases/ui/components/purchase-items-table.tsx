@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Button,
   Tooltip,
@@ -116,8 +117,8 @@ export default function PurchaseItemsTable({
             {!item.cardImageUrl && (
               <div className="relative h-12 w-9 rounded overflow-hidden bg-default-100">
                 <Image
-                  src={pokemonCardPlaceholder}
-                  alt="Pokemon card placeholder"
+                  src={item.tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+                  alt="Card placeholder"
                   fill
                   sizes="36px"
                   className="object-cover"

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import { CardBody } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { ICard } from '../../domain/types';
@@ -34,8 +35,8 @@ export default function CardGridItem({ card, onPress }: CardGridItemProps) {
             />
           ) : (
             <Image
-              src={pokemonCardPlaceholder}
-              alt="Pokemon card placeholder"
+              src={card.tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+              alt="Card placeholder"
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="object-contain p-2"
