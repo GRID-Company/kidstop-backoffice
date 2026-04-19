@@ -110,6 +110,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice || undefined,
+        currentReferencePrice: item.referencePrice || undefined,
         sellPrice: item.sellPrice || undefined,
       })),
       payments: (p.payments || []).map((payment) => ({

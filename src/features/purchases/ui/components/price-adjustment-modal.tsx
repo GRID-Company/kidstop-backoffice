@@ -243,7 +243,7 @@ export default function PriceAdjustmentModal({
                         Precio referencia
                       </span>
                       <span className="text-sm font-medium text-default-600">
-                        {displayCurrency(item.sellPrice || 0)}
+                        {displayCurrency(item.referencePrice || 0)}
                       </span>
                     </div>
 
