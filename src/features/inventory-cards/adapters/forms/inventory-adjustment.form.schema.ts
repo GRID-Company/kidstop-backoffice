@@ -11,7 +11,12 @@ export const inventoryAdjustmentFormSchema = z.object({
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
-  quantity: z.coerce.number().int('La cantidad debe ser un número entero').min(1, 'La cantidad debe ser al menos 1'),
+  quantity: z.coerce
+    .number()
+    .int('La cantidad debe ser un número entero')
+    .refine(val => val === 0 || val >= 1, {
+      message: 'La cantidad debe ser al menos 1',
+    }),
   movementType: z.enum(movementTypeValues, {
     message: 'El tipo de movimiento es obligatorio',
   }),

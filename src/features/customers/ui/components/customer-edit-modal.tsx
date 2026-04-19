@@ -13,6 +13,7 @@ import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
+import { formatPhoneNumber } from '@/shared/utils/phone-format';
 import { ICustomer } from '../../domain/types';
 import { useCustomerForm } from '../../adapters/forms/use-customer-form';
 import { CustomerFormData } from '../../adapters/forms/customer-form.schema';
@@ -91,6 +92,7 @@ export default function CustomerEditModal({
               label="Teléfono"
               placeholder="+52 55 1234 5678"
               controlProps={{ control, name: 'phone' }}
+              formatValue={formatPhoneNumber}
               aria-label="Teléfono del cliente"
             />
 
