@@ -14,17 +14,40 @@ const purchaseItemSchema = z.object({
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
-  quantity: z.coerce.number().int().min(1, 'La cantidad debe ser al menos 1'),
-  offerPrice: z.coerce.number().min(0, 'El precio de compra debe ser mayor o igual a 0'),
-  referencePrice: z.coerce.number().min(0).optional(),
-  sellPrice: z.coerce.number().min(0).optional(),
+  quantity: z.coerce
+    .number()
+    .int()
+    .refine(val => val === 0 || val >= 1, {
+      message: 'La cantidad debe ser al menos 1',
+    }),
+  offerPrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0, {
+      message: 'El precio de compra debe ser mayor o igual a 0',
+    }),
+  referencePrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0, {
+      message: 'El precio debe ser mayor o igual a 0',
+    })
+    .optional(),
+  sellPrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0, {
+      message: 'El precio debe ser mayor o igual a 0',
+    })
+    .optional(),
 });
 
 const paymentDetailSchema = z.object({
   method: z.enum(paymentMethodValues, {
     message: 'El método de pago es obligatorio',
   }),
-  amount: z.coerce.number().min(0.01, 'El monto debe ser mayor a 0'),
+  amount: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0.01, {
+      message: 'El monto debe ser mayor a 0',
+    }),
 });
 
 export const purchaseFormSchema = z.object({

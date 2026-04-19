@@ -15,6 +15,7 @@ import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
+import { formatPhoneNumber } from '@/shared/utils/phone-format';
 import { useSellerForm } from '../../adapters/forms/use-seller-form';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 
@@ -79,6 +80,7 @@ export default function SellerCreateDrawer({
               label="Celular"
               placeholder="+52 55 1234 5678"
               controlProps={{ control, name: 'phone' }}
+              formatValue={formatPhoneNumber}
               isRequired
               aria-label="Celular del vendedor"
             />

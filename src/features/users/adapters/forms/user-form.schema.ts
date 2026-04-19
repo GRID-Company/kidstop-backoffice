@@ -10,6 +10,7 @@ export const userFormSchema = (isEditing = false) =>
       emailAddress: z
         .string()
         .trim()
+        .toLowerCase()
         .min(1, 'El email es obligatorio')
         .email('El email no es válido'),
       role: z.enum(userRoleValues, {

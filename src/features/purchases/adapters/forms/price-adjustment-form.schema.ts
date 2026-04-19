@@ -2,7 +2,11 @@ import { z } from 'zod';
 
 const priceAdjustmentItemSchema = z.object({
   itemId: z.string(),
-  publicPrice: z.coerce.number().min(0),
+  publicPrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val > 0, {
+      message: 'El precio debe ser mayor a 0',
+    }),
 });
 
 export const priceAdjustmentFormSchema = z.object({
