@@ -284,3 +284,18 @@ mutation CreateSeller($createSellerInput: CreateSellerInput!) {
     updatedDate
   }
 }
+
+mutation UpdateSeller($updateSellerInput: UpdateSellerInput!) {
+  updateSeller(updateSellerInput: $updateSellerInput) {
+    guid
+    name
+    phone
+    email
+    notes
+    updatedDate
+  }
+}
+
+mutation DeleteSeller($guid: String!) {
+  deleteSeller(guid: $guid)
+}

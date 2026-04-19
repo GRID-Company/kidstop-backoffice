@@ -301,6 +301,27 @@ export type CreateSellerMutation = {
   };
 };
 
+export type UpdateSellerMutationVariables = Types.Exact<{
+  updateSellerInput: Types.UpdateSellerInput;
+}>;
+
+export type UpdateSellerMutation = {
+  updateSeller: {
+    guid: string;
+    name: string;
+    phone: string | null;
+    email: string | null;
+    notes: string | null;
+    updatedDate: unknown;
+  };
+};
+
+export type DeleteSellerMutationVariables = Types.Exact<{
+  guid: Types.Scalars['String']['input'];
+}>;
+
+export type DeleteSellerMutation = { deleteSeller: boolean };
+
 export const PurchasesDocument = {
   kind: 'Document',
   definitions: [
@@ -1565,4 +1586,108 @@ export const CreateSellerDocument = {
 } as unknown as DocumentNode<
   CreateSellerMutation,
   CreateSellerMutationVariables
+>;
+export const UpdateSellerDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSeller' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'updateSellerInput' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateSellerInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSeller' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'updateSellerInput' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'updateSellerInput' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'phone' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSellerMutation,
+  UpdateSellerMutationVariables
+>;
+export const DeleteSellerDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteSeller' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteSeller' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'guid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'guid' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteSellerMutation,
+  DeleteSellerMutationVariables
 >;

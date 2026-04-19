@@ -14,6 +14,7 @@ import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ISeller } from '../../domain/types';
+import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
@@ -21,6 +22,8 @@ import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
+import SellerEditDrawer from '../components/seller-edit-drawer';
+import SellerDeleteModal from '../components/seller-delete-modal';
 
 interface PurchaseFormData {
   sellerGuid: string;
@@ -43,13 +46,15 @@ export default function PurchaseNew() {
     saving,
   } = useNewPurchase();
 
-  const { getSellerById } = useSellers();
+  const { getSellerById, updateSeller, deleteSeller, updating, deleting } = useSellers();
   const { control, watch } = useForm<PurchaseFormData>({
     defaultValues: { sellerGuid: '' },
   });
 
   const selectedSellerGuid = watch('sellerGuid');
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleConfirmSeller = useCallback(() => {
     if (!selectedSellerGuid) return;
@@ -66,8 +71,30 @@ export default function PurchaseNew() {
   }, [setSeller]);
 
   const handleEditSeller = useCallback(() => {
-    setIsSellerConfirmed(false);
+    setIsEditDrawerOpen(true);
   }, []);
+
+  const handleUpdateSeller = useCallback(
+    async (data: SellerFormData) => {
+      if (!seller) return;
+      const updatedSeller = await updateSeller(seller.guid, data);
+      if (updatedSeller) {
+        setSeller(updatedSeller);
+        setIsEditDrawerOpen(false);
+      }
+    },
+    [seller, updateSeller, setSeller]
+  );
+
+  const handleDeleteSeller = useCallback(async () => {
+    if (!seller) return;
+    const deleted = await deleteSeller(seller.guid);
+    if (deleted) {
+      setSeller(null);
+      setIsSellerConfirmed(false);
+      setIsDeleteModalOpen(false);
+    }
+  }, [seller, deleteSeller, setSeller]);
 
   const handleSave = useCallback(() => {
     savePurchase();
@@ -115,15 +142,28 @@ export default function PurchaseNew() {
                     <span className="text-sm font-semibold">Vendedor</span>
                   </div>
                   {isSellerConfirmed && (
-                    <Button
-                      size="sm"
-                      variant="light"
-                      className="text-accent"
-                      startContent={<Icon icon="lucide:pencil" width={14} />}
-                      onPress={handleEditSeller}
-                    >
-                      Editar
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="light"
+                        className="text-accent"
+                        startContent={<Icon icon="lucide:pencil" width={14} />}
+                        onPress={handleEditSeller}
+                        isDisabled={updating || deleting}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="light"
+                        className="text-danger"
+                        startContent={<Icon icon="lucide:trash-2" width={14} />}
+                        onPress={() => setIsDeleteModalOpen(true)}
+                        isDisabled={updating || deleting}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
                   )}
                 </div>
 
@@ -233,6 +273,22 @@ export default function PurchaseNew() {
           </Button>
         </div>
       </div>
+
+      <SellerEditDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => setIsEditDrawerOpen(false)}
+        onSubmit={handleUpdateSeller}
+        seller={seller}
+        isLoading={updating}
+      />
+
+      <SellerDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteSeller}
+        seller={seller}
+        isLoading={deleting}
+      />
     </EntitiesPage>
   );
 }
