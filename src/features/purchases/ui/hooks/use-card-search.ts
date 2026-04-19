@@ -145,7 +145,7 @@ export function useCardSearch() {
         name: card.name,
         setName: card.setName || '',
         setCode: card.setCode || '',
-        number: '',
+        number: card.cardNumber || '',
         rarity: '',
         imageUrl: card.imageUri || '',
         tcgType: TCG_TYPES.POKEMON,

@@ -76,6 +76,16 @@ export type BannerGuidsInput = {
   pokemon?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type BatchSearchMagicCardsInput = {
+  /** Multiline text with Magic cards in Moxfield format */
+  searchText: Scalars['String']['input'];
+};
+
+export type BatchSearchPokemonCardsInput = {
+  /** Multiline text with Pokemon cards in Limitless format */
+  searchText: Scalars['String']['input'];
+};
+
 export type BuyerBudgetWithUsage = {
   assignedAmount: Scalars['Float']['output'];
   buyer: User;
@@ -383,6 +393,13 @@ export type FindSalesFilter = {
   tcg: Scalars['String']['input'];
 };
 
+export type FindSellersArgs = {
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
 export type FindUsersArgs = {
   filters?: InputMaybe<FindUsersFilter>;
   limit: Scalars['Int']['input'];
@@ -531,6 +548,28 @@ export type MagicCard = {
   variation?: Maybe<Scalars['String']['output']>;
 };
 
+export type MagicCardBatchSearchItem = {
+  /** Best matching card */
+  bestMatch?: Maybe<MagicCardInternalItem>;
+  /** Error message if search failed */
+  error?: Maybe<Scalars['String']['output']>;
+  /** Original line from the search input */
+  originalLine: Scalars['String']['output'];
+  /** Parsed card name */
+  parsedName?: Maybe<Scalars['String']['output']>;
+  /** Parsed collector number */
+  parsedNumber?: Maybe<Scalars['String']['output']>;
+  /** Parsed set/edition code */
+  parsedSet?: Maybe<Scalars['String']['output']>;
+  /** Related cards (up to 3) */
+  relatedCards: Array<MagicCardInternalItem>;
+};
+
+export type MagicCardBatchSearchResult = {
+  /** Search results for each line */
+  results: Array<MagicCardBatchSearchItem>;
+};
+
 export type MagicCardCollection = {
   cards: Array<MagicCard>;
   cardsWithImages: Scalars['Float']['output'];
@@ -617,6 +656,7 @@ export type MagicCardPublicItem = {
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
+  totalStock: Scalars['Float']['output'];
 };
 
 export type MagicCardRecommended = {
@@ -1077,6 +1117,28 @@ export type PokemonCard = {
   variant: Scalars['String']['output'];
 };
 
+export type PokemonCardBatchSearchItem = {
+  /** Best matching card */
+  bestMatch?: Maybe<PokemonCardInternalItem>;
+  /** Error message if search failed */
+  error?: Maybe<Scalars['String']['output']>;
+  /** Original line from the search input */
+  originalLine: Scalars['String']['output'];
+  /** Parsed card name */
+  parsedName?: Maybe<Scalars['String']['output']>;
+  /** Parsed card number */
+  parsedNumber?: Maybe<Scalars['String']['output']>;
+  /** Parsed set code */
+  parsedSet?: Maybe<Scalars['String']['output']>;
+  /** Related cards (up to 3) */
+  relatedCards: Array<PokemonCardInternalItem>;
+};
+
+export type PokemonCardBatchSearchResult = {
+  /** Search results for each line */
+  results: Array<PokemonCardBatchSearchItem>;
+};
+
 export type PokemonCardCollection = {
   cards: Array<PokemonCard>;
   cardsWithImages: Scalars['Float']['output'];
@@ -1165,6 +1227,7 @@ export type PokemonCardPublicItem = {
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  totalStock: Scalars['Float']['output'];
 };
 
 export type PokemonCardRecommended = {
@@ -1282,6 +1345,8 @@ export type Query = {
   /** Get paginated list of inventory movements */
   inventoryMovements: PaginatedInventoryMovements;
   isValidToken: IsValidTokenOutput;
+  /** Batch search Magic cards from multiline text (Moxfield format) */
+  magicBatchCardSearch: MagicCardBatchSearchResult;
   /** Get all Magic card collections/editions (public) */
   magicCardCollections: Array<MagicCardCollectionOutput>;
   /** Get internal detail of a single Magic card with inventory data */
@@ -1314,6 +1379,8 @@ export type Query = {
   mySales: PaginatedSales;
   /** Get current user wishlist (carpeta digital) */
   myWishlist: PaginatedWishlistItems;
+  /** Batch search Pokemon cards from multiline text (Limitless format) */
+  pokemonBatchCardSearch: PokemonCardBatchSearchResult;
   /** Get all Pokemon card collections (public) */
   pokemonCardCollections: Array<PokemonCardCollectionOutput>;
   /** Get all unique card genres available in the catalog (cached 1hr) */
@@ -1394,6 +1461,10 @@ export type QueryInventoryMovementsArgs = {
   findInventoryMovementsArgs: FindInventoryMovementsArgs;
 };
 
+export type QueryMagicBatchCardSearchArgs = {
+  input: BatchSearchMagicCardsInput;
+};
+
 export type QueryMagicCardInternalDetailArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1438,6 +1509,10 @@ export type QueryMyWishlistArgs = {
   findMyWishlistArgs: FindMyWishlistArgs;
 };
 
+export type QueryPokemonBatchCardSearchArgs = {
+  input: BatchSearchPokemonCardsInput;
+};
+
 export type QueryPokemonCardInternalDetailArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1476,6 +1551,10 @@ export type QuerySalesArgs = {
 
 export type QuerySellerArgs = {
   guid: Scalars['String']['input'];
+};
+
+export type QuerySellersArgs = {
+  findSellersArgs: FindSellersArgs;
 };
 
 export type QueryUserArgs = {
