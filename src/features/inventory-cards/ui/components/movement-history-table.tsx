@@ -142,9 +142,13 @@ function MovementMobileCard({
               className="absolute inset-0 h-full w-full object-contain"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-default-400">
-              🃏
-            </div>
+            <Image
+              src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+              alt="Card placeholder"
+              fill
+              sizes="40px"
+              className="object-contain"
+            />
           )}
         </div>
 
