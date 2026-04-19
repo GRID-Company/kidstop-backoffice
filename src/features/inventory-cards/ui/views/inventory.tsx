@@ -89,6 +89,7 @@ export default function Inventory() {
     return {
       guid: item.cardGuid,
       name: item.name,
+      cardNumber: item.number,
       setName: item.setName,
       setCode: item.setCode,
       sellPrice: item.sellPrice,

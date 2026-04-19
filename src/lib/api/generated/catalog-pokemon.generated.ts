@@ -11,6 +11,7 @@ export type PokemonCardInternalListQuery = {
     data: Array<{
       guid: string;
       name: string;
+      cardNumber: string | null;
       setName: string | null;
       setCode: string | null;
       sellPrice: number | null;
@@ -165,6 +166,10 @@ export const PokemonCardInternalListDocument = {
                     selections: [
                       { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'cardNumber' },
+                      },
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'setName' },
