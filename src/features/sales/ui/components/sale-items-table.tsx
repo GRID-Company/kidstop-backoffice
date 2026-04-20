@@ -1,14 +1,13 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import { Chip } from '@heroui/react';
 
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { CardImage } from '@/shared/components/card-image';
+import { getCardName, getCardImageUri, getCardTCG, getSetInfo } from '@/shared/utils/card-utils';
 import { ISaleItem } from '../../domain/types';
 import { calculateItemSubtotal } from '../../domain/sales.domain';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
@@ -29,55 +28,19 @@ const SALE_ITEMS_COLUMNS: ITableColumn[] = [
 
 type ColumnRenderer = (row: ISaleItem) => React.ReactNode;
 
-function getCardName(row: ISaleItem): string {
-  return row.pokemonCardSummary?.name ?? row.magicCardSummary?.name ?? '—';
-}
-
-function getCardImageUri(row: ISaleItem): string | null {
-  return row.pokemonCardSummary?.imageUri ?? row.magicCardSummary?.imageUri ?? null;
-}
-
-function getCardTCG(row: ISaleItem): 'POKEMON' | 'MAGIC' {
-  return row.pokemonCardSummary ? 'POKEMON' : 'MAGIC';
-}
-
-function getSetInfo(row: ISaleItem): string {
-  if (row.pokemonCardSummary) {
-    const { setName, setCode } = row.pokemonCardSummary;
-    return setName && setCode ? `${setName} (${setCode})` : setName ?? '—';
-  }
-  if (row.magicCardSummary) {
-    const { edition, collectorNumber } = row.magicCardSummary;
-    return edition && collectorNumber
-      ? `${edition} #${collectorNumber}`
-      : edition ?? '—';
-  }
-  return '—';
-}
-
 const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   image: (row) => {
     const imageUri = getCardImageUri(row);
     const cardName = getCardName(row);
     const tcg = getCardTCG(row);
     return (
-      <div className="relative mx-auto h-10 w-10 overflow-hidden rounded bg-default-100">
-        {imageUri ? (
-          <img
-            src={imageUri}
-            alt={cardName}
-            className="absolute inset-0 h-full w-full object-contain"
-          />
-        ) : (
-          <Image
-            src={tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-            alt="Card placeholder"
-            fill
-            sizes="40px"
-            className="object-contain"
-          />
-        )}
-      </div>
+      <CardImage
+        src={imageUri}
+        alt={cardName}
+        tcgType={tcg}
+        containerClassName="relative mx-auto h-10 w-10 overflow-hidden rounded bg-default-100"
+        className="object-contain"
+      />
     );
   },
   cardName: (row) => (

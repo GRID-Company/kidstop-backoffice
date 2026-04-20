@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { memo, useMemo } from 'react';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import { CardBody } from '@heroui/react';
@@ -13,9 +14,12 @@ interface CardGridItemProps {
   onPress?: (card: ICard) => void;
 }
 
-export default function CardGridItem({ card, onPress }: CardGridItemProps) {
-  const totalStock = card.variants.reduce((sum, v) => sum + v.stock, 0);
-  const lowestSellPrice = Math.min(...card.variants.map((v) => v.sellPrice));
+function CardGridItemComponent({ card, onPress }: CardGridItemProps) {
+  const { totalStock, lowestSellPrice } = useMemo(() => {
+    const total = card.variants.reduce((sum, v) => sum + v.stock, 0);
+    const lowest = Math.min(...card.variants.map((v) => v.sellPrice));
+    return { totalStock: total, lowestSellPrice: lowest };
+  }, [card.variants]);
 
   return (
     <KidstopCard
@@ -77,3 +81,5 @@ export default function CardGridItem({ card, onPress }: CardGridItemProps) {
     </KidstopCard>
   );
 }
+
+export default memo(CardGridItemComponent);

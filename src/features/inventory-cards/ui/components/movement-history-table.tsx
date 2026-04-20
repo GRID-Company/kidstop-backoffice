@@ -1,9 +1,6 @@
 'use client';
 
-import React from 'react';
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
+import React, { memo } from 'react';
 import {
   Chip,
   Pagination,
@@ -20,6 +17,7 @@ import { Icon } from '@iconify/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { formatUnixDateTime } from '@/lib/utils/format-date';
+import { CardImage } from '@/shared/components/card-image';
 import { IInventoryMovement } from '../../domain/types';
 import {
   MOVEMENT_TYPE_LABELS,
@@ -61,23 +59,13 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
     case 'cardName':
       return (
         <div className="flex items-center gap-3">
-          <div className="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100">
-            {item.cardImageUrl ? (
-              <img
-                src={item.cardImageUrl}
-                alt={item.cardName}
-                className="absolute inset-0 h-full w-full object-contain"
-              />
-            ) : (
-              <Image
-                src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-                alt="Card placeholder"
-                fill
-                sizes="32px"
-                className="object-contain"
-              />
-            )}
-          </div>
+          <CardImage
+            src={item.cardImageUrl}
+            alt={item.cardName}
+            tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+            containerClassName="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100"
+            className="object-contain"
+          />
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{item.cardName}</p>
             <p className="truncate text-xs text-default-400">
@@ -119,7 +107,7 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
   }
 }
 
-function MovementMobileCard({
+function MovementMobileCardComponent({
   item,
   onPress,
 }: {
@@ -134,23 +122,13 @@ function MovementMobileCard({
       onPress={() => onPress?.(item)}
     >
       <CardBody className="flex flex-row gap-3 !p-4">
-        <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100">
-          {item.cardImageUrl ? (
-            <img
-              src={item.cardImageUrl}
-              alt={item.cardName}
-              className="absolute inset-0 h-full w-full object-contain"
-            />
-          ) : (
-            <Image
-              src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-              alt="Card placeholder"
-              fill
-              sizes="40px"
-              className="object-contain"
-            />
-          )}
-        </div>
+        <CardImage
+          src={item.cardImageUrl}
+          alt={item.cardName}
+          tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+          containerClassName="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100"
+          className="object-contain"
+        />
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex items-start justify-between gap-2">
@@ -190,6 +168,8 @@ function MovementMobileCard({
     </KidstopCard>
   );
 }
+
+const MovementMobileCard = memo(MovementMobileCardComponent);
 
 export default function MovementHistoryTable({
   items,

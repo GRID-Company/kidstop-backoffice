@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -49,6 +49,7 @@ export function usePurchases(): UsePurchasesReturn {
       },
     },
     fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
   });
 
   const purchases = useMemo(() => {
@@ -59,37 +60,37 @@ export function usePurchases(): UsePurchasesReturn {
   const totalCount = data?.purchases?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
 
-  const setStatusFilter = (status: PurchaseStatus | undefined) => {
+  const setStatusFilter = useCallback((status: PurchaseStatus | undefined) => {
     setFilters((prev) => ({ ...prev, status }));
     setPage(1);
-  };
+  }, []);
 
-  const setSearch = (search: string) => {
+  const setSearch = useCallback((search: string) => {
     setFilters((prev) => ({ ...prev, search }));
     setPage(1);
-  };
+  }, []);
 
-  const setSellerFilter = (sellerGuid: string | undefined) => {
+  const setSellerFilter = useCallback((sellerGuid: string | undefined) => {
     setFilters((prev) => ({ ...prev, sellerGuid }));
     setPage(1);
-  };
+  }, []);
 
-  const handleSetDateFrom = (from: string | undefined) => {
+  const handleSetDateFrom = useCallback((from: string | undefined) => {
     setDateFrom(from);
     setPage(1);
-  };
+  }, []);
 
-  const handleSetDateTo = (to: string | undefined) => {
+  const handleSetDateTo = useCallback((to: string | undefined) => {
     setDateTo(to);
     setPage(1);
-  };
+  }, []);
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
     setDateFrom(undefined);
     setDateTo(undefined);
     setPage(1);
-  };
+  }, []);
 
   const hasActiveFilters =
     !!filters.status ||
