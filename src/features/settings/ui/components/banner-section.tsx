@@ -71,6 +71,7 @@ export default function BannerSection({
           currentBannerGuid={banners.pokemon}
           onFileSelect={handlePokemonFileSelect}
           isLoading={isLoading || isSaving}
+          onClear={() => setPokemonFile(null)}
         />
 
         <Divider />
@@ -80,6 +81,7 @@ export default function BannerSection({
           currentBannerGuid={banners.magic}
           onFileSelect={handleMagicFileSelect}
           isLoading={isLoading || isSaving}
+          onClear={() => setMagicFile(null)}
         />
 
         <Divider />

@@ -9,6 +9,7 @@ interface BannerUploadDropzoneProps {
   currentBannerGuid?: string;
   onFileSelect: (file: File) => void;
   isLoading?: boolean;
+  onClear?: () => void;
 }
 
 export const BannerUploadDropzone = ({
@@ -16,6 +17,7 @@ export const BannerUploadDropzone = ({
   currentBannerGuid,
   onFileSelect,
   isLoading = false,
+  onClear,
 }: BannerUploadDropzoneProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -35,6 +37,13 @@ export const BannerUploadDropzone = ({
       refetchBanner();
     }
   }, [currentBannerGuid, refetchBanner]);
+
+  useEffect(() => {
+    if (!isLoading && selectedFile) {
+      setSelectedFile(null);
+      onClear?.();
+    }
+  }, [isLoading, selectedFile, onClear]);
 
   const currentBanner = bannerData?.getBanner;
 
