@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button, Card, CardBody, Spinner, Image } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useQuery } from '@apollo/client/react';
@@ -21,6 +21,7 @@ export const BannerUploadDropzone = ({
 }: BannerUploadDropzoneProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const prevLoadingRef = useRef(isLoading);
 
   const tcgLabel = tcg === 'pokemon' ? 'Pokémon' : 'Magic';
   const tcgIcon = tcg === 'pokemon' ? 'game-icons:pokeball' : 'game-icons:magic-swirl';
@@ -39,10 +40,11 @@ export const BannerUploadDropzone = ({
   }, [currentBannerGuid, refetchBanner]);
 
   useEffect(() => {
-    if (!isLoading && selectedFile) {
+    if (prevLoadingRef.current && !isLoading && selectedFile) {
       setSelectedFile(null);
       onClear?.();
     }
+    prevLoadingRef.current = isLoading;
   }, [isLoading, selectedFile, onClear]);
 
   const currentBanner = bannerData?.getBanner;
