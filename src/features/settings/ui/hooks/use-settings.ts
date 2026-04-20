@@ -11,7 +11,7 @@ import {
   UpdateBuyerBudgetDocument,
 } from '@/lib/api/generated/buyer-budgets.generated';
 import { UsersDocument } from '@/lib/api/generated/users.generated';
-import { UploadFileDocument } from '@/lib/api/generated/files.generated';
+import { UploadFileDocument, GetBannerDocument } from '@/lib/api/generated/files.generated';
 import { IGeofenceConfig, IOperatingHours, IThresholdConfig, IBannerConfig } from '../../domain/types';
 import {
   fromApiToSettings,
@@ -49,7 +49,13 @@ export function useSettings() {
 
   const [updateConfigMutation, { loading: updatingConfig }] = useMutation(
     UpdateGlobalConfigDocument,
-    { refetchQueries: [GlobalConfigDocument] }
+    {
+      refetchQueries: [
+        GlobalConfigDocument,
+        { query: GetBannerDocument, variables: { tcg: 'POKEMON' } },
+        { query: GetBannerDocument, variables: { tcg: 'MAGIC' } },
+      ],
+    }
   );
 
   const [updateBudgetMutation, { loading: updatingBudget }] = useMutation(
