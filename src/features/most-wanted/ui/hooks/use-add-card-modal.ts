@@ -41,9 +41,9 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
 
   const searchResults = useMemo(() => {
     if (selectedTCG === 'POKEMON') {
-      return pokemonCards.filter((card) => !existingCardGuids.has(card.guid));
+      return pokemonCards.filter((card: any) => !existingCardGuids.has(card.guid));
     } else if (selectedTCG === 'MAGIC') {
-      return magicCards.filter((card) => !existingCardGuids.has(card.guid));
+      return magicCards.filter((card: any) => !existingCardGuids.has(card.guid));
     }
     return [];
   }, [pokemonCards, magicCards, existingCardGuids, selectedTCG]);
