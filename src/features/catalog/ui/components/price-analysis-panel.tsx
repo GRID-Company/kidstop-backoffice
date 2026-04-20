@@ -15,7 +15,6 @@ import { CardCondition } from '../../domain/types';
 
 interface PriceAnalysisPanelProps {
   analysis: IPriceAnalysis[];
-  selectedItems?: IBulkLoadItem[];
 }
 
 const CARD_CONDITIONS = [
@@ -34,10 +33,9 @@ interface PriceAnalysisFormData {
   items: IPriceAnalysis[];
 }
 
-export default function PriceAnalysisPanel({ analysis, selectedItems: selectedItemsProp }: PriceAnalysisPanelProps) {
-  const { updateItemPrice, selectedItems: selectedItemsStore, toggleItemSelection } = useBulkLookupStore();
+export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps) {
+  const { updateItemPrice, selectedItems, toggleItemSelection } = useBulkLookupStore();
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
-  const selectedItems = selectedItemsProp || selectedItemsStore;
 
   const { control, watch } = useForm<PriceAnalysisFormData>({
     defaultValues: {

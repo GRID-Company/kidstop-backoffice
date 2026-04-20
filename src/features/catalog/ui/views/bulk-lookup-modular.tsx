@@ -218,7 +218,7 @@ export default function BulkLookupModular() {
           isDisabled={searchResults.length === 0}
         >
           <div className="flex flex-col gap-4">
-            <PriceAnalysisPanel analysis={priceAnalysis} selectedItems={selectedItems} />
+            <PriceAnalysisPanel analysis={priceAnalysis} />
 
             {selectedItems.length > 0 && (
               <>
