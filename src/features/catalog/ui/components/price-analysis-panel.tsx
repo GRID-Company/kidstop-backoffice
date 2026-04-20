@@ -51,6 +51,17 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
     [updateItemPrice]
   );
 
+  const handleStockChange = useCallback(
+    (cardGuid: string, condition: string, value: string) => {
+      const stock = parseInt(value);
+      if (!isNaN(stock) && stock > 0) {
+        // Stock is read-only from backend, but we can log it for now
+        console.log('Stock change requested:', { cardGuid, condition, stock });
+      }
+    },
+    []
+  );
+
   const columns: ITableColumn[] = useMemo(() => {
     return [
       {
@@ -70,7 +81,7 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
             />
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{item.cardName}</span>
-              <span className="text-xs text-default-400">Mercado: ${item.marketPrice?.toFixed(2) || '—'}</span>
+              <span className="text-xs text-default-400">Ref: ${item.marketPrice?.toFixed(2) || '—'}</span>
             </div>
           </div>
         ),
@@ -104,7 +115,19 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
         label: 'Stock',
         className: 'w-[100px]',
         customCol: (item: IPriceAnalysis) => (
-          <span className="text-sm">{item.quantity}</span>
+          <Input
+            aria-label="Stock"
+            type="number"
+            size="sm"
+            variant="bordered"
+            min={1}
+            value={String(item.quantity)}
+            onValueChange={(val) => handleStockChange(item.cardGuid, item.condition, val)}
+            classNames={{
+              inputWrapper: 'border-[1px] bg-white w-[80px]',
+              input: 'text-center',
+            }}
+          />
         ),
       },
       {
@@ -145,31 +168,27 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
         key: 'actions',
         label: '',
         className: 'w-[60px]',
-        customCol: (item: IPriceAnalysis) => (
-          <Tooltip content="Seleccionar">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              color={
-                selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition)
-                  ? 'success'
-                  : 'default'
-              }
-              onPress={() => toggleItemSelection(item.cardGuid, item.condition)}
-              aria-label={`Select ${item.cardName}`}
-            >
-              <Icon
-                icon={
-                  selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition)
-                    ? 'lucide:check-circle-2'
-                    : 'lucide:circle'
-                }
-                width={20}
-              />
-            </Button>
-          </Tooltip>
-        ),
+        customCol: (item: IPriceAnalysis) => {
+          const isSelected = selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition);
+          return (
+            <Tooltip content={isSelected ? 'Deseleccionar' : 'Seleccionar'}>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                className={isSelected ? 'bg-success-100' : 'bg-default-100'}
+                onPress={() => toggleItemSelection(item.cardGuid, item.condition)}
+                aria-label={`Select ${item.cardName}`}
+              >
+                <Icon
+                  icon={isSelected ? 'lucide:check-circle-2' : 'lucide:circle'}
+                  width={20}
+                  className={isSelected ? 'text-success-600' : 'text-default-400'}
+                />
+              </Button>
+            </Tooltip>
+          );
+        },
       },
     ];
   }, [selectedItems, toggleItemSelection, selectedTCG, handleConditionChange, handlePriceChange]);
