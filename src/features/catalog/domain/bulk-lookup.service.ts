@@ -15,6 +15,27 @@ export class BulkLookupService {
           return [];
         }
 
+        // If variantsMetrics is empty, create a single analysis entry with the market price
+        if (!metrics.variantsMetrics || metrics.variantsMetrics.length === 0) {
+          const currentPrice = card.sellPrice;
+          const marketPrice = this.getMarketPrice(metrics);
+
+          return [
+            {
+              cardGuid: card.guid,
+              cardName: card.name,
+              currentPrice,
+              suggestedPrice: card.sellPrice,
+              marketPrice,
+              margin: marketPrice && currentPrice ? marketPrice - currentPrice : null,
+              marginPercentage:
+                marketPrice && currentPrice ? ((marketPrice - currentPrice) / currentPrice) * 100 : null,
+              condition: 'Ungraded',
+              quantity: card.totalStock,
+            },
+          ];
+        }
+
         return metrics.variantsMetrics.map((variant) => {
           const currentPrice = this.getCurrentPrice(card, variant.condition);
           const suggestedPrice = card.sellPrice;
