@@ -69,7 +69,6 @@ export default function BulkLookupModular() {
         : await searchMagic({ searchText });
 
       setSearchResults(results);
-      setExpandedSections(['search', 'analyze']);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error during search');
     } finally {

@@ -67,7 +67,6 @@ export default function BulkLookupComplete() {
         : await searchMagic({ searchText });
 
       setSearchResults(results);
-      setCurrentStep('analyze');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error during search');
     } finally {
