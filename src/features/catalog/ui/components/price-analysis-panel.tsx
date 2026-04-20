@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardBody, Chip, Input, Tab, Tabs, Button } from '@heroui/react';
+import { Card, CardBody, Chip, Input, Tab, Tabs, Button, Checkbox } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 import { IPriceAnalysis } from '../../domain/bulk-lookup.types';
@@ -14,7 +14,7 @@ type FilterTab = 'all' | 'profitable' | 'loss' | 'neutral';
 
 export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps) {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
-  const { updateItemPrice, selectedItems } = useBulkLookupStore();
+  const { updateItemPrice, selectedItems, toggleItemSelection } = useBulkLookupStore();
 
   const filteredAnalysis = useMemo(() => {
     switch (activeTab) {
@@ -75,6 +75,7 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
               isSelected={selectedItems.some(
                 (s) => s.cardGuid === item.cardGuid && s.condition === item.condition
               )}
+              onToggleSelection={() => toggleItemSelection(item.cardGuid, item.condition)}
               onPriceChange={(sellPrice, purchasePrice) =>
                 updateItemPrice(item.cardGuid, item.condition, sellPrice, purchasePrice)
               }
@@ -89,10 +90,11 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
 interface PriceAnalysisRowProps {
   item: IPriceAnalysis;
   isSelected: boolean;
+  onToggleSelection: () => void;
   onPriceChange: (sellPrice: number, purchasePrice: number) => void;
 }
 
-function PriceAnalysisRow({ item, isSelected, onPriceChange }: PriceAnalysisRowProps) {
+function PriceAnalysisRow({ item, isSelected, onToggleSelection, onPriceChange }: PriceAnalysisRowProps) {
   const [editMode, setEditMode] = useState(false);
   const [sellPrice, setSellPrice] = useState(item.currentPrice?.toString() || '0');
 
@@ -113,6 +115,11 @@ function PriceAnalysisRow({ item, isSelected, onPriceChange }: PriceAnalysisRowP
 
   return (
     <div className="flex items-center gap-3 p-3 rounded-lg border border-default-200 hover:border-default-300 transition-colors">
+      <Checkbox
+        isSelected={isSelected}
+        onChange={onToggleSelection}
+        aria-label={`Select ${item.cardName}`}
+      />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-2">
           <p className="font-medium truncate">{item.cardName}</p>
