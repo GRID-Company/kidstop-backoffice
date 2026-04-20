@@ -8,9 +8,10 @@ import DeckListResultsTable from '../components/deck-list-results-table';
 import PriceAnalysisPanel from '../components/price-analysis-panel';
 import BulkLoadConfirmation from '../components/bulk-load-confirmation';
 import { useBulkLookupStore } from '../../adapters/store/bulk-lookup.store';
-import { useBulkLoadInventory } from '../../adapters/api/use-bulk-lookup';
+import { useBulkLoadInventory, useMagicBatchSearch, usePokemonBatchSearch, useMagicCardMetrics, usePokemonCardMetrics } from '../../adapters/api/use-bulk-lookup';
 import { BulkLookupService } from '../../domain/bulk-lookup.service';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
+import { parseDeckListText } from '../../domain/deck-list-parser';
 
 export default function BulkLookupModular() {
   const [expandedSections, setExpandedSections] = useState<string[]>(['search']);
@@ -35,6 +36,10 @@ export default function BulkLookupModular() {
 
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const { bulkLoad } = useBulkLoadInventory();
+  const { search: searchMagic } = useMagicBatchSearch();
+  const { search: searchPokemon } = usePokemonBatchSearch();
+  const { getMetrics: getMagicMetrics } = useMagicCardMetrics();
+  const { getMetrics: getPokemonMetrics } = usePokemonCardMetrics();
 
   const handleSearch = useCallback(async () => {
     if (!rawText.trim() || !selectedTCG) return;
@@ -43,21 +48,34 @@ export default function BulkLookupModular() {
     setError(null);
 
     try {
-      // TODO: Replace with actual API call when codegen is ready
-      console.log('Searching for cards:', { rawText, selectedTCG });
+      // Parse the deck list text
+      const parsedLines = parseDeckListText(rawText);
+      
+      if (parsedLines.length === 0) {
+        setError('No valid card lines found in the list');
+        setIsSearching(false);
+        return;
+      }
 
-      // Simulated delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Extract card names for batch search
+      const searchText = parsedLines
+        .filter((line) => line.isValid)
+        .map((line) => `${line.quantity} ${line.cardName} ${line.setCode} ${line.collectorNumber}`)
+        .join('\n');
 
-      // TODO: Parse results and call batch search query
-      setSearchResults([]);
+      // Call the appropriate batch search
+      const results = selectedTCG === 'POKEMON'
+        ? await searchPokemon({ searchText })
+        : await searchMagic({ searchText });
+
+      setSearchResults(results);
       setExpandedSections(['search', 'analyze']);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error during search');
     } finally {
       setIsSearching(false);
     }
-  }, [rawText, selectedTCG, setIsSearching, setError, setSearchResults, setExpandedSections]);
+  }, [rawText, selectedTCG, setIsSearching, setError, setSearchResults, setExpandedSections, searchMagic, searchPokemon]);
 
   const handleAnalyze = useCallback(async () => {
     if (searchResults.length === 0) return;
@@ -66,21 +84,31 @@ export default function BulkLookupModular() {
     setError(null);
 
     try {
-      // TODO: Fetch metrics for each card and enrich analysis
-      console.log('Fetching metrics for cards:', searchResults);
+      // Fetch metrics for each card
+      const metricsMap: Record<string, any> = {};
+      
+      for (const result of searchResults) {
+        if (result.bestMatch) {
+          const metrics = selectedTCG === 'POKEMON'
+            ? await getPokemonMetrics(result.bestMatch.guid)
+            : await getMagicMetrics(result.bestMatch.guid);
+          
+          if (metrics) {
+            metricsMap[result.bestMatch.guid] = metrics;
+          }
+        }
+      }
 
-      // Simulated delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // TODO: Call metrics queries and calculate analysis
-      setPriceAnalysis([]);
+      // Enrich results with metrics and calculate price analysis
+      const analysis = BulkLookupService.enrichWithMetrics(searchResults, metricsMap);
+      setPriceAnalysis(analysis);
       setExpandedSections(['search', 'analyze', 'confirm']);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error fetching metrics');
     } finally {
       setIsLoadingMetrics(false);
     }
-  }, [searchResults, setIsLoadingMetrics, setError, setPriceAnalysis, setExpandedSections]);
+  }, [searchResults, selectedTCG, setIsLoadingMetrics, setError, setPriceAnalysis, setExpandedSections, getMagicMetrics, getPokemonMetrics]);
 
   const handleConfirm = useCallback(async () => {
     if (selectedItems.length === 0) return;
