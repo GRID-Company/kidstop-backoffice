@@ -1,9 +1,6 @@
 'use client';
 
 import { useCallback, useMemo, useEffect } from 'react';
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Button,
   Tooltip,
@@ -17,6 +14,7 @@ import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { CardImage } from '@/shared/components/card-image';
 import { CardCondition, IPurchaseItem } from '../../domain/types';
 import {
   CARD_CONDITION_OPTIONS,
@@ -101,30 +99,15 @@ export default function PurchaseItemsTable({
         className: '!text-left min-w-[220px]',
         customCol: (item: IPurchaseItem) => (
           <div className="flex items-center gap-3">
-            {item.cardImageUrl ? (
-              <img
-                src={item.cardImageUrl}
-                alt={item.cardName}
-                className="h-12 w-9 rounded object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.style.display = 'none';
-                  const placeholder = img.nextElementSibling as HTMLElement;
-                  if (placeholder) placeholder.style.display = 'block';
-                }}
-              />
-            ) : null}
-            {!item.cardImageUrl && (
-              <div className="relative h-12 w-9 rounded overflow-hidden bg-default-100">
-                <Image
-                  src={item.tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-                  alt="Card placeholder"
-                  fill
-                  sizes="36px"
-                  className="object-cover"
-                />
-              </div>
-            )}
+            <CardImage
+              src={item.cardImageUrl}
+              alt={item.cardName}
+              tcgType={item.tcgType}
+              containerClassName="relative h-12 w-9 rounded overflow-hidden bg-default-100 flex-shrink-0"
+              className="object-cover"
+              fill
+              sizes="36px"
+            />
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{item.cardName}</span>
               <span className="text-xs text-default-400">
