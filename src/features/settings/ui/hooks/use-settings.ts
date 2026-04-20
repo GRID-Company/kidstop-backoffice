@@ -124,7 +124,10 @@ export function useSettings() {
   const updateBanners = useCallback(
     async (pokemonFile?: File, magicFile?: File) => {
       try {
-        const bannerGuids: IBannerConfig = {};
+        const bannerGuids: IBannerConfig = {
+          pokemon: settings?.bannerGuids?.pokemon,
+          magic: settings?.bannerGuids?.magic,
+        };
 
         if (pokemonFile) {
           const { data: pokemonData } = await uploadFileMutation({
@@ -163,7 +166,7 @@ export function useSettings() {
         throw error;
       }
     },
-    [uploadFileMutation, updateConfigMutation]
+    [uploadFileMutation, updateConfigMutation, settings?.bannerGuids]
   );
 
   return {
