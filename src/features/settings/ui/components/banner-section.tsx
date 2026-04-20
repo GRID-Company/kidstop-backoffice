@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Button, Divider } from '@heroui/react';
-import { Icon } from '@iconify/react';
+import { Divider } from '@heroui/react';
 import toast from 'react-hot-toast';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { IBannerConfig } from '../../domain/types';
 import { bannerSettingsSchema } from '../../adapters/forms/banner-settings.schema';
 import SettingsSection from './settings-section';
@@ -84,16 +84,15 @@ export default function BannerSection({
 
         <Divider />
 
-        <div className="flex justify-end gap-2">
-          <Button
-            color="primary"
-            startContent={<Icon icon="lucide:save" width={18} height={18} />}
+        <div className="flex justify-end">
+          <KidstopButton
+            variant="accent"
             onClick={handleSave}
             isLoading={isSaving}
-            disabled={!pokemonFile && !magicFile}
+            isDisabled={!pokemonFile && !magicFile}
           >
             Guardar Banners
-          </Button>
+          </KidstopButton>
         </div>
       </div>
     </SettingsSection>
