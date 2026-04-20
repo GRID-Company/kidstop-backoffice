@@ -102,6 +102,7 @@ query MagicCardPublicList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) 
   - `name`: Card name
   - `edition`: Edition/set name
   - `collectorNumber`: Collector number in set
+  - `rarity`: Card rarity (nullable)
   - `isFoil`: Whether the card is foil
   - `sellPrice`: Current sell price
   - `availableStock`: Whether stock is available (boolean)
@@ -330,7 +331,54 @@ query MagicCardInternalDetail($guid: UUID!) {
 
 ---
 
-### 8. Get Card with Metrics (Internal)
+### 8. Get Top 5 Best-Selling Magic Cards
+
+**Query:** `magicTopSoldCards`
+**Type:** Public
+**Description:** Returns the 5 all-time best-selling Magic cards ranked by total quantity sold across all completed sales, grouped by card (all conditions combined).
+
+```graphql
+query MagicTopSoldCards {
+  magicTopSoldCards {
+    guid
+    name
+    edition
+    collectorNumber
+    rarity
+    isFoil
+    imageUri
+    sellPrice
+    availableStock
+    totalStock
+    totalSold
+  }
+}
+```
+
+**Response Fields:**
+
+- `guid`: Unique card identifier
+- `name`: Card name
+- `edition`: Edition/set name (nullable)
+- `collectorNumber`: Collector number in set (nullable)
+- `rarity`: Card rarity (nullable)
+- `isFoil`: Whether the card is foil
+- `imageUri`: Card image URL (nullable)
+- `sellPrice`: Lowest current sell price across all conditions (nullable)
+- `availableStock`: Whether any stock is currently available (boolean)
+- `totalStock`: Total units in stock across all conditions
+- `totalSold`: Total number of completed sales this card appears in
+
+**Notes:**
+
+- Results are ordered by `totalSold` descending (most sold first)
+- Aggregation groups by card — all conditions are collapsed into one result per card
+- Only `COMPLETED` sales are counted toward `totalSold`
+- No authentication required
+
+---
+
+### 9. Get Card with Metrics (Internal)
 
 **Query:** `magicCardWithMetrics`
 **Type:** Internal (Requires Authentication)
@@ -570,6 +618,185 @@ const SearchableMagicCardList: React.FC = () => {
   );
 };
 ```
+
+---
+
+### 8. Batch Search Cards
+
+**Query:** `magicBatchCardSearch`
+**Type:** Internal (requires authentication)
+**Roles:** ADMIN, BUYER, RECEPTION
+**Description:** Search multiple Magic cards from multiline text in Moxfield format
+
+```graphql
+query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
+  magicBatchCardSearch(input: $input) {
+    results {
+      originalLine
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      relatedCards {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      error
+    }
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "input": {
+    "searchText": "1 Rin and Seri, Inseparable (SLD) 1910\n1 Ajani, the Greathearted (PLST) WAR-184\n1 Impact Tremors (FDN) 717 *F*\n1 Mirri, Weatherlight Duelist (CMM) 585 *E*"
+  }
+}
+```
+
+**Input Format (Moxfield):**
+
+```
+[cantidad] [nombre] ([set]) [número] [*suffix*]
+```
+
+**Examples:**
+- `1 Rin and Seri, Inseparable (SLD) 1910`
+- `1 Impact Tremors (FDN) 717 *F*` (foil marker removed before search)
+- `1 Mirri, Weatherlight Duelist (CMM) 585 *E*` (etched marker removed)
+
+**Special Handling:**
+- Suffix markers (`*F*`, `*E*`, etc.) are automatically removed before searching
+- Empty lines are ignored
+- Set codes are extracted from parentheses
+
+**Response Fields:**
+
+- `originalLine`: The original input line
+- `parsedName`: Extracted card name
+- `parsedSet`: Extracted set/edition code
+- `parsedNumber`: Extracted collector number
+- `bestMatch`: The top matching card with full inventory details
+- `relatedCards`: Up to 3 additional related cards
+- `error`: Error message if search failed for this line
+
+**Use Cases:**
+
+1. **Bulk Card Lookup:** Paste a decklist from Moxfield and get all card details
+2. **Inventory Check:** See available stock and conditions for multiple cards at once
+3. **Price Verification:** Check purchase and sell prices across multiple cards
+4. **Foil Detection:** Automatically handles foil and special finish markers
+
+**TypeScript Example:**
+
+```typescript
+import { gql, useLazyQuery } from '@apollo/client';
+
+const BATCH_SEARCH_MAGIC = gql`
+  query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
+    magicBatchCardSearch(input: $input) {
+      results {
+        originalLine
+        parsedName
+        bestMatch {
+          guid
+          name
+          edition
+          isFoil
+          totalStock
+          inventoryCards {
+            condition
+            stock
+            sellPrice
+          }
+        }
+        error
+      }
+    }
+  }
+`;
+
+const BatchSearchComponent = () => {
+  const [searchCards, { data, loading }] = useLazyQuery(BATCH_SEARCH_MAGIC);
+
+  const handlePaste = (decklistText: string) => {
+    searchCards({
+      variables: {
+        input: { searchText: decklistText }
+      }
+    });
+  };
+
+  return (
+    <div>
+      <textarea 
+        placeholder="Paste your Moxfield decklist here..."
+        onPaste={(e) => handlePaste(e.clipboardData.getData('text'))}
+      />
+      {loading && <p>Searching...</p>}
+      {data?.magicBatchCardSearch.results.map((result, idx) => (
+        <div key={idx}>
+          <h4>{result.parsedName}</h4>
+          {result.bestMatch ? (
+            <div>
+              <p>
+                {result.bestMatch.edition} 
+                {result.bestMatch.isFoil && ' (Foil)'}
+              </p>
+              <p>Stock: {result.bestMatch.totalStock}</p>
+              <ul>
+                {result.bestMatch.inventoryCards.map(inv => (
+                  <li key={inv.guid}>
+                    {inv.condition}: {inv.stock} @ ${inv.sellPrice}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="error">{result.error}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+---
 
 ## Error Handling
 
