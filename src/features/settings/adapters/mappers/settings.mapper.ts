@@ -4,6 +4,7 @@ import {
   DEFAULT_GEOFENCE_CONFIG,
   DEFAULT_OPERATING_HOURS,
   DEFAULT_THRESHOLDS,
+  DEFAULT_BANNER_CONFIG,
 } from '../../domain/constants';
 import {
   IGeofenceConfig,
@@ -11,6 +12,7 @@ import {
   IOperatingHoursSlot,
   ISettings,
   IThresholdConfig,
+  IBannerConfig,
 } from '../../domain/types';
 
 type ApiTime = {
@@ -100,6 +102,16 @@ export function fromApiToOperatingHours(
   };
 }
 
+export function fromApiBanners(
+  banners: any
+): IBannerConfig {
+  if (!banners) return DEFAULT_BANNER_CONFIG;
+  return {
+    pokemon: banners.pokemon || undefined,
+    magic: banners.magic || undefined,
+  };
+}
+
 export function fromApiToSettings(
   api: GlobalConfigQuery['globalConfig']
 ): ISettings {
@@ -108,6 +120,7 @@ export function fromApiToSettings(
     geofence: fromApiToGeofence(api.config.geofence),
     thresholds: fromApiToThresholds(api.config),
     operatingHours: fromApiToOperatingHours(api.config.operationSchedule),
+    bannerGuids: fromApiBanners((api.config as any).bannerGuids),
     createdDate: String(api.createdDate),
     updatedDate: String(api.updatedDate),
   };

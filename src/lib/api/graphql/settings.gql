@@ -40,6 +40,10 @@ query GlobalConfig {
           closing { hour minute period }
         }
       }
+      bannerGuids {
+        pokemon
+        magic
+      }
     }
     createdDate
     updatedDate

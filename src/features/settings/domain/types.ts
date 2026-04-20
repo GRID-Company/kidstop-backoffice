@@ -46,15 +46,22 @@ export interface IBudgetConfig {
   buyer: IBudgetBuyer;
 }
 
+export interface IBannerConfig {
+  pokemon?: string;
+  magic?: string;
+}
+
 export interface ISettings {
   guid: string;
   geofence: IGeofenceConfig | null;
   thresholds: IThresholdConfig;
   operatingHours: IOperatingHours | null;
+  bannerGuids?: IBannerConfig;
   createdDate: string;
   updatedDate: string;
 }
 
 export type SettingsSection =
   | 'general'
-  | 'budgets';
+  | 'budgets'
+  | 'banners';
