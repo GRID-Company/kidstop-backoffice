@@ -24,11 +24,17 @@ export const BannerUploadDropzone = ({
   const tcgIcon = tcg === 'pokemon' ? 'game-icons:pokeball' : 'game-icons:magic-swirl';
   const tcgType = tcg === 'pokemon' ? 'POKEMON' : 'MAGIC';
 
-  const { data: bannerData, loading: bannerLoading } = useQuery(GetBannerDocument, {
+  const { data: bannerData, loading: bannerLoading, refetch: refetchBanner } = useQuery(GetBannerDocument, {
     variables: { tcg: tcgType as any },
     skip: !currentBannerGuid,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
+
+  useEffect(() => {
+    if (currentBannerGuid) {
+      refetchBanner();
+    }
+  }, [currentBannerGuid, refetchBanner]);
 
   const currentBanner = bannerData?.getBanner;
 

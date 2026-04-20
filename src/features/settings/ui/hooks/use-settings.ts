@@ -55,6 +55,7 @@ export function useSettings() {
         { query: GetBannerDocument, variables: { tcg: 'POKEMON' } },
         { query: GetBannerDocument, variables: { tcg: 'MAGIC' } },
       ],
+      awaitRefetchQueries: true,
     }
   );
 
