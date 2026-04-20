@@ -2,8 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { Button, Tooltip, Select, SelectItem, Input } from '@heroui/react';
-import { Icon } from '@iconify/react';
+import { Select, SelectItem, Input } from '@heroui/react';
 import { IPriceAnalysis, IBulkLoadItem } from '../../domain/bulk-lookup.types';
 import { useBulkLookupStore } from '../../adapters/store/bulk-lookup.store';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -12,25 +11,18 @@ import { ITableColumn } from '@/lib/types/datatable.types';
 import { CardImage } from '@/shared/components/card-image';
 import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { CardCondition } from '../../domain/types';
+import CheckboxForm from '@/shared/base/form-controls/checkbox-form';
 
 interface PriceAnalysisPanelProps {
   analysis: IPriceAnalysis[];
 }
 
-const CARD_CONDITIONS = [
-  { value: 'Mint', label: 'Mint' },
-  { value: 'NearMint', label: 'Near Mint' },
-  { value: 'Excellent', label: 'Excellent' },
-  { value: 'Good', label: 'Good' },
-  { value: 'Light Play', label: 'Light Play' },
-  { value: 'Moderate Play', label: 'Moderate Play' },
-  { value: 'Heavy Play', label: 'Heavy Play' },
-  { value: 'Damaged', label: 'Damaged' },
-  { value: 'Ungraded', label: 'Ungraded' },
-];
+interface PriceAnalysisItemWithSelection extends IPriceAnalysis {
+  isSelected?: boolean;
+}
 
 interface PriceAnalysisFormData {
-  items: IPriceAnalysis[];
+  items: PriceAnalysisItemWithSelection[];
 }
 
 export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps) {
@@ -39,7 +31,10 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
 
   const { control, watch } = useForm<PriceAnalysisFormData>({
     defaultValues: {
-      items: analysis,
+      items: analysis.map((item) => ({
+        ...item,
+        isSelected: selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition),
+      })),
     },
   });
 
@@ -84,7 +79,7 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
   );
 
   const columns: ITableColumn[] = useMemo(() => {
-    const createColumns = (fieldIndex: number) => [
+    const createColumns = (fieldIndex: number): any[] => [
       {
         key: 'card',
         label: 'Carta',
@@ -125,7 +120,7 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
               trigger: 'border-[1px] bg-white min-w-[140px]',
             }}
           >
-            {CARD_CONDITIONS.map((opt) => (
+            {CARD_CONDITION_OPTIONS.map((opt) => (
               <SelectItem key={opt.value}>{opt.label}</SelectItem>
             ))}
           </Select>
@@ -186,28 +181,25 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
         ),
       },
       {
-        key: 'actions',
+        key: 'select',
         label: '',
-        className: 'w-[60px]',
-        customCol: (item: IPriceAnalysis) => {
-          const isSelected = selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition);
+        className: 'w-[50px]',
+        customCol: (item: PriceAnalysisItemWithSelection, index: number) => {
+          const fieldIndex = fields.findIndex((f) => f.id === item.guid);
           return (
-            <Tooltip content={isSelected ? 'Deseleccionar' : 'Seleccionar'}>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="flat"
-                className={isSelected ? 'bg-success-100' : 'bg-default-100'}
-                onPress={() => toggleItemSelection(item.cardGuid, item.condition)}
-                aria-label={`Select ${item.cardName}`}
-              >
-                <Icon
-                  icon={isSelected ? 'lucide:check-circle-2' : 'lucide:circle'}
-                  width={20}
-                  className={isSelected ? 'text-success-600' : 'text-default-400'}
-                />
-              </Button>
-            </Tooltip>
+            <CheckboxForm
+              controlProps={{
+                name: `items.${fieldIndex}.isSelected`,
+                control,
+              }}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  toggleItemSelection(item.cardGuid, item.condition);
+                } else {
+                  toggleItemSelection(item.cardGuid, item.condition);
+                }
+              }}
+            />
           );
         },
       },
