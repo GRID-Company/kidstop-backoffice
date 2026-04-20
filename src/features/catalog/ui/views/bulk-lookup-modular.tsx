@@ -99,8 +99,13 @@ export default function BulkLookupModular() {
         }
       }
 
+      console.log('Metrics map:', metricsMap);
+      console.log('Search results:', searchResults);
+
       // Enrich results with metrics and calculate price analysis
       const analysis = BulkLookupService.enrichWithMetrics(searchResults, metricsMap);
+      console.log('Price analysis:', analysis);
+      
       setPriceAnalysis(analysis);
       setExpandedSections(['search', 'analyze', 'confirm']);
     } catch (err) {

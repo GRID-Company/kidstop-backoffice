@@ -100,16 +100,20 @@ export default function BulkLookupComplete() {
         }
       }
 
+      console.log('Metrics map:', metricsMap);
+      console.log('Search results:', searchResults);
+
       // Enrich results with metrics and calculate price analysis
       const analysis = BulkLookupService.enrichWithMetrics(searchResults, metricsMap);
+      console.log('Price analysis:', analysis);
+      
       setPriceAnalysis(analysis);
-      setCurrentStep('confirm');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error fetching metrics');
     } finally {
       setIsLoadingMetrics(false);
     }
-  }, [searchResults, selectedTCG, setIsLoadingMetrics, setError, setPriceAnalysis, setCurrentStep, getMagicMetrics, getPokemonMetrics]);
+  }, [searchResults, selectedTCG, setIsLoadingMetrics, setError, setPriceAnalysis, getMagicMetrics, getPokemonMetrics]);
 
   const handleConfirm = useCallback(async () => {
     if (selectedItems.length === 0) return;
@@ -216,7 +220,10 @@ export default function BulkLookupComplete() {
                   </p>
                   <Button
                     color="primary"
-                    onPress={handleAnalyze}
+                    onPress={async () => {
+                      await handleAnalyze();
+                      setCurrentStep('analyze');
+                    }}
                     isLoading={isLoadingMetrics}
                   >
                     Continuar al análisis
