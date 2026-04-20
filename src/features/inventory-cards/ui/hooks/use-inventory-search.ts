@@ -82,7 +82,7 @@ export function useInventorySearch() {
         },
       },
     },
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-and-network',
     notifyOnNetworkStatusChange: true,
   });
 

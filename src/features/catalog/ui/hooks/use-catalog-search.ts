@@ -42,26 +42,37 @@ export function useCatalogSearch({
     variables: vars,
     fetchPolicy: 'cache-and-network',
     skip,
+    notifyOnNetworkStatusChange: true,
   });
 
   const { data: collectionsData, loading: collectionsLoading } = useQuery(
     collectionsDocument,
-    { fetchPolicy: 'cache-first', skip }
+    { 
+      fetchPolicy: 'cache-first',
+      skip,
+      notifyOnNetworkStatusChange: false,
+    }
   );
 
   const { data: raritiesData, loading: raritiesLoading } = useQuery(
     raritiesDocument,
-    { fetchPolicy: 'cache-first', skip }
+    { 
+      fetchPolicy: 'cache-first',
+      skip,
+      notifyOnNetworkStatusChange: false,
+    }
   );
 
   const { data: variantsData } = useQuery(variantsDocument || listDocument, {
     fetchPolicy: 'cache-first',
     skip: !variantsDocument || skip,
+    notifyOnNetworkStatusChange: false,
   });
 
   const { data: genresData } = useQuery(genresDocument || listDocument, {
     fetchPolicy: 'cache-first',
     skip: !genresDocument || skip,
+    notifyOnNetworkStatusChange: false,
   });
 
   // Extract cards from data - assumes data has a key like 'pokemonCardInternalList' or 'magicCardInternalList'

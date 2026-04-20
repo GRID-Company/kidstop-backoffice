@@ -49,6 +49,7 @@ export function usePurchases(): UsePurchasesReturn {
       },
     },
     fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
   });
 
   const purchases = useMemo(() => {
