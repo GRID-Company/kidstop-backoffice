@@ -235,7 +235,7 @@ export default function BulkLookupComplete() {
 
         {currentStep === 'analyze' && (
           <>
-            <PriceAnalysisPanel analysis={priceAnalysis} />
+            <PriceAnalysisPanel analysis={priceAnalysis} selectedItems={selectedItems} />
             {selectedItems.length > 0 && (
               <div className="flex gap-2">
                 <Button

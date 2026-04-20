@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react';
 import { Button, Tooltip, Select, SelectItem, Input } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { IPriceAnalysis } from '../../domain/bulk-lookup.types';
+import { IPriceAnalysis, IBulkLoadItem } from '../../domain/bulk-lookup.types';
 import { useBulkLookupStore } from '../../adapters/store/bulk-lookup.store';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -14,6 +14,7 @@ import { CardCondition } from '../../domain/types';
 
 interface PriceAnalysisPanelProps {
   analysis: IPriceAnalysis[];
+  selectedItems?: IBulkLoadItem[];
 }
 
 const CARD_CONDITIONS = [
@@ -28,9 +29,10 @@ const CARD_CONDITIONS = [
   { value: 'Ungraded', label: 'Ungraded' },
 ];
 
-export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps) {
-  const { updateItemPrice, selectedItems, toggleItemSelection } = useBulkLookupStore();
+export default function PriceAnalysisPanel({ analysis, selectedItems: selectedItemsProp }: PriceAnalysisPanelProps) {
+  const { updateItemPrice, selectedItems: selectedItemsStore, toggleItemSelection } = useBulkLookupStore();
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
+  const selectedItems = selectedItemsProp || selectedItemsStore;
 
   const handleConditionChange = useCallback(
     (cardGuid: string, condition: string, newCondition: string) => {
