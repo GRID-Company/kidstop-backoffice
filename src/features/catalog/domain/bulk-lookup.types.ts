@@ -1,19 +1,54 @@
 import { IDeckListResolvedLine } from './deck-list-parser.types';
 import { IPokemonCard, IMagicCard } from './types';
 
+export interface IBatchCardVariant {
+  guid: string;
+  condition: string;
+  stock: number;
+  purchasePrice: number | null;
+  sellPrice: number | null;
+}
+
+export interface IBatchMagicCard {
+  guid: string;
+  name: string;
+  edition: string | null;
+  collectorNumber: string | null;
+  isFoil: boolean;
+  sellPrice: number | null;
+  availableStock: boolean;
+  totalStock: number;
+  imageUri: string | null;
+  inventoryCards: IBatchCardVariant[] | null;
+}
+
+export interface IBatchPokemonCard {
+  guid: string;
+  name: string;
+  cardNumber: string | null;
+  setName: string | null;
+  setCode: string | null;
+  sellPrice: number | null;
+  availableStock: boolean;
+  totalStock: number;
+  imageUri: string | null;
+  inventoryCards: IBatchCardVariant[] | null;
+}
+
 export interface IBatchSearchResult {
   originalLine: string;
-  parsedName: string;
-  parsedSet: string;
-  parsedNumber: string;
-  bestMatch: IPokemonCard | IMagicCard | null;
-  relatedCards: (IPokemonCard | IMagicCard)[];
+  parsedName: string | null;
+  parsedSet: string | null;
+  parsedNumber: string | null;
+  bestMatch: IBatchMagicCard | IBatchPokemonCard | null;
+  relatedCards: (IBatchMagicCard | IBatchPokemonCard)[];
+  error?: string;
 }
 
 export interface ICardMetrics {
   condition: string;
   stock: number;
-  lastSellDate: string | null;
+  lastSellDate: string | null | unknown;
   avgDaysInInventory: number | null;
   wishlistCount: number;
 }

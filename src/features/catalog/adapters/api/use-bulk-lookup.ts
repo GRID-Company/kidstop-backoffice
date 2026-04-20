@@ -1,112 +1,158 @@
-import { useCallback } from 'react';
+import { useLazyQuery } from '@apollo/client/react';
+import { useCallback, useState } from 'react';
 import { IBatchSearchResult, IPokemonCardMetricsResponse, IMagicCardMetricsResponse } from '../../domain/bulk-lookup.types';
 import type {
   BulkSearchMagicCardsQuery,
+  BulkSearchMagicCardsQueryVariables,
   BulkSearchPokemonCardsQuery,
+  BulkSearchPokemonCardsQueryVariables,
   BulkMagicCardMetricsQuery,
+  BulkMagicCardMetricsQueryVariables,
   BulkPokemonCardMetricsQuery,
+  BulkPokemonCardMetricsQueryVariables,
+} from '@/lib/api/generated/bulk-lookup.generated';
+import {
+  BulkSearchMagicCardsDocument,
+  BulkSearchPokemonCardsDocument,
+  BulkMagicCardMetricsDocument,
+  BulkPokemonCardMetricsDocument,
 } from '@/lib/api/generated/bulk-lookup.generated';
 
 interface BatchSearchInput {
-  lines: string[];
+  searchText: string;
 }
 
 export function useMagicBatchSearch() {
-  // TODO: Replace with actual Apollo useLazyQuery when backend is ready
-  const search = useCallback(
+  const [search, { loading, error }] = useLazyQuery<
+    BulkSearchMagicCardsQuery,
+    BulkSearchMagicCardsQueryVariables
+  >(BulkSearchMagicCardsDocument);
+
+  const execute = useCallback(
     async (input: BatchSearchInput): Promise<IBatchSearchResult[]> => {
-      console.log('Magic batch search:', input);
-      // TODO: Call Apollo query with input
-      // const { data } = await magicBatchCardSearch({ variables: { input } });
-      return [];
+      try {
+        const { data } = await search({ variables: { input } });
+        return data?.magicBatchCardSearch?.results ?? [];
+      } catch (err) {
+        console.error('Magic batch search error:', err);
+        return [];
+      }
     },
-    []
+    [search]
   );
 
   return {
-    search,
-    loading: false,
-    error: null,
+    search: execute,
+    loading,
+    error,
   };
 }
 
 export function usePokemonBatchSearch() {
-  // TODO: Replace with actual Apollo useLazyQuery when backend is ready
-  const search = useCallback(
+  const [search, { loading, error }] = useLazyQuery<
+    BulkSearchPokemonCardsQuery,
+    BulkSearchPokemonCardsQueryVariables
+  >(BulkSearchPokemonCardsDocument);
+
+  const execute = useCallback(
     async (input: BatchSearchInput): Promise<IBatchSearchResult[]> => {
-      console.log('Pokemon batch search:', input);
-      // TODO: Call Apollo query with input
-      // const { data } = await pokemonBatchCardSearch({ variables: { input } });
-      return [];
+      try {
+        const { data } = await search({ variables: { input } });
+        return data?.pokemonBatchCardSearch?.results ?? [];
+      } catch (err) {
+        console.error('Pokemon batch search error:', err);
+        return [];
+      }
     },
-    []
+    [search]
   );
 
   return {
-    search,
-    loading: false,
-    error: null,
+    search: execute,
+    loading,
+    error,
   };
 }
 
 export function useMagicCardMetrics() {
-  // TODO: Replace with actual Apollo useLazyQuery when backend is ready
-  const getMetrics = useCallback(
+  const [getMetrics, { loading, error }] = useLazyQuery<
+    BulkMagicCardMetricsQuery,
+    BulkMagicCardMetricsQueryVariables
+  >(BulkMagicCardMetricsDocument);
+
+  const execute = useCallback(
     async (guid: string): Promise<IMagicCardMetricsResponse | null> => {
-      console.log('Magic card metrics:', guid);
-      // TODO: Call Apollo query with guid
-      // const { data } = await bulkMagicCardMetrics({ variables: { guid } });
-      return null;
+      try {
+        const { data } = await getMetrics({ variables: { guid } });
+        return data?.magicCardWithMetrics ?? null;
+      } catch (err) {
+        console.error('Magic card metrics error:', err);
+        return null;
+      }
     },
-    []
+    [getMetrics]
   );
 
   return {
-    getMetrics,
-    loading: false,
-    error: null,
+    getMetrics: execute,
+    loading,
+    error,
   };
 }
 
 export function usePokemonCardMetrics() {
-  // TODO: Replace with actual Apollo useLazyQuery when backend is ready
-  const getMetrics = useCallback(
+  const [getMetrics, { loading, error }] = useLazyQuery<
+    BulkPokemonCardMetricsQuery,
+    BulkPokemonCardMetricsQueryVariables
+  >(BulkPokemonCardMetricsDocument);
+
+  const execute = useCallback(
     async (guid: string): Promise<IPokemonCardMetricsResponse | null> => {
-      console.log('Pokemon card metrics:', guid);
-      // TODO: Call Apollo query with guid
-      // const { data } = await bulkPokemonCardMetrics({ variables: { guid } });
-      return null;
+      try {
+        const { data } = await getMetrics({ variables: { guid } });
+        return data?.pokemonCardWithMetrics ?? null;
+      } catch (err) {
+        console.error('Pokemon card metrics error:', err);
+        return null;
+      }
     },
-    []
+    [getMetrics]
   );
 
   return {
-    getMetrics,
-    loading: false,
-    error: null,
+    getMetrics: execute,
+    loading,
+    error,
   };
 }
 
 export function useBulkLoadInventory() {
   // TODO: Uncomment when backend mutation is ready
+  const [isLoading, setIsLoading] = useState(false);
+
   const bulkLoad = useCallback(
     async (payload: any) => {
-      console.log('Bulk load inventory:', payload);
-      // TODO: Call Apollo mutation when backend is ready
-      // const { data } = await bulkLoadInventory({ variables: { input: payload } });
-      return {
-        success: false,
-        createdCount: 0,
-        updatedCount: 0,
-        errors: ['Backend mutation not yet implemented'],
-      };
+      setIsLoading(true);
+      try {
+        console.log('Bulk load inventory:', payload);
+        // TODO: Call Apollo mutation when backend is ready
+        // const { data } = await bulkLoadInventory({ variables: { input: payload } });
+        return {
+          success: false,
+          createdCount: 0,
+          updatedCount: 0,
+          errors: ['Backend mutation not yet implemented'],
+        };
+      } finally {
+        setIsLoading(false);
+      }
     },
     []
   );
 
   return {
     bulkLoad,
-    loading: false,
+    loading: isLoading,
     error: null,
   };
 }
