@@ -1,5 +1,8 @@
 'use client';
 
+import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Drawer,
   DrawerContent,
@@ -56,7 +59,13 @@ export default function MovementDetailDrawer({
                   className="absolute inset-0 h-full w-full object-contain"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-2xl">🃏</div>
+                <Image
+                  src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+                  alt="Card placeholder"
+                  fill
+                  sizes="48px"
+                  className="object-contain"
+                />
               )}
             </div>
             <div className="min-w-0 flex-1">

@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Drawer,
   DrawerContent,
@@ -100,9 +102,13 @@ export default function MagicCardDetailModal({
                   className="absolute inset-0 h-full w-full object-contain p-1"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-default-400">
-                  <span className="text-5xl">🃏</span>
-                </div>
+                <Image
+                  src={magicCardPlaceholder}
+                  alt="Magic card placeholder"
+                  fill
+                  sizes="160px"
+                  className="object-contain p-1"
+                />
               )}
             </div>
 

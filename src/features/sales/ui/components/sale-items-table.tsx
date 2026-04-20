@@ -1,6 +1,9 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import { Chip } from '@heroui/react';
 
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -34,6 +37,10 @@ function getCardImageUri(row: ISaleItem): string | null {
   return row.pokemonCardSummary?.imageUri ?? row.magicCardSummary?.imageUri ?? null;
 }
 
+function getCardTCG(row: ISaleItem): 'POKEMON' | 'MAGIC' {
+  return row.pokemonCardSummary ? 'POKEMON' : 'MAGIC';
+}
+
 function getSetInfo(row: ISaleItem): string {
   if (row.pokemonCardSummary) {
     const { setName, setCode } = row.pokemonCardSummary;
@@ -52,6 +59,7 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   image: (row) => {
     const imageUri = getCardImageUri(row);
     const cardName = getCardName(row);
+    const tcg = getCardTCG(row);
     return (
       <div className="relative mx-auto h-10 w-10 overflow-hidden rounded bg-default-100">
         {imageUri ? (
@@ -61,9 +69,13 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
             className="absolute inset-0 h-full w-full object-contain"
           />
         ) : (
-          <span className="flex h-full items-center justify-center text-lg">
-            🃏
-          </span>
+          <Image
+            src={tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+            alt="Card placeholder"
+            fill
+            sizes="40px"
+            className="object-contain"
+          />
         )}
       </div>
     );

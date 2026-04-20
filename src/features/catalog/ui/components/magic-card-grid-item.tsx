@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import { Card, CardBody, CardFooter, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { IMagicCard } from '../../domain/types';
@@ -27,9 +29,13 @@ export default function MagicCardGridItem({ card, onPress }: MagicCardGridItemPr
               className="absolute inset-0 h-full w-full object-contain p-2"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-default-400">
-              <span className="text-6xl">🃏</span>
-            </div>
+            <Image
+              src={magicCardPlaceholder}
+              alt="Magic card placeholder"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-contain p-2"
+            />
           )}
 
           {card.isFoil && (
