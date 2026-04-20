@@ -1,0 +1,132 @@
+query BulkSearchMagicCards($input: BatchSearchMagicCardsInput!) {
+  magicBatchCardSearch(input: $input) {
+    results {
+      originalLine
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      relatedCards {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+    }
+  }
+}
+
+query BulkSearchPokemonCards($input: BatchSearchPokemonCardsInput!) {
+  pokemonBatchCardSearch(input: $input) {
+    results {
+      originalLine
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        cardNumber
+        setName
+        setCode
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      relatedCards {
+        guid
+        name
+        cardNumber
+        setName
+        setCode
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+    }
+  }
+}
+
+query BulkMagicCardMetrics($guid: String!) {
+  magicCardWithMetrics(guid: $guid) {
+    variantsMetrics {
+      condition
+      stock
+      lastSellDate
+      avgDaysInInventory
+      wishlistCount
+    }
+    priceRetail
+    priceBuy
+  }
+}
+
+query BulkPokemonCardMetrics($guid: String!) {
+  pokemonCardWithMetrics(guid: $guid) {
+    variantsMetrics {
+      condition
+      stock
+      lastSellDate
+      avgDaysInInventory
+      wishlistCount
+    }
+    ungradedPrice
+    gradedPriceSeven
+    gradedPriceEightOrAbove
+  }
+}
+
+# TODO: Uncomment when backend mutation is ready
+# mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
+#   bulkLoadInventory(input: $input) {
+#     success
+#     createdCount
+#     updatedCount
+#     errors
+#   }
+# }

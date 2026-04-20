@@ -1,8 +1,16 @@
 'use client';
 
+import { useState } from 'react';
+import { Tabs, Tab } from '@heroui/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
+import BulkLookupComplete from './bulk-lookup-complete';
+import BulkLookupModular from './bulk-lookup-modular';
+
+type ViewMode = 'complete' | 'modular';
 
 export default function DeckBuilder() {
+  const [viewMode, setViewMode] = useState<ViewMode>('complete');
+
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="Buscador Avanzado">
@@ -10,11 +18,22 @@ export default function DeckBuilder() {
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
-        <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
-          <p className="text-lg font-semibold text-foreground">Módulo en construcción</p>
-          <p className="text-sm text-default-500">
-            El Buscador Avanzado está siendo trabajado. Estará disponible próximamente.
-          </p>
+        <div className="w-full">
+          <Tabs
+            selectedKey={viewMode}
+            onSelectionChange={(key) => setViewMode(key as ViewMode)}
+            aria-label="Modo de búsqueda"
+            color="primary"
+            variant="underlined"
+            className="mb-6"
+          >
+            <Tab key="complete" title="Flujo Completo">
+              <BulkLookupComplete />
+            </Tab>
+            <Tab key="modular" title="Flujo Modular">
+              <BulkLookupModular />
+            </Tab>
+          </Tabs>
         </div>
       </EntitiesPage.CardContainer>
     </EntitiesPage>
