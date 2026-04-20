@@ -67,6 +67,7 @@ export interface IMagicCardMetricsResponse {
 }
 
 export interface IPriceAnalysis {
+  guid?: string;
   cardGuid: string;
   cardName: string;
   currentPrice: number | null;

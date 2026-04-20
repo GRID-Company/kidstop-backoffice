@@ -22,6 +22,7 @@ export class BulkLookupService {
 
           return [
             {
+              guid: `${card.guid}-ungraded`,
               cardGuid: card.guid,
               cardName: card.name,
               currentPrice,
@@ -42,6 +43,7 @@ export class BulkLookupService {
           const marketPrice = this.getMarketPrice(metrics);
 
           return {
+            guid: `${card.guid}-${variant.condition}`,
             cardGuid: card.guid,
             cardName: card.name,
             currentPrice,
