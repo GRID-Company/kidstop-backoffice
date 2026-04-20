@@ -30,9 +30,9 @@ type ColumnRenderer = (row: ISaleItem) => React.ReactNode;
 
 const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   image: (row) => {
-    const imageUri = getCardImageUri(row as any);
-    const cardName = getCardName(row as any);
-    const tcg = getCardTCG(row as any);
+    const imageUri = getCardImageUri(row);
+    const cardName = getCardName(row);
+    const tcg = getCardTCG(row);
     return (
       <CardImage
         src={imageUri}
@@ -44,10 +44,10 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
     );
   },
   cardName: (row) => (
-    <span className="font-medium">{getCardName(row as any)}</span>
+    <span className="font-medium">{getCardName(row)}</span>
   ),
   set: (row) => (
-    <span className="text-sm text-default-500">{getSetInfo(row as any)}</span>
+    <span className="text-sm text-default-500">{getSetInfo(row)}</span>
   ),
   condition: (row) => (
     <Chip size="sm" variant="flat">
