@@ -1,7 +1,7 @@
 'use client';
 
-import { Tab, Tabs, Checkbox, Input, Button, Tooltip } from '@heroui/react';
-import { useMemo, useState, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { Button, Tooltip, Select, SelectItem, Input } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { IPriceAnalysis } from '../../domain/bulk-lookup.types';
 import { useBulkLookupStore } from '../../adapters/store/bulk-lookup.store';
@@ -9,72 +9,48 @@ import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { CardImage } from '@/shared/components/card-image';
+import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
+import { CardCondition } from '../../domain/types';
 
 interface PriceAnalysisPanelProps {
   analysis: IPriceAnalysis[];
 }
 
-type FilterTab = 'all' | 'profitable' | 'loss' | 'neutral';
+const CARD_CONDITIONS = [
+  { value: 'Mint', label: 'Mint' },
+  { value: 'NearMint', label: 'Near Mint' },
+  { value: 'Excellent', label: 'Excellent' },
+  { value: 'Good', label: 'Good' },
+  { value: 'Light Play', label: 'Light Play' },
+  { value: 'Moderate Play', label: 'Moderate Play' },
+  { value: 'Heavy Play', label: 'Heavy Play' },
+  { value: 'Damaged', label: 'Damaged' },
+  { value: 'Ungraded', label: 'Ungraded' },
+];
 
 export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps) {
-  const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const { updateItemPrice, selectedItems, toggleItemSelection } = useBulkLookupStore();
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
-  const [editingPrice, setEditingPrice] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState('');
 
-  const filteredAnalysis = useMemo(() => {
-    switch (activeTab) {
-      case 'profitable':
-        return analysis.filter((a) => a.marginPercentage && a.marginPercentage > 0);
-      case 'loss':
-        return analysis.filter((a) => a.marginPercentage && a.marginPercentage < 0);
-      case 'neutral':
-        return analysis.filter((a) => a.marginPercentage === 0 || a.marginPercentage === null);
-      default:
-        return analysis;
-    }
-  }, [analysis, activeTab]);
+  const handleConditionChange = useCallback(
+    (cardGuid: string, condition: string, newCondition: string) => {
+      updateItemPrice(cardGuid, newCondition, 0, 0);
+    },
+    [updateItemPrice]
+  );
 
-  const stats = useMemo(() => {
-    return {
-      profitable: analysis.filter((a) => a.marginPercentage && a.marginPercentage > 0).length,
-      loss: analysis.filter((a) => a.marginPercentage && a.marginPercentage < 0).length,
-      neutral: analysis.filter((a) => a.marginPercentage === 0 || a.marginPercentage === null).length,
-    };
-  }, [analysis]);
-
-  const getMarginColor = useCallback((margin: number | null) => {
-    if (margin === null) return 'default';
-    if (margin > 0) return 'success';
-    if (margin < 0) return 'danger';
-    return 'warning';
-  }, []);
-
-  const handlePriceSave = useCallback((cardGuid: string, condition: string) => {
-    const newPrice = parseFloat(editValue);
-    if (!isNaN(newPrice)) {
-      updateItemPrice(cardGuid, condition, newPrice, newPrice);
-      setEditingPrice(null);
-    }
-  }, [editValue, updateItemPrice]);
+  const handlePriceChange = useCallback(
+    (cardGuid: string, condition: string, value: string) => {
+      const price = parseFloat(value);
+      if (!isNaN(price)) {
+        updateItemPrice(cardGuid, condition, price, price);
+      }
+    },
+    [updateItemPrice]
+  );
 
   const columns: ITableColumn[] = useMemo(() => {
     return [
-      {
-        key: 'select',
-        label: '',
-        className: 'w-[50px]',
-        customCol: (item: IPriceAnalysis) => (
-          <Checkbox
-            isSelected={selectedItems.some(
-              (s) => s.cardGuid === item.cardGuid && s.condition === item.condition
-            )}
-            onChange={() => toggleItemSelection(item.cardGuid, item.condition)}
-            aria-label={`Select ${item.cardName}`}
-          />
-        ),
-      },
       {
         key: 'card',
         label: 'Carta',
@@ -82,7 +58,7 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
         customCol: (item: IPriceAnalysis) => (
           <div className="flex items-center gap-3">
             <CardImage
-              src={undefined}
+              src={item.cardImageUrl}
               alt={item.cardName}
               tcgType={selectedTCG === 'POKEMON' ? 'POKEMON' : 'MAGIC'}
               containerClassName="relative h-12 w-9 rounded overflow-hidden bg-default-100 flex-shrink-0"
@@ -92,25 +68,62 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
             />
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{item.cardName}</span>
-              <span className="text-xs text-default-400">{item.condition}</span>
+              <span className="text-xs text-default-400">Mercado: ${item.marketPrice?.toFixed(2) || '—'}</span>
             </div>
           </div>
         ),
       },
       {
-        key: 'currentPrice',
-        label: 'Actual',
-        className: 'w-[120px]',
+        key: 'condition',
+        label: 'Condición',
+        className: 'min-w-[160px]',
         customCol: (item: IPriceAnalysis) => (
-          <span className="text-sm font-medium">${item.currentPrice?.toFixed(2) || '—'}</span>
+          <Select
+            aria-label="Condición"
+            size="sm"
+            variant="bordered"
+            selectedKeys={new Set([item.condition])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string;
+              handleConditionChange(item.cardGuid, item.condition, selected);
+            }}
+            classNames={{
+              trigger: 'border-[1px] bg-white min-w-[140px]',
+            }}
+          >
+            {CARD_CONDITIONS.map((opt) => (
+              <SelectItem key={opt.value}>{opt.label}</SelectItem>
+            ))}
+          </Select>
         ),
       },
       {
-        key: 'marketPrice',
-        label: 'Mercado',
-        className: 'w-[120px]',
+        key: 'quantity',
+        label: 'Stock',
+        className: 'w-[100px]',
         customCol: (item: IPriceAnalysis) => (
-          <span className="text-sm font-medium">${item.marketPrice?.toFixed(2) || '—'}</span>
+          <span className="text-sm">{item.quantity}</span>
+        ),
+      },
+      {
+        key: 'sellPrice',
+        label: 'Precio Venta',
+        customCol: (item: IPriceAnalysis) => (
+          <Input
+            aria-label="Precio venta"
+            type="number"
+            size="sm"
+            variant="bordered"
+            min={0.01}
+            step={0.01}
+            value={String(item.currentPrice || 0)}
+            onValueChange={(val) => handlePriceChange(item.cardGuid, item.condition, val)}
+            startContent={<span className="text-xs text-default-400">$</span>}
+            classNames={{
+              inputWrapper: 'border-[1px] bg-white w-[100px]',
+              input: 'text-right',
+            }}
+          />
         ),
       },
       {
@@ -118,83 +131,46 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
         label: 'Margen',
         className: 'w-[100px]',
         customCol: (item: IPriceAnalysis) => (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-center">
             <span className="text-sm font-medium">${item.margin?.toFixed(2) || '—'}</span>
-            <span
-              className={`text-xs px-2 py-1 rounded ${
-                getMarginColor(item.marginPercentage) === 'success'
-                  ? 'bg-success-100 text-success-700'
-                  : getMarginColor(item.marginPercentage) === 'danger'
-                    ? 'bg-danger-100 text-danger-700'
-                    : 'bg-default-100 text-default-700'
-              }`}
-            >
+            <span className="text-xs text-default-500">
               {item.marginPercentage !== null ? `${item.marginPercentage.toFixed(1)}%` : 'N/A'}
             </span>
           </div>
         ),
       },
       {
-        key: 'quantity',
-        label: 'Stock',
-        className: 'w-[80px]',
-        customCol: (item: IPriceAnalysis) => (
-          <span className="text-sm">{item.quantity}</span>
-        ),
-      },
-      {
         key: 'actions',
         label: '',
-        className: 'w-[100px]',
-        customCol: (item: IPriceAnalysis) => {
-          const isEditing = editingPrice === `${item.cardGuid}-${item.condition}`;
-          return isEditing ? (
-            <div className="flex gap-1">
-              <Input
-                type="number"
-                size="sm"
-                value={editValue}
-                onValueChange={setEditValue}
-                placeholder="Precio"
-                className="w-20"
+        className: 'w-[60px]',
+        customCol: (item: IPriceAnalysis) => (
+          <Tooltip content="Seleccionar">
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              color={
+                selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition)
+                  ? 'success'
+                  : 'default'
+              }
+              onPress={() => toggleItemSelection(item.cardGuid, item.condition)}
+              aria-label={`Select ${item.cardName}`}
+            >
+              <Icon
+                icon={
+                  selectedItems.some((s) => s.cardGuid === item.cardGuid && s.condition === item.condition)
+                    ? 'lucide:check-circle-2'
+                    : 'lucide:circle'
+                }
+                width={20}
               />
-              <Button
-                isIconOnly
-                size="sm"
-                color="success"
-                variant="flat"
-                onPress={() => handlePriceSave(item.cardGuid, item.condition)}
-              >
-                <Icon icon="lucide:check" width={16} />
-              </Button>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="flat"
-                onPress={() => setEditingPrice(null)}
-              >
-                <Icon icon="lucide:x" width={16} />
-              </Button>
-            </div>
-          ) : (
-            <Tooltip content="Editar precio">
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                onPress={() => {
-                  setEditingPrice(`${item.cardGuid}-${item.condition}`);
-                  setEditValue(item.currentPrice?.toString() || '0');
-                }}
-              >
-                <Icon icon="lucide:edit-2" width={16} />
-              </Button>
-            </Tooltip>
-          );
-        },
+            </Button>
+          </Tooltip>
+        ),
       },
     ];
-  }, [selectedItems, toggleItemSelection, selectedTCG, getMarginColor, editingPrice, editValue, handlePriceSave]);
+  }, [selectedItems, toggleItemSelection, selectedTCG, handleConditionChange, handlePriceChange]);
 
   if (analysis.length === 0) {
     return (
@@ -206,25 +182,8 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Análisis de Precios</h3>
-
-        <Tabs
-          selectedKey={activeTab}
-          onSelectionChange={(key) => setActiveTab(key as FilterTab)}
-          variant="underlined"
-          color="primary"
-          aria-label="Filtrar por margen"
-        >
-          <Tab key="all" title={`Todas (${analysis.length})`} />
-          <Tab key="profitable" title={`Rentables (${stats.profitable})`} />
-          <Tab key="loss" title={`Pérdida (${stats.loss})`} />
-          <Tab key="neutral" title={`Neutral (${stats.neutral})`} />
-        </Tabs>
-      </div>
-
-      <DataTable cols={columns} data={filteredAnalysis} isLoading={false} />
+    <div className="flex flex-col gap-3">
+      <DataTable cols={columns} data={analysis} isLoading={false} />
     </div>
   );
 }

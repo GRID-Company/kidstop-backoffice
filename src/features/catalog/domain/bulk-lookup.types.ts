@@ -70,6 +70,7 @@ export interface IPriceAnalysis {
   guid?: string;
   cardGuid: string;
   cardName: string;
+  cardImageUrl?: string;
   currentPrice: number | null;
   suggestedPrice: number | null;
   marketPrice: number | null;
