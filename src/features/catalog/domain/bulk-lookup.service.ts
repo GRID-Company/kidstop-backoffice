@@ -1,5 +1,4 @@
-import { IBatchSearchResult, IPriceAnalysis, IPokemonCardMetricsResponse, IMagicCardMetricsResponse } from './bulk-lookup.types';
-import { IPokemonCard, IMagicCard } from './types';
+import { IBatchSearchResult, IPriceAnalysis, IPokemonCardMetricsResponse, IMagicCardMetricsResponse, IBatchMagicCard, IBatchPokemonCard } from './bulk-lookup.types';
 
 export class BulkLookupService {
   static enrichWithMetrics(
@@ -9,7 +8,7 @@ export class BulkLookupService {
     return results
       .filter((result) => result.bestMatch)
       .flatMap((result) => {
-        const card = result.bestMatch as IPokemonCard | IMagicCard;
+        const card = result.bestMatch as IBatchMagicCard | IBatchPokemonCard;
         const metrics = metricsMap[card.guid];
 
         if (!metrics) {
@@ -37,8 +36,8 @@ export class BulkLookupService {
       });
   }
 
-  private static getCurrentPrice(card: IPokemonCard | IMagicCard, condition: string): number | null {
-    const variant = card.variants.find((v) => v.condition === condition);
+  private static getCurrentPrice(card: IBatchMagicCard | IBatchPokemonCard, condition: string): number | null {
+    const variant = card.inventoryCards?.find((v) => v.condition === condition);
     return variant?.sellPrice ?? null;
   }
 

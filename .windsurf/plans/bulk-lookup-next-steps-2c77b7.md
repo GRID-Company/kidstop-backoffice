@@ -4,7 +4,9 @@
 ✅ Módulo UI completamente implementado con flujos completo y modular
 ✅ Tipos y dominio listos
 ✅ GraphQL queries definidas y codegen ejecutado
-⏳ Hooks API listos pero sin integración con Apollo (retornan datos vacíos)
+✅ Hooks API implementados con Apollo useLazyQuery (queries batch search y metrics)
+✅ Tipos específicos para respuesta del batch search
+⏳ Integración en vistas (conectar hooks con lógica de búsqueda)
 ⏳ Mutation de carga comentada, esperando backend
 
 ## Tareas Pendientes
