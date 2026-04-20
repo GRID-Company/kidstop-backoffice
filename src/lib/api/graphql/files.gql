@@ -1,3 +1,14 @@
+query GetBanner($tcg: TCGType!) {
+  getBanner(tcg: $tcg) {
+    guid
+    name
+    path
+    category
+    createdDate
+    updatedDate
+  }
+}
+
 mutation UploadFile($uploadFileArgs: UploadFileInput!) {
   uploadFile(uploadFileArgs: $uploadFileArgs) {
     category

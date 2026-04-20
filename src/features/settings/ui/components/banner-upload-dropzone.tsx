@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react';
-import { Button, Card, CardBody, Spinner } from '@heroui/react';
+import { useState, useCallback, useEffect } from 'react';
+import { Button, Card, CardBody, Spinner, Image } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { useQuery } from '@apollo/client/react';
+import { GetBannerDocument } from '@/lib/api/generated/files.generated';
 
 interface BannerUploadDropzoneProps {
   tcg: 'pokemon' | 'magic';
@@ -20,6 +22,15 @@ export const BannerUploadDropzone = ({
 
   const tcgLabel = tcg === 'pokemon' ? 'Pokémon' : 'Magic';
   const tcgIcon = tcg === 'pokemon' ? 'game-icons:pokeball' : 'game-icons:magic-swirl';
+  const tcgType = tcg === 'pokemon' ? 'POKEMON' : 'MAGIC';
+
+  const { data: bannerData, loading: bannerLoading } = useQuery(GetBannerDocument, {
+    variables: { tcg: tcgType as any },
+    skip: !currentBannerGuid,
+    fetchPolicy: 'cache-first',
+  });
+
+  const currentBanner = bannerData?.getBanner;
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -125,6 +136,25 @@ export const BannerUploadDropzone = ({
             >
               <Icon icon="lucide:x" width={18} height={18} />
             </Button>
+          </div>
+        )}
+
+        {currentBannerGuid && currentBanner && !selectedFile && (
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium text-default-500">Banner actual</p>
+            {bannerLoading ? (
+              <div className="flex items-center justify-center rounded-lg bg-default-100 py-8">
+                <Spinner size="sm" />
+              </div>
+            ) : (
+              <Image
+                src={currentBanner.path}
+                alt={`${tcgLabel} banner`}
+                className="rounded-lg object-cover"
+                width={400}
+                height={150}
+              />
+            )}
           </div>
         )}
       </CardBody>
