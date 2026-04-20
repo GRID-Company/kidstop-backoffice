@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { Button, Tooltip, Select, SelectItem, Input } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { IPriceAnalysis, IBulkLoadItem } from '../../domain/bulk-lookup.types';
@@ -29,41 +30,63 @@ const CARD_CONDITIONS = [
   { value: 'Ungraded', label: 'Ungraded' },
 ];
 
+interface PriceAnalysisFormData {
+  items: IPriceAnalysis[];
+}
+
 export default function PriceAnalysisPanel({ analysis, selectedItems: selectedItemsProp }: PriceAnalysisPanelProps) {
   const { updateItemPrice, selectedItems: selectedItemsStore, toggleItemSelection } = useBulkLookupStore();
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const selectedItems = selectedItemsProp || selectedItemsStore;
 
-  const handleConditionChange = useCallback(
-    (cardGuid: string, condition: string, newCondition: string) => {
-      updateItemPrice(cardGuid, newCondition, 0, 0);
+  const { control, watch } = useForm<PriceAnalysisFormData>({
+    defaultValues: {
+      items: analysis,
     },
-    [updateItemPrice]
+  });
+
+  const { fields } = useFieldArray({
+    control,
+    name: 'items',
+  });
+
+  const watchedItems = watch('items');
+
+  const handleConditionChange = useCallback(
+    (index: number, newCondition: string) => {
+      const item = watchedItems[index];
+      if (item) {
+        updateItemPrice(item.cardGuid, newCondition, item.currentPrice || 0, item.currentPrice || 0);
+      }
+    },
+    [watchedItems, updateItemPrice]
   );
 
   const handlePriceChange = useCallback(
-    (cardGuid: string, condition: string, value: string) => {
-      const price = parseFloat(value);
-      if (!isNaN(price)) {
-        updateItemPrice(cardGuid, condition, price, price);
+    (index: number, value: string) => {
+      const item = watchedItems[index];
+      if (item) {
+        const price = parseFloat(value);
+        if (!isNaN(price)) {
+          updateItemPrice(item.cardGuid, item.condition, price, price);
+        }
       }
     },
-    [updateItemPrice]
+    [watchedItems, updateItemPrice]
   );
 
   const handleStockChange = useCallback(
-    (cardGuid: string, condition: string, value: string) => {
+    (index: number, value: string) => {
       const stock = parseInt(value);
       if (!isNaN(stock) && stock > 0) {
-        // Stock is read-only from backend, but we can log it for now
-        console.log('Stock change requested:', { cardGuid, condition, stock });
+        console.log('Stock change at index:', index, 'value:', stock);
       }
     },
     []
   );
 
   const columns: ITableColumn[] = useMemo(() => {
-    return [
+    const createColumns = (fieldIndex: number) => [
       {
         key: 'card',
         label: 'Carta',
@@ -98,7 +121,7 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
             selectedKeys={new Set([item.condition])}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
-              handleConditionChange(item.cardGuid, item.condition, selected);
+              handleConditionChange(fields.findIndex((f) => f.id === item.guid), selected);
             }}
             classNames={{
               trigger: 'border-[1px] bg-white min-w-[140px]',
@@ -122,7 +145,7 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
             variant="bordered"
             min={1}
             value={String(item.quantity)}
-            onValueChange={(val) => handleStockChange(item.cardGuid, item.condition, val)}
+            onValueChange={(val) => handleStockChange(fields.findIndex((f) => f.id === item.guid), val)}
             classNames={{
               inputWrapper: 'border-[1px] bg-white w-[80px]',
               input: 'text-center',
@@ -142,7 +165,7 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
             min={0.01}
             step={0.01}
             value={String(item.currentPrice || 0)}
-            onValueChange={(val) => handlePriceChange(item.cardGuid, item.condition, val)}
+            onValueChange={(val) => handlePriceChange(fields.findIndex((f) => f.id === item.guid), val)}
             startContent={<span className="text-xs text-default-400">$</span>}
             classNames={{
               inputWrapper: 'border-[1px] bg-white w-[100px]',
@@ -191,7 +214,8 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
         },
       },
     ];
-  }, [selectedItems, toggleItemSelection, selectedTCG, handleConditionChange, handlePriceChange]);
+    return createColumns(0);
+  }, [selectedItems, toggleItemSelection, selectedTCG, handleConditionChange, handlePriceChange, handleStockChange, fields]);
 
   if (analysis.length === 0) {
     return (
@@ -204,7 +228,7 @@ export default function PriceAnalysisPanel({ analysis, selectedItems: selectedIt
 
   return (
     <div className="flex flex-col gap-3">
-      <DataTable cols={columns} data={analysis} isLoading={false} />
+      <DataTable cols={columns} data={watchedItems} isLoading={false} />
     </div>
   );
 }
