@@ -1,9 +1,10 @@
 import { Tabs, Tab } from '@heroui/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { useSettings } from '../hooks/use-settings';
-import { SETTINGS_SECTIONS, DEFAULT_GEOFENCE_CONFIG, DEFAULT_OPERATING_HOURS, DEFAULT_THRESHOLDS } from '../../domain/constants';
+import { SETTINGS_SECTIONS, DEFAULT_GEOFENCE_CONFIG, DEFAULT_OPERATING_HOURS, DEFAULT_THRESHOLDS, DEFAULT_BANNER_CONFIG } from '../../domain/constants';
 import GeneralSection from '../components/general-section';
 import BudgetSection from '../components/budget-section';
+import BannerSection from '../components/banner-section';
 
 export default function Settings() {
   const {
@@ -17,6 +18,7 @@ export default function Settings() {
     updateThresholds,
     updateOperatingHours,
     updateBudget,
+    updateBanners,
   } = useSettings();
 
   if (loading && !settings) return null;
@@ -54,6 +56,13 @@ export default function Settings() {
               buyers={buyers}
               loading={updatingBudget}
               onSave={updateBudget}
+            />
+          </Tab>
+          <Tab key="banners" title={SETTINGS_SECTIONS.banners}>
+            <BannerSection
+              banners={settings?.bannerGuids ?? DEFAULT_BANNER_CONFIG}
+              isLoading={updatingConfig}
+              onSave={updateBanners}
             />
           </Tab>
         </Tabs>

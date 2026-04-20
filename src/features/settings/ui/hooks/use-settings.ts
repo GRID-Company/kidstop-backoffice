@@ -11,7 +11,8 @@ import {
   UpdateBuyerBudgetDocument,
 } from '@/lib/api/generated/buyer-budgets.generated';
 import { UsersDocument } from '@/lib/api/generated/users.generated';
-import { IGeofenceConfig, IOperatingHours, IThresholdConfig } from '../../domain/types';
+import { UploadFileDocument, GetBannerDocument } from '@/lib/api/generated/files.generated';
+import { IGeofenceConfig, IOperatingHours, IThresholdConfig, IBannerConfig } from '../../domain/types';
 import {
   fromApiToSettings,
   toGeofenceMutationInput,
@@ -22,6 +23,7 @@ import {
   fromApiBudgets,
   toUpdateBuyerBudgetPayload,
 } from '../../adapters/mappers/buyer-budget.mapper';
+import { toBannerMutationInput } from '../../adapters/mappers/banner.mapper';
 import { BudgetFormData } from '../../adapters/forms/budget-settings.schema';
 
 export function useSettings() {
@@ -47,13 +49,22 @@ export function useSettings() {
 
   const [updateConfigMutation, { loading: updatingConfig }] = useMutation(
     UpdateGlobalConfigDocument,
-    { refetchQueries: [GlobalConfigDocument] }
+    {
+      refetchQueries: [
+        GlobalConfigDocument,
+        { query: GetBannerDocument, variables: { tcg: 'POKEMON' } },
+        { query: GetBannerDocument, variables: { tcg: 'MAGIC' } },
+      ],
+      awaitRefetchQueries: true,
+    }
   );
 
   const [updateBudgetMutation, { loading: updatingBudget }] = useMutation(
     UpdateBuyerBudgetDocument,
     { refetchQueries: [BuyerBudgetsDocument] }
   );
+
+  const [uploadFileMutation] = useMutation(UploadFileDocument);
 
   const settings = configData ? fromApiToSettings(configData.globalConfig) : null;
   const budgets = budgetsData ? fromApiBudgets(budgetsData.buyerBudgets) : [];
@@ -117,6 +128,54 @@ export function useSettings() {
     [updateBudgetMutation]
   );
 
+  const updateBanners = useCallback(
+    async (pokemonFile?: File, magicFile?: File) => {
+      try {
+        const bannerGuids: IBannerConfig = {
+          pokemon: settings?.bannerGuids?.pokemon,
+          magic: settings?.bannerGuids?.magic,
+        };
+
+        if (pokemonFile) {
+          const { data: pokemonData } = await uploadFileMutation({
+            variables: {
+              uploadFileArgs: {
+                file: pokemonFile,
+                name: pokemonFile.name,
+                category: 'TECHNICAL_IMAGE',
+              },
+            },
+          });
+          bannerGuids.pokemon = pokemonData?.uploadFile?.guid;
+        }
+
+        if (magicFile) {
+          const { data: magicData } = await uploadFileMutation({
+            variables: {
+              uploadFileArgs: {
+                file: magicFile,
+                name: magicFile.name,
+                category: 'TECHNICAL_IMAGE',
+              },
+            },
+          });
+          bannerGuids.magic = magicData?.uploadFile?.guid;
+        }
+
+        await updateConfigMutation({
+          variables: { updateGlobalConfigInput: toBannerMutationInput(bannerGuids) },
+        });
+
+        toast.success('Banners actualizados correctamente');
+      } catch (error) {
+        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        toast.error(message ?? 'Error al actualizar banners');
+        throw error;
+      }
+    },
+    [uploadFileMutation, updateConfigMutation, settings?.bannerGuids]
+  );
+
   return {
     settings,
     budgets,
@@ -128,5 +187,6 @@ export function useSettings() {
     updateThresholds,
     updateOperatingHours,
     updateBudget,
+    updateBanners,
   };
 }

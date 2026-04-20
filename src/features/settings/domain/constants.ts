@@ -1,8 +1,14 @@
-import { IGeofenceConfig, IOperatingHours, IThresholdConfig, SettingsSection } from './types';
+import { IGeofenceConfig, IOperatingHours, IThresholdConfig, IBannerConfig, SettingsSection } from './types';
 
 export const SETTINGS_SECTIONS: Record<SettingsSection, string> = {
   general: 'General',
   budgets: 'Presupuestos',
+  banners: 'Banners',
+};
+
+export const DEFAULT_BANNER_CONFIG: IBannerConfig = {
+  pokemon: undefined,
+  magic: undefined,
 };
 
 export const DEFAULT_GEOFENCE_CONFIG: IGeofenceConfig = {

@@ -103,6 +103,7 @@ export type GlobalConfigQuery = {
           } | null;
         } | null;
       } | null;
+      bannerGuids: { pokemon: string | null; magic: string | null } | null;
     };
   };
 };
@@ -620,6 +621,23 @@ export const GlobalConfigDocument = {
                                   },
                                 ],
                               },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'bannerGuids' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'pokemon' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'magic' },
                             },
                           ],
                         },

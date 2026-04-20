@@ -1745,7 +1745,6 @@ export type UpdatePurchaseItemDetailInput = {
   itemGuid: Scalars['String']['input'];
   offerPrice?: InputMaybe<Scalars['Float']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
-  referencePrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdatePurchaseItemsInput = {
