@@ -6,42 +6,19 @@
 ✅ GraphQL queries definidas y codegen ejecutado
 ✅ Hooks API implementados con Apollo useLazyQuery (queries batch search y metrics)
 ✅ Tipos específicos para respuesta del batch search
-⏳ Integración en vistas (conectar hooks con lógica de búsqueda)
+✅ Integración en vistas (hooks conectados con lógica de búsqueda)
+✅ Búsqueda batch search funcional (parsea lista y ejecuta query)
+✅ Enriquecimiento con métricas funcional
 ⏳ Mutation de carga comentada, esperando backend
+⏳ Testing y refinamiento
 
 ## Tareas Pendientes
 
-### 1. Integración con Apollo (Cuando Backend esté listo)
-
-**Archivo:** `src/features/catalog/adapters/api/use-bulk-lookup.ts`
-
-```typescript
-// Reemplazar placeholders con:
-import { useLazyQuery } from '@apollo/client';
-import { BULK_SEARCH_MAGIC_CARDS, BULK_SEARCH_POKEMON_CARDS, ... } from '@/lib/api/graphql/bulk-lookup.gql';
-
-export function useMagicBatchSearch() {
-  const [search, { data, loading, error }] = useLazyQuery<BulkSearchMagicCardsQuery>(
-    BULK_SEARCH_MAGIC_CARDS
-  );
-  
-  const execute = useCallback(
-    async (input: BatchSearchInput) => {
-      const { data: result } = await search({ variables: { input } });
-      return result?.magicBatchCardSearch?.results ?? [];
-    },
-    [search]
-  );
-  
-  return { search: execute, loading, error };
-}
-```
-
-### 2. Implementar Mutation de Carga
+### 1. Implementar Mutation de Carga (Backend)
 
 **Archivo:** `src/lib/api/graphql/bulk-lookup.gql`
 
-Descomentar y ajustar:
+Descomentar cuando el backend implemente la mutation:
 ```graphql
 mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
   bulkLoadInventory(input: $input) {
@@ -55,13 +32,14 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
 
 Luego en `use-bulk-lookup.ts`:
 ```typescript
+import { useMutation } from '@apollo/client/react';
+import { BulkLoadInventoryDocument } from '@/lib/api/generated/bulk-lookup.generated';
+
 export function useBulkLoadInventory() {
-  const [bulkLoad, { loading, error }] = useMutation<BulkLoadInventoryMutation>(
-    BULK_LOAD_INVENTORY
-  );
+  const [bulkLoad, { loading, error }] = useMutation(BulkLoadInventoryDocument);
   
   const execute = useCallback(
-    async (payload: IBulkLoadPayload) => {
+    async (payload: any) => {
       const { data } = await bulkLoad({ variables: { input: payload } });
       return data?.bulkLoadInventory ?? { success: false, errors: [...] };
     },
@@ -72,40 +50,7 @@ export function useBulkLoadInventory() {
 }
 ```
 
-### 3. Integración en Vistas
-
-**Archivos:** `bulk-lookup-complete.tsx` y `bulk-lookup-modular.tsx`
-
-Reemplazar llamadas a funciones mock con hooks reales:
-```typescript
-const { search: searchMagic, loading: searchLoading } = useMagicBatchSearch();
-const { search: searchPokemon, loading: searchLoading } = usePokemonBatchSearch();
-
-// En handleSearch:
-const results = selectedTCG === 'POKEMON' 
-  ? await searchPokemon({ lines: parsedLines })
-  : await searchMagic({ lines: parsedLines });
-```
-
-### 4. Enriquecimiento con Métricas
-
-Implementar llamadas a `useMagicCardMetrics()` y `usePokemonCardMetrics()` en `handleAnalyze`:
-```typescript
-const metricsMap = {};
-for (const result of searchResults) {
-  if (result.bestMatch) {
-    const metrics = selectedTCG === 'POKEMON'
-      ? await getPokemonMetrics(result.bestMatch.guid)
-      : await getMagicMetrics(result.bestMatch.guid);
-    metricsMap[result.bestMatch.guid] = metrics;
-  }
-}
-
-const analysis = BulkLookupService.enrichWithMetrics(searchResults, metricsMap);
-setPriceAnalysis(analysis);
-```
-
-### 5. Testing
+### 2. Testing
 
 Crear tests para:
 - Búsqueda batch (mock de datos)
@@ -114,26 +59,31 @@ Crear tests para:
 - Flujos completo y modular
 - Manejo de errores
 
-## Checklist de Integración
+### 3. Refinamiento UI
 
-- [ ] Importar queries GraphQL en hooks
-- [ ] Implementar useMagicBatchSearch
-- [ ] Implementar usePokemonBatchSearch
-- [ ] Implementar useMagicCardMetrics
-- [ ] Implementar usePokemonCardMetrics
-- [ ] Descomentar y ajustar mutation BulkLoadInventory
-- [ ] Implementar useBulkLoadInventory
-- [ ] Conectar hooks en bulk-lookup-complete.tsx
-- [ ] Conectar hooks en bulk-lookup-modular.tsx
-- [ ] Agregar enriquecimiento con métricas
-- [ ] Crear tests unitarios
-- [ ] Crear tests de integración
-- [ ] Validar flujos end-to-end
+- [ ] Mejorar visualización de resultados de búsqueda
+- [ ] Agregar indicadores de carga
+- [ ] Mejorar manejo de errores
+- [ ] Agregar confirmación antes de cargar
 
-## Estimación
+## Checklist Completado
 
-- Integración Apollo: 2-3 horas
+- ✅ Importar queries GraphQL en hooks
+- ✅ Implementar useMagicBatchSearch
+- ✅ Implementar usePokemonBatchSearch
+- ✅ Implementar useMagicCardMetrics
+- ✅ Implementar usePokemonCardMetrics
+- ✅ Conectar hooks en bulk-lookup-complete.tsx
+- ✅ Conectar hooks en bulk-lookup-modular.tsx
+- ✅ Agregar enriquecimiento con métricas
+- ⏳ Implementar useBulkLoadInventory (esperando backend)
+- ⏳ Crear tests unitarios
+- ⏳ Crear tests de integración
+
+## Estimación Restante
+
+- Mutation de carga: 1 hora (cuando backend esté listo)
 - Testing: 2-3 horas
 - Refinamiento: 1-2 horas
 
-**Total:** 5-8 horas
+**Total:** 4-6 horas
