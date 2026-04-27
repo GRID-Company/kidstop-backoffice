@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { Select, SelectItem, Input } from '@heroui/react';
+import { Input, Checkbox } from '@heroui/react';
+import { Icon } from '@iconify/react';
 import { IPriceAnalysis, IBulkLoadItem } from '../../domain/bulk-lookup.types';
 import { useBulkLookupStore } from '../../adapters/store/bulk-lookup.store';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -12,6 +13,8 @@ import { CardImage } from '@/shared/components/card-image';
 import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { CardCondition } from '../../domain/types';
 import CheckboxForm from '@/shared/base/form-controls/checkbox-form';
+import SelectForm from '@/shared/base/form-controls/select-form';
+import InputForm from '@/shared/base/form-controls/input-form';
 
 interface PriceAnalysisPanelProps {
   analysis: IPriceAnalysis[];
@@ -45,39 +48,6 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
 
   const watchedItems = watch('items');
 
-  const handleConditionChange = useCallback(
-    (index: number, newCondition: string) => {
-      const item = watchedItems[index];
-      if (item) {
-        updateItemPrice(item.cardGuid, newCondition, item.currentPrice || 0, item.currentPrice || 0);
-      }
-    },
-    [watchedItems, updateItemPrice]
-  );
-
-  const handlePriceChange = useCallback(
-    (index: number, value: string) => {
-      const item = watchedItems[index];
-      if (item) {
-        const price = parseFloat(value);
-        if (!isNaN(price)) {
-          updateItemPrice(item.cardGuid, item.condition, price, price);
-        }
-      }
-    },
-    [watchedItems, updateItemPrice]
-  );
-
-  const handleStockChange = useCallback(
-    (index: number, value: string) => {
-      const stock = parseInt(value);
-      if (!isNaN(stock) && stock > 0) {
-        console.log('Stock change at index:', index, 'value:', stock);
-      }
-    },
-    []
-  );
-
   const columns: ITableColumn[] = useMemo(() => {
     const createColumns = (fieldIndex: number): any[] => [
       {
@@ -106,66 +76,81 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
         key: 'condition',
         label: 'Condición',
         className: 'min-w-[160px]',
-        customCol: (item: IPriceAnalysis) => (
-          <Select
-            aria-label="Condición"
-            size="sm"
-            variant="bordered"
-            selectedKeys={new Set([item.condition])}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0] as string;
-              handleConditionChange(fields.findIndex((f) => f.id === item.guid), selected);
-            }}
-            classNames={{
-              trigger: 'border-[1px] bg-white min-w-[140px]',
-            }}
-          >
-            {CARD_CONDITION_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value}>{opt.label}</SelectItem>
-            ))}
-          </Select>
-        ),
+        customCol: (item: PriceAnalysisItemWithSelection, index: number) => {
+          const fieldIndex = fields.findIndex((f) => f.id === item.guid);
+          if (fieldIndex === -1) return null;
+          
+          return (
+            <SelectForm
+              controlProps={{
+                name: `items.${fieldIndex}.condition`,
+                control,
+              }}
+              items={CARD_CONDITION_OPTIONS}
+              size="sm"
+              variant="bordered"
+              classNames={{
+                trigger: 'border-[1px] bg-white min-w-[140px]',
+              }}
+              aria-label="Condición"
+            />
+          );
+        },
       },
       {
         key: 'quantity',
         label: 'Stock',
         className: 'w-[100px]',
-        customCol: (item: IPriceAnalysis) => (
-          <Input
-            aria-label="Stock"
-            type="number"
-            size="sm"
-            variant="bordered"
-            min={1}
-            value={String(item.quantity)}
-            onValueChange={(val) => handleStockChange(fields.findIndex((f) => f.id === item.guid), val)}
-            classNames={{
-              inputWrapper: 'border-[1px] bg-white w-[80px]',
-              input: 'text-center',
-            }}
-          />
-        ),
+        customCol: (item: PriceAnalysisItemWithSelection, index: number) => {
+          const fieldIndex = fields.findIndex((f) => f.id === item.guid);
+          if (fieldIndex === -1) return null;
+          
+          return (
+            <InputForm
+              controlProps={{
+                name: `items.${fieldIndex}.quantity`,
+                control,
+              }}
+              type="number"
+              size="sm"
+              variant="bordered"
+              min={1}
+              classNames={{
+                inputWrapper: 'border-[1px] bg-white w-[80px]',
+                input: 'text-center',
+              }}
+              aria-label="Stock"
+            />
+          );
+        },
       },
       {
         key: 'sellPrice',
         label: 'Precio Venta',
-        customCol: (item: IPriceAnalysis) => (
-          <Input
-            aria-label="Precio venta"
-            type="number"
-            size="sm"
-            variant="bordered"
-            min={0.01}
-            step={0.01}
-            value={String(item.currentPrice || 0)}
-            onValueChange={(val) => handlePriceChange(fields.findIndex((f) => f.id === item.guid), val)}
-            startContent={<span className="text-xs text-default-400">$</span>}
-            classNames={{
-              inputWrapper: 'border-[1px] bg-white w-[100px]',
-              input: 'text-right',
-            }}
-          />
-        ),
+        customCol: (item: PriceAnalysisItemWithSelection, index: number) => {
+          const fieldIndex = fields.findIndex((f) => f.id === item.guid);
+          if (fieldIndex === -1) return null;
+          
+          return (
+            <InputForm
+              controlProps={{
+                name: `items.${fieldIndex}.currentPrice`,
+                control,
+              }}
+              type="number"
+              size="sm"
+              variant="bordered"
+              min={0.01}
+              step={0.01}
+              startContent={<span className="text-xs text-default-400">$</span>}
+              classNames={{
+                inputWrapper: 'border-[1px] bg-white w-[100px]',
+                input: 'text-right',
+              }}
+              aria-label="Precio venta"
+            />
+          );
+        },
       },
       {
         key: 'margin',
@@ -186,18 +171,16 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
         className: 'w-[50px]',
         customCol: (item: PriceAnalysisItemWithSelection, index: number) => {
           const fieldIndex = fields.findIndex((f) => f.id === item.guid);
+          if (fieldIndex === -1) return null;
+          
           return (
             <CheckboxForm
               controlProps={{
                 name: `items.${fieldIndex}.isSelected`,
                 control,
               }}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  toggleItemSelection(item.cardGuid, item.condition);
-                } else {
-                  toggleItemSelection(item.cardGuid, item.condition);
-                }
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                toggleItemSelection(item.cardGuid, item.condition);
               }}
             />
           );
@@ -205,7 +188,7 @@ export default function PriceAnalysisPanel({ analysis }: PriceAnalysisPanelProps
       },
     ];
     return createColumns(0);
-  }, [selectedItems, toggleItemSelection, selectedTCG, handleConditionChange, handlePriceChange, handleStockChange, fields]);
+  }, [selectedItems, toggleItemSelection, selectedTCG, fields]);
 
   if (analysis.length === 0) {
     return (

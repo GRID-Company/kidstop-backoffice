@@ -1,4 +1,5 @@
 import { IBatchSearchResult, IPriceAnalysis, IPokemonCardMetricsResponse, IMagicCardMetricsResponse, IBatchMagicCard, IBatchPokemonCard } from './bulk-lookup.types';
+import { CARD_CONDITIONS } from '@/lib/types/card.types';
 
 export class BulkLookupService {
   static enrichWithMetrics(
@@ -19,6 +20,7 @@ export class BulkLookupService {
         if (!metrics.variantsMetrics || metrics.variantsMetrics.length === 0) {
           const currentPrice = card.sellPrice;
           const marketPrice = this.getMarketPrice(metrics);
+          const condition = CARD_CONDITIONS.NEAR_MINT;
 
           return [
             {
@@ -32,7 +34,7 @@ export class BulkLookupService {
               margin: marketPrice && currentPrice ? marketPrice - currentPrice : null,
               marginPercentage:
                 marketPrice && currentPrice ? ((marketPrice - currentPrice) / currentPrice) * 100 : null,
-              condition: 'Ungraded',
+              condition,
               quantity: card.totalStock,
             },
           ];
