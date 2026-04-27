@@ -38,7 +38,6 @@ export default function BulkCardFormControls({
         controlProps={{
           name: `cards.${index}.quantity`,
           control,
-          rules: { valueAsNumber: true },
         }}
         type="number"
         size="sm"
@@ -57,7 +56,6 @@ export default function BulkCardFormControls({
         controlProps={{
           name: priceName,
           control,
-          rules: { valueAsNumber: true },
         }}
         type="number"
         size="sm"
