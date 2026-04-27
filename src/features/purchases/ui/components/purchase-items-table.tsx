@@ -4,11 +4,12 @@ import { useCallback, useMemo, useEffect } from 'react';
 import {
   Button,
   Tooltip,
-  Select,
   SelectItem,
-  Input,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
+
+import OverrideInput from '@/shared/base/heorui-overrides/input';
+import KidstopSelect from '@/shared/base/heorui-overrides/select';
 
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { ITableColumn } from '@/lib/types/datatable.types';
@@ -147,7 +148,7 @@ export default function PurchaseItemsTable({
               {CARD_CONDITION_SHORT_LABELS[item.condition]}
             </span>
           ) : (
-            <Select
+            <KidstopSelect
               aria-label="Condición"
               size="sm"
               variant="bordered"
@@ -163,7 +164,7 @@ export default function PurchaseItemsTable({
               {CARD_CONDITION_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value}>{opt.label}</SelectItem>
               ))}
-            </Select>
+            </KidstopSelect>
           ),
       },
       {
@@ -174,7 +175,7 @@ export default function PurchaseItemsTable({
           isReadOnly ? (
             <span className="text-sm">{item.quantity}</span>
           ) : (
-            <Input
+            <OverrideInput
               aria-label="Cantidad"
               type="number"
               size="sm"
@@ -198,21 +199,21 @@ export default function PurchaseItemsTable({
               {displayCurrency(item.offerPrice)}
             </span>
           ) : (
-            <Input
+            <OverrideInput
               aria-label="Precio oferta"
               type="number"
               size="sm"
               variant="bordered"
-              min={0.01}
-              step={0.01}
+              min={0}
+              step={1}
               value={String(item.offerPrice)}
               onValueChange={(val) => handleOfferPriceChange(item.guid, val)}
               startContent={
                 <span className="text-xs text-default-400">$</span>
               }
               classNames={{
-                inputWrapper: 'border-[1px] bg-white w-[100px]',
-                input: 'text-right',
+                inputWrapper: 'border-[1px] bg-white w-[120px] pr-1',
+                input: 'text-right pr-6',
               }}
             />
           ),

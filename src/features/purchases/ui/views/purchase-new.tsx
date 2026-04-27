@@ -2,15 +2,16 @@
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
 import { Button, Card, CardBody, Chip, Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import toast from 'react-hot-toast';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
+import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
@@ -18,10 +19,6 @@ import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import SellerDeleteModal from '../components/seller-delete-modal';
-
-interface PurchaseFormData {
-  sellerGuid: string;
-}
 
 export default function PurchaseNew() {
   const router = useRouter();
@@ -31,6 +28,7 @@ export default function PurchaseNew() {
     currentBuyerSpent,
     assignedBudget,
     existingItemIds,
+    form: purchaseForm,
     setSeller,
     addItem,
     updateItem,
@@ -42,9 +40,7 @@ export default function PurchaseNew() {
 
   const { getSellerById, updateSeller, deleteSeller, updating, deleting } =
     useSellers();
-  const { control, watch, setValue } = useForm<PurchaseFormData>({
-    defaultValues: { sellerGuid: '' },
-  });
+  const { control, watch, setValue } = usePurchaseForm();
 
   const selectedSellerGuid = watch('sellerGuid');
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
@@ -100,10 +96,20 @@ export default function PurchaseNew() {
     setValue('sellerGuid', '');
   }, [setValue]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    const isValid = await purchaseForm.trigger();
+    if (!isValid) {
+      const errors = purchaseForm.formState.errors;
+      if (errors.items?.message) {
+        toast.error(errors.items.message);
+      } else if (errors.items) {
+        toast.error('Hay errores en los items. Verifica cantidad y precio.');
+      }
+      return;
+    }
     savePurchase();
     router.push('/compras');
-  }, [savePurchase, router]);
+  }, [savePurchase, router, purchaseForm]);
 
   const isSellerFormValid = !!selectedSellerGuid;
 

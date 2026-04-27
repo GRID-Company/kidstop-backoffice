@@ -26,6 +26,8 @@ import {
 } from '../../domain/constants';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
+import { useSellers } from '../hooks/use-sellers';
+import { useSellerEditState } from '../hooks/use-seller-edit-state';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
 import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
@@ -35,6 +37,7 @@ import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
+import SellerEditDrawer from '../components/seller-edit-drawer';
 
 const REDACTED_VALUE = '$••••••';
 
@@ -50,6 +53,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     purchase,
     items,
     payments,
+    itemsForm,
+    paymentsForm,
     isEditable,
     canSendQuote,
     canQuote,
@@ -76,6 +81,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
   const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
+
+  const { updateSeller, updating: updatingSeller } = useSellers();
+  const { canEditSeller, isEditSellerDrawerOpen, setIsEditSellerDrawerOpen } = useSellerEditState(purchase?.status);
 
   const [setPurchaseItemSellPrice] = useMutation(SetPurchaseItemSellPriceDocument, {
     onError: (error) => {
@@ -220,6 +228,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               createdAt={purchase.createdDate}
               updatedAt={purchase.updatedDate}
               notes={purchase.notes}
+              isEditable={canEditSeller}
+              onEditClick={() => setIsEditSellerDrawerOpen(true)}
             />
           </div>
           {assignedBudget > 0 && (
@@ -463,6 +473,17 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         onClose={() => setIsPriceModalOpen(false)}
         onConfirm={handlePriceAdjustmentConfirm}
       />
+
+      <SellerEditDrawer
+        isOpen={isEditSellerDrawerOpen}
+        onClose={() => setIsEditSellerDrawerOpen(false)}
+        onSubmit={async (data) => {
+          await updateSeller(purchase.seller.guid, data);
+          setIsEditSellerDrawerOpen(false);
+        }}
+        seller={purchase.seller}
+        isLoading={updatingSeller}
+      />
     </EntitiesPage>
   );
 }
@@ -472,18 +493,35 @@ function SellerInfoCard({
   createdAt,
   updatedAt,
   notes,
+  isEditable,
+  onEditClick,
 }: {
   seller: IPurchase['seller'];
   createdAt: string;
   updatedAt: string;
   notes?: string;
+  isEditable?: boolean;
+  onEditClick?: () => void;
 }) {
   return (
     <Card>
       <CardBody className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Icon icon="lucide:user" width={18} className="text-accent" />
-          <span className="text-sm font-semibold">Vendedor</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon icon="lucide:user" width={18} className="text-accent" />
+            <span className="text-sm font-semibold">Vendedor</span>
+          </div>
+          {isEditable && onEditClick && (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={onEditClick}
+              aria-label="Editar vendedor"
+            >
+              <Icon icon="lucide:edit-2" width={16} />
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">

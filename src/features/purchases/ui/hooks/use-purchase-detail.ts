@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
+import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 import { useAuthStore } from '@/lib/store/auth';
@@ -20,11 +21,16 @@ import {
   CardCondition,
 } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
+import { usePurchaseItemsForm, PurchaseItemsFormData } from '../../adapters/forms/use-purchase-items-form';
+import { usePaymentSplitForm, PaymentSplitFormData } from '../../adapters/forms/use-payment-split-form';
+import { mapFormItemToPurchaseItem } from '../../adapters/mappers/item-mapper';
 
 interface UsePurchaseDetailReturn {
   purchase: IPurchase | null;
   items: IPurchaseItem[];
   payments: IPaymentDetail[];
+  itemsForm: ReturnType<typeof usePurchaseItemsForm>;
+  paymentsForm: ReturnType<typeof usePaymentSplitForm>;
   isEditable: boolean;
   canSendQuote: boolean;
   canQuote: boolean;
@@ -123,17 +129,45 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     };
   }, [data]);
 
-  const [items, setItems] = useState<IPurchaseItem[]>([]);
-  const [payments, setPayments] = useState<IPaymentDetail[]>([]);
+  const itemsForm = usePurchaseItemsForm({ initialItems: basePurchase?.items || [] });
+  const paymentsForm = usePaymentSplitForm();
   const [status, setStatus] = useState<PurchaseStatus>(PURCHASE_STATUS.DRAFT);
 
   useEffect(() => {
     if (basePurchase) {
-      setItems(basePurchase.items);
-      setPayments(basePurchase.payments);
+      itemsForm.form.reset({
+        items: basePurchase.items.map((item) => ({
+          cardGuid: item.cardGuid,
+          condition: item.condition,
+          quantity: item.quantity,
+          offerPrice: item.offerPrice,
+          referencePrice: item.referencePrice,
+        })),
+      });
+      paymentsForm.reset({
+        payments: basePurchase.payments,
+      });
       setStatus(basePurchase.status);
     }
-  }, [basePurchase]);
+  }, [basePurchase?.guid]);
+
+  const formValues = itemsForm.form.getValues('items');
+  const items = useMemo(() => {
+    if (!basePurchase) return [];
+    return basePurchase.items.map((originalItem, index) => {
+      const formItem = formValues[index];
+      if (!formItem) return originalItem;
+      return {
+        ...originalItem,
+        condition: formItem.condition,
+        quantity: formItem.quantity,
+        offerPrice: formItem.offerPrice,
+        referencePrice: formItem.referencePrice,
+      };
+    });
+  }, [basePurchase, formValues]);
+
+  const payments = paymentsForm.getValues('payments') as IPaymentDetail[];
 
   const purchase = useMemo(() => {
     if (!basePurchase) return null;
@@ -188,29 +222,50 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   );
 
   const addItem = useCallback((item: IPurchaseItem) => {
-    setItems((prev) => [...prev, item]);
-  }, []);
+    itemsForm.fieldArray.append({
+      cardGuid: item.cardGuid,
+      condition: item.condition,
+      quantity: item.quantity,
+      offerPrice: item.offerPrice,
+      referencePrice: item.referencePrice,
+    } as any);
+  }, [itemsForm.fieldArray]);
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<IPurchaseItem>) => {
-      setItems((prev) =>
-        prev.map((item) => (item.guid === itemId ? { ...item, ...updates } : item))
-      );
+      const index = items.findIndex((item) => item.guid === itemId);
+      if (index !== -1) {
+        itemsForm.fieldArray.update(index, { ...items[index], ...updates } as any);
+      }
     },
-    []
+    [items, itemsForm.fieldArray]
   );
 
   const removeItem = useCallback((itemId: string) => {
-    setItems((prev) => prev.filter((item) => item.guid !== itemId));
-  }, []);
+    const index = items.findIndex((item) => item.guid === itemId);
+    if (index !== -1) {
+      itemsForm.fieldArray.remove(index);
+    }
+  }, [items, itemsForm.fieldArray]);
 
   const updatePayments = useCallback((newPayments: IPaymentDetail[]) => {
-    setPayments(newPayments);
-  }, []);
+    paymentsForm.reset({ payments: newPayments });
+  }, [paymentsForm]);
 
   const updateItems = useCallback((newItems: IPurchaseItem[]) => {
-    setItems(newItems);
-  }, []);
+    itemsForm.form.reset({
+      items: newItems.map((item) => ({
+        cardGuid: item.cardGuid,
+        condition: item.condition,
+        quantity: item.quantity,
+        offerPrice: item.offerPrice,
+        referencePrice: item.referencePrice,
+      })),
+    });
+    if (basePurchase) {
+      void refetch();
+    }
+  }, [itemsForm.form, basePurchase, refetch]);
 
   const hasItemChanges = useMemo(() => {
     if (!basePurchase) return false;
@@ -343,6 +398,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     purchase,
     items,
     payments,
+    itemsForm,
+    paymentsForm,
     isEditable,
     canSendQuote,
     canQuote,
