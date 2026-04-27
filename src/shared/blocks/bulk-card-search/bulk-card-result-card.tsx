@@ -176,14 +176,14 @@ export default function BulkCardResultCard({
                         : 'Sin stock'}
                     </span>
                   </div>
-                  {selectedCard.sellPrice && (
-                    <div className="flex items-center gap-1">
-                      <Icon icon="lucide:tag" width={12} className="text-default-400" />
-                      <span className="text-xs font-semibold text-accent">
-                        {formatCurrency(selectedCard.sellPrice)}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <Icon icon="lucide:tag" width={12} className="text-default-400" />
+                    <span className={`text-xs ${selectedCard.sellPrice && selectedCard.sellPrice > 0 ? 'font-semibold text-accent' : 'text-default-400'}`}>
+                      {selectedCard.sellPrice && selectedCard.sellPrice > 0
+                        ? formatCurrency(selectedCard.sellPrice)
+                        : 'Sin precio'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
