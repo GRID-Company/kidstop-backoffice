@@ -76,14 +76,12 @@ export default function BulkCardResultCard({
   }, [selectedCardGuid, result.bestMatch, result.relatedCards]);
 
   const isConfigured = useMemo(() => {
-    return (
-      selectedCardGuid &&
-      condition &&
-      typeof quantity === 'number' &&
-      quantity > 0 &&
-      typeof price === 'number' &&
-      price >= 0
-    );
+    const hasValidGuid = !!selectedCardGuid;
+    const hasValidCondition = !!condition;
+    const hasValidQuantity = typeof quantity === 'number' && quantity > 0 && !isNaN(quantity);
+    const hasValidPrice = typeof price === 'number' && price >= 0 && !isNaN(price);
+    
+    return hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice;
   }, [selectedCardGuid, condition, quantity, price]);
 
   const handleSelectRelatedCard = useCallback(
@@ -123,7 +121,7 @@ export default function BulkCardResultCard({
   }
 
   return (
-    <KidstopCard className={`w-full ${isConfigured ? 'border-2 border-accent' : ''}`}>
+    <KidstopCard className={`w-full ${isConfigured ? 'border-l-4 border-l-success' : ''}`}>
       <Accordion
         variant="light"
         selectedKeys={isExpanded ? ['content'] : []}
