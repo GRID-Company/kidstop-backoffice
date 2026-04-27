@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Button, Card, CardBody, Chip, Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import toast from 'react-hot-toast';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { ISeller } from '../../domain/types';
@@ -31,6 +32,7 @@ export default function PurchaseNew() {
     currentBuyerSpent,
     assignedBudget,
     existingItemIds,
+    form: purchaseForm,
     setSeller,
     addItem,
     updateItem,
@@ -100,10 +102,18 @@ export default function PurchaseNew() {
     setValue('sellerGuid', '');
   }, [setValue]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    const isValid = await purchaseForm.trigger();
+    if (!isValid) {
+      const errors = purchaseForm.formState.errors;
+      if (errors.items) {
+        toast.error('Hay errores en los items. Verifica cantidad y precio.');
+      }
+      return;
+    }
     savePurchase();
     router.push('/compras');
-  }, [savePurchase, router]);
+  }, [savePurchase, router, purchaseForm]);
 
   const isSellerFormValid = !!selectedSellerGuid;
 

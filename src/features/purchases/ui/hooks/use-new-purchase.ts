@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client/react';
+import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -9,6 +10,7 @@ import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated
 import { IPurchaseItem, ISeller } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { toCreatePurchasePayload } from '../../adapters/mappers/purchase.mapper';
+import { useNewPurchaseForm, NewPurchaseFormData } from '../../adapters/forms/use-new-purchase-form';
 
 interface UseNewPurchaseReturn {
   seller: ISeller | null;
@@ -18,6 +20,7 @@ interface UseNewPurchaseReturn {
   assignedBudget: number;
   budgetUtilization: number;
   existingItemIds: Set<string>;
+  form: UseFormReturn<NewPurchaseFormData>;
   setSeller: (seller: ISeller | null) => void;
   addItem: (item: IPurchaseItem) => void;
   updateItem: (itemId: string, updates: Partial<IPurchaseItem>) => void;
@@ -32,7 +35,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
   const currentUser = useAuthStore((state) => state.user);
 
   const [seller, setSeller] = useState<ISeller | null>(null);
-  const [items, setItems] = useState<IPurchaseItem[]>([]);
+  const { form, fieldArray } = useNewPurchaseForm();
 
   const { data: budgetData } = useQuery(BuyerBudgetDocument, {
     variables: {
@@ -52,6 +55,8 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     },
   });
 
+  const items = form.getValues('items') as IPurchaseItem[];
+
   const total = useMemo(() => calculateTotal(items), [items]);
 
   const currentBuyerSpent = budgetData?.buyerBudget?.usedAmount || 0;
@@ -59,28 +64,32 @@ export function useNewPurchase(): UseNewPurchaseReturn {
   const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
   const existingItemIds = useMemo(
-    () => new Set(items.map((i) => i.cardGuid)),
+    () => new Set(items.map((i: IPurchaseItem) => i.cardGuid)),
     [items]
   );
 
-  const canSave = seller !== null && items.length > 0 && !saving;
+  const canSave = seller !== null && items.length > 0 && !saving && form.formState.isValid;
 
   const addItem = useCallback((item: IPurchaseItem) => {
-    setItems((prev) => [...prev, item]);
-  }, []);
+    fieldArray.append(item as any);
+  }, [fieldArray]);
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<IPurchaseItem>) => {
-      setItems((prev) =>
-        prev.map((item) => (item.guid === itemId ? { ...item, ...updates } : item))
-      );
+      const index = items.findIndex((item) => item.guid === itemId);
+      if (index !== -1) {
+        fieldArray.update(index, { ...items[index], ...updates } as any);
+      }
     },
-    []
+    [items, fieldArray]
   );
 
   const removeItem = useCallback((itemId: string) => {
-    setItems((prev) => prev.filter((item) => item.guid !== itemId));
-  }, []);
+    const index = items.findIndex((item) => item.guid === itemId);
+    if (index !== -1) {
+      fieldArray.remove(index);
+    }
+  }, [items, fieldArray]);
 
   const savePurchase = useCallback(async () => {
     if (!canSave || !seller) return;
@@ -122,6 +131,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     assignedBudget,
     budgetUtilization,
     existingItemIds,
+    form,
     setSeller,
     addItem,
     updateItem,

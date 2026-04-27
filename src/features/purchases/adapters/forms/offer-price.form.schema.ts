@@ -11,7 +11,7 @@ export const offerPriceSchema = z.coerce
 export const quantitySchema = z.coerce
   .number()
   .int()
-  .min(1, 'La cantidad debe ser mayor a 0');
+  .refine(val => val === 0 || val >= 1);
 
 export type OfferPriceValue = z.infer<typeof offerPriceSchema>;
 export type QuantityValue = z.infer<typeof quantitySchema>;
