@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CardCondition } from '../../domain/types';
+import { offerPriceSchema, quantitySchema } from './price-schemas';
 
 const newPurchaseItemSchema = z.object({
   guid: z.string(),
@@ -10,8 +11,8 @@ const newPurchaseItemSchema = z.object({
   setCode: z.string(),
   tcgType: z.enum(['POKEMON', 'MAGIC']),
   condition: z.enum(['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED', 'HEAVILY_PLAYED', 'DAMAGED'] as const),
-  quantity: z.number().int().min(1, 'Cantidad debe ser mayor a 0'),
-  offerPrice: z.number().min(0, 'Precio debe ser mayor o igual a 0').transform(val => Math.floor(val)),
+  quantity: quantitySchema,
+  offerPrice: offerPriceSchema,
   referencePrice: z.number().optional(),
   currentReferencePrice: z.number().optional(),
   sellPrice: z.number().optional(),

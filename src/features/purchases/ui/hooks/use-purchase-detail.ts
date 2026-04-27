@@ -23,6 +23,7 @@ import {
 import { calculateTotal } from '../../domain/purchases.domain';
 import { usePurchaseItemsForm, PurchaseItemsFormData } from '../../adapters/forms/use-purchase-items-form';
 import { usePaymentSplitForm, PaymentSplitFormData } from '../../adapters/forms/use-payment-split-form';
+import { mapFormItemToPurchaseItem } from '../../adapters/mappers/item-mapper';
 
 interface UsePurchaseDetailReturn {
   purchase: IPurchase | null;
@@ -261,13 +262,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         referencePrice: item.referencePrice,
       })),
     });
-    // Update basePurchase items to include sellPrice and other fields
     if (basePurchase) {
-      const updatedBasePurchase = {
-        ...basePurchase,
-        items: newItems,
-      };
-      // Force re-render by updating the items calculation
       void refetch();
     }
   }, [itemsForm.form, basePurchase, refetch]);

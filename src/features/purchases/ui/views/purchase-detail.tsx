@@ -27,6 +27,7 @@ import {
 import { calculateTotal } from '../../domain/purchases.domain';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
+import { useSellerEditState } from '../hooks/use-seller-edit-state';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
 import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
@@ -79,24 +80,16 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
-  const [isEditSellerDrawerOpen, setIsEditSellerDrawerOpen] = useState(false);
   const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
 
   const { updateSeller, updating: updatingSeller } = useSellers();
+  const { canEditSeller, isEditSellerDrawerOpen, setIsEditSellerDrawerOpen } = useSellerEditState(purchase?.status);
 
   const [setPurchaseItemSellPrice] = useMutation(SetPurchaseItemSellPriceDocument, {
     onError: (error) => {
       toast.error(`Error al actualizar precio: ${error.message}`);
     },
   });
-
-  const canEditSeller = useMemo(() => {
-    return (
-      purchase?.status === PURCHASE_STATUS.DRAFT ||
-      purchase?.status === PURCHASE_STATUS.QUOTED ||
-      purchase?.status === PURCHASE_STATUS.REJECTED
-    );
-  }, [purchase?.status]);
 
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),

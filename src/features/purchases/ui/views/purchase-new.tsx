@@ -100,7 +100,9 @@ export default function PurchaseNew() {
     const isValid = await purchaseForm.trigger();
     if (!isValid) {
       const errors = purchaseForm.formState.errors;
-      if (errors.items) {
+      if (errors.items?.message) {
+        toast.error(errors.items.message);
+      } else if (errors.items) {
         toast.error('Hay errores en los items. Verifica cantidad y precio.');
       }
       return;

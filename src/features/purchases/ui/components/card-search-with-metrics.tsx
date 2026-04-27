@@ -25,6 +25,7 @@ import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
+import { calculateOfferPrice } from '../../domain/price.utils';
 
 interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
@@ -60,7 +61,7 @@ function CardResultItem({
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
-    unitBuyPrice: Math.floor(card.metrics.referencePrice * 0.6),
+    unitBuyPrice: calculateOfferPrice(card.metrics.referencePrice),
   });
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
@@ -73,7 +74,7 @@ function CardResultItem({
 
   useEffect(() => {
     if (referencePrice !== null) {
-      const calculatedPrice = Math.floor(referencePrice * 0.6);
+      const calculatedPrice = calculateOfferPrice(referencePrice);
       setAddState((s) => ({ ...s, unitBuyPrice: calculatedPrice }));
     }
   }, [referencePrice, addState.condition]);
@@ -84,8 +85,8 @@ function CardResultItem({
     try {
       await onAdd(card, addState, variantMetrics, referencePrice);
       const resetPrice = referencePrice !== null 
-        ? Math.floor(referencePrice * 0.6)
-        : Math.floor(card.metrics.referencePrice * 0.6);
+        ? calculateOfferPrice(referencePrice)
+        : calculateOfferPrice(card.metrics.referencePrice);
       setAddState({
         ...DEFAULT_ADD_STATE,
         unitBuyPrice: resetPrice,

@@ -204,16 +204,16 @@ export default function PurchaseItemsTable({
               type="number"
               size="sm"
               variant="bordered"
-              min={0.01}
-              step={0.01}
+              min={0}
+              step={1}
               value={String(item.offerPrice)}
               onValueChange={(val) => handleOfferPriceChange(item.guid, val)}
               startContent={
                 <span className="text-xs text-default-400">$</span>
               }
               classNames={{
-                inputWrapper: 'border-[1px] bg-white w-[100px]',
-                input: 'text-right',
+                inputWrapper: 'border-[1px] bg-white w-[120px] pr-1',
+                input: 'text-right pr-6',
               }}
             />
           ),
