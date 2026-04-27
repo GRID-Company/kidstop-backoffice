@@ -101,7 +101,7 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   const handleSubmit = form.handleSubmit(
     (data) => {
-      onConfirm(data as any);
+      onConfirm(data as any, results);
       handleClear();
     },
     (errors) => {

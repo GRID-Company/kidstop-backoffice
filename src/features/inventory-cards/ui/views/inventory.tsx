@@ -11,6 +11,7 @@ import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
 import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
+import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import Drawer from '@/shared/base/heorui-overrides/drawer';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
@@ -158,9 +159,9 @@ export default function Inventory() {
   }, []);
 
   const handleBulkAddConfirm = useCallback(
-    (data: BulkSearchFormDataInventory) => {
+    (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => {
       try {
-        const input = mapBulkSearchToInventoryInput(data, selectedTCG);
+        const input = mapBulkSearchToInventoryInput(data, results, selectedTCG);
         toast.success(`${input.items.length} cartas agregadas al inventario`);
         setIsBulkAddDrawerOpen(false);
         refetch();

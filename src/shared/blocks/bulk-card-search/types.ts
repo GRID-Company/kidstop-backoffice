@@ -108,14 +108,14 @@ export interface BulkCardFormControlsProps {
 
 export interface BulkCardSearchPurchasesProps {
   variant: 'purchases';
-  onConfirm: (data: BulkSearchFormDataPurchases) => void;
+  onConfirm: (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => void;
   onCancel: () => void;
   isOpen?: boolean;
 }
 
 export interface BulkCardSearchInventoryProps {
   variant: 'inventory';
-  onConfirm: (data: BulkSearchFormDataInventory) => void;
+  onConfirm: (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => void;
   onCancel: () => void;
   isOpen?: boolean;
 }

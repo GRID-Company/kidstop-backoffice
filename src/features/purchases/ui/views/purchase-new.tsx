@@ -9,10 +9,11 @@ import toast from 'react-hot-toast';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
 import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/schemas';
+import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
+import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
-import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
 import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
@@ -54,25 +55,9 @@ export default function PurchaseNew() {
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
 
   const handleBulkSearchConfirm = useCallback(
-    (data: BulkSearchFormDataPurchases) => {
+    (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
-        const newItems = data.cards.map((cardForm) => {
-          return {
-            guid: `${cardForm.selectedCardGuid}-${cardForm.condition}-${Date.now()}`,
-            cardGuid: cardForm.selectedCardGuid,
-            cardName: 'Bulk Card',
-            cardImageUrl: '',
-            setName: '',
-            setCode: '',
-            tcgType: selectedTCG,
-            condition: cardForm.condition,
-            quantity: cardForm.quantity,
-            offerPrice: cardForm.offerPrice,
-            referencePrice: cardForm.offerPrice,
-            sellPrice: cardForm.offerPrice,
-          };
-        });
-
+        const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
         newItems.forEach((item) => addItem(item));
         toast.success(`${newItems.length} cartas agregadas exitosamente`);
         setIsAdvancedSearchEnabled(false);

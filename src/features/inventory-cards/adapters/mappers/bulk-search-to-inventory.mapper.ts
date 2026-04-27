@@ -1,4 +1,5 @@
 import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
+import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import { TCGType } from '@/lib/types/tcg.types';
 
 export interface BulkLoadInventoryItemInput {
@@ -16,6 +17,7 @@ export interface BulkLoadInventoryInput {
 
 export function mapBulkSearchToInventoryInput(
   formData: BulkSearchFormDataInventory,
+  results: BulkCardResult[],
   tcgType: TCGType
 ): BulkLoadInventoryInput {
   return {
