@@ -38,7 +38,8 @@ export default function BulkCardSearchInput({
 
       <div className="flex gap-2">
         <Button
-          color="primary"
+          className="text-white"
+          style={{ backgroundColor: 'var(--color-accent)' }}
           startContent={!isLoading && <Icon icon="lucide:search" />}
           onPress={onSearch}
           isDisabled={!canSearch || isDisabled}
