@@ -38,22 +38,26 @@ export default function BulkCardResultCard({
   variant,
   tcgType,
 }: BulkCardResultCardProps) {
-  const { setValue } = useFormContext();
+  const { setValue, control } = useFormContext();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const selectedCardGuid = useWatch({
+    control,
     name: `cards.${index}.selectedCardGuid`,
   });
 
   const quantity = useWatch({
+    control,
     name: `cards.${index}.quantity`,
   });
 
   const condition = useWatch({
+    control,
     name: `cards.${index}.condition`,
   });
 
   const price = useWatch({
+    control,
     name: variant === 'purchases' ? `cards.${index}.offerPrice` : `cards.${index}.publicPrice`,
   });
 
