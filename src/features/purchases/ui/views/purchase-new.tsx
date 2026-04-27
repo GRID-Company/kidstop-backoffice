@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
 import { Button, Card, CardBody, Chip, Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import toast from 'react-hot-toast';
@@ -12,6 +11,7 @@ import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
+import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PurchaseItemsTable from '../components/purchase-items-table';
 import BudgetIndicator from '../components/budget-indicator';
@@ -19,10 +19,6 @@ import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import SellerDeleteModal from '../components/seller-delete-modal';
-
-interface PurchaseFormData {
-  sellerGuid: string;
-}
 
 export default function PurchaseNew() {
   const router = useRouter();
@@ -44,9 +40,7 @@ export default function PurchaseNew() {
 
   const { getSellerById, updateSeller, deleteSeller, updating, deleting } =
     useSellers();
-  const { control, watch, setValue } = useForm<PurchaseFormData>({
-    defaultValues: { sellerGuid: '' },
-  });
+  const { control, watch, setValue } = usePurchaseForm();
 
   const selectedSellerGuid = watch('sellerGuid');
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
