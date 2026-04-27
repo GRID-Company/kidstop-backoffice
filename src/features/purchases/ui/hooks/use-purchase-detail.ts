@@ -261,7 +261,16 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         referencePrice: item.referencePrice,
       })),
     });
-  }, [itemsForm.form]);
+    // Update basePurchase items to include sellPrice and other fields
+    if (basePurchase) {
+      const updatedBasePurchase = {
+        ...basePurchase,
+        items: newItems,
+      };
+      // Force re-render by updating the items calculation
+      void refetch();
+    }
+  }, [itemsForm.form, basePurchase, refetch]);
 
   const hasItemChanges = useMemo(() => {
     if (!basePurchase) return false;
