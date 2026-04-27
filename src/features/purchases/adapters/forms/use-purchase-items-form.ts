@@ -9,7 +9,7 @@ const purchaseItemFormSchema = z.object({
   cardGuid: z.string().min(1, 'Card GUID is required'),
   condition: z.enum(['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED', 'HEAVILY_PLAYED', 'DAMAGED'] as const),
   quantity: z.number().int().min(1, 'Quantity must be at least 1'),
-  offerPrice: z.number().min(0, 'Offer price must be non-negative'),
+  offerPrice: z.number().min(0, 'Offer price must be non-negative').transform(val => Math.floor(val)),
   referencePrice: z.number().optional(),
 });
 

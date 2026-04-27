@@ -6,7 +6,8 @@ export const offerPriceSchema = z.coerce
   .number()
   .refine(val => val === 0 || val >= MIN_PRICE, {
     message: 'El precio de oferta debe ser mayor o igual a 0',
-  });
+  })
+  .transform(val => (val === 0 ? 0 : Math.floor(val)));
 
 export const quantitySchema = z.coerce
   .number()
