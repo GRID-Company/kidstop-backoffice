@@ -31,13 +31,8 @@ export default function BulkCardFormControls({
           label: 'text-xs',
         }}
         aria-label="Condición de la carta"
-      >
-        {CARD_CONDITION_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </SelectForm>
+        items={CARD_CONDITION_OPTIONS}
+      />
 
       <InputForm
         controlProps={{
