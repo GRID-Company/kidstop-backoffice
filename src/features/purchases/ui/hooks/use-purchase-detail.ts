@@ -134,11 +134,38 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   useEffect(() => {
     if (basePurchase) {
+      itemsForm.form.reset({
+        items: basePurchase.items.map((item) => ({
+          cardGuid: item.cardGuid,
+          condition: item.condition,
+          quantity: item.quantity,
+          offerPrice: item.offerPrice,
+          referencePrice: item.referencePrice,
+        })),
+      });
+      paymentsForm.reset({
+        payments: basePurchase.payments,
+      });
       setStatus(basePurchase.status);
     }
-  }, [basePurchase?.status]);
+  }, [basePurchase?.guid]);
 
-  const items = itemsForm.form.getValues('items') as IPurchaseItem[];
+  const formValues = itemsForm.form.getValues('items');
+  const items = useMemo(() => {
+    if (!basePurchase) return [];
+    return basePurchase.items.map((originalItem, index) => {
+      const formItem = formValues[index];
+      if (!formItem) return originalItem;
+      return {
+        ...originalItem,
+        condition: formItem.condition,
+        quantity: formItem.quantity,
+        offerPrice: formItem.offerPrice,
+        referencePrice: formItem.referencePrice,
+      };
+    });
+  }, [basePurchase, formValues]);
+
   const payments = paymentsForm.getValues('payments') as IPaymentDetail[];
 
   const purchase = useMemo(() => {
