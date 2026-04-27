@@ -86,6 +86,26 @@ export type BatchSearchPokemonCardsInput = {
   searchText: Scalars['String']['input'];
 };
 
+export type BulkLoadInventoryInput = {
+  items: Array<BulkLoadInventoryItemInput>;
+};
+
+export type BulkLoadInventoryItemInput = {
+  cardGuid: Scalars['String']['input'];
+  condition: Scalars['String']['input'];
+  purchasePrice?: InputMaybe<Scalars['Float']['input']>;
+  sellPrice?: InputMaybe<Scalars['Float']['input']>;
+  stock: Scalars['Int']['input'];
+  tcg: Scalars['String']['input'];
+};
+
+export type BulkLoadInventoryResult = {
+  createdCount: Scalars['Int']['output'];
+  errors: Array<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+  updatedCount: Scalars['Int']['output'];
+};
+
 export type BuyerBudgetWithUsage = {
   assignedAmount: Scalars['Float']['output'];
   buyer: User;
@@ -744,6 +764,8 @@ export type Mutation = {
   addMostWantedCard: MostWantedCard;
   /** Add item to wishlist (carpeta digital) */
   addWishlistItem: WishlistItem;
+  /** Bulk load inventory items (admin only) */
+  bulkLoadInventory: BulkLoadInventoryResult;
   /** Cancel a sale with reason (backoffice) */
   cancelSale: Sale;
   /** Mutation to reset your password after requesting a change or expiration */
@@ -828,6 +850,10 @@ export type MutationAddMostWantedCardArgs = {
 
 export type MutationAddWishlistItemArgs = {
   addWishlistItemInput: AddWishlistItemInput;
+};
+
+export type MutationBulkLoadInventoryArgs = {
+  input: BulkLoadInventoryInput;
 };
 
 export type MutationCancelSaleArgs = {
@@ -1097,6 +1123,7 @@ export type PokemonCard = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   genre?: Maybe<Scalars['String']['output']>;
+  genrePriority?: Maybe<Scalars['Float']['output']>;
   gradedPrice?: Maybe<Scalars['Float']['output']>;
   guid: Scalars['String']['output'];
   hpTcgPlayer?: Maybe<Scalars['String']['output']>;
@@ -1142,6 +1169,7 @@ export type PokemonCardBatchSearchResult = {
 export type PokemonCardCollection = {
   cards: Array<PokemonCard>;
   cardsWithImages: Scalars['Float']['output'];
+  collectionPriority: Scalars['Float']['output'];
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
@@ -1745,6 +1773,7 @@ export type UpdatePurchaseItemDetailInput = {
   itemGuid: Scalars['String']['input'];
   offerPrice?: InputMaybe<Scalars['Float']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
+  referencePrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdatePurchaseItemsInput = {

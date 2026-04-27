@@ -192,7 +192,453 @@ query MagicCardPublicList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) 
 
 ---
 
-### 5. Get Public Card Detail
+### 5. Custom Sorting Options
+
+**Description:** The `magicCardPublicList` query supports custom sorting through the `sort` parameter. You can sort by multiple columns in ascending or descending order.
+
+**Available Sort Columns:**
+
+| Column | Description | Data Type | Example Use Case |
+|--------|-------------|-----------|------------------|
+| `name` | Card name (alphabetical) | string | Sort cards A-Z or Z-A |
+| `sellPrice` | Minimum sell price across all conditions | number | Find cheapest/most expensive cards |
+| `releaseDate` | Edition release date | date | Sort by newest/oldest releases |
+| `collectorNumber` | Collector number in set | string | Sort by set order |
+| `edition` | Edition/set name | string | Group by edition alphabetically |
+
+**Sort Order Values:**
+- `ASC` - Ascending order (A-Z, 0-9, oldest-newest, false-true)
+- `DESC` - Descending order (Z-A, 9-0, newest-oldest, true-false)
+
+**Important Notes:**
+- **Stock Priority Sorting:** The API uses a priority system that ensures optimal card discovery:
+  1. **Stock Availability** - Cards with stock always appear before cards without stock
+  2. **User Sort** - Your specified sort column and order
+  3. **Default Tiebreaker** - Release date (newest first) when no sort is specified
+  4. **Search Rank** - Applied last if searching
+
+- **Search Behavior:** When a `search` query is active, results are sorted by relevance (search rank) after stock priority and user sort
+
+- **Example:** If you sort by `name ASC`, you'll get:
+  - Cards with stock → sorted A-Z
+  - Cards without stock → sorted A-Z
+
+---
+
+#### Sort by Price (Low to High)
+
+```graphql
+query MagicCardsByPriceLowToHigh {
+  magicCardPublicList(
+    findMagicCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "sellPrice"
+        order: "ASC"
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Sort by Price (High to Low)
+
+```graphql
+query MagicCardsByPriceHighToLow {
+  magicCardPublicList(
+    findMagicCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "sellPrice"
+        order: "DESC"
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      edition
+      sellPrice
+      availableStock
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Sort by Name (Alphabetical)
+
+```graphql
+query MagicCardsByName {
+  magicCardPublicList(
+    findMagicCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "name"
+        order: "ASC"
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      edition
+      sellPrice
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Combining Sorting with Filters
+
+```graphql
+query MagicCardsFilteredAndSorted {
+  magicCardPublicList(
+    findMagicCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "sellPrice"
+        order: "ASC"
+      }
+      filters: {
+        stockStatus: "AVAILABLE"
+        condition: "NEAR_MINT"
+        isFoil: true
+        sellPrice: {
+          range: {
+            from: 50
+            to: 500
+          }
+        }
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      edition
+      isFoil
+      sellPrice
+      availableStock
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Frontend Integration: Sort Dropdown
+
+```typescript
+import { useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
+
+type SortOption = {
+  label: string;
+  column: string;
+  order: 'ASC' | 'DESC';
+};
+
+const sortOptions: SortOption[] = [
+  { label: 'Name (A-Z)', column: 'name', order: 'ASC' },
+  { label: 'Name (Z-A)', column: 'name', order: 'DESC' },
+  { label: 'Price (Low to High)', column: 'sellPrice', order: 'ASC' },
+  { label: 'Price (High to Low)', column: 'sellPrice', order: 'DESC' },
+  { label: 'Newest Releases', column: 'releaseDate', order: 'DESC' },
+  { label: 'Oldest Releases', column: 'releaseDate', order: 'ASC' },
+  { label: 'Collector Number', column: 'collectorNumber', order: 'ASC' },
+  { label: 'Edition (A-Z)', column: 'edition', order: 'ASC' },
+];
+
+const GET_MAGIC_CARDS = gql`
+  query MagicCardPublicList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) {
+    magicCardPublicList(findMagicCardsPublicArgs: $findMagicCardsPublicArgs) {
+      data {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+      }
+      count
+    }
+  }
+`;
+
+const MagicCardListWithSort: React.FC = () => {
+  const [selectedSort, setSelectedSort] = useState<SortOption>(sortOptions[0]);
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
+
+  const { data, loading, error } = useQuery(GET_MAGIC_CARDS, {
+    variables: {
+      findMagicCardsPublicArgs: {
+        skip: page * pageSize,
+        limit: pageSize,
+        sort: {
+          column: selectedSort.column,
+          order: selectedSort.order,
+        },
+      },
+    },
+  });
+
+  if (loading) return <div>Loading cards...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  const cards = data?.magicCardPublicList?.data || [];
+  const totalCount = data?.magicCardPublicList?.count || 0;
+
+  return (
+    <div>
+      <div className="controls">
+        <label htmlFor="sort-select">Sort by:</label>
+        <select
+          id="sort-select"
+          value={sortOptions.indexOf(selectedSort)}
+          onChange={(e) => {
+            setSelectedSort(sortOptions[parseInt(e.target.value)]);
+            setPage(0); // Reset to first page when sorting changes
+          }}
+        >
+          {sortOptions.map((option, index) => (
+            <option key={index} value={index}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <span className="result-count">
+          Showing {cards.length} of {totalCount} cards
+        </span>
+      </div>
+
+      <div className="card-grid">
+        {cards.map((card: any) => (
+          <div key={card.guid} className="card-item">
+            <img src={card.imageUri} alt={card.name} />
+            <h3>{card.name}</h3>
+            <p>{card.edition} - #{card.collectorNumber}</p>
+            {card.isFoil && <span className="foil-badge">Foil</span>}
+            <p className="price">${card.sellPrice?.toFixed(2) || 'N/A'}</p>
+            <p className="stock">
+              {card.availableStock ? `${card.totalStock} in stock` : 'Out of stock'}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="pagination">
+        <button
+          disabled={page === 0}
+          onClick={() => setPage(page - 1)}
+        >
+          Previous
+        </button>
+        <span>Page {page + 1} of {Math.ceil(totalCount / pageSize)}</span>
+        <button
+          disabled={(page + 1) * pageSize >= totalCount}
+          onClick={() => setPage(page + 1)}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default MagicCardListWithSort;
+```
+
+---
+
+#### Advanced: Combined Filters and Sorting
+
+```typescript
+import { useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
+
+interface FilterState {
+  search: string;
+  rarity: string;
+  condition: string;
+  stockStatus: string;
+  isFoil: boolean | null;
+  priceFrom: string;
+  priceTo: string;
+}
+
+const MagicCardListAdvanced: React.FC = () => {
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    rarity: '',
+    condition: '',
+    stockStatus: '',
+    isFoil: null,
+    priceFrom: '',
+    priceTo: '',
+  });
+
+  const buildFilters = () => {
+    const filterObj: any = {};
+    
+    if (filters.rarity) filterObj.rarity = filters.rarity;
+    if (filters.condition) filterObj.condition = filters.condition;
+    if (filters.stockStatus) filterObj.stockStatus = filters.stockStatus;
+    if (filters.isFoil !== null) filterObj.isFoil = filters.isFoil;
+    
+    if (filters.priceFrom || filters.priceTo) {
+      filterObj.sellPrice = {
+        range: {
+          ...(filters.priceFrom && { from: parseFloat(filters.priceFrom) }),
+          ...(filters.priceTo && { to: parseFloat(filters.priceTo) }),
+        },
+      };
+    }
+    
+    return Object.keys(filterObj).length > 0 ? filterObj : undefined;
+  };
+
+  const { data, loading } = useQuery(GET_MAGIC_CARDS, {
+    variables: {
+      findMagicCardsPublicArgs: {
+        skip: 0,
+        limit: 20,
+        ...(filters.search && { search: filters.search }),
+        sort: {
+          column: sortColumn,
+          order: sortOrder,
+        },
+        filters: buildFilters(),
+      },
+    },
+  });
+
+  return (
+    <div>
+      <div className="filters-and-sort">
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search cards..."
+          value={filters.search}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+        />
+
+        {/* Sort Controls */}
+        <select
+          value={sortColumn}
+          onChange={(e) => setSortColumn(e.target.value)}
+        >
+          <option value="name">Name</option>
+          <option value="sellPrice">Price</option>
+          <option value="releaseDate">Release Date</option>
+          <option value="collectorNumber">Collector Number</option>
+          <option value="edition">Edition</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as 'ASC' | 'DESC')}
+        >
+          <option value="ASC">Ascending</option>
+          <option value="DESC">Descending</option>
+        </select>
+
+        {/* Foil Filter */}
+        <label>
+          <input
+            type="checkbox"
+            checked={filters.isFoil === true}
+            onChange={(e) => setFilters({ 
+              ...filters, 
+              isFoil: e.target.checked ? true : null 
+            })}
+          />
+          Foil Only
+        </label>
+
+        {/* Price Range */}
+        <input
+          type="number"
+          placeholder="Min Price"
+          value={filters.priceFrom}
+          onChange={(e) => setFilters({ ...filters, priceFrom: e.target.value })}
+        />
+        <input
+          type="number"
+          placeholder="Max Price"
+          value={filters.priceTo}
+          onChange={(e) => setFilters({ ...filters, priceTo: e.target.value })}
+        />
+
+        {/* Stock Status */}
+        <select
+          value={filters.stockStatus}
+          onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value })}
+        >
+          <option value="">All Stock</option>
+          <option value="AVAILABLE">In Stock</option>
+          <option value="UNAVAILABLE">Out of Stock</option>
+        </select>
+      </div>
+
+      {/* Results */}
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="card-grid">
+          {data?.magicCardPublicList?.data.map((card: any) => (
+            <div key={card.guid} className="card-item">
+              <img src={card.imageUri} alt={card.name} />
+              <h3>{card.name}</h3>
+              <p>{card.edition}</p>
+              {card.isFoil && <span className="foil-badge">Foil</span>}
+              <p>${card.sellPrice}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+---
+
+### 6. Get Public Card Detail
 
 **Query:** `magicCardPublicDetail`
 **Type:** Public
@@ -237,7 +683,7 @@ query MagicCardPublicDetail($guid: UUID!) {
 
 ---
 
-### 6. Get Internal Card List (Admin)
+### 7. Get Internal Card List (Admin)
 
 **Query:** `magicCardInternalList`
 **Type:** Internal (Requires Authentication)
@@ -285,7 +731,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
 
 ---
 
-### 7. Get Internal Card Detail (Admin)
+### 8. Get Internal Card Detail (Admin)
 
 **Query:** `magicCardInternalDetail`
 **Type:** Internal (Requires Authentication)
@@ -331,7 +777,7 @@ query MagicCardInternalDetail($guid: UUID!) {
 
 ---
 
-### 8. Get Top 5 Best-Selling Magic Cards
+### 9. Get Top 5 Best-Selling Magic Cards
 
 **Query:** `magicTopSoldCards`
 **Type:** Public
@@ -378,7 +824,7 @@ query MagicTopSoldCards {
 
 ---
 
-### 9. Get Card with Metrics (Internal)
+### 10. Get Card with Metrics (Internal)
 
 **Query:** `magicCardWithMetrics`
 **Type:** Internal (Requires Authentication)
@@ -621,7 +1067,7 @@ const SearchableMagicCardList: React.FC = () => {
 
 ---
 
-### 8. Batch Search Cards
+### 11. Batch Search Cards
 
 **Query:** `magicBatchCardSearch`
 **Type:** Internal (requires authentication)

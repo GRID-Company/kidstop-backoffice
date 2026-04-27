@@ -1,0 +1,95 @@
+query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
+  magicBatchCardSearch(input: $input) {
+    results {
+      originalLine
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      relatedCards {
+        guid
+        name
+        edition
+        collectorNumber
+        isFoil
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      error
+    }
+  }
+}
+
+query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
+  pokemonBatchCardSearch(input: $input) {
+    results {
+      originalLine
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      relatedCards {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+        inventoryCards {
+          guid
+          condition
+          stock
+          purchasePrice
+          sellPrice
+        }
+      }
+      error
+    }
+  }
+}
