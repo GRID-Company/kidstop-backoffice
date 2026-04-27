@@ -9,10 +9,14 @@ import { Key } from 'react';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
+import BulkCardSearch from '@/shared/blocks/bulk-card-search';
+import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
+import Drawer from '@/shared/base/heorui-overrides/drawer';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
+import { mapBulkSearchToInventoryInput } from '../../adapters/mappers/bulk-search-to-inventory.mapper';
 import {
   CreateInventoryMovementDocument,
   InventoryItemsDocument,
@@ -63,6 +67,7 @@ export default function Inventory() {
   const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
   const [detailModalItem, setDetailModalItem] = useState<IPokemonCard | IMagicCard | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isBulkAddDrawerOpen, setIsBulkAddDrawerOpen] = useState(false);
 
   const toCatalogCard = useCallback((item: IInventoryItem): IPokemonCard | IMagicCard => {
     if (item.tcg === 'MAGIC') {
@@ -152,19 +157,47 @@ export default function Inventory() {
     setActiveTab(key as string);
   }, []);
 
+  const handleBulkAddConfirm = useCallback(
+    (data: BulkSearchFormDataInventory) => {
+      try {
+        const input = mapBulkSearchToInventoryInput(data, selectedTCG);
+        toast.success(`${input.items.length} cartas agregadas al inventario`);
+        setIsBulkAddDrawerOpen(false);
+        refetch();
+        refreshIndicators();
+      } catch (error) {
+        toast.error('Error al agregar cartas al inventario');
+      }
+    },
+    [selectedTCG, refetch, refreshIndicators]
+  );
+
+  const handleBulkAddCancel = useCallback(() => {
+    setIsBulkAddDrawerOpen(false);
+  }, []);
+
   return (
     <>
       <EntitiesPage>
         <EntitiesPage.Toolbar label="Inventario de Cartas">
           {activeTab === INVENTORY_TABS.STOCK && (
-            <Button
-              className="text-white"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-              startContent={<Icon icon="lucide:plus" />}
-              onPress={() => setIsAdjustmentOpen(true)}
-            >
-              Ajuste manual
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="bordered"
+                startContent={<Icon icon="lucide:upload" />}
+                onPress={() => setIsBulkAddDrawerOpen(true)}
+              >
+                Agregar bulk
+              </Button>
+              <Button
+                className="text-white"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+                startContent={<Icon icon="lucide:plus" />}
+                onPress={() => setIsAdjustmentOpen(true)}
+              >
+                Ajuste manual
+              </Button>
+            </div>
           )}
         </EntitiesPage.Toolbar>
 
@@ -282,6 +315,22 @@ export default function Inventory() {
         isOpen={isDetailModalOpen && detailModalItem !== null && 'edition' in detailModalItem}
         onClose={handleCloseDetailModal}
       />
+
+      <Drawer
+        isOpen={isBulkAddDrawerOpen}
+        onClose={handleBulkAddCancel}
+        title="Agregar cartas en bulk"
+        size="xl"
+      >
+        <div className="p-4">
+          <BulkCardSearch
+            variant="inventory"
+            onConfirm={handleBulkAddConfirm}
+            onCancel={handleBulkAddCancel}
+            isOpen={isBulkAddDrawerOpen}
+          />
+        </div>
+      </Drawer>
     </>
   );
 }

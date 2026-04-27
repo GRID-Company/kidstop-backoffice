@@ -17,7 +17,7 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   const { search, results, loading, error, reset: resetSearch } = useBulkCardSearch();
 
-  const { form, fields, initializeCards, resetForm } = useBulkSearchForm(variant, onConfirm);
+  const { form, fields, initializeCards, resetForm } = useBulkSearchForm(variant, onConfirm as any);
 
   useEffect(() => {
     if (results.length > 0) {
@@ -38,7 +38,7 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
   };
 
   const handleSubmit = form.handleSubmit((data) => {
-    onConfirm(data);
+    onConfirm(data as any);
     handleClear();
   });
 
