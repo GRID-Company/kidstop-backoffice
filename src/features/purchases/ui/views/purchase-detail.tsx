@@ -50,6 +50,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     purchase,
     items,
     payments,
+    itemsForm,
+    paymentsForm,
     isEditable,
     canSendQuote,
     canQuote,
