@@ -90,6 +90,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     },
   });
 
+  const canEditSeller = useMemo(() => {
+    return (
+      purchase?.status === PURCHASE_STATUS.DRAFT ||
+      purchase?.status === PURCHASE_STATUS.QUOTED ||
+      purchase?.status === PURCHASE_STATUS.REJECTED
+    );
+  }, [purchase?.status]);
+
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),
     [items]
@@ -227,7 +235,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               createdAt={purchase.createdDate}
               updatedAt={purchase.updatedDate}
               notes={purchase.notes}
-              isEditable={isEditable}
+              isEditable={canEditSeller}
               onEditClick={() => setIsEditSellerDrawerOpen(true)}
             />
           </div>
