@@ -1,4 +1,5 @@
 import { useForm, useFieldArray } from 'react-hook-form';
+import { useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import {
@@ -40,59 +41,71 @@ export function useBulkSearchForm(
     name: 'cards',
   });
 
-  const addCard = (result: BulkCardResult) => {
-    const selectedCard = result.bestMatch;
-    if (!selectedCard) return;
+  const addCard = useCallback(
+    (result: BulkCardResult) => {
+      const selectedCard = result.bestMatch;
+      if (!selectedCard) return;
 
-    const defaultReferencePrice = selectedCard.sellPrice || 0;
+      const defaultReferencePrice = selectedCard.sellPrice || 0;
 
-    if (variant === 'purchases') {
-      append({
-        selectedCardGuid: selectedCard.guid,
-        condition: CARD_CONDITIONS.NEAR_MINT,
-        quantity: 1,
-        offerPrice: defaultReferencePrice * 0.7,
-      } as any);
-    } else {
-      append({
-        selectedCardGuid: selectedCard.guid,
-        condition: CARD_CONDITIONS.NEAR_MINT,
-        quantity: 1,
-        publicPrice: defaultReferencePrice,
-      } as any);
-    }
-  };
-
-  const removeCard = (index: number) => {
-    remove(index);
-  };
-
-  const updateSelectedCard = (index: number, cardGuid: string) => {
-    const currentField = fields[index];
-    if (currentField) {
-      update(index, {
-        ...currentField,
-        selectedCardGuid: cardGuid,
-      } as any);
-    }
-  };
-
-  const initializeCards = (results: BulkCardResult[]) => {
-    form.setValue('cards', []);
-    
-    results.forEach((result) => {
-      if (result.bestMatch && !result.error) {
-        addCard(result);
+      if (variant === 'purchases') {
+        append({
+          selectedCardGuid: selectedCard.guid,
+          condition: CARD_CONDITIONS.NEAR_MINT,
+          quantity: 1,
+          offerPrice: defaultReferencePrice * 0.7,
+        } as any);
+      } else {
+        append({
+          selectedCardGuid: selectedCard.guid,
+          condition: CARD_CONDITIONS.NEAR_MINT,
+          quantity: 1,
+          publicPrice: defaultReferencePrice,
+        } as any);
       }
-    });
-  };
+    },
+    [variant, append]
+  );
 
-  const resetForm = () => {
+  const removeCard = useCallback(
+    (index: number) => {
+      remove(index);
+    },
+    [remove]
+  );
+
+  const updateSelectedCard = useCallback(
+    (index: number, cardGuid: string) => {
+      const currentField = fields[index];
+      if (currentField) {
+        update(index, {
+          ...currentField,
+          selectedCardGuid: cardGuid,
+        } as any);
+      }
+    },
+    [fields, update]
+  );
+
+  const initializeCards = useCallback(
+    (results: BulkCardResult[]) => {
+      form.setValue('cards', []);
+
+      results.forEach((result) => {
+        if (result.bestMatch && !result.error) {
+          addCard(result);
+        }
+      });
+    },
+    [form, addCard]
+  );
+
+  const resetForm = useCallback(() => {
     form.reset({
       searchText: '',
       cards: [],
     });
-  };
+  }, [form]);
 
   return {
     form,
