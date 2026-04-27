@@ -12,7 +12,7 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
 import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
-import Drawer from '@/shared/base/heorui-overrides/drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@heroui/react';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
@@ -320,17 +320,25 @@ export default function Inventory() {
       <Drawer
         isOpen={isBulkAddDrawerOpen}
         onClose={handleBulkAddCancel}
-        title="Agregar cartas en bulk"
         size="xl"
       >
-        <div className="p-4">
-          <BulkCardSearch
-            variant="inventory"
-            onConfirm={handleBulkAddConfirm}
-            onCancel={handleBulkAddCancel}
-            isOpen={isBulkAddDrawerOpen}
-          />
-        </div>
+        <DrawerContent>
+          <DrawerHeader className="flex flex-col gap-1">
+            <span className="text-lg font-semibold text-accent">Agregar cartas en bulk</span>
+            <span className="text-sm font-normal text-default-500">
+              Búsqueda masiva de cartas para agregar al inventario
+            </span>
+          </DrawerHeader>
+          
+          <DrawerBody>
+            <BulkCardSearch
+              variant="inventory"
+              onConfirm={handleBulkAddConfirm}
+              onCancel={handleBulkAddCancel}
+              isOpen={isBulkAddDrawerOpen}
+            />
+          </DrawerBody>
+        </DrawerContent>
       </Drawer>
     </>
   );
