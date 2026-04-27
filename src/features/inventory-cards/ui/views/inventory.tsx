@@ -23,6 +23,7 @@ import {
   InventoryItemsDocument,
   InventoryMovementsDocument,
   IndicatorsInventoryItemsDocument,
+  BulkLoadInventoryDocument,
 } from '@/lib/api/generated/inventory.generated';
 import { toAdjustInventoryPayload } from '../../adapters/mappers/inventory.mapper';
 import { useInventorySearch } from '../hooks/use-inventory-search';
@@ -130,6 +131,8 @@ export default function Inventory() {
     setSelectedItem(null);
   }, []);
 
+  const [bulkLoadInventory, { loading: bulkLoading }] = useMutation(BulkLoadInventoryDocument);
+  
   const [createMovement, { loading: adjusting }] = useMutation(
     CreateInventoryMovementDocument,
     {
@@ -159,18 +162,42 @@ export default function Inventory() {
   }, []);
 
   const handleBulkAddConfirm = useCallback(
-    (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => {
+    async (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => {
       try {
         const input = mapBulkSearchToInventoryInput(data, results, selectedTCG);
-        toast.success(`${input.items.length} cartas agregadas al inventario`);
-        setIsBulkAddDrawerOpen(false);
-        refetch();
-        refreshIndicators();
+        
+        const response = await bulkLoadInventory({
+          variables: { input },
+          refetchQueries: [
+            InventoryItemsDocument,
+            InventoryMovementsDocument,
+            IndicatorsInventoryItemsDocument,
+          ],
+        });
+
+        if (response.data?.bulkLoadInventory.success) {
+          const { createdCount, updatedCount, errors } = response.data.bulkLoadInventory;
+          
+          if (errors.length > 0) {
+            toast.error(`Algunas cartas no se pudieron agregar: ${errors.join(', ')}`);
+          } else {
+            toast.success(
+              `${createdCount} cartas creadas, ${updatedCount} actualizadas exitosamente`
+            );
+          }
+          
+          setIsBulkAddDrawerOpen(false);
+          refetch();
+          refreshIndicators();
+        } else {
+          toast.error('Error al procesar las cartas');
+        }
       } catch (error) {
+        console.error('Error in bulk add:', error);
         toast.error('Error al agregar cartas al inventario');
       }
     },
-    [selectedTCG, refetch, refreshIndicators]
+    [selectedTCG, bulkLoadInventory, refetch, refreshIndicators]
   );
 
   const handleBulkAddCancel = useCallback(() => {

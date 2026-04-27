@@ -109,6 +109,19 @@ export type CreateInventoryMovementMutation = {
   };
 };
 
+export type BulkLoadInventoryMutationVariables = Types.Exact<{
+  input: Types.BulkLoadInventoryInput;
+}>;
+
+export type BulkLoadInventoryMutation = {
+  bulkLoadInventory: {
+    success: boolean;
+    createdCount: number;
+    updatedCount: number;
+    errors: Array<string>;
+  };
+};
+
 export const InventoryItemsDocument = {
   kind: 'Document',
   definitions: [
@@ -588,4 +601,67 @@ export const CreateInventoryMovementDocument = {
 } as unknown as DocumentNode<
   CreateInventoryMovementMutation,
   CreateInventoryMovementMutationVariables
+>;
+export const BulkLoadInventoryDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'BulkLoadInventory' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'BulkLoadInventoryInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'bulkLoadInventory' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'createdCount' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'updatedCount' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'errors' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  BulkLoadInventoryMutation,
+  BulkLoadInventoryMutationVariables
 >;
