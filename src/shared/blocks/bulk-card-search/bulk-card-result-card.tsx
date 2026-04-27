@@ -64,6 +64,17 @@ export default function BulkCardResultCard({
     return result.relatedCards.find((c) => c.guid === selectedCardGuid) || result.bestMatch;
   }, [selectedCardGuid, result.bestMatch, result.relatedCards]);
 
+  const availableRelatedCards = useMemo(() => {
+    if (!result.bestMatch) return result.relatedCards;
+    
+    if (selectedCardGuid === result.bestMatch.guid) {
+      return result.relatedCards;
+    }
+    
+    const otherRelated = result.relatedCards.filter((c) => c.guid !== selectedCardGuid);
+    return [result.bestMatch, ...otherRelated];
+  }, [selectedCardGuid, result.bestMatch, result.relatedCards]);
+
   const isConfigured = useMemo(() => {
     return (
       selectedCardGuid &&
@@ -177,9 +188,9 @@ export default function BulkCardResultCard({
           }
         >
           <div className="flex flex-col gap-4 px-2 pb-3">
-            {result.relatedCards.length > 0 && (
+            {availableRelatedCards.length > 0 && (
               <BulkCardRelatedSelector
-                relatedCards={result.relatedCards}
+                relatedCards={availableRelatedCards}
                 selectedCardGuid={selectedCardGuid}
                 onSelect={handleSelectRelatedCard}
               />
