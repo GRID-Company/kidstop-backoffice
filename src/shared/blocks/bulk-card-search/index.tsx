@@ -60,7 +60,8 @@ function BulkCardSearchFooter({
             Cancelar
           </Button>
           <Button
-            color="primary"
+            className="text-white"
+            style={{ backgroundColor: 'var(--color-accent)' }}
             type="submit"
             startContent={<Icon icon="lucide:check" />}
             isDisabled={fields.length === 0}
