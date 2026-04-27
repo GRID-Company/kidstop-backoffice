@@ -1,8 +1,7 @@
 'use client';
 
-import { Button } from '@heroui/react';
+import { Button, Textarea } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import TextareaForm from '@/shared/base/form-controls/textarea-form';
 import { BulkCardSearchInputProps } from './types';
 
 const PLACEHOLDER_TEXT = `Pokémon (Limitless):
@@ -25,11 +24,7 @@ export default function BulkCardSearchInput({
 
   return (
     <div className="flex flex-col gap-4">
-      <TextareaForm
-        controlProps={{
-          name: 'searchText',
-          control: {} as any,
-        }}
+      <Textarea
         label="Lista de cartas"
         placeholder={PLACEHOLDER_TEXT}
         value={value}
