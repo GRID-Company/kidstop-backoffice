@@ -60,7 +60,7 @@ function CardResultItem({
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
-    unitBuyPrice: Math.round(card.metrics.referencePrice * 0.6 * 100) / 100,
+    unitBuyPrice: Math.floor(card.metrics.referencePrice * 0.6),
   });
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
@@ -73,7 +73,7 @@ function CardResultItem({
 
   useEffect(() => {
     if (referencePrice !== null) {
-      const calculatedPrice = Math.round(referencePrice * 0.6 * 100) / 100;
+      const calculatedPrice = Math.floor(referencePrice * 0.6);
       setAddState((s) => ({ ...s, unitBuyPrice: calculatedPrice }));
     }
   }, [referencePrice, addState.condition]);
@@ -84,8 +84,8 @@ function CardResultItem({
     try {
       await onAdd(card, addState, variantMetrics, referencePrice);
       const resetPrice = referencePrice !== null 
-        ? Math.round(referencePrice * 0.6 * 100) / 100
-        : Math.round(card.metrics.referencePrice * 0.6 * 100) / 100;
+        ? Math.floor(referencePrice * 0.6)
+        : Math.floor(card.metrics.referencePrice * 0.6);
       setAddState({
         ...DEFAULT_ADD_STATE,
         unitBuyPrice: resetPrice,
