@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Accordion, AccordionItem, Badge, CardBody } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -75,9 +75,12 @@ export default function BulkCardResultCard({
     );
   }, [selectedCardGuid, condition, quantity, price]);
 
-  const handleSelectRelatedCard = (cardGuid: string) => {
-    setValue(`cards.${index}.selectedCardGuid`, cardGuid);
-  };
+  const handleSelectRelatedCard = useCallback(
+    (cardGuid: string) => {
+      setValue(`cards.${index}.selectedCardGuid`, cardGuid);
+    },
+    [setValue, index]
+  );
 
   if (result.error) {
     return (
