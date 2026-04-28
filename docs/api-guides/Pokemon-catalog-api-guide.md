@@ -758,8 +758,36 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
         sellPrice
       }
       totalStock
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
     }
     count
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "findPokemonCardsPublicArgs": {
+    "skip": 0,
+    "limit": 10,
+    "sort": {
+      "column": "name",
+      "order": "ASC"
+    },
+    "withCardsMetrics": true
   }
 }
 ```
@@ -768,6 +796,23 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
 
 - `purchasePrice`: Cost price of inventory items
 - `totalStock`: Total stock across all conditions
+- `cardMetrics` (nullable): Card metrics data (only populated when `withCardsMetrics: true`)
+  - `variantsMetrics`: Array of inventory condition variants with metrics
+    - `condition`: Card condition
+    - `stock`: Current stock quantity
+    - `lastSellDate`: Date of last sale (nullable)
+    - `avgDaysInInventory`: Average days in inventory (nullable)
+    - `wishlistCount`: Number of wishlists
+  - `ungradedPrice`: Market price for ungraded card in MXN (nullable)
+  - `gradedPriceSeven`: Market price for PSA 7 in MXN (nullable)
+  - `gradedPriceEightOrAbove`: Market price for PSA 8+ in MXN (nullable)
+
+**Optional Parameters:**
+
+- `withCardsMetrics` (boolean, default: false): Include card metrics and PriceCharting prices for each card
+  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (PriceCharting)
+  - When `true`: Each card includes full metrics data
+  - When `false` or omitted: `cardMetrics` field is null (faster response)
 
 ---
 
@@ -1117,6 +1162,18 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
           purchasePrice
           sellPrice
         }
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
+        }
       }
       relatedCards {
         guid
@@ -1147,7 +1204,8 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 ```json
 {
   "input": {
-    "searchText": "Pokémon: 6\n3 Mega Charizard Y ex ASC 22\n3 Dreepy TWM 128\n\nTrainer: 3\n2 Iono PAL 185\n1 Lillie's Determination MEG 169\n\nEnergy: 6\n2 Luminous Energy PAL 191\n2 Psychic Energy MEE 5\n2 Fire Energy MEE 2"
+    "searchText": "Pokémon: 6\n3 Mega Charizard Y ex ASC 22\n3 Dreepy TWM 128\n\nTrainer: 3\n2 Iono PAL 185\n1 Lillie's Determination MEG 169\n\nEnergy: 6\n2 Luminous Energy PAL 191\n2 Psychic Energy MEE 5\n2 Fire Energy MEE 2",
+    "withCardsMetrics": true
   }
 }
 ```
@@ -1167,6 +1225,14 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 - Section headers: `Pokémon:`, `Trainer:`, `Energy:`
 - Empty lines
 
+**Input Parameters:**
+
+- `searchText` (required): Multiline text in Limitless format
+- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for best match
+  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (PriceCharting)
+  - When `true`: `bestMatch.cardMetrics` includes full metrics data
+  - When `false` or omitted: `cardMetrics` field is null (faster response)
+
 **Response Fields:**
 
 - `originalLine`: The original input line
@@ -1174,7 +1240,8 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 - `parsedSet`: Extracted set code
 - `parsedNumber`: Extracted card number
 - `bestMatch`: The top matching card with full inventory details
-- `relatedCards`: Up to 3 additional related cards
+  - `cardMetrics` (nullable): Card metrics data (only when `withCardsMetrics: true`)
+- `relatedCards`: Up to 3 additional related cards (no metrics)
 - `error`: Error message if search failed for this line
 
 **Use Cases:**

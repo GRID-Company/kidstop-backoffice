@@ -90,6 +90,53 @@ export type MagicCardWithMetricsQuery = {
   };
 };
 
+export type MagicBatchCardSearchQueryVariables = Types.Exact<{
+  input: Types.BatchSearchMagicCardsInput;
+}>;
+
+export type MagicBatchCardSearchQuery = {
+  magicBatchCardSearch: {
+    results: Array<{
+      originalLine: string;
+      parsedName: string | null;
+      parsedSet: string | null;
+      parsedNumber: string | null;
+      error: string | null;
+      bestMatch: {
+        guid: string;
+        name: string;
+        edition: string | null;
+        collectorNumber: string | null;
+        imageUri: string | null;
+        isFoil: boolean;
+        sellPrice: number | null;
+        totalStock: number;
+        cardMetrics: {
+          priceRetail: number | null;
+          priceBuy: number | null;
+          variantsMetrics: Array<{
+            condition: string;
+            stock: number;
+            lastSellDate: unknown | null;
+            avgDaysInInventory: number | null;
+            wishlistCount: number;
+          }>;
+        } | null;
+      } | null;
+      relatedCards: Array<{
+        guid: string;
+        name: string;
+        edition: string | null;
+        collectorNumber: string | null;
+        imageUri: string | null;
+        isFoil: boolean;
+        sellPrice: number | null;
+        totalStock: number;
+      }>;
+    }>;
+  };
+};
+
 export const MagicCardInternalListDocument = {
   kind: 'Document',
   definitions: [
@@ -426,4 +473,232 @@ export const MagicCardWithMetricsDocument = {
 } as unknown as DocumentNode<
   MagicCardWithMetricsQuery,
   MagicCardWithMetricsQueryVariables
+>;
+export const MagicBatchCardSearchDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'MagicBatchCardSearch' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'BatchSearchMagicCardsInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'magicBatchCardSearch' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'results' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'originalLine' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedName' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedSet' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedNumber' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'bestMatch' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'edition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'collectorNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'isFoil' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'sellPrice' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'totalStock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardMetrics' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'variantsMetrics',
+                                    },
+                                    selectionSet: {
+                                      kind: 'SelectionSet',
+                                      selections: [
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'condition',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'stock',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'lastSellDate',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'avgDaysInInventory',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'wishlistCount',
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'priceRetail',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'priceBuy' },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'relatedCards' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'edition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'collectorNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'isFoil' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'sellPrice' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'totalStock' },
+                            },
+                          ],
+                        },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MagicBatchCardSearchQuery,
+  MagicBatchCardSearchQueryVariables
 >;

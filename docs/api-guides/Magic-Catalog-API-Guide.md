@@ -716,8 +716,35 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
         sellPrice
       }
       totalStock
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        priceRetail
+        priceBuy
+      }
     }
     count
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "findMagicCardsPublicArgs": {
+    "skip": 0,
+    "limit": 10,
+    "sort": {
+      "column": "name",
+      "order": "ASC"
+    },
+    "withCardsMetrics": true
   }
 }
 ```
@@ -728,6 +755,22 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
   - `guid`: Inventory item identifier
   - `purchasePrice`: Cost price of inventory items
 - `totalStock`: Total stock across all conditions
+- `cardMetrics` (nullable): Card metrics data (only populated when `withCardsMetrics: true`)
+  - `variantsMetrics`: Array of inventory condition variants with metrics
+    - `condition`: Card condition
+    - `stock`: Current stock quantity
+    - `lastSellDate`: Date of last sale (nullable)
+    - `avgDaysInInventory`: Average days in inventory (nullable)
+    - `wishlistCount`: Number of wishlists
+  - `priceRetail`: CardKingdom retail price in MXN (nullable)
+  - `priceBuy`: CardKingdom buy price in MXN (nullable)
+
+**Optional Parameters:**
+
+- `withCardsMetrics` (boolean, default: false): Include card metrics and CardKingdom prices for each card
+  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (CardKingdom)
+  - When `true`: Each card includes full metrics data
+  - When `false` or omitted: `cardMetrics` field is null (faster response)
 
 ---
 
@@ -1099,6 +1142,17 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
           purchasePrice
           sellPrice
         }
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          priceRetail
+          priceBuy
+        }
       }
       relatedCards {
         guid
@@ -1129,7 +1183,8 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
 ```json
 {
   "input": {
-    "searchText": "1 Rin and Seri, Inseparable (SLD) 1910\n1 Ajani, the Greathearted (PLST) WAR-184\n1 Impact Tremors (FDN) 717 *F*\n1 Mirri, Weatherlight Duelist (CMM) 585 *E*"
+    "searchText": "1 Rin and Seri, Inseparable (SLD) 1910\n1 Ajani, the Greathearted (PLST) WAR-184\n1 Impact Tremors (FDN) 717 *F*\n1 Mirri, Weatherlight Duelist (CMM) 585 *E*",
+    "withCardsMetrics": true
   }
 }
 ```
@@ -1150,6 +1205,14 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
 - Empty lines are ignored
 - Set codes are extracted from parentheses
 
+**Input Parameters:**
+
+- `searchText` (required): Multiline text in Moxfield format
+- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for best match
+  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (CardKingdom)
+  - When `true`: `bestMatch.cardMetrics` includes full metrics data
+  - When `false` or omitted: `cardMetrics` field is null (faster response)
+
 **Response Fields:**
 
 - `originalLine`: The original input line
@@ -1157,7 +1220,8 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
 - `parsedSet`: Extracted set/edition code
 - `parsedNumber`: Extracted collector number
 - `bestMatch`: The top matching card with full inventory details
-- `relatedCards`: Up to 3 additional related cards
+  - `cardMetrics` (nullable): Card metrics data (only when `withCardsMetrics: true`)
+- `relatedCards`: Up to 3 additional related cards (no metrics)
 - `error`: Error message if search failed for this line
 
 **Use Cases:**

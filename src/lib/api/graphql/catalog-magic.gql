@@ -68,3 +68,46 @@ query MagicCardWithMetrics($guid: String!) {
     priceBuy
   }
 }
+
+query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
+  magicBatchCardSearch(input: $input) {
+    results {
+    originalLine
+    parsedName
+    parsedSet
+    parsedNumber
+    bestMatch {
+      guid
+      name
+      edition
+      collectorNumber
+      imageUri
+      isFoil
+      sellPrice
+      totalStock
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        priceRetail
+        priceBuy
+      }
+    }
+    relatedCards {
+      guid
+      name
+      edition
+      collectorNumber
+      imageUri
+      isFoil
+      sellPrice
+      totalStock
+    }
+    error
+    }
+  }
+}

@@ -116,6 +116,54 @@ export type PokemonCardWithMetricsQuery = {
   };
 };
 
+export type PokemonBatchCardSearchQueryVariables = Types.Exact<{
+  input: Types.BatchSearchPokemonCardsInput;
+}>;
+
+export type PokemonBatchCardSearchQuery = {
+  pokemonBatchCardSearch: {
+    results: Array<{
+      originalLine: string;
+      parsedName: string | null;
+      parsedSet: string | null;
+      parsedNumber: string | null;
+      error: string | null;
+      bestMatch: {
+        guid: string;
+        name: string;
+        cardNumber: string | null;
+        setName: string | null;
+        setCode: string | null;
+        imageUri: string | null;
+        sellPrice: number | null;
+        totalStock: number;
+        cardMetrics: {
+          ungradedPrice: number | null;
+          gradedPriceSeven: number | null;
+          gradedPriceEightOrAbove: number | null;
+          variantsMetrics: Array<{
+            condition: string;
+            stock: number;
+            lastSellDate: unknown | null;
+            avgDaysInInventory: number | null;
+            wishlistCount: number;
+          }>;
+        } | null;
+      } | null;
+      relatedCards: Array<{
+        guid: string;
+        name: string;
+        cardNumber: string | null;
+        setName: string | null;
+        setCode: string | null;
+        imageUri: string | null;
+        sellPrice: number | null;
+        totalStock: number;
+      }>;
+    }>;
+  };
+};
+
 export const PokemonCardInternalListDocument = {
   kind: 'Document',
   definitions: [
@@ -563,4 +611,242 @@ export const PokemonCardWithMetricsDocument = {
 } as unknown as DocumentNode<
   PokemonCardWithMetricsQuery,
   PokemonCardWithMetricsQueryVariables
+>;
+export const PokemonBatchCardSearchDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'PokemonBatchCardSearch' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'BatchSearchPokemonCardsInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'pokemonBatchCardSearch' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'results' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'originalLine' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedName' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedSet' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedNumber' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'bestMatch' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setName' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setCode' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'sellPrice' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'totalStock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardMetrics' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'variantsMetrics',
+                                    },
+                                    selectionSet: {
+                                      kind: 'SelectionSet',
+                                      selections: [
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'condition',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'stock',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'lastSellDate',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'avgDaysInInventory',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'wishlistCount',
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'ungradedPrice',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'gradedPriceSeven',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'gradedPriceEightOrAbove',
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'relatedCards' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setName' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setCode' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'sellPrice' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'totalStock' },
+                            },
+                          ],
+                        },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'error' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  PokemonBatchCardSearchQuery,
+  PokemonBatchCardSearchQueryVariables
 >;

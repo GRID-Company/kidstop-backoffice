@@ -86,3 +86,47 @@ query PokemonCardWithMetrics($guid: String!) {
     gradedPriceEightOrAbove
   }
 }
+
+query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
+  pokemonBatchCardSearch(input: $input) {
+    results {
+    originalLine
+    parsedName
+    parsedSet
+    parsedNumber
+    bestMatch {
+      guid
+      name
+      cardNumber
+      setName
+      setCode
+      imageUri
+      sellPrice
+      totalStock
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
+    }
+    relatedCards {
+      guid
+      name
+      cardNumber
+      setName
+      setCode
+      imageUri
+      sellPrice
+      totalStock
+    }
+    error
+    }
+  }
+}

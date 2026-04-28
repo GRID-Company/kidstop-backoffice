@@ -79,11 +79,15 @@ export type BannerGuidsInput = {
 export type BatchSearchMagicCardsInput = {
   /** Multiline text with Magic cards in Moxfield format */
   searchText: Scalars['String']['input'];
+  /** Include card metrics for best match (variants metrics + CardKingdom prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type BatchSearchPokemonCardsInput = {
   /** Multiline text with Pokemon cards in Limitless format */
   searchText: Scalars['String']['input'];
+  /** Include card metrics for best match (variants metrics + PriceCharting prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type BulkLoadInventoryInput = {
@@ -312,6 +316,8 @@ export type FindMagicCardsPublicArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
+  /** Include card metrics (variants metrics + CardKingdom prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type FindMagicCardsPublicFilter = {
@@ -369,6 +375,8 @@ export type FindPokemonCardsPublicArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
+  /** Include card metrics (variants metrics + PriceCharting prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type FindPokemonCardsPublicFilter = {
@@ -628,6 +636,7 @@ export type MagicCardInternalDetail = {
 
 export type MagicCardInternalItem = {
   availableStock: Scalars['Boolean']['output'];
+  cardMetrics?: Maybe<MagicCardWithMetrics>;
   collectorNumber?: Maybe<Scalars['String']['output']>;
   edition?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
@@ -1206,6 +1215,7 @@ export type PokemonCardInternalDetail = {
 
 export type PokemonCardInternalItem = {
   availableStock: Scalars['Boolean']['output'];
+  cardMetrics?: Maybe<PokemonCardWithMetrics>;
   cardNumber?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
