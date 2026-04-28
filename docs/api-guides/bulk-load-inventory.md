@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Bulk Load Inventory API allows administrators to efficiently create or update multiple inventory items in a single operation. This is ideal for importing inventory data from external sources or performing bulk updates.
+The Bulk Load Inventory API allows administrators to efficiently create or update multiple inventory items in a single operation with three operation types: manual entry (add stock), manual exit (remove stock), or manual set (set absolute stock). This is ideal for importing inventory data from external sources or performing bulk updates.
 
 ## Authentication & Authorization
 
@@ -33,7 +33,13 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `bulkOperationType` | `BulkOperationType!` | Yes | Type of operation: `MANUAL_ENTRY`, `MANUAL_EXIT`, or `MANUAL_SET` |
 | `items` | `[BulkLoadInventoryItemInput!]!` | Yes | Array of inventory items to process (minimum 1) |
+
+**Bulk Operation Types:**
+- `MANUAL_ENTRY` - Add quantity to existing stock (or create new item)
+- `MANUAL_EXIT` - Remove quantity from existing stock (requires sufficient stock)
+- `MANUAL_SET` - Set stock to absolute value (create new or update existing)
 
 ### BulkLoadInventoryItemInput
 
@@ -42,9 +48,14 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
 | `cardGuid` | `UUID!` | Yes | GUID of the Pokemon or Magic card |
 | `tcg` | `TCGType!` | Yes | Card game type: `POKEMON` or `MAGIC` |
 | `condition` | `CardCondition!` | Yes | Card condition (see conditions below) |
-| `stock` | `Int!` | Yes | Absolute stock quantity to set (≥ 0) |
+| `quantity` | `Int!` | Yes | Quantity value (meaning depends on operation type) |
 | `purchasePrice` | `Float` | No | Purchase price per unit |
 | `sellPrice` | `Float` | No | Selling price per unit |
+
+**Quantity Meaning by Operation Type:**
+- `MANUAL_ENTRY`: Amount to add to current stock (must be > 0)
+- `MANUAL_EXIT`: Amount to remove from current stock (must be > 0, cannot exceed current stock)
+- `MANUAL_SET`: Absolute stock value to set (must be ≥ 0)
 
 **Card Conditions:**
 - `NEAR_MINT`
@@ -71,12 +82,37 @@ The mutation automatically detects whether an inventory item exists based on:
 - Card ID (Pokemon or Magic)
 - Card condition
 
-If the combination exists, it updates the item. Otherwise, it creates a new one.
+Behavior depends on operation type:
+- **MANUAL_ENTRY & MANUAL_SET:** Creates new item if it doesn't exist
+- **MANUAL_EXIT:** Requires existing item (throws error if not found)
 
-### Stock Updates
-- **Absolute Values:** Stock is set to the exact value provided (not incremental)
-- **Delta Calculation:** The system calculates the difference between new and current stock
-- **Inventory Movements:** Automatic movement records are created for stock changes
+### Operation Type Behaviors
+
+#### MANUAL_ENTRY (Add Stock)
+- Adds the specified quantity to current stock
+- Creates new inventory item if it doesn't exist (starting with quantity)
+- Creates new FIFO batch with the added quantity
+- Always creates a movement record
+- **Validation:** quantity must be > 0
+
+#### MANUAL_EXIT (Remove Stock)
+- Removes the specified quantity from current stock
+- Requires existing inventory item (error if not found)
+- Requires sufficient stock (error if quantity > current stock)
+- Consumes oldest FIFO batches first
+- Updates lastSellDate to current timestamp
+- Always creates a movement record
+- **Validation:** quantity must be > 0 and ≤ current stock
+
+#### MANUAL_SET (Set Absolute Stock)
+- Sets stock to the exact quantity specified
+- Creates new inventory item if it doesn't exist
+- Calculates delta and adjusts FIFO batches accordingly:
+  - Delta > 0: adds new batch with the difference
+  - Delta < 0: consumes batches for the difference
+  - Delta = 0: no batch changes
+- Always creates a movement record (even if delta = 0)
+- **Validation:** quantity must be ≥ 0
 
 ### FIFO Batch Tracking
 - **Stock Increases:** New FIFO batches are created with the current timestamp
@@ -84,11 +120,14 @@ If the combination exists, it updates the item. Otherwise, it creates a new one.
 - **Batch Management:** Fully consumed batches are automatically removed
 
 ### Inventory Movements
-Automatic movements are created when stock changes:
-- **Delta > 0:** `PURCHASE_ENTRY` movement
-- **Delta < 0:** `SALE_EXIT` movement
-- **Delta = 0:** No movement created
-- **Reference:** All movements use reference `"BULK_LOAD"`
+All operations create `MANUAL_ADJUSTMENT` type movements with:
+- **Movement Type:** Always `MANUAL_ADJUSTMENT`
+- **Quantity:** Amount added/removed (absolute value for MANUAL_SET delta)
+- **Reference:** `BULK-YYYYMMDD-HHmm` (e.g., `BULK-20260427-1751`)
+- **Notes:** Operation-specific Spanish text:
+  - MANUAL_ENTRY: "Ingreso manual desde carga masiva"
+  - MANUAL_EXIT: "Salida manual desde carga masiva"
+  - MANUAL_SET: "Seteo manual desde carga masiva"
 
 ### Error Handling
 - **Partial Success:** Processing continues even if individual items fail
@@ -101,17 +140,18 @@ If stock increases from 0 to a positive value, wishlist restock notifications ar
 
 ## Example Usage
 
-### Example 1: Create New Inventory Items
+### Example 1: Create New Inventory Items (MANUAL_SET)
 
 ```graphql
 mutation {
   bulkLoadInventory(input: {
+    bulkOperationType: MANUAL_SET
     items: [
       {
         cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         tcg: POKEMON
         condition: NEAR_MINT
-        stock: 25
+        quantity: 25
         purchasePrice: 4.50
         sellPrice: 10.99
       },
@@ -119,7 +159,7 @@ mutation {
         cardGuid: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
         tcg: MAGIC
         condition: LIGHTLY_PLAYED
-        stock: 15
+        quantity: 15
         purchasePrice: 2.00
         sellPrice: 6.50
       }
@@ -147,17 +187,18 @@ mutation {
 }
 ```
 
-### Example 2: Update Existing Inventory
+### Example 2: Add Stock to Existing Items (MANUAL_ENTRY)
 
 ```graphql
 mutation {
   bulkLoadInventory(input: {
+    bulkOperationType: MANUAL_ENTRY
     items: [
       {
         cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         tcg: POKEMON
         condition: NEAR_MINT
-        stock: 50
+        quantity: 10
         sellPrice: 12.99
       }
     ]
@@ -169,6 +210,8 @@ mutation {
   }
 }
 ```
+
+**Note:** This adds 10 units to the existing stock. If current stock is 25, new stock will be 35.
 
 **Response:**
 ```json
@@ -184,29 +227,80 @@ mutation {
 }
 ```
 
-### Example 3: Mixed Operations with Errors
+### Example 3: Remove Stock (MANUAL_EXIT)
 
 ```graphql
 mutation {
   bulkLoadInventory(input: {
+    bulkOperationType: MANUAL_EXIT
+    items: [
+      {
+        cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        tcg: POKEMON
+        condition: NEAR_MINT
+        quantity: 5
+      }
+    ]
+  }) {
+    success
+    createdCount
+    updatedCount
+    errors
+  }
+}
+```
+
+**Note:** This removes 5 units from existing stock. Requires item to exist and have at least 5 units in stock.
+
+### Example 4: Set Absolute Stock (MANUAL_SET)
+
+```graphql
+mutation {
+  bulkLoadInventory(input: {
+    bulkOperationType: MANUAL_SET
+    items: [
+      {
+        cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        tcg: POKEMON
+        condition: NEAR_MINT
+        quantity: 50
+      }
+    ]
+  }) {
+    success
+    createdCount
+    updatedCount
+    errors
+  }
+}
+```
+
+**Note:** This sets stock to exactly 50 units, regardless of current stock.
+
+### Example 5: Mixed Operations with Errors
+
+```graphql
+mutation {
+  bulkLoadInventory(input: {
+    bulkOperationType: MANUAL_ENTRY
     items: [
       {
         cardGuid: "valid-card-guid-1"
         tcg: POKEMON
         condition: NEAR_MINT
-        stock: 10
+        quantity: 10
       },
       {
         cardGuid: "invalid-card-guid"
         tcg: MAGIC
         condition: DAMAGED
-        stock: 5
+        quantity: 5
       },
       {
         cardGuid: "valid-card-guid-2"
         tcg: POKEMON
         condition: HEAVILY_PLAYED
-        stock: 3
+        quantity: 3
       }
     ]
   }) {
@@ -240,13 +334,16 @@ mutation {
 Import inventory from a CSV/Excel file by mapping each row to a `BulkLoadInventoryItemInput`.
 
 ### 2. Stock Synchronization
-Sync inventory with external systems by setting absolute stock values.
+Sync inventory with external systems using `MANUAL_SET` to set absolute stock values.
 
-### 3. Bulk Price Updates
-Update prices across multiple items without changing stock levels (set stock to current value).
+### 3. Receiving Shipments
+Use `MANUAL_ENTRY` to add newly received inventory to existing stock.
 
-### 4. Inventory Adjustments
-Perform physical inventory counts and update all items to match actual stock.
+### 4. Physical Inventory Counts
+Use `MANUAL_SET` to update all items to match actual counted stock.
+
+### 5. Bulk Adjustments
+Use `MANUAL_EXIT` to remove damaged or lost inventory.
 
 ## Error Messages
 
@@ -257,16 +354,26 @@ Common error scenarios:
 | "Card not found" | Card GUID doesn't exist in catalog | Ensure card is synced to catalog first |
 | "Invalid TCG type" | TCG doesn't match card type | Verify card belongs to specified TCG |
 | "Invalid condition" | Condition enum value is wrong | Use valid CardCondition enum value |
-| "Stock must be >= 0" | Negative stock value provided | Provide non-negative stock value |
+| "Quantity must be greater than 0" | Zero or negative quantity for ENTRY/EXIT | Provide positive quantity value |
+| "Quantity must be >= 0" | Negative quantity for SET | Provide non-negative quantity value |
+| "Cannot perform MANUAL_EXIT on..." | Item doesn't exist for EXIT operation | Use MANUAL_ENTRY or MANUAL_SET to create item first |
+| "Cannot remove X units. Only Y in stock" | Insufficient stock for EXIT operation | Reduce quantity or check current stock |
 
 ## Best Practices
 
-1. **Batch Size:** Process items in batches of 100-500 for optimal performance
-2. **Error Handling:** Always check the `errors` array even if `success` is true
-3. **Price Updates:** Only include prices when you want to update them
-4. **Card Validation:** Ensure cards exist in catalog before bulk loading
-5. **Stock Verification:** Double-check stock values before submitting
-6. **Monitoring:** Review `createdCount` and `updatedCount` to verify expected results
+1. **Choose Correct Operation Type:**
+   - Use `MANUAL_ENTRY` when adding new stock (shipments, returns)
+   - Use `MANUAL_EXIT` when removing stock (damage, loss, theft)
+   - Use `MANUAL_SET` for physical counts or external system sync
+2. **Batch Size:** Process items in batches of 100-500 for optimal performance
+3. **Error Handling:** Always check the `errors` array even if `success` is true
+4. **Price Updates:** Only include prices when you want to update them
+5. **Card Validation:** Ensure cards exist in catalog before bulk loading
+6. **Stock Verification:** 
+   - For MANUAL_ENTRY/EXIT: verify you're using delta values (amount to add/remove)
+   - For MANUAL_SET: verify you're using absolute values (final stock)
+7. **Monitoring:** Review `createdCount` and `updatedCount` to verify expected results
+8. **Movement Tracking:** All operations create movements with timestamp-based references (BULK-YYYYMMDD-HHmm)
 
 ## Performance Considerations
 

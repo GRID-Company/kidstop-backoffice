@@ -91,6 +91,7 @@ export type BatchSearchPokemonCardsInput = {
 };
 
 export type BulkLoadInventoryInput = {
+  bulkOperationType: BulkOperationType;
   items: Array<BulkLoadInventoryItemInput>;
 };
 
@@ -98,8 +99,8 @@ export type BulkLoadInventoryItemInput = {
   cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
   purchasePrice?: InputMaybe<Scalars['Float']['input']>;
+  quantity: Scalars['Int']['input'];
   sellPrice?: InputMaybe<Scalars['Float']['input']>;
-  stock: Scalars['Int']['input'];
   tcg: Scalars['String']['input'];
 };
 
@@ -109,6 +110,13 @@ export type BulkLoadInventoryResult = {
   success: Scalars['Boolean']['output'];
   updatedCount: Scalars['Int']['output'];
 };
+
+/** Type of bulk operation. MANUAL_ENTRY adds quantity, MANUAL_EXIT removes quantity, MANUAL_SET sets absolute stock value. */
+export enum BulkOperationType {
+  ManualEntry = 'MANUAL_ENTRY',
+  ManualExit = 'MANUAL_EXIT',
+  ManualSet = 'MANUAL_SET',
+}
 
 export type BuyerBudgetWithUsage = {
   assignedAmount: Scalars['Float']['output'];
@@ -587,6 +595,8 @@ export type MagicCardBatchSearchItem = {
   parsedName?: Maybe<Scalars['String']['output']>;
   /** Parsed collector number */
   parsedNumber?: Maybe<Scalars['String']['output']>;
+  /** Parsed quantity from the search line */
+  parsedQuantity?: Maybe<Scalars['Float']['output']>;
   /** Parsed set/edition code */
   parsedSet?: Maybe<Scalars['String']['output']>;
   /** Related cards (up to 3) */
@@ -1164,6 +1174,8 @@ export type PokemonCardBatchSearchItem = {
   parsedName?: Maybe<Scalars['String']['output']>;
   /** Parsed card number */
   parsedNumber?: Maybe<Scalars['String']['output']>;
+  /** Parsed quantity from the search line */
+  parsedQuantity?: Maybe<Scalars['Float']['output']>;
   /** Parsed set code */
   parsedSet?: Maybe<Scalars['String']['output']>;
   /** Related cards (up to 3) */

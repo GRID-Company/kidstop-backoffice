@@ -12,12 +12,13 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
 import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
-import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@heroui/react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, Select, SelectItem } from '@heroui/react';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { mapBulkSearchToInventoryInput } from '../../adapters/mappers/bulk-search-to-inventory.mapper';
+import { BulkOperationType } from '@/lib/api/schema-types';
 import {
   CreateInventoryMovementDocument,
   InventoryItemsDocument,
@@ -40,6 +41,24 @@ const INVENTORY_TABS = {
   STOCK: 'stock',
   MOVEMENTS: 'movements',
 } as const;
+
+const BULK_OPERATION_OPTIONS = [
+  {
+    key: BulkOperationType.ManualEntry,
+    label: 'Entrada Manual',
+    description: 'Suma la cantidad al stock existente',
+  },
+  {
+    key: BulkOperationType.ManualSet,
+    label: 'Establecer Stock',
+    description: 'Establece el stock al valor absoluto especificado',
+  },
+  {
+    key: BulkOperationType.ManualExit,
+    label: 'Salida Manual',
+    description: 'Resta la cantidad del stock existente',
+  },
+];
 
 export default function Inventory() {
   const [activeTab, setActiveTab] = useState<string>(INVENTORY_TABS.STOCK);
@@ -70,6 +89,9 @@ export default function Inventory() {
   const [detailModalItem, setDetailModalItem] = useState<IPokemonCard | IMagicCard | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isBulkAddDrawerOpen, setIsBulkAddDrawerOpen] = useState(false);
+  const [bulkOperationType, setBulkOperationType] = useState<BulkOperationType>(
+    BulkOperationType.ManualEntry
+  );
 
   const toCatalogCard = useCallback((item: IInventoryItem): IPokemonCard | IMagicCard => {
     if (item.tcg === 'MAGIC') {
@@ -164,7 +186,7 @@ export default function Inventory() {
   const handleBulkAddConfirm = useCallback(
     async (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => {
       try {
-        const input = mapBulkSearchToInventoryInput(data, results, selectedTCG);
+        const input = mapBulkSearchToInventoryInput(data, results, selectedTCG, bulkOperationType);
         
         const response = await bulkLoadInventory({
           variables: { input },
@@ -197,7 +219,7 @@ export default function Inventory() {
         toast.error('Error al agregar cartas al inventario');
       }
     },
-    [selectedTCG, bulkLoadInventory, refetch, refreshIndicators]
+    [selectedTCG, bulkOperationType, bulkLoadInventory, refetch, refreshIndicators]
   );
 
   const handleBulkAddCancel = useCallback(() => {
@@ -350,11 +372,32 @@ export default function Inventory() {
         size="xl"
       >
         <DrawerContent>
-          <DrawerHeader className="flex flex-col gap-1">
-            <span className="text-lg font-semibold text-accent">Agregar cartas en bulk</span>
-            <span className="text-sm font-normal text-default-500">
-              Búsqueda masiva de cartas para agregar al inventario
-            </span>
+          <DrawerHeader className="flex flex-col gap-3">
+            <div>
+              <span className="text-lg font-semibold text-accent">Agregar cartas en bulk</span>
+              <p className="text-sm font-normal text-default-500">
+                Búsqueda masiva de cartas para agregar al inventario
+              </p>
+            </div>
+            <Select
+              label="Tipo de operación"
+              placeholder="Selecciona el tipo de operación"
+              selectedKeys={[bulkOperationType]}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as BulkOperationType;
+                setBulkOperationType(selected);
+              }}
+              size="sm"
+              classNames={{
+                
+              }}
+            >
+              {BULK_OPERATION_OPTIONS.map((option) => (
+                <SelectItem key={option.key} description={option.description}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </Select>
           </DrawerHeader>
           
           <DrawerBody>
