@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
+import { calculateOfferPrice } from '@/features/purchases/domain/price.utils';
 import { BulkCardFormControlsProps } from './types';
 
 export default function BulkCardFormControls({
@@ -11,10 +13,24 @@ export default function BulkCardFormControls({
   index,
   selectedCard,
 }: BulkCardFormControlsProps) {
-  const { control } = useFormContext();
+  const { control, setValue, watch } = useFormContext();
 
   const priceLabel = variant === 'purchases' ? 'Oferta' : 'Precio público';
   const priceName = variant === 'purchases' ? `cards.${index}.offerPrice` : `cards.${index}.publicPrice`;
+  
+  const currentPrice = watch(priceName);
+
+  useEffect(() => {
+    if (
+      variant === 'purchases' &&
+      selectedCard?.referencePrice &&
+      selectedCard.referencePrice > 0 &&
+      (currentPrice === undefined || currentPrice === null || currentPrice === 0)
+    ) {
+      const offerPrice = calculateOfferPrice(selectedCard.referencePrice);
+      setValue(priceName, offerPrice, { shouldValidate: true });
+    }
+  }, [variant, selectedCard?.guid, selectedCard?.referencePrice, priceName, setValue]);
 
   return (
     <div className="grid grid-cols-3 gap-2">

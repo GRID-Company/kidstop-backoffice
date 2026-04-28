@@ -46,21 +46,24 @@ export function useBulkSearchForm(
       const selectedCard = result.bestMatch;
       if (!selectedCard) return;
 
-      const defaultReferencePrice = selectedCard.sellPrice || 0;
-
       if (variant === 'purchases') {
+        const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
+        const offerPrice = referencePrice > 0 ? Math.floor(referencePrice * 0.6) : 0;
+        
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
           quantity: 1,
-          offerPrice: defaultReferencePrice * 0.7,
+          offerPrice,
         } as any);
       } else {
+        const defaultPublicPrice = selectedCard.sellPrice || 0;
+        
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
           quantity: 1,
-          publicPrice: defaultReferencePrice,
+          publicPrice: defaultPublicPrice,
         } as any);
       }
     },

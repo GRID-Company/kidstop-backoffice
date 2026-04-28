@@ -64,7 +64,7 @@ function BulkCardSearchFooter({
             style={{ backgroundColor: 'var(--color-accent)' }}
             type="submit"
             startContent={<Icon icon="lucide:check" />}
-            isDisabled={fields.length === 0}
+            isDisabled={fields.length === 0 || configuredCount < fields.length}
           >
             Confirmar y agregar
           </Button>

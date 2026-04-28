@@ -148,16 +148,17 @@ bulk-card-search/
 - Texto de búsqueda requerido
 - Al menos una carta configurada
 - Cantidad mínima: 1
-- Precio mínimo: 0
+- Precio mínimo: 0.01 (no se permiten precios en 0)
 - Condición requerida
 
 ## Estados Visuales
 
-- **Sin configurar**: border default
-- **Configurado**: border accent + badge "Configurado"
+- **Sin configurar**: border-l-4 warning (naranja) - requiere atención
+- **Configurado**: border-l-4 success (verde) cuando tiene GUID, condición, cantidad > 0 y precio > 0
 - **Error**: border danger con mensaje
 - **Sin coincidencia**: border warning
 - **Expandido**: background subtle
+- **Botón confirmar**: deshabilitado si hay cartas sin configurar
 
 ## Notas Técnicas
 

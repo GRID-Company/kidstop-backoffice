@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Accordion, AccordionItem, Badge, CardBody } from '@heroui/react';
+import { Accordion, AccordionItem, CardBody } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
@@ -83,7 +83,7 @@ export default function BulkCardResultCard({
     const hasValidGuid = !!selectedCardGuid;
     const hasValidCondition = !!condition;
     const hasValidQuantity = typeof quantity === 'number' && quantity > 0 && !isNaN(quantity);
-    const hasValidPrice = typeof price === 'number' && price >= 0 && !isNaN(price);
+    const hasValidPrice = typeof price === 'number' && price > 0 && !isNaN(price);
     
     return hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice;
   }, [selectedCardGuid, condition, quantity, price]);
@@ -125,7 +125,7 @@ export default function BulkCardResultCard({
   }
 
   return (
-    <KidstopCard className={`w-full ${isConfigured ? 'border-l-4 border-l-success' : ''}`}>
+    <KidstopCard className={`w-full border-l-4 ${isConfigured ? 'border-l-success' : 'border-l-warning'}`}>
       <Accordion
         variant="light"
         selectedKeys={isExpanded ? ['content'] : []}
@@ -152,14 +152,7 @@ export default function BulkCardResultCard({
                 )}
               </div>
               <div className="flex flex-1 flex-col gap-1">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-semibold leading-tight">{selectedCard.name}</p>
-                  {isConfigured && (
-                    <Badge color="success" size="sm" variant="flat">
-                      Configurado
-                    </Badge>
-                  )}
-                </div>
+                <p className="text-sm font-semibold leading-tight">{selectedCard.name}</p>
                 <p className="text-xs text-default-500">
                   {selectedCard.edition} · #{selectedCard.collectorNumber}
                 </p>
@@ -184,6 +177,14 @@ export default function BulkCardResultCard({
                         : 'Sin precio'}
                     </span>
                   </div>
+                  {selectedCard.referencePrice && selectedCard.referencePrice > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Icon icon="lucide:trending-up" width={12} className="text-default-400" />
+                      <span className="text-xs text-default-500">
+                        Ref: {formatCurrency(selectedCard.referencePrice)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

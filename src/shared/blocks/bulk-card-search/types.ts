@@ -27,10 +27,10 @@ export interface BulkCardData {
   isFoil?: boolean;
   rarity?: string;
   sellPrice: number | null;
-  availableStock: boolean;
   totalStock: number;
   imageUri: string | null;
   inventoryCards: BulkCardInventoryData[];
+  referencePrice: number | null;
 }
 
 export interface BulkCardResult {

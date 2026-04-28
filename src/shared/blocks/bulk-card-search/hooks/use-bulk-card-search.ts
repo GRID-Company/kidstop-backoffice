@@ -4,10 +4,12 @@ import { TCGType, TCG_TYPES } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
 import {
   MagicBatchCardSearchDocument,
-  PokemonBatchCardSearchDocument,
   MagicBatchCardSearchQuery,
+} from '@/lib/api/generated/catalog-magic.generated';
+import {
+  PokemonBatchCardSearchDocument,
   PokemonBatchCardSearchQuery,
-} from '../generated/bulk-search.generated';
+} from '@/lib/api/generated/catalog-pokemon.generated';
 import { BulkCardResult, BulkCardData, BulkCardInventoryData } from '../types';
 
 interface UseBulkCardSearchReturn {
@@ -24,15 +26,17 @@ type MagicCard = NonNullable<
 type PokemonCard = NonNullable<
   NonNullable<PokemonBatchCardSearchQuery['pokemonBatchCardSearch']>['results'][number]['bestMatch']
 >;
+type MagicRelatedCard = NonNullable<MagicBatchCardSearchQuery['magicBatchCardSearch']>['results'][number]['relatedCards'][number];
+type PokemonRelatedCard = NonNullable<PokemonBatchCardSearchQuery['pokemonBatchCardSearch']>['results'][number]['relatedCards'][number];
 
 const mapMagicCardToBulkCardData = (card: MagicCard): BulkCardData => {
-  const inventoryCards: BulkCardInventoryData[] = (card.inventoryCards || []).map((inv) => ({
-    guid: inv.guid,
-    condition: inv.condition as CardCondition,
-    stock: inv.stock,
-    purchasePrice: inv.purchasePrice,
-    sellPrice: inv.sellPrice,
-  }));
+  const inventoryCards: BulkCardInventoryData[] = card.cardMetrics?.variantsMetrics?.map((variant) => ({
+    guid: `${card.guid}-${variant.condition}`,
+    condition: variant.condition as CardCondition,
+    stock: variant.stock,
+    purchasePrice: null,
+    sellPrice: null,
+  })) || [];
 
   return {
     guid: card.guid,
@@ -41,21 +45,21 @@ const mapMagicCardToBulkCardData = (card: MagicCard): BulkCardData => {
     collectorNumber: card.collectorNumber || '',
     isFoil: card.isFoil,
     sellPrice: card.sellPrice,
-    availableStock: card.availableStock,
     totalStock: card.totalStock,
     imageUri: card.imageUri,
     inventoryCards,
+    referencePrice: card.cardMetrics?.priceRetail || null,
   };
 };
 
 const mapPokemonCardToBulkCardData = (card: PokemonCard): BulkCardData => {
-  const inventoryCards: BulkCardInventoryData[] = (card.inventoryCards || []).map((inv) => ({
-    guid: inv.guid,
-    condition: inv.condition as CardCondition,
-    stock: inv.stock,
-    purchasePrice: inv.purchasePrice,
-    sellPrice: inv.sellPrice,
-  }));
+  const inventoryCards: BulkCardInventoryData[] = card.cardMetrics?.variantsMetrics?.map((variant) => ({
+    guid: `${card.guid}-${variant.condition}`,
+    condition: variant.condition as CardCondition,
+    stock: variant.stock,
+    purchasePrice: null,
+    sellPrice: null,
+  })) || [];
 
   return {
     guid: card.guid,
@@ -63,10 +67,39 @@ const mapPokemonCardToBulkCardData = (card: PokemonCard): BulkCardData => {
     edition: card.setName || '',
     collectorNumber: card.cardNumber || '',
     sellPrice: card.sellPrice,
-    availableStock: card.availableStock,
     totalStock: card.totalStock,
     imageUri: card.imageUri,
     inventoryCards,
+    referencePrice: card.cardMetrics?.ungradedPrice || null,
+  };
+};
+
+const mapMagicRelatedCardToBulkCardData = (card: MagicRelatedCard): BulkCardData => {
+  return {
+    guid: card.guid,
+    name: card.name,
+    edition: card.edition || '',
+    collectorNumber: card.collectorNumber || '',
+    isFoil: card.isFoil,
+    sellPrice: card.sellPrice,
+    totalStock: card.totalStock,
+    imageUri: card.imageUri,
+    inventoryCards: [],
+    referencePrice: null,
+  };
+};
+
+const mapPokemonRelatedCardToBulkCardData = (card: PokemonRelatedCard): BulkCardData => {
+  return {
+    guid: card.guid,
+    name: card.name,
+    edition: card.setName || '',
+    collectorNumber: card.cardNumber || '',
+    sellPrice: card.sellPrice,
+    totalStock: card.totalStock,
+    imageUri: card.imageUri,
+    inventoryCards: [],
+    referencePrice: null,
   };
 };
 
@@ -93,7 +126,7 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
           parsedSet: result.parsedSet,
           parsedNumber: result.parsedNumber,
           bestMatch: result.bestMatch ? mapMagicCardToBulkCardData(result.bestMatch) : null,
-          relatedCards: result.relatedCards?.map(mapMagicCardToBulkCardData) || [],
+          relatedCards: result.relatedCards?.map(mapMagicRelatedCardToBulkCardData) || [],
           error: result.error,
         })
       );
@@ -111,7 +144,7 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
           parsedSet: result.parsedSet,
           parsedNumber: result.parsedNumber,
           bestMatch: result.bestMatch ? mapPokemonCardToBulkCardData(result.bestMatch) : null,
-          relatedCards: result.relatedCards?.map(mapPokemonCardToBulkCardData) || [],
+          relatedCards: result.relatedCards?.map(mapPokemonRelatedCardToBulkCardData) || [],
           error: result.error,
         })
       );
@@ -147,6 +180,7 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
           variables: {
             input: {
               searchText: searchText.trim(),
+              withCardsMetrics: true,
             },
           },
         });
@@ -155,6 +189,7 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
           variables: {
             input: {
               searchText: searchText.trim(),
+              withCardsMetrics: true,
             },
           },
         });

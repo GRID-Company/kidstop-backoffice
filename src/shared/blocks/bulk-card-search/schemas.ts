@@ -13,14 +13,14 @@ export const bulkCardFormSchemaPurchases = z.object({
   selectedCardGuid: z.string().min(1, 'Debe seleccionar una carta'),
   condition: cardConditionEnum,
   quantity: z.number().min(1, 'La cantidad debe ser al menos 1').int('La cantidad debe ser un número entero'),
-  offerPrice: z.number().min(0, 'El precio de oferta debe ser mayor o igual a 0'),
+  offerPrice: z.number().min(0.01, 'El precio de oferta debe ser mayor a 0'),
 });
 
 export const bulkCardFormSchemaInventory = z.object({
   selectedCardGuid: z.string().min(1, 'Debe seleccionar una carta'),
   condition: cardConditionEnum,
   quantity: z.number().min(1, 'La cantidad debe ser al menos 1').int('La cantidad debe ser un número entero'),
-  publicPrice: z.number().min(0, 'El precio público debe ser mayor o igual a 0'),
+  publicPrice: z.number().min(0.01, 'El precio público debe ser mayor a 0'),
 });
 
 export const bulkSearchFormSchemaPurchases = z.object({
