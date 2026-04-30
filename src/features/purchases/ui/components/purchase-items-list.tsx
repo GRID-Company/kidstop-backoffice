@@ -107,16 +107,9 @@ export default function PurchaseItemsList({
             aria-label="Items de la compra"
             title={
               <div className="flex items-center justify-between w-full pr-2">
-                <div className="flex items-center gap-3">
-                  <Icon
-                    icon={isExpanded ? 'lucide:chevron-down' : 'lucide:chevron-right'}
-                    width={20}
-                    className="text-default-400"
-                  />
-                  <span className="text-sm font-medium text-default-700">
-                    {itemsWithPrices.length} {itemsWithPrices.length === 1 ? 'carta' : 'cartas'}
-                  </span>
-                </div>
+                <span className="text-sm font-medium text-default-700">
+                  {itemsWithPrices.length} {itemsWithPrices.length === 1 ? 'carta' : 'cartas'}
+                </span>
                 {!isExpanded && (
                   <span className="text-sm font-semibold text-accent">
                     {displayCurrency(total)}
@@ -127,6 +120,7 @@ export default function PurchaseItemsList({
             classNames={{
               trigger: 'py-2 px-3 hover:bg-default-100 rounded-lg transition-colors cursor-pointer',
               content: 'pt-2',
+              indicator: 'text-default-400',
             }}
           >
             <div className="flex flex-col gap-3">
