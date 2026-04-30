@@ -16,6 +16,7 @@ import { Icon } from '@iconify/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
+import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { IPurchaseItem, IPaymentDetail, PaymentMethod } from '../../domain/types';
@@ -25,8 +26,6 @@ import {
   validatePaymentSplit,
 } from '../../domain/purchases.domain';
 import { usePaymentSplitForm, PaymentSplitFormData } from '../../adapters/forms/use-payment-split-form';
-
-const REDACTED_VALUE = '$••••••';
 
 interface PaymentSplitModalProps {
   items: IPurchaseItem[];
@@ -43,6 +42,7 @@ export default function PaymentSplitModal({
   onConfirm,
   defaultPayments = [],
 }: PaymentSplitModalProps) {
+  const displayCurrency = usePrivacyCurrency();
   const { isPrivacyMode } = usePrivacyModeStore();
 
   const { control, handleSubmit, watch, reset, fieldArray } =
@@ -96,12 +96,6 @@ export default function PaymentSplitModal({
       });
     }
   }, [isOpen, defaultPayments, reset]);
-
-  const displayCurrency = useCallback(
-    (value: number): string =>
-      isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
-    [isPrivacyMode]
-  );
 
   const handleAddPayment = useCallback(() => {
     if (availableMethods.length === 0) return;

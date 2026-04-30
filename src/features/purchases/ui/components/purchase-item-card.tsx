@@ -9,12 +9,10 @@ import { CardImage } from '@/shared/components/card-image';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
-import { formatCurrency } from '@/lib/utils/format-currency';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { REDACTED_VALUE, formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { IPurchaseItem } from '../../domain/types';
 import { calculateItemSubtotal } from '../../domain/purchases.domain';
-
-const REDACTED_VALUE = '$••••••';
 
 interface PurchaseItemCardProps {
   item: IPurchaseItem;
@@ -35,7 +33,7 @@ function PriceMetric({
   isHighlighted?: boolean;
 }) {
   const { isPrivacyMode } = usePrivacyModeStore();
-  const displayValue = isPrivacyMode ? REDACTED_VALUE : formatCurrency(value);
+  const displayValue = formatCurrencyWithPrivacy(value, isPrivacyMode);
 
   return (
     <div className="flex items-center gap-1.5">
@@ -81,7 +79,7 @@ export default function PurchaseItemCard({
     return Math.abs(item.referencePrice - item.currentReferencePrice) > 0.01;
   }, [item.referencePrice, item.currentReferencePrice]);
 
-  const displaySubtotal = isPrivacyMode ? REDACTED_VALUE : formatCurrency(subtotal);
+  const displaySubtotal = formatCurrencyWithPrivacy(subtotal, isPrivacyMode);
 
   return (
     <KidstopCard className="w-full border-default-200">
@@ -192,7 +190,7 @@ export default function PurchaseItemCard({
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-default-500">Precio oferta</span>
                 <span className="text-sm font-medium">
-                  {isPrivacyMode ? REDACTED_VALUE : formatCurrency(item.offerPrice)}
+                  {formatCurrencyWithPrivacy(item.offerPrice, isPrivacyMode)}
                 </span>
               </div>
               <div className="flex flex-col gap-1">

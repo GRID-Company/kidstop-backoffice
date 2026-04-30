@@ -15,8 +15,7 @@ import {
 import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
-import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { formatCurrency } from '@/lib/utils/format-currency';
+import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { SetPurchaseItemSellPriceDocument } from '@/lib/api/generated/purchases.generated';
 import { PURCHASE_STATUS, IPaymentDetail, IPurchaseItem, IPurchase } from '../../domain/types';
@@ -39,15 +38,13 @@ import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 
-const REDACTED_VALUE = '$••••••';
-
 interface PurchaseDetailProps {
   purchaseId: string;
 }
 
 export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const router = useRouter();
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const displayCurrency = usePrivacyCurrency();
 
   const {
     purchase,
@@ -94,12 +91,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),
     [items]
-  );
-
-  const displayCurrency = useCallback(
-    (value: number): string =>
-      isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
-    [isPrivacyMode]
   );
 
   const handlePaymentsConfirm = useCallback(

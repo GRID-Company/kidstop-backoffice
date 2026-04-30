@@ -3,13 +3,10 @@
 import { useMemo } from 'react';
 import { Card, CardBody, Progress } from '@heroui/react';
 import { Icon } from '@iconify/react';
-
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { IPurchaseItem } from '../../domain/types';
 import { checkBudget, BudgetCheckResult } from '../../domain/purchases.domain';
-
-const REDACTED_VALUE = '$••••••';
 
 interface BudgetIndicatorProps {
   items: IPurchaseItem[];
@@ -72,7 +69,7 @@ export default function BudgetIndicator({
   const config = LEVEL_CONFIG[level];
 
   const displayCurrency = (value: number): string =>
-    isPrivacyMode ? REDACTED_VALUE : formatCurrency(Math.abs(value));
+    formatCurrencyWithPrivacy(Math.abs(value), isPrivacyMode);
 
   return (
     <Card

@@ -1,16 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { formatCurrency } from '@/lib/utils/format-currency';
-import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { useItemsReferencePrices } from '../hooks/use-items-reference-prices';
 import PurchaseItemCard from './purchase-item-card';
-
-const REDACTED_VALUE = '$••••••';
 
 interface PurchaseItemsListProps {
   items: IPurchaseItem[];
@@ -27,7 +24,7 @@ export default function PurchaseItemsList({
   onRefetchPrices,
   isReadOnly = false,
 }: PurchaseItemsListProps) {
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const displayCurrency = usePrivacyCurrency();
   const { itemsWithPrices, refetch: refetchPrices } = useItemsReferencePrices(items);
 
   const form = useForm({
@@ -83,12 +80,6 @@ export default function PurchaseItemsList({
   }, [form, items, onUpdateItem, isReadOnly]);
 
   const total = useMemo(() => calculateTotal(itemsWithPrices), [itemsWithPrices]);
-
-  const displayCurrency = useCallback(
-    (value: number): string =>
-      isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
-    [isPrivacyMode]
-  );
 
   if (itemsWithPrices.length === 0) {
     return (

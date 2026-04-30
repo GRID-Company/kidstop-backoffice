@@ -9,6 +9,7 @@ import {
   BulkSearchFormDataInventory,
 } from '../schemas';
 import { BulkSearchVariant, BulkCardResult } from '../types';
+import { DEFAULT_OFFER_PERCENTAGE } from '../constants';
 
 interface UseBulkSearchFormReturn {
   form: ReturnType<typeof useForm<BulkSearchFormDataPurchases | BulkSearchFormDataInventory>>;
@@ -48,7 +49,9 @@ export function useBulkSearchForm(
 
       if (variant === 'purchases') {
         const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
-        const offerPrice = referencePrice > 0 ? Math.floor(referencePrice * 0.6) : 0;
+        const offerPrice = referencePrice > 0 
+          ? Math.floor(referencePrice * DEFAULT_OFFER_PERCENTAGE) 
+          : 0;
         
         append({
           selectedCardGuid: selectedCard.guid,
