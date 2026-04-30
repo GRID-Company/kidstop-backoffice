@@ -12,9 +12,9 @@ import OverrideInput from '@/shared/base/heorui-overrides/input';
 import KidstopSelect from '@/shared/base/heorui-overrides/select';
 
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
+import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
-import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardImage } from '@/shared/components/card-image';
 import { CardCondition, IPurchaseItem } from '../../domain/types';
 import {
@@ -28,7 +28,6 @@ import {
 import { useItemsReferencePrices } from '../hooks/use-items-reference-prices';
 import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
 
-const REDACTED_VALUE = '$••••••';
 
 interface PurchaseItemsTableProps {
   items: IPurchaseItem[];
@@ -45,6 +44,7 @@ export default function PurchaseItemsTable({
   onRefetchPrices,
   isReadOnly = false,
 }: PurchaseItemsTableProps) {
+  const displayCurrency = usePrivacyCurrency();
   const { isPrivacyMode } = usePrivacyModeStore();
   const { itemsWithPrices, refetch: refetchPrices } = useItemsReferencePrices(items);
 
@@ -55,11 +55,6 @@ export default function PurchaseItemsTable({
     }
   }, [refetchPrices, onRefetchPrices]);
 
-  const displayCurrency = useCallback(
-    (value: number): string =>
-      isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
-    [isPrivacyMode]
-  );
 
   const total = useMemo(() => calculateTotal(itemsWithPrices), [itemsWithPrices]);
 

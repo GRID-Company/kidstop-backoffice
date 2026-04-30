@@ -2,18 +2,23 @@
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardBody, Chip, Divider } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Divider, Switch } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import toast from 'react-hot-toast';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
+import BulkCardSearch from '@/shared/blocks/bulk-card-search';
+import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/schemas';
+import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
+import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
 import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
-import PurchaseItemsTable from '../components/purchase-items-table';
+import PurchaseItemsList from '../components/purchase-items-list';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
@@ -22,6 +27,7 @@ import SellerDeleteModal from '../components/seller-delete-modal';
 
 export default function PurchaseNew() {
   const router = useRouter();
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const {
     seller,
     items,
@@ -46,6 +52,25 @@ export default function PurchaseNew() {
   const [isSellerConfirmed, setIsSellerConfirmed] = useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
+
+  const handleBulkSearchConfirm = useCallback(
+    (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
+      try {
+        const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
+        newItems.forEach((item) => addItem(item));
+        toast.success(`${newItems.length} cartas agregadas exitosamente`);
+        setIsAdvancedSearchEnabled(false);
+      } catch (error) {
+        toast.error('Error al agregar cartas desde búsqueda masiva');
+      }
+    },
+    [addItem, selectedTCG]
+  );
+
+  const handleBulkSearchCancel = useCallback(() => {
+    setIsAdvancedSearchEnabled(false);
+  }, []);
 
   const handleConfirmSeller = useCallback(() => {
     if (!selectedSellerGuid) return;
@@ -248,14 +273,33 @@ export default function PurchaseNew() {
 
         {isSellerConfirmed && (
           <EntitiesPage.CardContainer>
-            <div className='flex flex-col gap-2'>
-              <span className='text-accent text-sm font-semibold'>
-                Agregar cartas
-              </span>
-              <CardSearchWithMetrics
-                onAddItem={addItem}
-                existingItemIds={existingItemIds}
-              />
+            <div className='flex flex-col gap-4'>
+              <div className='flex items-center justify-between'>
+                <span className='text-accent text-sm font-semibold'>
+                  Agregar cartas
+                </span>
+                <Switch
+                  size='sm'
+                  isSelected={isAdvancedSearchEnabled}
+                  onValueChange={setIsAdvancedSearchEnabled}
+                >
+                  <span className='text-xs'>Búsqueda avanzada</span>
+                </Switch>
+              </div>
+
+              {isAdvancedSearchEnabled ? (
+                <BulkCardSearch
+                  variant='purchases'
+                  onConfirm={handleBulkSearchConfirm}
+                  onCancel={handleBulkSearchCancel}
+                  isOpen={isAdvancedSearchEnabled}
+                />
+              ) : (
+                <CardSearchWithMetrics
+                  onAddItem={addItem}
+                  existingItemIds={existingItemIds}
+                />
+              )}
             </div>
           </EntitiesPage.CardContainer>
         )}
@@ -273,7 +317,7 @@ export default function PurchaseNew() {
                 </Chip>
               </div>
             </div>
-            <PurchaseItemsTable
+            <PurchaseItemsList
               items={items}
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}

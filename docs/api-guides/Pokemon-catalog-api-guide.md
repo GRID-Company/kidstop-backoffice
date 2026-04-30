@@ -252,7 +252,436 @@ query PokemonCardGenres {
 
 ---
 
-### 8. Get Public Card Detail
+### 8. Custom Sorting Options
+
+**Description:** The `pokemonCardPublicList` query supports custom sorting through the `sort` parameter. You can sort by multiple columns in ascending or descending order.
+
+**Available Sort Columns:**
+
+| Column | Description | Data Type | Example Use Case |
+|--------|-------------|-----------|------------------|
+| `name` | Card name (alphabetical) | string | Sort cards A-Z or Z-A |
+| `sellPrice` | Minimum sell price across all conditions | number | Find cheapest/most expensive cards |
+| `releaseDate` | Collection release date | date | Sort by newest/oldest releases |
+| `cardNumber` | Card number in set | string | Sort by set order |
+| `setName` | Collection/set name | string | Group by collection alphabetically |
+| `setCode` | Collection/set code | string | Sort by set code |
+
+**Sort Order Values:**
+- `ASC` - Ascending order (A-Z, 0-9, oldest-newest, false-true)
+- `DESC` - Descending order (Z-A, 9-0, newest-oldest, true-false)
+
+**Important Notes:**
+- **Priority-Based Sorting:** The API uses a multi-level priority system that ensures optimal card discovery:
+  1. **Stock Availability** - Cards with stock always appear before cards without stock
+  2. **Collection Priority** - Normal collections appear before foreign language collections (Chinese, Japanese, Korean)
+  3. **Genre Priority** - "Pokemon Card" and "Pokemon Cards" genres appear before other genres
+  4. **User Sort** - Your specified sort column and order
+  5. **Default Tiebreaker** - Release date (newest first) when no sort is specified
+
+- **Search Behavior:** When a `search` query is active, results are sorted by relevance (search rank) after the priority filters, then by your specified sort criteria
+
+- **Example:** If you sort by `name ASC`, you'll get:
+  - Cards with stock from normal collections (Pokemon Card genre) → sorted A-Z
+  - Cards with stock from normal collections (other genres) → sorted A-Z
+  - Cards with stock from foreign collections → sorted A-Z
+  - Cards without stock from normal collections → sorted A-Z
+  - Cards without stock from foreign collections → sorted A-Z
+
+---
+
+#### Sort by Price (Low to High)
+
+```graphql
+query PokemonCardsByPriceLowToHigh {
+  pokemonCardPublicList(
+    findPokemonCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "sellPrice"
+        order: "ASC"
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      setName
+      sellPrice
+      availableStock
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Sort by Price (High to Low)
+
+```graphql
+query PokemonCardsByPriceHighToLow {
+  pokemonCardPublicList(
+    findPokemonCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "sellPrice"
+        order: "DESC"
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      setName
+      sellPrice
+      availableStock
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Sort by Name (Alphabetical)
+
+```graphql
+query PokemonCardsByName {
+  pokemonCardPublicList(
+    findPokemonCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "name"
+        order: "ASC"
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      setName
+      sellPrice
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Combining Sorting with Filters
+
+```graphql
+query PokemonCardsFilteredAndSorted {
+  pokemonCardPublicList(
+    findPokemonCardsPublicArgs: {
+      skip: 0
+      limit: 20
+      sort: {
+        column: "sellPrice"
+        order: "ASC"
+      }
+      filters: {
+        stockStatus: "AVAILABLE"
+        condition: "NEAR_MINT"
+        sellPrice: {
+          range: {
+            from: 50
+            to: 500
+          }
+        }
+      }
+    }
+  ) {
+    data {
+      guid
+      name
+      setName
+      sellPrice
+      availableStock
+      imageUri
+    }
+    count
+  }
+}
+```
+
+---
+
+#### Frontend Integration: Sort Dropdown
+
+```typescript
+import { useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
+
+type SortOption = {
+  label: string;
+  column: string;
+  order: 'ASC' | 'DESC';
+};
+
+const sortOptions: SortOption[] = [
+  { label: 'Name (A-Z)', column: 'name', order: 'ASC' },
+  { label: 'Name (Z-A)', column: 'name', order: 'DESC' },
+  { label: 'Price (Low to High)', column: 'sellPrice', order: 'ASC' },
+  { label: 'Price (High to Low)', column: 'sellPrice', order: 'DESC' },
+  { label: 'Newest Releases', column: 'releaseDate', order: 'DESC' },
+  { label: 'Oldest Releases', column: 'releaseDate', order: 'ASC' },
+  { label: 'Card Number', column: 'cardNumber', order: 'ASC' },
+  { label: 'Set Name (A-Z)', column: 'setName', order: 'ASC' },
+  { label: 'Set Code', column: 'setCode', order: 'ASC' },
+];
+
+const GET_POKEMON_CARDS = gql`
+  query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
+    pokemonCardPublicList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+      data {
+        guid
+        name
+        setName
+        setCode
+        sellPrice
+        availableStock
+        totalStock
+        imageUri
+      }
+      count
+    }
+  }
+`;
+
+const PokemonCardListWithSort: React.FC = () => {
+  const [selectedSort, setSelectedSort] = useState<SortOption>(sortOptions[0]);
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
+
+  const { data, loading, error } = useQuery(GET_POKEMON_CARDS, {
+    variables: {
+      findPokemonCardsPublicArgs: {
+        skip: page * pageSize,
+        limit: pageSize,
+        sort: {
+          column: selectedSort.column,
+          order: selectedSort.order,
+        },
+      },
+    },
+  });
+
+  if (loading) return <div>Loading cards...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  const cards = data?.pokemonCardPublicList?.data || [];
+  const totalCount = data?.pokemonCardPublicList?.count || 0;
+
+  return (
+    <div>
+      <div className="controls">
+        <label htmlFor="sort-select">Sort by:</label>
+        <select
+          id="sort-select"
+          value={sortOptions.indexOf(selectedSort)}
+          onChange={(e) => {
+            setSelectedSort(sortOptions[parseInt(e.target.value)]);
+            setPage(0); // Reset to first page when sorting changes
+          }}
+        >
+          {sortOptions.map((option, index) => (
+            <option key={index} value={index}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <span className="result-count">
+          Showing {cards.length} of {totalCount} cards
+        </span>
+      </div>
+
+      <div className="card-grid">
+        {cards.map((card: any) => (
+          <div key={card.guid} className="card-item">
+            <img src={card.imageUri} alt={card.name} />
+            <h3>{card.name}</h3>
+            <p>{card.setName} - {card.setCode}</p>
+            <p className="price">${card.sellPrice?.toFixed(2) || 'N/A'}</p>
+            <p className="stock">
+              {card.availableStock ? `${card.totalStock} in stock` : 'Out of stock'}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="pagination">
+        <button
+          disabled={page === 0}
+          onClick={() => setPage(page - 1)}
+        >
+          Previous
+        </button>
+        <span>Page {page + 1} of {Math.ceil(totalCount / pageSize)}</span>
+        <button
+          disabled={(page + 1) * pageSize >= totalCount}
+          onClick={() => setPage(page + 1)}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default PokemonCardListWithSort;
+```
+
+---
+
+#### Advanced: Combined Filters and Sorting
+
+```typescript
+import { useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
+
+interface FilterState {
+  search: string;
+  rarity: string;
+  condition: string;
+  stockStatus: string;
+  priceFrom: string;
+  priceTo: string;
+}
+
+const PokemonCardListAdvanced: React.FC = () => {
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    rarity: '',
+    condition: '',
+    stockStatus: '',
+    priceFrom: '',
+    priceTo: '',
+  });
+
+  const buildFilters = () => {
+    const filterObj: any = {};
+    
+    if (filters.rarity) filterObj.rarity = filters.rarity;
+    if (filters.condition) filterObj.condition = filters.condition;
+    if (filters.stockStatus) filterObj.stockStatus = filters.stockStatus;
+    
+    if (filters.priceFrom || filters.priceTo) {
+      filterObj.sellPrice = {
+        range: {
+          ...(filters.priceFrom && { from: parseFloat(filters.priceFrom) }),
+          ...(filters.priceTo && { to: parseFloat(filters.priceTo) }),
+        },
+      };
+    }
+    
+    return Object.keys(filterObj).length > 0 ? filterObj : undefined;
+  };
+
+  const { data, loading } = useQuery(GET_POKEMON_CARDS, {
+    variables: {
+      findPokemonCardsPublicArgs: {
+        skip: 0,
+        limit: 20,
+        ...(filters.search && { search: filters.search }),
+        sort: {
+          column: sortColumn,
+          order: sortOrder,
+        },
+        filters: buildFilters(),
+      },
+    },
+  });
+
+  return (
+    <div>
+      <div className="filters-and-sort">
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search cards..."
+          value={filters.search}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+        />
+
+        {/* Sort Controls */}
+        <select
+          value={sortColumn}
+          onChange={(e) => setSortColumn(e.target.value)}
+        >
+          <option value="name">Name</option>
+          <option value="sellPrice">Price</option>
+          <option value="releaseDate">Release Date</option>
+          <option value="cardNumber">Card Number</option>
+          <option value="setName">Set Name</option>
+          <option value="setCode">Set Code</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as 'ASC' | 'DESC')}
+        >
+          <option value="ASC">Ascending</option>
+          <option value="DESC">Descending</option>
+        </select>
+
+        {/* Price Range */}
+        <input
+          type="number"
+          placeholder="Min Price"
+          value={filters.priceFrom}
+          onChange={(e) => setFilters({ ...filters, priceFrom: e.target.value })}
+        />
+        <input
+          type="number"
+          placeholder="Max Price"
+          value={filters.priceTo}
+          onChange={(e) => setFilters({ ...filters, priceTo: e.target.value })}
+        />
+
+        {/* Stock Status */}
+        <select
+          value={filters.stockStatus}
+          onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value })}
+        >
+          <option value="">All Stock</option>
+          <option value="AVAILABLE">In Stock</option>
+          <option value="UNAVAILABLE">Out of Stock</option>
+        </select>
+      </div>
+
+      {/* Results */}
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="card-grid">
+          {data?.pokemonCardPublicList?.data.map((card: any) => (
+            <div key={card.guid} className="card-item">
+              <img src={card.imageUri} alt={card.name} />
+              <h3>{card.name}</h3>
+              <p>${card.sellPrice}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+---
+
+### 9. Get Public Card Detail
 
 **Query:** `pokemonCardPublicDetail`
 **Type:** Public
@@ -299,7 +728,7 @@ query PokemonCardPublicDetail($guid: String!) {
 
 ---
 
-### 9. Get Internal Card List (Admin)
+### 10. Get Internal Card List (Admin)
 
 **Query:** `pokemonCardInternalList`
 **Type:** Internal (Requires Authentication)
@@ -329,8 +758,36 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
         sellPrice
       }
       totalStock
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
     }
     count
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "findPokemonCardsPublicArgs": {
+    "skip": 0,
+    "limit": 10,
+    "sort": {
+      "column": "name",
+      "order": "ASC"
+    },
+    "withCardsMetrics": true
   }
 }
 ```
@@ -339,10 +796,27 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
 
 - `purchasePrice`: Cost price of inventory items
 - `totalStock`: Total stock across all conditions
+- `cardMetrics` (nullable): Card metrics data (only populated when `withCardsMetrics: true`)
+  - `variantsMetrics`: Array of inventory condition variants with metrics
+    - `condition`: Card condition
+    - `stock`: Current stock quantity
+    - `lastSellDate`: Date of last sale (nullable)
+    - `avgDaysInInventory`: Average days in inventory (nullable)
+    - `wishlistCount`: Number of wishlists
+  - `ungradedPrice`: Market price for ungraded card in MXN (nullable)
+  - `gradedPriceSeven`: Market price for PSA 7 in MXN (nullable)
+  - `gradedPriceEightOrAbove`: Market price for PSA 8+ in MXN (nullable)
+
+**Optional Parameters:**
+
+- `withCardsMetrics` (boolean, default: false): Include card metrics and PriceCharting prices for each card
+  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (PriceCharting)
+  - When `true`: Each card includes full metrics data
+  - When `false` or omitted: `cardMetrics` field is null (faster response)
 
 ---
 
-### 10. Get Top 5 Best-Selling Pokemon Cards
+### 11. Get Top 5 Best-Selling Pokemon Cards
 
 **Query:** `pokemonTopSoldCards`
 **Type:** Public
@@ -389,7 +863,7 @@ query PokemonTopSoldCards {
 
 ---
 
-### 11. Get Card with Metrics (Internal)
+### 12. Get Card with Metrics (Internal)
 
 **Query:** `pokemonCardWithMetrics`
 **Type:** Internal (Requires Authentication)
@@ -656,7 +1130,7 @@ const SearchableCardList: React.FC = () => {
 
 ---
 
-### 8. Batch Search Cards
+### 13. Batch Search Cards
 
 **Query:** `pokemonBatchCardSearch`
 **Type:** Internal (requires authentication)
@@ -688,6 +1162,18 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
           purchasePrice
           sellPrice
         }
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
+        }
       }
       relatedCards {
         guid
@@ -718,7 +1204,8 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 ```json
 {
   "input": {
-    "searchText": "Pokémon: 6\n3 Mega Charizard Y ex ASC 22\n3 Dreepy TWM 128\n\nTrainer: 3\n2 Iono PAL 185\n1 Lillie's Determination MEG 169\n\nEnergy: 6\n2 Luminous Energy PAL 191\n2 Psychic Energy MEE 5\n2 Fire Energy MEE 2"
+    "searchText": "Pokémon: 6\n3 Mega Charizard Y ex ASC 22\n3 Dreepy TWM 128\n\nTrainer: 3\n2 Iono PAL 185\n1 Lillie's Determination MEG 169\n\nEnergy: 6\n2 Luminous Energy PAL 191\n2 Psychic Energy MEE 5\n2 Fire Energy MEE 2",
+    "withCardsMetrics": true
   }
 }
 ```
@@ -738,6 +1225,14 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 - Section headers: `Pokémon:`, `Trainer:`, `Energy:`
 - Empty lines
 
+**Input Parameters:**
+
+- `searchText` (required): Multiline text in Limitless format
+- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for best match
+  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (PriceCharting)
+  - When `true`: `bestMatch.cardMetrics` includes full metrics data
+  - When `false` or omitted: `cardMetrics` field is null (faster response)
+
 **Response Fields:**
 
 - `originalLine`: The original input line
@@ -745,7 +1240,8 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 - `parsedSet`: Extracted set code
 - `parsedNumber`: Extracted card number
 - `bestMatch`: The top matching card with full inventory details
-- `relatedCards`: Up to 3 additional related cards
+  - `cardMetrics` (nullable): Card metrics data (only when `withCardsMetrics: true`)
+- `relatedCards`: Up to 3 additional related cards (no metrics)
 - `error`: Error message if search failed for this line
 
 **Use Cases:**

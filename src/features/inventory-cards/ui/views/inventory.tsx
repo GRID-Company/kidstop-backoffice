@@ -9,15 +9,22 @@ import { Key } from 'react';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
+import BulkCardSearch from '@/shared/blocks/bulk-card-search';
+import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
+import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, Select, SelectItem } from '@heroui/react';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
+import { mapBulkSearchToInventoryInput } from '../../adapters/mappers/bulk-search-to-inventory.mapper';
+import { BulkOperationType } from '@/lib/api/schema-types';
 import {
   CreateInventoryMovementDocument,
   InventoryItemsDocument,
   InventoryMovementsDocument,
   IndicatorsInventoryItemsDocument,
+  BulkLoadInventoryDocument,
 } from '@/lib/api/generated/inventory.generated';
 import { toAdjustInventoryPayload } from '../../adapters/mappers/inventory.mapper';
 import { useInventorySearch } from '../hooks/use-inventory-search';
@@ -34,6 +41,24 @@ const INVENTORY_TABS = {
   STOCK: 'stock',
   MOVEMENTS: 'movements',
 } as const;
+
+const BULK_OPERATION_OPTIONS = [
+  {
+    key: BulkOperationType.ManualEntry,
+    label: 'Entrada Manual',
+    description: 'Suma la cantidad al stock existente',
+  },
+  {
+    key: BulkOperationType.ManualSet,
+    label: 'Establecer Stock',
+    description: 'Establece el stock al valor absoluto especificado',
+  },
+  {
+    key: BulkOperationType.ManualExit,
+    label: 'Salida Manual',
+    description: 'Resta la cantidad del stock existente',
+  },
+];
 
 export default function Inventory() {
   const [activeTab, setActiveTab] = useState<string>(INVENTORY_TABS.STOCK);
@@ -63,6 +88,10 @@ export default function Inventory() {
   const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
   const [detailModalItem, setDetailModalItem] = useState<IPokemonCard | IMagicCard | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isBulkAddDrawerOpen, setIsBulkAddDrawerOpen] = useState(false);
+  const [bulkOperationType, setBulkOperationType] = useState<BulkOperationType>(
+    BulkOperationType.ManualEntry
+  );
 
   const toCatalogCard = useCallback((item: IInventoryItem): IPokemonCard | IMagicCard => {
     if (item.tcg === 'MAGIC') {
@@ -124,6 +153,8 @@ export default function Inventory() {
     setSelectedItem(null);
   }, []);
 
+  const [bulkLoadInventory, { loading: bulkLoading }] = useMutation(BulkLoadInventoryDocument);
+  
   const [createMovement, { loading: adjusting }] = useMutation(
     CreateInventoryMovementDocument,
     {
@@ -152,19 +183,71 @@ export default function Inventory() {
     setActiveTab(key as string);
   }, []);
 
+  const handleBulkAddConfirm = useCallback(
+    async (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => {
+      try {
+        const input = mapBulkSearchToInventoryInput(data, results, selectedTCG, bulkOperationType);
+        
+        const response = await bulkLoadInventory({
+          variables: { input },
+          refetchQueries: [
+            InventoryItemsDocument,
+            InventoryMovementsDocument,
+            IndicatorsInventoryItemsDocument,
+          ],
+        });
+
+        if (response.data?.bulkLoadInventory.success) {
+          const { createdCount, updatedCount, errors } = response.data.bulkLoadInventory;
+          
+          if (errors.length > 0) {
+            toast.error(`Algunas cartas no se pudieron agregar: ${errors.join(', ')}`);
+          } else {
+            toast.success(
+              `${createdCount} cartas creadas, ${updatedCount} actualizadas exitosamente`
+            );
+          }
+          
+          setIsBulkAddDrawerOpen(false);
+          refetch();
+          refreshIndicators();
+        } else {
+          toast.error('Error al procesar las cartas');
+        }
+      } catch (error) {
+        console.error('Error in bulk add:', error);
+        toast.error('Error al agregar cartas al inventario');
+      }
+    },
+    [selectedTCG, bulkOperationType, bulkLoadInventory, refetch, refreshIndicators]
+  );
+
+  const handleBulkAddCancel = useCallback(() => {
+    setIsBulkAddDrawerOpen(false);
+  }, []);
+
   return (
     <>
       <EntitiesPage>
         <EntitiesPage.Toolbar label="Inventario de Cartas">
           {activeTab === INVENTORY_TABS.STOCK && (
-            <Button
-              className="text-white"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-              startContent={<Icon icon="lucide:plus" />}
-              onPress={() => setIsAdjustmentOpen(true)}
-            >
-              Ajuste manual
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="bordered"
+                startContent={<Icon icon="lucide:upload" />}
+                onPress={() => setIsBulkAddDrawerOpen(true)}
+              >
+                Agregar bulk
+              </Button>
+              <Button
+                className="text-white"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+                startContent={<Icon icon="lucide:plus" />}
+                onPress={() => setIsAdjustmentOpen(true)}
+              >
+                Ajuste manual
+              </Button>
+            </div>
           )}
         </EntitiesPage.Toolbar>
 
@@ -282,6 +365,51 @@ export default function Inventory() {
         isOpen={isDetailModalOpen && detailModalItem !== null && 'edition' in detailModalItem}
         onClose={handleCloseDetailModal}
       />
+
+      <Drawer
+        isOpen={isBulkAddDrawerOpen}
+        onClose={handleBulkAddCancel}
+        size="xl"
+      >
+        <DrawerContent>
+          <DrawerHeader className="flex flex-col gap-3">
+            <div>
+              <span className="text-lg font-semibold text-accent">Agregar cartas en bulk</span>
+              <p className="text-sm font-normal text-default-500">
+                Búsqueda masiva de cartas para agregar al inventario
+              </p>
+            </div>
+            <Select
+              label="Tipo de operación"
+              placeholder="Selecciona el tipo de operación"
+              selectedKeys={[bulkOperationType]}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as BulkOperationType;
+                setBulkOperationType(selected);
+              }}
+              size="sm"
+              classNames={{
+                
+              }}
+            >
+              {BULK_OPERATION_OPTIONS.map((option) => (
+                <SelectItem key={option.key} description={option.description}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </Select>
+          </DrawerHeader>
+          
+          <DrawerBody>
+            <BulkCardSearch
+              variant="inventory"
+              onConfirm={handleBulkAddConfirm}
+              onCancel={handleBulkAddCancel}
+              isOpen={isBulkAddDrawerOpen}
+            />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }

@@ -90,3 +90,12 @@ mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryM
     createdDate
   }
 }
+
+mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
+  bulkLoadInventory(input: $input) {
+    success
+    createdCount
+    updatedCount
+    errors
+  }
+}

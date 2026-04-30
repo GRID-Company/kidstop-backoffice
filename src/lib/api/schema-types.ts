@@ -79,12 +79,44 @@ export type BannerGuidsInput = {
 export type BatchSearchMagicCardsInput = {
   /** Multiline text with Magic cards in Moxfield format */
   searchText: Scalars['String']['input'];
+  /** Include card metrics for best match (variants metrics + CardKingdom prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type BatchSearchPokemonCardsInput = {
   /** Multiline text with Pokemon cards in Limitless format */
   searchText: Scalars['String']['input'];
+  /** Include card metrics for best match (variants metrics + PriceCharting prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
+
+export type BulkLoadInventoryInput = {
+  bulkOperationType: BulkOperationType;
+  items: Array<BulkLoadInventoryItemInput>;
+};
+
+export type BulkLoadInventoryItemInput = {
+  cardGuid: Scalars['String']['input'];
+  condition: Scalars['String']['input'];
+  purchasePrice?: InputMaybe<Scalars['Float']['input']>;
+  quantity: Scalars['Int']['input'];
+  sellPrice?: InputMaybe<Scalars['Float']['input']>;
+  tcg: Scalars['String']['input'];
+};
+
+export type BulkLoadInventoryResult = {
+  createdCount: Scalars['Int']['output'];
+  errors: Array<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+  updatedCount: Scalars['Int']['output'];
+};
+
+/** Type of bulk operation. MANUAL_ENTRY adds quantity, MANUAL_EXIT removes quantity, MANUAL_SET sets absolute stock value. */
+export enum BulkOperationType {
+  ManualEntry = 'MANUAL_ENTRY',
+  ManualExit = 'MANUAL_EXIT',
+  ManualSet = 'MANUAL_SET',
+}
 
 export type BuyerBudgetWithUsage = {
   assignedAmount: Scalars['Float']['output'];
@@ -292,6 +324,8 @@ export type FindMagicCardsPublicArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
+  /** Include card metrics (variants metrics + CardKingdom prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type FindMagicCardsPublicFilter = {
@@ -349,6 +383,8 @@ export type FindPokemonCardsPublicArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
+  /** Include card metrics (variants metrics + PriceCharting prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type FindPokemonCardsPublicFilter = {
@@ -559,6 +595,8 @@ export type MagicCardBatchSearchItem = {
   parsedName?: Maybe<Scalars['String']['output']>;
   /** Parsed collector number */
   parsedNumber?: Maybe<Scalars['String']['output']>;
+  /** Parsed quantity from the search line */
+  parsedQuantity?: Maybe<Scalars['Float']['output']>;
   /** Parsed set/edition code */
   parsedSet?: Maybe<Scalars['String']['output']>;
   /** Related cards (up to 3) */
@@ -608,6 +646,7 @@ export type MagicCardInternalDetail = {
 
 export type MagicCardInternalItem = {
   availableStock: Scalars['Boolean']['output'];
+  cardMetrics?: Maybe<MagicCardWithMetrics>;
   collectorNumber?: Maybe<Scalars['String']['output']>;
   edition?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
@@ -744,6 +783,8 @@ export type Mutation = {
   addMostWantedCard: MostWantedCard;
   /** Add item to wishlist (carpeta digital) */
   addWishlistItem: WishlistItem;
+  /** Bulk load inventory items (admin only) */
+  bulkLoadInventory: BulkLoadInventoryResult;
   /** Cancel a sale with reason (backoffice) */
   cancelSale: Sale;
   /** Mutation to reset your password after requesting a change or expiration */
@@ -828,6 +869,10 @@ export type MutationAddMostWantedCardArgs = {
 
 export type MutationAddWishlistItemArgs = {
   addWishlistItemInput: AddWishlistItemInput;
+};
+
+export type MutationBulkLoadInventoryArgs = {
+  input: BulkLoadInventoryInput;
 };
 
 export type MutationCancelSaleArgs = {
@@ -1097,6 +1142,7 @@ export type PokemonCard = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   genre?: Maybe<Scalars['String']['output']>;
+  genrePriority?: Maybe<Scalars['Float']['output']>;
   gradedPrice?: Maybe<Scalars['Float']['output']>;
   guid: Scalars['String']['output'];
   hpTcgPlayer?: Maybe<Scalars['String']['output']>;
@@ -1128,6 +1174,8 @@ export type PokemonCardBatchSearchItem = {
   parsedName?: Maybe<Scalars['String']['output']>;
   /** Parsed card number */
   parsedNumber?: Maybe<Scalars['String']['output']>;
+  /** Parsed quantity from the search line */
+  parsedQuantity?: Maybe<Scalars['Float']['output']>;
   /** Parsed set code */
   parsedSet?: Maybe<Scalars['String']['output']>;
   /** Related cards (up to 3) */
@@ -1142,6 +1190,7 @@ export type PokemonCardBatchSearchResult = {
 export type PokemonCardCollection = {
   cards: Array<PokemonCard>;
   cardsWithImages: Scalars['Float']['output'];
+  collectionPriority: Scalars['Float']['output'];
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
@@ -1178,6 +1227,7 @@ export type PokemonCardInternalDetail = {
 
 export type PokemonCardInternalItem = {
   availableStock: Scalars['Boolean']['output'];
+  cardMetrics?: Maybe<PokemonCardWithMetrics>;
   cardNumber?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
@@ -1745,6 +1795,7 @@ export type UpdatePurchaseItemDetailInput = {
   itemGuid: Scalars['String']['input'];
   offerPrice?: InputMaybe<Scalars['Float']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
+  referencePrice?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdatePurchaseItemsInput = {

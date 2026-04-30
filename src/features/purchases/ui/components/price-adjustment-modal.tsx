@@ -15,8 +15,7 @@ import {
 import { Icon } from '@iconify/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
-import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { formatCurrency } from '@/lib/utils/format-currency';
+import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import {
@@ -28,7 +27,6 @@ import {
   PriceAdjustmentFormData,
 } from '../../adapters/forms/use-price-adjustment-form';
 
-const REDACTED_VALUE = '$••••••';
 
 interface PriceAdjustmentModalProps {
   items: IPurchaseItem[];
@@ -43,7 +41,7 @@ export default function PriceAdjustmentModal({
   onClose,
   onConfirm,
 }: PriceAdjustmentModalProps) {
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const displayCurrency = usePrivacyCurrency();
 
   const { control, handleSubmit, reset, fieldArray } = usePriceAdjustmentForm();
   const { fields } = fieldArray;
@@ -96,11 +94,6 @@ export default function PriceAdjustmentModal({
     }
   }, [isOpen, items, reset]);
 
-  const displayCurrency = useCallback(
-    (value: number): string =>
-      isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
-    [isPrivacyMode]
-  );
 
   const handleFormSubmit = useCallback(
     (data: PriceAdjustmentFormData) => {

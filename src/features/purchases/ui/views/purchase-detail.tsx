@@ -15,8 +15,7 @@ import {
 import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
-import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { formatCurrency } from '@/lib/utils/format-currency';
+import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { SetPurchaseItemSellPriceDocument } from '@/lib/api/generated/purchases.generated';
 import { PURCHASE_STATUS, IPaymentDetail, IPurchaseItem, IPurchase } from '../../domain/types';
@@ -29,7 +28,7 @@ import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
 import { useSellerEditState } from '../hooks/use-seller-edit-state';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
-import PurchaseItemsTable from '../components/purchase-items-table';
+import PurchaseItemsList from '../components/purchase-items-list';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import WhatsAppQuoteButton from '../components/whatsapp-quote-button';
@@ -39,15 +38,13 @@ import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 
-const REDACTED_VALUE = '$••••••';
-
 interface PurchaseDetailProps {
   purchaseId: string;
 }
 
 export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const router = useRouter();
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const displayCurrency = usePrivacyCurrency();
 
   const {
     purchase,
@@ -94,12 +91,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),
     [items]
-  );
-
-  const displayCurrency = useCallback(
-    (value: number): string =>
-      isPrivacyMode ? REDACTED_VALUE : formatCurrency(value),
-    [isPrivacyMode]
   );
 
   const handlePaymentsConfirm = useCallback(
@@ -270,7 +261,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 </Chip>
               </div>
             </div>
-            <PurchaseItemsTable
+            <PurchaseItemsList
               items={items}
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}
