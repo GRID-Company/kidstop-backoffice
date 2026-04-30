@@ -61,6 +61,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canAdjustPrices,
     canFinalize,
     canReject,
+    canReturnToDraft,
     hasItemChanges,
     total,
     currentBuyerSpent,
@@ -140,6 +141,10 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     updateStatus(PURCHASE_STATUS.REJECTED);
   }, [updateStatus]);
 
+  const handleReturnToDraft = useCallback(() => {
+    updateStatus(PURCHASE_STATUS.DRAFT);
+  }, [updateStatus]);
+
   const handleUpdateItemsOnly = useCallback(async () => {
     await updateItemsOnly();
     if (tableRefetchPricesRef.current) {
@@ -177,9 +182,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     );
   }
 
-  const isTerminal =
-    purchase.status === PURCHASE_STATUS.FINALIZED ||
-    purchase.status === PURCHASE_STATUS.REJECTED;
+  const isTerminal = purchase.status === PURCHASE_STATUS.FINALIZED;
 
   return (
     <EntitiesPage>
@@ -423,6 +426,17 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                     onPress={handleReject}
                   >
                     Rechazar
+                  </Button>
+                )}
+
+                {canReturnToDraft && (
+                  <Button
+                    color="warning"
+                    variant="bordered"
+                    startContent={<Icon icon="lucide:rotate-ccw" width={18} />}
+                    onPress={handleReturnToDraft}
+                  >
+                    Volver a borrador
                   </Button>
                 )}
               </div>
