@@ -40,6 +40,7 @@ interface UsePurchaseDetailReturn {
   canAdjustPrices: boolean;
   canFinalize: boolean;
   canReject: boolean;
+  canReturnToDraft: boolean;
   hasItemChanges: boolean;
   total: number;
   currentBuyerSpent: number;
@@ -192,7 +193,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const assignedBudget = budgetData?.buyerBudget?.assignedAmount || 0;
   const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
-  const isEditable = status === PURCHASE_STATUS.DRAFT;
+  const isEditable = status === PURCHASE_STATUS.DRAFT || status === PURCHASE_STATUS.QUOTED;
 
   const canSendQuote =
     status === PURCHASE_STATUS.DRAFT && items.length > 0;
@@ -215,6 +216,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const canReject =
     status === PURCHASE_STATUS.DRAFT || status === PURCHASE_STATUS.QUOTED;
+
+  const canReturnToDraft = status === PURCHASE_STATUS.REJECTED;
 
   const existingItemIds = useMemo(
     () => new Set(items.map((i) => i.cardGuid)),
@@ -409,6 +412,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     canAdjustPrices,
     canFinalize,
     canReject,
+    canReturnToDraft,
     hasItemChanges,
     total,
     currentBuyerSpent,

@@ -5,7 +5,7 @@ export const PURCHASE_STATUS_TRANSITIONS: Record<PurchaseStatus, PurchaseStatus[
   [PURCHASE_STATUS.QUOTED]: [PURCHASE_STATUS.WAITING_PRICE, PURCHASE_STATUS.REJECTED],
   [PURCHASE_STATUS.WAITING_PRICE]: [PURCHASE_STATUS.FINALIZED],
   [PURCHASE_STATUS.FINALIZED]: [],
-  [PURCHASE_STATUS.REJECTED]: [],
+  [PURCHASE_STATUS.REJECTED]: [PURCHASE_STATUS.DRAFT],
 };
 
 export function canTransitionTo(
@@ -21,7 +21,7 @@ export function getAvailableTransitions(currentStatus: PurchaseStatus): Purchase
 }
 
 export function isTerminalStatus(status: PurchaseStatus): boolean {
-  return status === PURCHASE_STATUS.FINALIZED || status === PURCHASE_STATUS.REJECTED;
+  return status === PURCHASE_STATUS.FINALIZED;
 }
 
 export function isEditable(status: PurchaseStatus): boolean {
