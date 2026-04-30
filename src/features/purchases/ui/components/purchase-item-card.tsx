@@ -162,14 +162,6 @@ export default function PurchaseItemCard({
                   </div>
                 </div>
               )}
-
-              {item.sellPrice && item.sellPrice > 0 && (
-                <PriceMetric
-                  label="Precio venta"
-                  value={item.sellPrice}
-                  icon="lucide:dollar-sign"
-                />
-              )}
             </div>
           </div>
         </div>

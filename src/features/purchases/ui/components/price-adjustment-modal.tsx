@@ -88,7 +88,7 @@ export default function PriceAdjustmentModal({
       reset({
         items: items.map((item) => ({
           itemId: item.guid,
-          publicPrice: item.sellPrice || 0,
+          publicPrice: item.sellPrice || item.currentReferencePrice || item.referencePrice || 0,
         })),
       });
     }
