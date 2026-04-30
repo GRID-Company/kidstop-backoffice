@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { Accordion, AccordionItem } from '@heroui/react';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
@@ -80,6 +81,7 @@ export default function PurchaseItemsList({
   }, [form, items, onUpdateItem, isReadOnly]);
 
   const total = useMemo(() => calculateTotal(itemsWithPrices), [itemsWithPrices]);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   if (itemsWithPrices.length === 0) {
     return (
@@ -93,17 +95,47 @@ export default function PurchaseItemsList({
   return (
     <FormProvider {...form}>
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3">
-          {itemsWithPrices.map((item, index) => (
-            <PurchaseItemCard
-              key={item.guid}
-              item={item}
-              index={index}
-              onRemove={isReadOnly ? undefined : onRemoveItem}
-              isReadOnly={isReadOnly}
-            />
-          ))}
-        </div>
+        <Accordion
+          className="w-full"
+          selectedKeys={isExpanded ? ['items'] : []}
+          onSelectionChange={(keys) => {
+            setIsExpanded(Array.from(keys).includes('items'));
+          }}
+        >
+          <AccordionItem
+            key="items"
+            aria-label="Items de la compra"
+            title={
+              <div className="flex items-center justify-between w-full pr-2">
+                <span className="text-sm font-medium text-default-700">
+                  {itemsWithPrices.length} {itemsWithPrices.length === 1 ? 'carta' : 'cartas'}
+                </span>
+                {!isExpanded && (
+                  <span className="text-sm font-semibold text-accent">
+                    {displayCurrency(total)}
+                  </span>
+                )}
+              </div>
+            }
+            classNames={{
+              trigger: 'py-2 px-3 hover:bg-default-100 rounded-lg transition-colors cursor-pointer',
+              content: 'pt-2',
+              indicator: 'text-default-400',
+            }}
+          >
+            <div className="flex flex-col gap-3">
+              {itemsWithPrices.map((item, index) => (
+                <PurchaseItemCard
+                  key={item.guid}
+                  item={item}
+                  index={index}
+                  onRemove={isReadOnly ? undefined : onRemoveItem}
+                  isReadOnly={isReadOnly}
+                />
+              ))}
+            </div>
+          </AccordionItem>
+        </Accordion>
 
         <div className="flex justify-end border-t border-default-200 pt-3">
           <div className="flex items-center gap-2">
