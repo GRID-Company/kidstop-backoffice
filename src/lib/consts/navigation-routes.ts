@@ -40,22 +40,17 @@ const MostWanted = {
   route: '/most-wanted',
   icon: 'lucide:star',
 };
-const DeckBuilder = {
-  label: 'Buscador Avanzado',
-  route: '/deck-builder',
-  icon: 'lucide:file-search',
-};
-const ClickUp = {
-  label: 'ClickUp',
-  route: '/clickup',
-  icon: 'simple-icons:clickup',
-};
+// const DeckBuilder = {
+//   label: 'Buscador Avanzado',
+//   route: '/deck-builder',
+//   icon: 'lucide:file-search',
+// };
 
-const ADMIN_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings];
+const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings];
 
-const RECEPTION_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases, Sales, Customers, MostWanted];
+const RECEPTION_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, MostWanted];
 
-const BUYER_ROUTES = [Catalog, DeckBuilder, InventoryCards, Purchases];
+const BUYER_ROUTES = [Catalog, InventoryCards, Purchases];
 
 export const MENU_ROUTES: Partial<Record<UserRole, { label: string; route: string; icon: string }[]>> = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
