@@ -18,7 +18,7 @@ import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
 import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
-import PurchaseItemsTable from '../components/purchase-items-table';
+import PurchaseItemsList from '../components/purchase-items-list';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
@@ -317,7 +317,7 @@ export default function PurchaseNew() {
                 </Chip>
               </div>
             </div>
-            <PurchaseItemsTable
+            <PurchaseItemsList
               items={items}
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}

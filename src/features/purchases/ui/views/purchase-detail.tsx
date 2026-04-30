@@ -29,7 +29,7 @@ import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
 import { useSellerEditState } from '../hooks/use-seller-edit-state';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
-import PurchaseItemsTable from '../components/purchase-items-table';
+import PurchaseItemsList from '../components/purchase-items-list';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import WhatsAppQuoteButton from '../components/whatsapp-quote-button';
@@ -270,7 +270,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 </Chip>
               </div>
             </div>
-            <PurchaseItemsTable
+            <PurchaseItemsList
               items={items}
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}
