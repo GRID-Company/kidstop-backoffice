@@ -20,7 +20,7 @@ export function mapBulkSearchToPurchaseItems(
       throw new Error(`Card not found for index ${index}`);
     }
 
-    const referencePrice = selectedCard.sellPrice || 0;
+    const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
 
     return {
       guid: `${selectedCard.guid}-${cardForm.condition}-${Date.now()}-${index}`,
