@@ -60,6 +60,7 @@ export interface IPokemonCard {
   cardNumber: string | null;
   setName: string | null;
   setCode: string | null;
+  variant?: string | null;
   sellPrice: number | null;
   availableStock: boolean;
   totalStock: number;

@@ -106,6 +106,32 @@ export default function PokemonCardDetailModal({
             </div>
 
             <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  classNames={{
+                    base: 'bg-accent/10',
+                    content: 'text-accent font-medium',
+                  }}
+                >
+                  Pokemon
+                </Chip>
+                {detail?.variant && detail.variant.toLowerCase().includes('holo') && (
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    startContent={<Icon icon="lucide:sparkles" className="text-xs" />}
+                    classNames={{
+                      base: 'bg-gradient-to-r from-yellow-400/20 to-amber-500/20',
+                      content: 'text-amber-600 font-semibold',
+                    }}
+                  >
+                    {detail.variant}
+                  </Chip>
+                )}
+              </div>
+
               <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
                 {setName && (
                   <>

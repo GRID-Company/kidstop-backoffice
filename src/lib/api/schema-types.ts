@@ -497,6 +497,11 @@ export type GlobalConfigData = {
   saleCancellationBlockThreshold?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ImageResolution = {
+  imageUrl: Scalars['String']['output'];
+  resolution: Scalars['String']['output'];
+};
+
 export type IndicatorsDataOutput = {
   indicatorId: Scalars['String']['output'];
   value: Scalars['Float']['output'];
@@ -1149,6 +1154,7 @@ export type PokemonCard = {
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryItems?: Maybe<Array<InventoryItem>>;
   loosePrice?: Maybe<Scalars['Float']['output']>;
+  moreImagesTcgPlayer?: Maybe<Array<ImageResolution>>;
   newPrice?: Maybe<Scalars['Float']['output']>;
   productName: Scalars['String']['output'];
   rarityPriceCharting?: Maybe<Scalars['String']['output']>;
@@ -1212,31 +1218,46 @@ export type PokemonCardCollectionOutput = {
 };
 
 export type PokemonCardInternalDetail = {
+  artist?: Maybe<Scalars['String']['output']>;
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
   totalStock: Scalars['Int']['output'];
+  type?: Maybe<Scalars['String']['output']>;
   variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardInternalItem = {
+  artist?: Maybe<Scalars['String']['output']>;
   availableStock: Scalars['Boolean']['output'];
   cardMetrics?: Maybe<PokemonCardWithMetrics>;
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
   totalStock: Scalars['Int']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+  variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardInventoryItemInternal = {
@@ -1254,67 +1275,106 @@ export type PokemonCardInventoryItemPublic = {
 };
 
 export type PokemonCardPublicDetail = {
+  artist?: Maybe<Scalars['String']['output']>;
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemPublic>>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setGuid?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
   variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardPublicItem = {
+  artist?: Maybe<Scalars['String']['output']>;
   availableStock: Scalars['Boolean']['output'];
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
   totalStock: Scalars['Float']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+  variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardRecommended = {
+  artist?: Maybe<Scalars['String']['output']>;
   availableStock: Scalars['Boolean']['output'];
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
   totalStock: Scalars['Int']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+  variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardSummary = {
+  artist?: Maybe<Scalars['String']['output']>;
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+  variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardTopSold = {
+  artist?: Maybe<Scalars['String']['output']>;
   availableStock: Scalars['Boolean']['output'];
   cardNumber?: Maybe<Scalars['String']['output']>;
+  cardText?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
+  moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setName?: Maybe<Scalars['String']['output']>;
+  stage?: Maybe<Scalars['String']['output']>;
   totalSold: Scalars['Int']['output'];
   totalStock: Scalars['Int']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+  variant?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardVariantMetrics = {

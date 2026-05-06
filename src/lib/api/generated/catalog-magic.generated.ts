@@ -98,6 +98,7 @@ export type MagicBatchCardSearchQuery = {
   magicBatchCardSearch: {
     results: Array<{
       originalLine: string;
+      parsedQuantity: number | null;
       parsedName: string | null;
       parsedSet: string | null;
       parsedNumber: string | null;
@@ -525,6 +526,10 @@ export const MagicBatchCardSearchDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'originalLine' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedQuantity' },
                       },
                       {
                         kind: 'Field',

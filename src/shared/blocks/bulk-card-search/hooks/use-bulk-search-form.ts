@@ -47,6 +47,8 @@ export function useBulkSearchForm(
       const selectedCard = result.bestMatch;
       if (!selectedCard) return;
 
+      const quantity = result.parsedQuantity ?? 1;
+
       if (variant === 'purchases') {
         const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
         const offerPrice = referencePrice > 0 
@@ -56,7 +58,7 @@ export function useBulkSearchForm(
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
-          quantity: 1,
+          quantity,
           offerPrice,
         } as any);
       } else {
@@ -65,7 +67,7 @@ export function useBulkSearchForm(
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
-          quantity: 1,
+          quantity,
           publicPrice: defaultPublicPrice,
         } as any);
       }

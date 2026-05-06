@@ -14,6 +14,7 @@ export type PokemonCardInternalListQuery = {
       cardNumber: string | null;
       setName: string | null;
       setCode: string | null;
+      variant: string | null;
       sellPrice: number | null;
       availableStock: boolean;
       totalStock: number;
@@ -124,6 +125,7 @@ export type PokemonBatchCardSearchQuery = {
   pokemonBatchCardSearch: {
     results: Array<{
       originalLine: string;
+      parsedQuantity: number | null;
       parsedName: string | null;
       parsedSet: string | null;
       parsedNumber: string | null;
@@ -225,6 +227,10 @@ export const PokemonCardInternalListDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'setCode' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'variant' },
                       },
                       {
                         kind: 'Field',
@@ -663,6 +669,10 @@ export const PokemonBatchCardSearchDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'originalLine' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'parsedQuantity' },
                       },
                       {
                         kind: 'Field',

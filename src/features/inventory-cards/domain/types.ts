@@ -53,7 +53,6 @@ export type { DateRange };
 
 export interface InventoryFilters {
   condition?: CardCondition;
-  stockStatus?: StockStatus;
   rarity?: string;
   search?: string;
   dateRange?: DateRange;

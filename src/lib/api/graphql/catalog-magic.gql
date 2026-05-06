@@ -73,6 +73,7 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
   magicBatchCardSearch(input: $input) {
     results {
     originalLine
+    parsedQuantity
     parsedName
     parsedSet
     parsedNumber

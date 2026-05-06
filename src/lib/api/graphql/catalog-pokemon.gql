@@ -6,6 +6,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       cardNumber
       setName
       setCode
+      variant
       sellPrice
       availableStock
       totalStock
@@ -91,6 +92,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
     results {
     originalLine
+    parsedQuantity
     parsedName
     parsedSet
     parsedNumber

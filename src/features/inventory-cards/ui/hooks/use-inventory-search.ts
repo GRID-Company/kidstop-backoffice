@@ -69,7 +69,6 @@ export function useInventorySearch() {
         filters: {
           tcg: selectedTCG,
           condition: filters.condition || undefined,
-          stockStatus: filters.stockStatus || undefined,
           ...(dateRange && {
             lastSellDate: {
               filterType: ':daterange:',
