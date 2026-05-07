@@ -11,10 +11,14 @@ import {
   Chip,
   Divider,
   Tooltip,
+  Switch,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
+import BulkCardSearch from '@/shared/blocks/bulk-card-search';
+import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/schemas';
+import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { SetPurchaseItemSellPriceDocument } from '@/lib/api/generated/purchases.generated';
@@ -24,6 +28,7 @@ import {
   PAYMENT_METHOD_LABELS,
 } from '../../domain/constants';
 import { calculateTotal } from '../../domain/purchases.domain';
+import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
 import { useSellerEditState } from '../hooks/use-seller-edit-state';
@@ -78,6 +83,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+  const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
   const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
 
   const { updateSeller, updating: updatingSeller } = useSellers();
@@ -152,6 +158,46 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     }
   }, [updateItemsOnly, items]);
 
+  const handleBulkSearchConfirm = useCallback(
+    (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
+      try {
+        const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
+        newItems.forEach((item) => addItem(item));
+        toast.success(`${newItems.length} cartas agregadas exitosamente`);
+        setIsAdvancedSearchEnabled(false);
+      } catch (error) {
+        toast.error('Error al agregar cartas desde búsqueda masiva');
+      }
+    },
+    [purchase?.tcgType, addItem]
+  );
+
+  const handleBulkSearchCancel = useCallback(() => {
+    setIsAdvancedSearchEnabled(false);
+  }, []);
+
+  const finalizeTooltipMessage = useMemo(() => {
+    if (purchase?.status !== PURCHASE_STATUS.WAITING_PRICE) {
+      return 'Finalizar la compra y registrar en inventario';
+    }
+
+    const missingPayments = payments.length === 0;
+    const allPricesAdjusted = items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
+    const missingPrices = !allPricesAdjusted;
+
+    if (missingPayments && missingPrices) {
+      return 'Debes registrar pagos y ajustar precios de venta en todos los items';
+    }
+    if (missingPayments) {
+      return 'Debes registrar al menos un pago';
+    }
+    if (missingPrices) {
+      return 'Debes ajustar precios de venta en todos los items';
+    }
+
+    return 'Finalizar la compra y registrar en inventario';
+  }, [purchase?.status, payments.length, items]);
+
   if (loading) {
     return (
       <EntitiesPage>
@@ -187,8 +233,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="">
-        <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex min-w-full items-center justify-between">
+          <div className="flex items-center gap-5">
             <Button
               isIconOnly
               variant="light"
@@ -197,16 +243,12 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
             >
               <Icon icon="lucide:arrow-left" width={20} />
             </Button>
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-semibold text-accent">
-                {purchase.reference}
-              </span>
-              <PurchaseStatusBadge status={purchase.status} />
-            </div>
+            <span className="text-lg font-semibold text-accent">
+              {purchase.reference}
+            </span>
+            <PurchaseStatusBadge status={purchase.status} />
           </div>
-          <div className="flex items-center gap-3">
-            <PrivacyModeToggle />
-          </div>
+          <PrivacyModeToggle />
         </div>
       </EntitiesPage.Toolbar>
 
@@ -239,14 +281,33 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
         {isEditable && (
           <EntitiesPage.CardContainer>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold text-accent">
-                Agregar cartas
-              </span>
-              <CardSearchWithMetrics
-                onAddItem={addItem}
-                existingItemIds={existingItemIds}
-              />
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-accent">
+                  Agregar cartas
+                </span>
+                <Switch
+                  size="sm"
+                  isSelected={isAdvancedSearchEnabled}
+                  onValueChange={setIsAdvancedSearchEnabled}
+                >
+                  <span className="text-xs">Búsqueda avanzada</span>
+                </Switch>
+              </div>
+
+              {isAdvancedSearchEnabled ? (
+                <BulkCardSearch
+                  variant="purchases"
+                  onConfirm={handleBulkSearchConfirm}
+                  onCancel={handleBulkSearchCancel}
+                  isOpen={isAdvancedSearchEnabled}
+                />
+              ) : (
+                <CardSearchWithMetrics
+                  onAddItem={addItem}
+                  existingItemIds={existingItemIds}
+                />
+              )}
             </div>
           </EntitiesPage.CardContainer>
         )}
@@ -328,9 +389,19 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         {!isTerminal && (
           <EntitiesPage.CardContainer>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <Icon icon="lucide:zap" width={18} className="text-accent" />
-                <span className="text-sm font-semibold">Acciones</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Icon icon="lucide:zap" width={18} className="text-accent" />
+                  <span className="text-sm font-semibold">Acciones</span>
+                </div>
+                {(canSendQuote || canResendQuote) && (
+                  <WhatsAppQuoteButton
+                    seller={purchase.seller}
+                    items={items}
+                    tcgType={purchase.tcgType}
+                    label={canResendQuote ? "Reenviar cotización" : undefined}
+                  />
+                )}
               </div>
               <Divider />
               <div className="flex flex-wrap gap-3">
@@ -357,23 +428,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                   </Button>
                 )}
 
-                {canSendQuote && (
-                  <WhatsAppQuoteButton
-                    seller={purchase.seller}
-                    items={items}
-                    tcgType={purchase.tcgType}
-                  />
-                )}
-
-                {canResendQuote && (
-                  <WhatsAppQuoteButton
-                    seller={purchase.seller}
-                    items={items}
-                    tcgType={purchase.tcgType}
-                    label="Reenviar cotización"
-                  />
-                )}
-
                 {canAcceptQuote && (
                   <Button
                     className="bg-success text-white"
@@ -391,7 +445,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                     startContent={<Icon icon="lucide:wallet" width={18} />}
                     onPress={() => setIsPaymentModalOpen(true)}
                   >
-                    Registrar pago
+                    {payments.length > 0 ? 'Editar pago' : 'Registrar pago'}
                   </Button>
                 )}
 
@@ -406,15 +460,18 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                   </Button>
                 )}
 
-                {canFinalize && (
-                  <Tooltip content="Finalizar la compra y registrar en inventario">
-                    <Button
-                      className="bg-accent text-white"
-                      startContent={<Icon icon="lucide:check-circle" width={18} />}
-                      onPress={handleFinalize}
-                    >
-                      Finalizar compra
-                    </Button>
+                {(canFinalize || purchase.status === PURCHASE_STATUS.WAITING_PRICE) && (
+                  <Tooltip content={finalizeTooltipMessage}>
+                    <span>
+                      <Button
+                        className="bg-accent text-white"
+                        startContent={<Icon icon="lucide:check-circle" width={18} />}
+                        onPress={handleFinalize}
+                        isDisabled={!canFinalize}
+                      >
+                        Finalizar compra
+                      </Button>
+                    </span>
                   </Tooltip>
                 )}
 

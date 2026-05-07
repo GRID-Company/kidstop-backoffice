@@ -19,6 +19,7 @@ import KidstopCard from '@/shared/base/heorui-overrides/card';
 import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter-drawer';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
+import { formatDaysInInventory } from '@/lib/utils/format-inventory';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -26,17 +27,12 @@ import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
 import { calculateOfferPrice } from '../../domain/price.utils';
+import CardConditionBreakdownPopover from './condition-breakdown-popover';
 
 interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
   existingItemIds: Set<string>;
 }
-
-const formatDaysInInventory = (days: number): string => {
-  if (days === 0) return 'Sin stock';
-  if (days === 1) return '1 día';
-  return `${days} días`;
-};
 
 interface AddToCartState {
   condition: CardCondition;
@@ -50,13 +46,15 @@ const DEFAULT_ADD_STATE: AddToCartState = {
   unitBuyPrice: 0,
 };
 
+const WISHLIST_HIGHLIGHT_THRESHOLD = 10;
+
 function CardResultItem({
   card,
   onAdd,
   isAlreadyAdded,
 }: {
   card: ICardSearchResult;
-  onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: any, referencePrice: number | null) => void;
+  onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => void;
   isAlreadyAdded: boolean;
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
@@ -66,7 +64,7 @@ function CardResultItem({
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
-  const { metrics: variantMetrics, referencePrice, loading: metricsLoading } = useCardVariantMetrics(
+  const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
     addState.condition,
     card.tcgType
@@ -162,10 +160,11 @@ function CardResultItem({
                 label="Wishlist"
                 value={String(displayMetrics.wishlistCount)}
                 valueClassName={
-                  displayMetrics.wishlistCount >= 10
+                  displayMetrics.wishlistCount >= WISHLIST_HIGHLIGHT_THRESHOLD
                     ? 'text-accent font-semibold'
                     : ''
                 }
+                endContent={<CardConditionBreakdownPopover variantsMetrics={variantsMetrics} />}
               />
               <div className="hidden xl:block">
                 <MetricItem
@@ -292,11 +291,13 @@ function MetricItem({
   label,
   value,
   valueClassName = '',
+  endContent,
 }: {
   icon: string;
   label: string;
   value: string;
   valueClassName?: string;
+  endContent?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-0.5">
@@ -304,7 +305,10 @@ function MetricItem({
         <Icon icon={icon} width={12} className="text-default-400" />
         <span className="text-[10px] text-default-400">{label}</span>
       </div>
-      <span className={`text-xs ${valueClassName}`}>{value}</span>
+      <div className="flex items-center gap-1">
+        <span className={`text-xs ${valueClassName}`}>{value}</span>
+        {endContent}
+      </div>
     </div>
   );
 }
@@ -335,7 +339,7 @@ export default function CardSearchWithMetrics({
   } = useCardSearch();
 
   const handleAddCard = useCallback(
-    (card: ICardSearchResult, state: AddToCartState, variantMetrics: any, referencePrice: number | null) => {
+    (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
         guid: `${card.guid}-${state.condition}-${Date.now()}`,

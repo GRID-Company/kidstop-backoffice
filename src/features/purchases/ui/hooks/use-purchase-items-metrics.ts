@@ -5,31 +5,7 @@ import { IPurchaseItem } from '../../domain/types';
 import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
-
-interface VariantMetric {
-  condition?: string | null;
-  stock?: number | null;
-  lastSellDate?: unknown;
-  avgDaysInInventory?: number | null;
-  wishlistCount?: number | null;
-}
-
-function extractVariantMetrics(
-  variantsMetrics: (VariantMetric | null)[] | null | undefined,
-  condition: string
-) {
-  if (!variantsMetrics) return null;
-
-  const variantMetric = variantsMetrics.find((v) => v?.condition === condition);
-  if (!variantMetric) return null;
-
-  return {
-    stock: variantMetric.stock ?? 0,
-    lastSaleDate: (variantMetric.lastSellDate as string | null) ?? null,
-    daysInInventory: variantMetric.avgDaysInInventory ?? 0,
-    wishlistCount: variantMetric.wishlistCount ?? 0,
-  };
-}
+import { extractVariantMetrics } from '../../domain/metrics.utils';
 
 interface UseItemsMetricsReturn {
   itemsWithMetrics: IPurchaseItem[];
@@ -38,7 +14,7 @@ interface UseItemsMetricsReturn {
 }
 
 export function usePurchaseItemsMetrics(items: IPurchaseItem[]): UseItemsMetricsReturn {
-  const [metricsCache, setMetricsCache] = useState<Record<string, any>>({});
+  const [metricsCache, setMetricsCache] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState(false);
 
   const pokemonItems = useMemo(() => items.filter((i) => i.tcgType === TCG_TYPES.POKEMON), [items]);
@@ -115,11 +91,11 @@ export function usePurchaseItemsMetrics(items: IPurchaseItem[]): UseItemsMetrics
 
   const itemsWithMetrics = useMemo(() => {
     return items.map((item) => {
-      const cachedMetrics = metricsCache[item.cardGuid];
+      const cachedMetrics = metricsCache[item.cardGuid] as { variantsMetrics?: unknown } | undefined;
 
-      if (cachedMetrics?.variantsMetrics) {
+      if (cachedMetrics && 'variantsMetrics' in cachedMetrics && cachedMetrics.variantsMetrics) {
         const variantMetrics = extractVariantMetrics(
-          cachedMetrics.variantsMetrics,
+          cachedMetrics.variantsMetrics as Parameters<typeof extractVariantMetrics>[0],
           item.condition
         );
 

@@ -12,6 +12,7 @@ import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { REDACTED_VALUE, formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
 
 type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
@@ -99,7 +100,7 @@ export default function ItemCard({
     return false;
   }, [item, variant]);
 
-  const displaySubtotal = formatCurrencyWithPrivacy(subtotal, isPrivacyMode);
+  const displaySubtotal = formatCurrency(subtotal);
 
   return (
     <KidstopCard className="w-full border-default-200">
@@ -263,9 +264,8 @@ export default function ItemCard({
                   {variant === 'purchase' ? 'Precio oferta' : 'Precio'}
                 </span>
                 <span className="text-sm font-medium">
-                  {formatCurrencyWithPrivacy(
-                    variant === 'purchase' && isPurchaseItem(item) ? item.offerPrice : isSaleItem(item) ? item.price : 0,
-                    isPrivacyMode
+                  {formatCurrency(
+                    variant === 'purchase' && isPurchaseItem(item) ? item.offerPrice : isSaleItem(item) ? item.price : 0
                   )}
                 </span>
               </div>
