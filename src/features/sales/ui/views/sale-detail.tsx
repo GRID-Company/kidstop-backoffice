@@ -58,15 +58,10 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [editedItems, setEditedItems] = useState<ISale['items']>([]);
 
-  const isEditable = sale?.status === SALE_STATUS.IN_PROGRESS;
-
-  useEffect(() => {
-    if (sale) {
-      setEditedItems(sale.items);
-    }
-  }, [sale]);
+  // TODO: Enable editing when backend implements updateSaleItems mutation
+  // const isEditable = sale?.status === SALE_STATUS.IN_PROGRESS;
+  const isEditable = false;
 
   const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
   const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
@@ -170,18 +165,8 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               </span>
             </div>
             <SaleItemsList
-              items={isEditable ? editedItems : sale.items}
-              onUpdateItem={isEditable ? (itemId, updates) => {
-                setEditedItems(prev =>
-                  prev.map(item =>
-                    item.guid === itemId ? { ...item, ...updates } : item
-                  )
-                );
-              } : undefined}
-              onRemoveItem={isEditable ? (itemId) => {
-                setEditedItems(prev => prev.filter(item => item.guid !== itemId));
-              } : undefined}
-              isReadOnly={!isEditable}
+              items={sale.items}
+              isReadOnly={true}
             />
           </div>
         </EntitiesPage.CardContainer>
