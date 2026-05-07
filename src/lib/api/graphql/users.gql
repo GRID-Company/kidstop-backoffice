@@ -6,6 +6,7 @@ query Users($findUsersArgs: FindUsersArgs!) {
       emailAddress
       role
       active
+      signedUp
       createdDate
       updatedDate
     }
@@ -32,6 +33,12 @@ mutation UpdateUser($updateUserInput: UpdateUserInput!) {
 
 mutation DeleteUser($guid: String!) {
   deleteUser(guid: $guid) {
+    message
+  }
+}
+
+query ResendEmailInvite($guid: String!) {
+  resendEmailInvite(guid: $guid) {
     message
   }
 }
