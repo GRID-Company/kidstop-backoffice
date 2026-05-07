@@ -209,6 +209,34 @@ export default function BulkCardResultCard({
                     </div>
                   )}
                 </div>
+                {selectedCard.cardMetrics && (
+                  <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs">
+                    {selectedCard.cardMetrics.ungradedPrice && selectedCard.cardMetrics.ungradedPrice > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Icon icon="lucide:dollar-sign" width={12} className="text-default-400" />
+                        <span className="text-default-500">
+                          Ungraded: {formatCurrency(selectedCard.cardMetrics.ungradedPrice)}
+                        </span>
+                      </div>
+                    )}
+                    {selectedCard.cardMetrics.variantsMetrics && selectedCard.cardMetrics.variantsMetrics.length > 0 && (
+                      <>
+                        {(() => {
+                          const totalWishlist = selectedCard.cardMetrics.variantsMetrics.reduce(
+                            (sum, v) => sum + (v.wishlistCount || 0),
+                            0
+                          );
+                          return totalWishlist > 0 ? (
+                            <div className="flex items-center gap-1">
+                              <Icon icon="lucide:heart" width={12} className="text-danger" />
+                              <span className="text-default-500">{totalWishlist} en wishlist</span>
+                            </div>
+                          ) : null;
+                        })()}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           }

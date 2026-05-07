@@ -189,6 +189,18 @@ export type PokemonBatchCardSearchQuery = {
         type: string | null;
         hp: string | null;
         stage: string | null;
+        cardMetrics: {
+          ungradedPrice: number | null;
+          gradedPriceSeven: number | null;
+          gradedPriceEightOrAbove: number | null;
+          variantsMetrics: Array<{
+            condition: string;
+            stock: number;
+            lastSellDate: unknown | null;
+            avgDaysInInventory: number | null;
+            wishlistCount: number;
+          }>;
+        } | null;
       }>;
     }>;
   };
@@ -993,6 +1005,83 @@ export const PokemonBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'stage' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardMetrics' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'variantsMetrics',
+                                    },
+                                    selectionSet: {
+                                      kind: 'SelectionSet',
+                                      selections: [
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'condition',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'stock',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'lastSellDate',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'avgDaysInInventory',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'wishlistCount',
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'ungradedPrice',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'gradedPriceSeven',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'gradedPriceEightOrAbove',
+                                    },
+                                  },
+                                ],
+                              },
                             },
                           ],
                         },

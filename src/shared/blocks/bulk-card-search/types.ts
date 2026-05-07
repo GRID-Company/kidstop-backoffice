@@ -19,6 +19,21 @@ export interface BulkCardMetrics {
   wishlistCount: number;
 }
 
+export interface BulkCardVariantMetrics {
+  condition: string;
+  stock: number;
+  lastSellDate: string | null;
+  avgDaysInInventory: number;
+  wishlistCount: number;
+}
+
+export interface BulkCardDetailMetrics {
+  variantsMetrics: BulkCardVariantMetrics[];
+  ungradedPrice: number | null;
+  gradedPriceSeven: number | null;
+  gradedPriceEightOrAbove: number | null;
+}
+
 export interface BulkCardData {
   guid: string;
   name: string;
@@ -36,6 +51,7 @@ export interface BulkCardData {
   stage?: string | null;
   inventoryCards: BulkCardInventoryData[];
   referencePrice: number | null;
+  cardMetrics?: BulkCardDetailMetrics | null;
 }
 
 export interface BulkCardResult {

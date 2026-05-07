@@ -164,6 +164,18 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
       type
       hp
       stage
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
     }
     error
     }
