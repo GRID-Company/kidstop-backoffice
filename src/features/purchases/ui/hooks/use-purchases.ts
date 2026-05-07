@@ -44,6 +44,12 @@ export function usePurchases(): UsePurchasesReturn {
           tcg: selectedTCG,
           status: filters.status,
           buyer: filters.buyerGuid,
+          ...(dateFrom && dateTo && {
+            createdDate: {
+              filterType: ':daterange:',
+              range: { from: dateFrom, to: dateTo },
+            },
+          }),
         },
         search: filters.search?.trim() || undefined,
       },
