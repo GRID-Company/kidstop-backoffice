@@ -261,7 +261,7 @@ export default function ItemCard({
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-default-500">
-                  {variant === 'purchase' ? 'Precio oferta' : 'Precio'}
+                  {variant === 'purchase' ? 'Precio por carta' : 'Precio'}
                 </span>
                 <span className="text-sm font-medium">
                   {formatCurrency(
@@ -321,7 +321,7 @@ export default function ItemCard({
                   type="number"
                   size="sm"
                   variant="bordered"
-                  label="Precio oferta"
+                  label="Precio por carta"
                   min={0}
                   step={0.01}
                   startContent={<span className="text-xs text-default-400">$</span>}
@@ -330,7 +330,7 @@ export default function ItemCard({
                     input: 'text-right',
                     label: 'text-xs',
                   }}
-                  aria-label="Precio oferta"
+                  aria-label="Precio por carta"
                 />
               )}
 

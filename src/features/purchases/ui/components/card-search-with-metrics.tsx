@@ -233,11 +233,11 @@ function CardResultItem({
             />
 
             <Input
-              aria-label="Precio oferta"
+              aria-label="Precio por carta"
               type="number"
               size="sm"
               variant="bordered"
-              label="Oferta"
+              label="Precio por carta"
               min={0}
               step={0.01}
               value={String(addState.unitBuyPrice)}

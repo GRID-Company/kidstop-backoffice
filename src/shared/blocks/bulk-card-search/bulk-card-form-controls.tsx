@@ -15,7 +15,7 @@ export default function BulkCardFormControls({
 }: BulkCardFormControlsProps) {
   const { control, setValue, watch } = useFormContext();
 
-  const priceLabel = variant === 'purchases' ? 'Oferta' : 'Precio público';
+  const priceLabel = variant === 'purchases' ? 'Precio por carta' : 'Precio público';
   const priceName = variant === 'purchases' ? `cards.${index}.offerPrice` : `cards.${index}.publicPrice`;
   
   const currentPrice = watch(priceName);

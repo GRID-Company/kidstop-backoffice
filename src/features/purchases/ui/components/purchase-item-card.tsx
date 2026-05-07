@@ -257,7 +257,7 @@ export default function PurchaseItemCard({
                 type="number"
                 size="sm"
                 variant="bordered"
-                label="Precio oferta"
+                label="Precio por carta"
                 min={0}
                 step={0.01}
                 startContent={<span className="text-xs text-default-400">$</span>}
@@ -266,7 +266,7 @@ export default function PurchaseItemCard({
                   input: 'text-right',
                   label: 'text-xs',
                 }}
-                aria-label="Precio oferta"
+                aria-label="Precio por carta"
               />
 
               <div className="flex flex-col justify-end gap-1">
