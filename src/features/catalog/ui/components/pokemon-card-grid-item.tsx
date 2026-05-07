@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import { CardBody, Chip } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
@@ -17,10 +17,17 @@ interface PokemonCardGridItemProps {
 }
 
 export default function PokemonCardGridItem({ card, onPress }: PokemonCardGridItemProps) {
-  const lowestSellPrice =
-    card.variants.length > 0
-      ? Math.min(...card.variants.map((v) => v.sellPrice ?? 0))
-      : card.sellPrice ?? 0;
+  const lowestSellPrice = useMemo(() => {
+    const validPrices = card.variants
+      .filter((v) => v.stock > 0 && v.sellPrice !== null && v.sellPrice > 0)
+      .map((v) => v.sellPrice as number);
+    
+    if (validPrices.length > 0) {
+      return Math.min(...validPrices);
+    }
+    
+    return card.sellPrice ?? 0;
+  }, [card.variants, card.sellPrice]);
 
   return (
     <KidstopCard
