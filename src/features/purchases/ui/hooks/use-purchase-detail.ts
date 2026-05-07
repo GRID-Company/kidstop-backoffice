@@ -138,6 +138,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const itemsForm = usePurchaseItemsForm({ initialItems: basePurchase?.items || [] });
   const paymentsForm = usePaymentSplitForm();
   const [status, setStatus] = useState<PurchaseStatus>(PURCHASE_STATUS.DRAFT);
+  const [newItems, setNewItems] = useState<Map<string, IPurchaseItem>>(new Map());
 
   useEffect(() => {
     if (basePurchase) {
@@ -157,21 +158,38 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     }
   }, [basePurchase?.guid]);
 
-  const formValues = itemsForm.form.getValues('items');
   const items = useMemo(() => {
     if (!basePurchase) return [];
-    return basePurchase.items.map((originalItem, index) => {
-      const formItem = formValues[index];
-      if (!formItem) return originalItem;
+    
+    return itemsForm.fieldArray.fields.map((field) => {
+      // Find the original item by cardGuid to get all the metadata
+      const originalItem = basePurchase.items.find((item) => item.cardGuid === field.cardGuid);
+      if (!originalItem) {
+        // If not found in basePurchase.items, check if it's in newItems
+        const newItem = newItems.get(field.cardGuid);
+        if (newItem) {
+          return {
+            ...newItem,
+            condition: field.condition,
+            quantity: field.quantity,
+            offerPrice: field.offerPrice,
+            referencePrice: field.referencePrice,
+          };
+        }
+        // Fallback for items without metadata
+        return field as unknown as IPurchaseItem;
+      }
+      
+      // Merge form values with original item data
       return {
         ...originalItem,
-        condition: formItem.condition,
-        quantity: formItem.quantity,
-        offerPrice: formItem.offerPrice,
-        referencePrice: formItem.referencePrice,
+        condition: field.condition,
+        quantity: field.quantity,
+        offerPrice: field.offerPrice,
+        referencePrice: field.referencePrice,
       };
     });
-  }, [basePurchase, formValues]);
+  }, [basePurchase, itemsForm.fieldArray.fields, newItems]);
 
   const payments = paymentsForm.getValues('payments') as IPaymentDetail[];
 
@@ -230,6 +248,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   );
 
   const addItem = useCallback((item: IPurchaseItem) => {
+    // Store the complete item in newItems Map
+    setNewItems((prev) => new Map(prev).set(item.cardGuid, item));
+    
+    // Add to form
     itemsForm.fieldArray.append({
       cardGuid: item.cardGuid,
       condition: item.condition,

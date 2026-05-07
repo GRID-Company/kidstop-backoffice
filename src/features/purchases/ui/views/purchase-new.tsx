@@ -151,18 +151,14 @@ export default function PurchaseNew() {
             >
               <Icon icon='lucide:arrow-left' width={20} />
             </Button>
-            <div className='flex items-center gap-3'>
-              <span className='text-accent text-lg font-semibold'>
-                Nueva compra
-              </span>
-              <Chip size='sm' variant='flat' color='primary'>
-                Borrador
-              </Chip>
-            </div>
+            <span className='text-accent text-lg font-semibold'>
+              Nueva compra
+            </span>
+            <Chip size='sm' variant='flat' color='primary'>
+              Borrador
+            </Chip>
           </div>
-          <div className='flex items-center gap-3'>
-            <PrivacyModeToggle />
-          </div>
+          <PrivacyModeToggle />
         </div>
       </EntitiesPage.Toolbar>
 

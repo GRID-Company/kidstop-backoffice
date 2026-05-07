@@ -33,12 +33,14 @@ EntitiesPage.Toolbar = function Toolbar({
 }: ToolbarProps) {
   return (
     <div
-      className={`mb-6 flex items-center justify-between gap-2 px-4 ${className}`}
+      className={`w-full mb-6 flex items-center justify-between gap-2 px-4 ${className}`}
     >
-      <EntitiesPage.FlexRow>
-        <EntitiesPage.Title label={label} />
-      </EntitiesPage.FlexRow>
-      <EntitiesPage.FlexRow>{children}</EntitiesPage.FlexRow>
+      {label && (
+        <EntitiesPage.FlexRow>
+          <EntitiesPage.Title label={label} />
+        </EntitiesPage.FlexRow>
+      )}
+      {children}
     </div>
   );
 };

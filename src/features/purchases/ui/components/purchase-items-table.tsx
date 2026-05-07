@@ -13,6 +13,7 @@ import KidstopSelect from '@/shared/base/heorui-overrides/select';
 
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { CardImage } from '@/shared/components/card-image';
@@ -218,7 +219,7 @@ export default function PurchaseItemsTable({
         label: 'Subtotal',
         customCol: (item: IPurchaseItem) => (
           <span className="text-sm font-semibold">
-            {displayCurrency(calculateItemSubtotal(item))}
+            {formatCurrency(calculateItemSubtotal(item))}
           </span>
         ),
       },
@@ -266,7 +267,7 @@ export default function PurchaseItemsTable({
           <div className="flex items-center gap-2">
             <span className="text-sm text-default-500">Total compra:</span>
             <span className="text-lg font-bold text-accent">
-              {displayCurrency(total)}
+              {formatCurrency(total)}
             </span>
           </div>
         </div>

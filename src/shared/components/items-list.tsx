@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Accordion, AccordionItem } from '@heroui/react';
-import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
+import { formatCurrency } from '@/lib/utils/format-currency';
 import ItemCard from './item-card';
 import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
 
@@ -31,7 +31,6 @@ export default function ItemsList({
   totalLabel = 'Total',
   emptyMessage = 'No hay items',
 }: ItemsListProps) {
-  const displayCurrency = usePrivacyCurrency();
 
   const form = useForm({
     defaultValues: {
@@ -111,7 +110,7 @@ export default function ItemsList({
                 </span>
                 {!isExpanded && (
                   <span className="text-sm font-semibold text-accent">
-                    {displayCurrency(total)}
+                    {formatCurrency(total)}
                   </span>
                 )}
               </div>
@@ -141,7 +140,7 @@ export default function ItemsList({
           <div className="flex items-center gap-2">
             <span className="text-sm text-default-500">{totalLabel}:</span>
             <span className="text-lg font-bold text-accent">
-              {displayCurrency(total)}
+              {formatCurrency(total)}
             </span>
           </div>
         </div>
