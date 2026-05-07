@@ -224,18 +224,10 @@ export default function BulkCardResultCard({
                         : 'Sin precio'}
                     </span>
                   </div>
-                  {displayCard.referencePrice && displayCard.referencePrice > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Icon icon="lucide:trending-up" width={12} className="text-default-400" />
-                      <span className="text-xs text-default-500">
-                        Ref: {formatCurrency(displayCard.referencePrice)}
-                      </span>
-                    </div>
-                  )}
                 </div>
                 {loadingMetrics && needsMetrics ? (
                   <PriceMetricsSkeleton />
-                ) : displayCard.cardMetrics && (
+                ) : displayCard.cardMetrics && (displayCard.cardMetrics.ungradedPrice || displayCard.cardMetrics.gradedPriceSeven || displayCard.cardMetrics.gradedPriceEightOrAbove) && (
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
                     {displayCard.cardMetrics.ungradedPrice && displayCard.cardMetrics.ungradedPrice > 0 && (
                       <div className="flex items-center gap-0.5">
