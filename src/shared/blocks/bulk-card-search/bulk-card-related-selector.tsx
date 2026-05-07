@@ -2,12 +2,16 @@
 
 import { RadioGroup, Radio } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import Image from 'next/image';
 import { BulkCardRelatedSelectorProps } from './types';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
 export default function BulkCardRelatedSelector({
   relatedCards,
   selectedCardGuid,
   onSelect,
+  tcgType,
 }: BulkCardRelatedSelectorProps) {
   if (relatedCards.length === 0) {
     return null;
@@ -42,9 +46,13 @@ export default function BulkCardRelatedSelector({
                     className="absolute inset-0 h-full w-full object-contain p-0.5"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-default-400">
-                    <Icon icon="lucide:image-off" width={16} />
-                  </div>
+                  <Image
+                    src={tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+                    alt={`${tcgType} card placeholder`}
+                    fill
+                    sizes="43px"
+                    className="object-contain p-0.5"
+                  />
                 )}
               </div>
               <div className="flex flex-col gap-0.5">

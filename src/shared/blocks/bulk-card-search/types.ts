@@ -99,6 +99,7 @@ export interface BulkCardRelatedSelectorProps {
   relatedCards: BulkCardData[];
   selectedCardGuid: string;
   onSelect: (cardGuid: string) => void;
+  tcgType: TCGType;
 }
 
 export interface BulkCardFormControlsProps {

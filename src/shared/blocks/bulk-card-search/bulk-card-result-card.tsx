@@ -3,12 +3,15 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Accordion, AccordionItem, CardBody } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import Image from 'next/image';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import BulkCardRelatedSelector from './bulk-card-related-selector';
 import BulkCardFormControls from './bulk-card-form-controls';
 import { BulkCardResultCardProps } from './types';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
+import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
 function MetricItem({
   icon,
@@ -146,9 +149,13 @@ export default function BulkCardResultCard({
                     className="absolute inset-0 h-full w-full object-contain p-1"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-default-400">
-                    <Icon icon="lucide:image-off" width={24} />
-                  </div>
+                  <Image
+                    src={tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+                    alt={`${tcgType} card placeholder`}
+                    fill
+                    sizes="65px"
+                    className="object-contain p-1"
+                  />
                 )}
               </div>
               <div className="flex flex-1 flex-col gap-1">
@@ -196,6 +203,7 @@ export default function BulkCardResultCard({
                 relatedCards={availableRelatedCards}
                 selectedCardGuid={selectedCardGuid}
                 onSelect={handleSelectRelatedCard}
+                tcgType={tcgType}
               />
             )}
 
