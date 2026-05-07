@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import {
   Drawer,
@@ -22,6 +22,7 @@ import {
   calculateTotal,
   validatePriceAdjustment,
 } from '../../domain/purchases.domain';
+import { calculatePublicPrice } from '../../domain/price.utils';
 import {
   usePriceAdjustmentForm,
   PriceAdjustmentFormData,
@@ -42,6 +43,7 @@ export default function PriceAdjustmentModal({
   onConfirm,
 }: PriceAdjustmentModalProps) {
   const displayCurrency = usePrivacyCurrency();
+  const [autoCalculatedItems, setAutoCalculatedItems] = useState<Set<string>>(new Set());
 
   const { control, handleSubmit, reset, fieldArray } = usePriceAdjustmentForm();
   const { fields } = fieldArray;
@@ -85,15 +87,50 @@ export default function PriceAdjustmentModal({
 
   useEffect(() => {
     if (isOpen) {
-      reset({
-        items: items.map((item) => ({
+      const autoCalcSet = new Set<string>();
+      
+      const formItems = items.map((item) => {
+        let publicPrice = item.sellPrice;
+        
+        if (!publicPrice || publicPrice === 0) {
+          const refPrice = item.currentReferencePrice || item.referencePrice || 0;
+          if (refPrice > 0) {
+            publicPrice = calculatePublicPrice(refPrice);
+            autoCalcSet.add(item.guid);
+          } else {
+            publicPrice = 0;
+          }
+        }
+        
+        return {
           itemId: item.guid,
-          publicPrice: item.sellPrice || item.currentReferencePrice || item.referencePrice || 0,
-        })),
+          publicPrice,
+        };
       });
+      
+      setAutoCalculatedItems(autoCalcSet);
+      reset({ items: formItems });
     }
   }, [isOpen, items, reset]);
 
+  useEffect(() => {
+    watchedItems.forEach((watchedItem, index) => {
+      const item = items[index];
+      if (!item) return;
+      
+      const currentPrice = Number(watchedItem.publicPrice);
+      const refPrice = item.currentReferencePrice || item.referencePrice || 0;
+      const calculatedPrice = refPrice > 0 ? calculatePublicPrice(refPrice) : 0;
+      
+      if (autoCalculatedItems.has(item.guid) && currentPrice !== calculatedPrice) {
+        setAutoCalculatedItems((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(item.guid);
+          return newSet;
+        });
+      }
+    });
+  }, [watchedItems, items, autoCalculatedItems]);
 
   const handleFormSubmit = useCallback(
     (data: PriceAdjustmentFormData) => {
@@ -240,7 +277,7 @@ export default function PriceAdjustmentModal({
                       </span>
                     </div>
 
-                    <div className="flex-1">
+                    <div className="flex flex-1 flex-col gap-1">
                       <InputForm
                         label="Precio público"
                         type="number"
@@ -256,6 +293,11 @@ export default function PriceAdjustmentModal({
                         size="sm"
                         aria-label={`Precio público de ${item.cardName}`}
                       />
+                      {autoCalculatedItems.has(item.guid) && (
+                        <p className="text-xs text-default-500">
+                          Precio sugerido: Ref. + 20%
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
