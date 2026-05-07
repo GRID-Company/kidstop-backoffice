@@ -68,6 +68,7 @@ export default function Topbar({ className }: { className?: string }) {
         </NavbarContent>
 
         <NavbarContent justify='end' className='xl:hidden'>
+          <TcgSelector />
           <NavbarMenuToggle
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           />

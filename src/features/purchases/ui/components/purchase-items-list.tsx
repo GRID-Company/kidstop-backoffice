@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import ItemsList from '@/shared/components/items-list';
+import { TCGType } from '@/lib/types/tcg.types';
 import { IPurchaseItem } from '../../domain/types';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { useItemsReferencePrices } from '../hooks/use-items-reference-prices';
@@ -15,6 +16,7 @@ interface PurchaseItemsListProps {
   onRemoveItem: (itemId: string) => void;
   onRefetchPrices?: (refetch: (items?: IPurchaseItem[]) => void) => void;
   showRefreshButton?: boolean;
+  tcgType?: TCGType;
   isReadOnly?: boolean;
 }
 
@@ -24,6 +26,7 @@ export default function PurchaseItemsList({
   onRemoveItem,
   onRefetchPrices,
   showRefreshButton = false,
+  tcgType,
   isReadOnly = false,
 }: PurchaseItemsListProps) {
   const { itemsWithPrices, loading, refetch: refetchPrices } = useItemsReferencePrices(items);
@@ -44,6 +47,13 @@ export default function PurchaseItemsList({
     [itemsWithPrices]
   );
 
+  const buttonClassName = useMemo(() => {
+    if (!tcgType) return '';
+    return tcgType === 'POKEMON' 
+      ? 'bg-[#e53223] text-white hover:bg-[#991b1b]' 
+      : 'bg-[#e85d26] text-white hover:bg-[#9a3412]';
+  }, [tcgType]);
+
   return (
     <div className="flex flex-col gap-3">
       {showRefreshButton && (
@@ -51,7 +61,7 @@ export default function PurchaseItemsList({
           <Button
             size="sm"
             variant="flat"
-            color="primary"
+            className={buttonClassName}
             startContent={
               loading ? (
                 <Icon icon="lucide:loader-2" width={16} className="animate-spin" />

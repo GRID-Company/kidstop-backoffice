@@ -333,6 +333,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 tableRefetchPricesRef.current = refetch;
               }}
               showRefreshButton={true}
+              tcgType={purchase.tcgType}
               isReadOnly={!isEditable}
             />
           </div>
