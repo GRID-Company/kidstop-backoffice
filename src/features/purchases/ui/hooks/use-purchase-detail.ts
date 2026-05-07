@@ -4,6 +4,7 @@ import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 import { useAuthStore } from '@/lib/store/auth';
+import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
 
 import { 
   PurchaseDocument,
@@ -20,7 +21,7 @@ import {
   ISeller,
   CardCondition,
 } from '../../domain/types';
-import { calculateTotal } from '../../domain/purchases.domain';
+import { calculateTotal, getItemKey } from '../../domain/purchases.domain';
 import { usePurchaseItemsForm, PurchaseItemsFormData } from '../../adapters/forms/use-purchase-items-form';
 import { usePaymentSplitForm, PaymentSplitFormData } from '../../adapters/forms/use-payment-split-form';
 import { mapFormItemToPurchaseItem } from '../../adapters/mappers/item-mapper';
@@ -170,7 +171,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
         // Try to find by cardGuid:condition key
-        const itemKey = `${field.cardGuid}:${field.condition}`;
+        const itemKey = getItemKey({ cardGuid: field.cardGuid, condition: field.condition });
         const newItem = newItems.get(itemKey);
         if (newItem) {
           return {
@@ -185,7 +186,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         // Fallback for items without metadata - use field.id as guid
         return {
           ...(field as unknown as IPurchaseItem),
-          guid: (field as any).id || `temp-${field.cardGuid}-${field.condition}`,
+          guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition),
         };
       }
       
@@ -252,13 +253,13 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const canReturnToDraft = status === PURCHASE_STATUS.REJECTED;
 
   const existingItemIds = useMemo(
-    () => new Set(items.map((i) => `${i.cardGuid}:${i.condition}`)),
+    () => new Set(items.map((i) => getItemKey(i))),
     [items]
   );
 
   const addItem = useCallback((item: IPurchaseItem) => {
     // Store the complete item in newItems Map using cardGuid:condition as key
-    const itemKey = `${item.cardGuid}:${item.condition}`;
+    const itemKey = getItemKey(item);
     setNewItems((prev) => new Map(prev).set(itemKey, item));
     
     // Add to form

@@ -20,8 +20,10 @@ import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
+import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
+import { getItemKey } from '../../domain/purchases.domain';
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
@@ -65,7 +67,7 @@ function CardResultItem({
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
   const isAlreadyAdded = useMemo(
-    () => existingItemIds.has(`${card.guid}:${addState.condition}`),
+    () => existingItemIds.has(getItemKey({ cardGuid: card.guid, condition: addState.condition })),
     [existingItemIds, card.guid, addState.condition]
   );
 
@@ -348,7 +350,7 @@ export default function CardSearchWithMetrics({
     (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
-        guid: `temp-${card.guid}-${state.condition}`,
+        guid: generateTemporaryItemGuid(card.guid, state.condition),
         cardGuid: card.guid,
         cardName: card.name,
         cardImageUrl: card.imageUrl,

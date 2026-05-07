@@ -9,10 +9,11 @@ import { CardImage } from '@/shared/components/card-image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
-import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { REDACTED_VALUE, formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
+import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { useAvailableConditions } from '@/shared/hooks/use-available-conditions';
 import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
 
 type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
@@ -102,22 +103,7 @@ export default function ItemCard({
     return false;
   }, [item, variant]);
 
-  // Calculate which conditions are already used for this card (excluding current item)
-  const usedConditions = useMemo(() => {
-    return new Set(
-      allItems
-        .filter((i) => i.cardGuid === item.cardGuid && i.guid !== item.guid)
-        .map((i) => i.condition)
-    );
-  }, [allItems, item.cardGuid, item.guid]);
-
-  // Filter available condition options
-  const availableConditionOptions = useMemo(() => {
-    return CARD_CONDITION_OPTIONS.map((option) => ({
-      ...option,
-      isDisabled: usedConditions.has(option.value),
-    }));
-  }, [usedConditions]);
+  const { usedConditions, availableConditionOptions } = useAvailableConditions(item, allItems);
 
   const displaySubtotal = formatCurrency(subtotal);
 

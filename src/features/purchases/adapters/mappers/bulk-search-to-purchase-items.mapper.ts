@@ -1,5 +1,6 @@
 import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/schemas';
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
+import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
 import { IPurchaseItem } from '../../domain/types';
 import { TCGType } from '@/lib/types/tcg.types';
 
@@ -23,7 +24,7 @@ export function mapBulkSearchToPurchaseItems(
     const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
 
     return {
-      guid: `temp-${selectedCard.guid}-${cardForm.condition}-${index}`,
+      guid: generateTemporaryItemGuid(selectedCard.guid, cardForm.condition, index),
       cardGuid: selectedCard.guid,
       cardName: selectedCard.name,
       cardImageUrl: selectedCard.imageUri || '',

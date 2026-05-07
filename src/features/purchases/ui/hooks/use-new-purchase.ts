@@ -8,7 +8,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { CreatePurchaseDocument, PurchasesDocument } from '@/lib/api/generated/purchases.generated';
 import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated';
 import { IPurchaseItem, ISeller } from '../../domain/types';
-import { calculateTotal } from '../../domain/purchases.domain';
+import { calculateTotal, getItemKey } from '../../domain/purchases.domain';
 import { toCreatePurchasePayload } from '../../adapters/mappers/purchase.mapper';
 import { useNewPurchaseForm, NewPurchaseFormData } from '../../adapters/forms/use-new-purchase-form';
 
@@ -64,7 +64,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
   const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
   const existingItemIds = useMemo(
-    () => new Set(items.map((i: IPurchaseItem) => `${i.cardGuid}:${i.condition}`)),
+    () => new Set(items.map((i: IPurchaseItem) => getItemKey(i))),
     [items]
   );
 
