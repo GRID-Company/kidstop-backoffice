@@ -221,7 +221,7 @@ export default function BulkCardResultCard({
                     <span className={`text-xs ${displayCard.sellPrice && displayCard.sellPrice > 0 ? 'font-semibold text-accent' : 'text-default-400'}`}>
                       {displayCard.sellPrice && displayCard.sellPrice > 0
                         ? formatCurrency(displayCard.sellPrice)
-                        : 'Sin precio'}
+                        : 'Sin precio público'}
                     </span>
                   </div>
                 </div>
