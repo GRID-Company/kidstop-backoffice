@@ -74,6 +74,13 @@ export default function Sales() {
     [setDateTo]
   );
 
+  const handleRowClick = useCallback(
+    (sale: ISale) => {
+      router.push(`/ventas/${sale.guid}`);
+    },
+    [router]
+  );
+
   const columns: ITableColumn[] = useMemo(
     () => [
       {
@@ -143,17 +150,19 @@ export default function Sales() {
         label: '',
         className: 'w-[60px]',
         customCol: (row: ISale) => (
-          <Tooltip content="Ver detalle">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              aria-label={`Ver pedido ${row.saleCode}`}
-              onPress={() => router.push(`/ventas/${row.guid}`)}
-            >
-              <Icon icon="lucide:eye" width={16} />
-            </Button>
-          </Tooltip>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Tooltip content="Ver detalle">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                aria-label={`Ver pedido ${row.saleCode}`}
+                onPress={() => router.push(`/ventas/${row.guid}`)}
+              >
+                <Icon icon="lucide:eye" width={16} />
+              </Button>
+            </Tooltip>
+          </div>
         ),
       },
     ],
@@ -253,7 +262,13 @@ export default function Sales() {
         </div>
 
         <div className="mt-4">
-          <DataTable cols={columns} data={sales} isLoading={loading} />
+          <DataTable 
+            cols={columns} 
+            data={sales} 
+            isLoading={loading} 
+            rowClickable={true}
+            onRowClick={handleRowClick}
+          />
         </div>
 
         {sales.length === 0 && (
