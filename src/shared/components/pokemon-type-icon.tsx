@@ -1,7 +1,6 @@
 'use client';
 
 import { Icon } from '@iconify/react';
-import { useMemo } from 'react';
 
 interface PokemonTypeIconProps {
   type: string | null | undefined;
@@ -37,12 +36,9 @@ export default function PokemonTypeIcon({
   showLabel = false,
   className = '',
 }: PokemonTypeIconProps) {
-  const typeConfig = useMemo(() => {
-    if (!type) return null;
-    return TYPE_ICONS[type] || { icon: 'mdi:help-circle', color: 'text-default-400' };
-  }, [type]);
-
-  if (!type || !typeConfig) return null;
+  if (!type) return null;
+  
+  const typeConfig = TYPE_ICONS[type] || { icon: 'mdi:help-circle', color: 'text-default-400' };
 
   const iconSize = SIZE_MAP[size];
 

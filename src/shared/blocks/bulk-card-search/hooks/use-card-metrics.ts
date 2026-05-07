@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 import { PokemonCardWithMetricsDocument, PokemonCardWithMetricsQuery } from '@/lib/api/generated/catalog-pokemon.generated';
-import { BulkCardDetailMetrics } from '../types';
+import { BulkCardDetailMetrics, BulkCardVariantMetrics } from '../types';
 
 type VariantMetric = NonNullable<NonNullable<PokemonCardWithMetricsQuery['pokemonCardWithMetrics']>['variantsMetrics']>[number];
 
@@ -11,7 +11,14 @@ interface UseCardMetricsReturn {
   error: string | null;
 }
 
-// Cache en memoria para evitar re-fetch de cartas ya consultadas
+const mapVariantMetric = (v: VariantMetric): BulkCardVariantMetrics => ({
+  condition: v.condition,
+  stock: v.stock,
+  lastSellDate: v.lastSellDate as string | null,
+  avgDaysInInventory: v.avgDaysInInventory ?? null,
+  wishlistCount: v.wishlistCount,
+});
+
 const metricsCache = new Map<string, BulkCardDetailMetrics>();
 
 export function useCardMetrics(cardGuid: string | null): UseCardMetricsReturn {
@@ -38,17 +45,10 @@ export function useCardMetrics(cardGuid: string | null): UseCardMetricsReturn {
     });
   }, [cardGuid, fetchMetrics]);
 
-  // Actualizar caché cuando lleguen datos
   useEffect(() => {
     if (data?.pokemonCardWithMetrics && cardGuid) {
       const metrics: BulkCardDetailMetrics = {
-        variantsMetrics: data.pokemonCardWithMetrics.variantsMetrics?.map((v: VariantMetric) => ({
-          condition: v.condition,
-          stock: v.stock,
-          lastSellDate: v.lastSellDate as string | null,
-          avgDaysInInventory: v.avgDaysInInventory ?? null,
-          wishlistCount: v.wishlistCount,
-        })) || [],
+        variantsMetrics: data.pokemonCardWithMetrics.variantsMetrics?.map(mapVariantMetric) || [],
         ungradedPrice: data.pokemonCardWithMetrics.ungradedPrice,
         gradedPriceSeven: data.pokemonCardWithMetrics.gradedPriceSeven,
         gradedPriceEightOrAbove: data.pokemonCardWithMetrics.gradedPriceEightOrAbove,
@@ -69,13 +69,7 @@ export function useCardMetrics(cardGuid: string | null): UseCardMetricsReturn {
 
   return {
     metrics: data?.pokemonCardWithMetrics ? {
-      variantsMetrics: data.pokemonCardWithMetrics.variantsMetrics?.map((v: VariantMetric) => ({
-        condition: v.condition,
-        stock: v.stock,
-        lastSellDate: v.lastSellDate as string | null,
-        avgDaysInInventory: v.avgDaysInInventory ?? null,
-        wishlistCount: v.wishlistCount,
-      })) || [],
+      variantsMetrics: data.pokemonCardWithMetrics.variantsMetrics?.map(mapVariantMetric) || [],
       ungradedPrice: data.pokemonCardWithMetrics.ungradedPrice,
       gradedPriceSeven: data.pokemonCardWithMetrics.gradedPriceSeven,
       gradedPriceEightOrAbove: data.pokemonCardWithMetrics.gradedPriceEightOrAbove,

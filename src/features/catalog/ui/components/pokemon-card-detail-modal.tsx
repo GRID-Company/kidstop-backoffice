@@ -19,6 +19,7 @@ import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { formatReleaseDate } from '@/lib/utils/format-date';
+import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
@@ -90,15 +91,7 @@ export default function PokemonCardDetailModal({
             <div className="w-40 shrink-0">
               <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
                 {(() => {
-                  // Usar la imagen de mayor calidad disponible
-                  const highQualityImage = detail?.moreImages && detail.moreImages.length > 0
-                    ? detail.moreImages.reduce((prev, current) => {
-                        const prevRes = parseInt(prev.resolution.split('x')[0]);
-                        const currentRes = parseInt(current.resolution.split('x')[0]);
-                        return currentRes > prevRes ? current : prev;
-                      })
-                    : null;
-
+                  const highQualityImage = getHighestQualityImage(detail?.moreImages);
                   const displayImage = highQualityImage?.imageUrl || imageUri;
 
                   return displayImage ? (

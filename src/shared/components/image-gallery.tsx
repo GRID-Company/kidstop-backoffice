@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
+import { filterImagesByMinResolution } from '@/lib/utils/image-utils';
 
 interface ImageResolution {
   resolution: string;
@@ -24,14 +24,7 @@ export default function ImageGallery({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const filteredImages = useMemo(() => {
-    return images.filter((img) => {
-      const resolution = parseInt(img.resolution.split('x')[0]);
-      return resolution >= minResolution;
-    }).sort((a, b) => {
-      const resA = parseInt(a.resolution.split('x')[0]);
-      const resB = parseInt(b.resolution.split('x')[0]);
-      return resA - resB;
-    });
+    return filterImagesByMinResolution(images, minResolution);
   }, [images, minResolution]);
 
   if (filteredImages.length === 0) return null;
@@ -87,6 +80,7 @@ export default function ImageGallery({
           {filteredImages.map((_, index) => (
             <button
               key={index}
+              type="button"
               onClick={() => setCurrentIndex(index)}
               className={`h-2 w-2 rounded-full transition-all ${
                 index === currentIndex
@@ -94,6 +88,7 @@ export default function ImageGallery({
                   : 'bg-default-300 hover:bg-default-400'
               }`}
               aria-label={`Ir a imagen ${index + 1}`}
+              aria-current={index === currentIndex}
             />
           ))}
         </div>
