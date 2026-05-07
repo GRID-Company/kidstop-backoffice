@@ -19,6 +19,7 @@ import KidstopCard from '@/shared/base/heorui-overrides/card';
 import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter-drawer';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
+import { formatDaysInInventory } from '@/lib/utils/format-inventory';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -33,12 +34,6 @@ interface CardSearchWithMetricsProps {
   existingItemIds: Set<string>;
 }
 
-const formatDaysInInventory = (days: number): string => {
-  if (days === 0) return 'Sin stock';
-  if (days === 1) return '1 día';
-  return `${days} días`;
-};
-
 interface AddToCartState {
   condition: CardCondition;
   quantity: number;
@@ -51,13 +46,15 @@ const DEFAULT_ADD_STATE: AddToCartState = {
   unitBuyPrice: 0,
 };
 
+const WISHLIST_HIGHLIGHT_THRESHOLD = 10;
+
 function CardResultItem({
   card,
   onAdd,
   isAlreadyAdded,
 }: {
   card: ICardSearchResult;
-  onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: any, referencePrice: number | null) => void;
+  onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => void;
   isAlreadyAdded: boolean;
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
@@ -163,7 +160,7 @@ function CardResultItem({
                 label="Wishlist"
                 value={String(displayMetrics.wishlistCount)}
                 valueClassName={
-                  displayMetrics.wishlistCount >= 10
+                  displayMetrics.wishlistCount >= WISHLIST_HIGHLIGHT_THRESHOLD
                     ? 'text-accent font-semibold'
                     : ''
                 }
@@ -342,7 +339,7 @@ export default function CardSearchWithMetrics({
   } = useCardSearch();
 
   const handleAddCard = useCallback(
-    (card: ICardSearchResult, state: AddToCartState, variantMetrics: any, referencePrice: number | null) => {
+    (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
         guid: `${card.guid}-${state.condition}-${Date.now()}`,

@@ -5,6 +5,7 @@ import { CardCondition } from '../../domain/types';
 import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType, TCG_TYPES } from '@/lib/types/tcg.types';
+import { extractVariantMetrics } from '../../domain/metrics.utils';
 
 interface VariantMetric {
   condition?: string | null;
@@ -12,23 +13,6 @@ interface VariantMetric {
   lastSellDate?: unknown;
   avgDaysInInventory?: number | null;
   wishlistCount?: number | null;
-}
-
-function extractVariantMetrics(
-  variantsMetrics: (VariantMetric | null)[] | null | undefined,
-  condition: string
-) {
-  if (!variantsMetrics) return null;
-
-  const variantMetric = variantsMetrics.find((v) => v?.condition === condition);
-  if (!variantMetric) return null;
-
-  return {
-    stock: variantMetric.stock ?? 0,
-    lastSaleDate: (variantMetric.lastSellDate as string | null) ?? null,
-    daysInInventory: variantMetric.avgDaysInInventory ?? 0,
-    wishlistCount: variantMetric.wishlistCount ?? 0,
-  };
 }
 
 interface UseCardVariantMetricsReturn {

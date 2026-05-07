@@ -54,9 +54,9 @@ export default function ItemsList({
 
   useEffect(() => {
     if (!isReadOnly) {
-      const subscription = form.watch((value: any, { name }: any) => {
+      const subscription = form.watch((value, { name }) => {
         if (name && name.startsWith('cards.')) {
-          const match = name.match(/^cards\.(\d+)\.(.+)$/);
+          const match = name.match(/^cards\\.(\d+)\\.(.+)$/);
           if (match) {
             const index = parseInt(match[1], 10);
             const field = match[2];
