@@ -11,6 +11,10 @@ export interface AdaptedPurchaseItem {
   cardImageUrl: string;
   setName: string;
   setCode: string;
+  cardNumber?: string | null;
+  variant?: string | null;
+  type?: string | null;
+  hp?: string | null;
   tcgType: TCGType;
   condition: CardCondition;
   quantity: number;
@@ -28,6 +32,10 @@ export interface AdaptedSaleItem {
   cardImageUrl: string;
   setName: string;
   setCode: string;
+  cardNumber?: string | null;
+  variant?: string | null;
+  type?: string | null;
+  hp?: string | null;
   tcgType: TCGType;
   condition: CardCondition;
   quantity: number;
@@ -42,6 +50,10 @@ export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
     cardImageUrl: item.cardImageUrl,
     setName: item.setName,
     setCode: item.setCode,
+    cardNumber: item.cardNumber,
+    variant: item.variant,
+    type: item.type,
+    hp: item.hp,
     tcgType: item.tcgType,
     condition: item.condition,
     quantity: item.quantity,

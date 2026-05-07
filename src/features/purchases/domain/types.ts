@@ -40,6 +40,7 @@ export interface IPurchaseItem {
   cardImageUrl: string;
   setName: string;
   setCode: string;
+  cardNumber?: string | null;
   tcgType: TCGType;
   variant?: string | null;
   type?: string | null;

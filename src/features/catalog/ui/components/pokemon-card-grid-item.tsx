@@ -77,7 +77,7 @@ export default function PokemonCardGridItem({ card, onPress }: PokemonCardGridIt
           </div>
 
           <p className="truncate text-xs text-default-500">
-            {card.setName} {card.setCode ? `· ${card.setCode}` : ''}
+            {card.setName} {card.setCode ? `· ${card.setCode}` : ''} {card.cardNumber ? `· #${card.cardNumber}` : ''}
           </p>
 
           {card.releaseDate && (
