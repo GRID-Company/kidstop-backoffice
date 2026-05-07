@@ -332,6 +332,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
               onRefetchPrices={(refetch) => {
                 tableRefetchPricesRef.current = refetch;
               }}
+              showRefreshButton={true}
               isReadOnly={!isEditable}
             />
           </div>

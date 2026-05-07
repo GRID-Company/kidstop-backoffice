@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 
 import { IPurchaseItem } from '../../domain/types';
@@ -36,69 +36,6 @@ export function useItemsReferencePrices(items: IPurchaseItem[]): UseItemsReferen
       fetchPolicy: 'cache-and-network',
     }
   );
-
-
-  useEffect(() => {
-    // Only fetch on mount, not on dependency changes
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    const fetchInitial = async () => {
-      if (pokemonCardGuids.length > 0) {
-        for (const guid of pokemonCardGuids) {
-          if (controller.signal.aborted) break;
-          if (fetchedGuidsRef.current.has(guid)) continue;
-          fetchedGuidsRef.current.add(guid);
-
-          try {
-            const result = await fetchPokemonMetrics({
-              variables: { guid },
-            });
-            if (result.data?.pokemonCardWithMetrics?.ungradedPrice != null) {
-              setPricesCache((prev) => ({
-                ...prev,
-                [guid]: result.data!.pokemonCardWithMetrics!.ungradedPrice!,
-              }));
-            }
-          } catch (error) {
-            if (error instanceof Error && error.name !== 'AbortError') {
-              console.warn(`Failed to fetch Pokemon price for ${guid}:`, error);
-            }
-          }
-        }
-      }
-
-      if (magicCardGuids.length > 0) {
-        for (const guid of magicCardGuids) {
-          if (controller.signal.aborted) break;
-          if (fetchedGuidsRef.current.has(guid)) continue;
-          fetchedGuidsRef.current.add(guid);
-
-          try {
-            const result = await fetchMagicMetrics({
-              variables: { guid },
-            });
-            if (result.data?.magicCardWithMetrics?.priceRetail != null) {
-              setPricesCache((prev) => ({
-                ...prev,
-                [guid]: result.data!.magicCardWithMetrics!.priceRetail!,
-              }));
-            }
-          } catch (error) {
-            if (error instanceof Error && error.name !== 'AbortError') {
-              console.warn(`Failed to fetch Magic price for ${guid}:`, error);
-            }
-          }
-        }
-      }
-    };
-
-    fetchInitial();
-
-    return () => {
-      controller.abort();
-    };
-  }, [pokemonCardGuids, magicCardGuids, fetchPokemonMetrics, fetchMagicMetrics]);
 
   const itemsWithPrices = useMemo(() => {
     return items.map((item) => {
