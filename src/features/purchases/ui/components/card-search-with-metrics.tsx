@@ -26,6 +26,7 @@ import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
 import { calculateOfferPrice } from '../../domain/price.utils';
+import CardConditionBreakdownPopover from './condition-breakdown-popover';
 
 interface CardSearchWithMetricsProps {
   onAddItem: (item: IPurchaseItem) => void;
@@ -66,7 +67,7 @@ function CardResultItem({
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
-  const { metrics: variantMetrics, referencePrice, loading: metricsLoading } = useCardVariantMetrics(
+  const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
     addState.condition,
     card.tcgType
@@ -157,16 +158,19 @@ function CardResultItem({
                     : 'font-semibold'
                 }
               />
-              <MetricItem
-                icon="lucide:heart"
-                label="Wishlist"
-                value={String(displayMetrics.wishlistCount)}
-                valueClassName={
-                  displayMetrics.wishlistCount >= 10
-                    ? 'text-accent font-semibold'
-                    : ''
-                }
-              />
+              <div className="flex items-center gap-1">
+                <MetricItem
+                  icon="lucide:heart"
+                  label="Wishlist"
+                  value={String(displayMetrics.wishlistCount)}
+                  valueClassName={
+                    displayMetrics.wishlistCount >= 10
+                      ? 'text-accent font-semibold'
+                      : ''
+                  }
+                />
+                <CardConditionBreakdownPopover variantsMetrics={variantsMetrics} />
+              </div>
               <div className="hidden xl:block">
                 <MetricItem
                   icon="lucide:calendar"

@@ -37,7 +37,6 @@ import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
-import ConditionBreakdownPopover from '../components/condition-breakdown-popover';
 
 interface PurchaseDetailProps {
   purchaseId: string;
@@ -285,7 +284,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 <Chip size="sm" variant="flat">
                   {items.length} {items.length === 1 ? 'carta' : 'cartas'}
                 </Chip>
-                <ConditionBreakdownPopover items={items} />
               </div>
             </div>
             <PurchaseItemsList

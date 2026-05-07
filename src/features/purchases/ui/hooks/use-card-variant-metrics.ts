@@ -39,6 +39,7 @@ interface UseCardVariantMetricsReturn {
     wishlistCount: number;
   } | null;
   referencePrice: number | null;
+  variantsMetrics: (VariantMetric | null)[] | null | undefined;
   loading: boolean;
   refetch: () => void;
 }
@@ -100,9 +101,20 @@ export function useCardVariantMetrics(
     return null;
   }, [tcgType, pokemonData, magicData]);
 
+  const variantsMetrics = useMemo(() => {
+    if (tcgType === TCG_TYPES.POKEMON) {
+      return pokemonData?.pokemonCardWithMetrics?.variantsMetrics;
+    }
+    if (tcgType === TCG_TYPES.MAGIC) {
+      return magicData?.magicCardWithMetrics?.variantsMetrics;
+    }
+    return null;
+  }, [tcgType, pokemonData, magicData]);
+
   return {
     metrics,
     referencePrice,
+    variantsMetrics,
     loading: tcgType === TCG_TYPES.POKEMON ? pokemonLoading : magicLoading,
     refetch: () => {
       if (tcgType === TCG_TYPES.POKEMON) {
