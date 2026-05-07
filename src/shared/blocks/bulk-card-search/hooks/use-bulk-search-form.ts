@@ -7,13 +7,18 @@ import {
   bulkSearchFormSchemaInventory,
   BulkSearchFormDataPurchases,
   BulkSearchFormDataInventory,
+  BulkCardFormDataPurchases,
+  BulkCardFormDataInventory,
 } from '../schemas';
 import { BulkSearchVariant, BulkCardResult } from '../types';
 import { DEFAULT_OFFER_PERCENTAGE } from '../constants';
 
+type BulkSearchFormData = BulkSearchFormDataPurchases | BulkSearchFormDataInventory;
+type BulkCardFormData = BulkCardFormDataPurchases | BulkCardFormDataInventory;
+
 interface UseBulkSearchFormReturn {
-  form: ReturnType<typeof useForm<BulkSearchFormDataPurchases | BulkSearchFormDataInventory>>;
-  fields: any[];
+  form: ReturnType<typeof useForm<BulkSearchFormData>>;
+  fields: BulkCardFormData[];
   addCard: (result: BulkCardResult) => void;
   removeCard: (index: number) => void;
   updateSelectedCard: (index: number, cardGuid: string) => void;
@@ -22,13 +27,12 @@ interface UseBulkSearchFormReturn {
 }
 
 export function useBulkSearchForm(
-  variant: BulkSearchVariant,
-  onSubmit: (data: BulkSearchFormDataPurchases | BulkSearchFormDataInventory) => void
+  variant: BulkSearchVariant
 ): UseBulkSearchFormReturn {
   const schema =
     variant === 'purchases' ? bulkSearchFormSchemaPurchases : bulkSearchFormSchemaInventory;
 
-  const form = useForm<BulkSearchFormDataPurchases | BulkSearchFormDataInventory>({
+  const form = useForm<BulkSearchFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       searchText: '',
@@ -60,7 +64,7 @@ export function useBulkSearchForm(
           condition: CARD_CONDITIONS.NEAR_MINT,
           quantity,
           offerPrice,
-        } as any);
+        } as BulkCardFormDataPurchases);
       } else {
         const defaultPublicPrice = selectedCard.sellPrice || 0;
         
@@ -69,7 +73,7 @@ export function useBulkSearchForm(
           condition: CARD_CONDITIONS.NEAR_MINT,
           quantity,
           publicPrice: defaultPublicPrice,
-        } as any);
+        } as BulkCardFormDataInventory);
       }
     },
     [variant, append]
@@ -89,7 +93,7 @@ export function useBulkSearchForm(
         update(index, {
           ...currentField,
           selectedCardGuid: cardGuid,
-        } as any);
+        } as BulkCardFormData);
       }
     },
     [fields, update]

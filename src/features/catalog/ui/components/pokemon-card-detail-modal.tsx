@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback } from 'react';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
@@ -17,6 +16,7 @@ import {
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
+import FoilChip from '@/shared/components/foil-chip';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
@@ -118,17 +118,7 @@ export default function PokemonCardDetailModal({
                   Pokemon
                 </Chip>
                 {detail?.variant && (detail.variant.toLowerCase().includes('holo') || detail.variant.toLowerCase().includes('foil')) && (
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    startContent={<Icon icon="lucide:sparkles" className="text-xs" />}
-                    classNames={{
-                      base: 'bg-gradient-to-r from-yellow-400/20 to-amber-500/20',
-                      content: 'text-amber-600 font-semibold',
-                    }}
-                  >
-                    {detail.variant}
-                  </Chip>
+                  <FoilChip label={detail.variant} variant="subtle" />
                 )}
               </div>
 

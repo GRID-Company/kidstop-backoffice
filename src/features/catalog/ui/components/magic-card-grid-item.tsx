@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
-import { Card, CardBody, CardFooter, Chip } from '@heroui/react';
-import { Icon } from '@iconify/react';
+import { Card, CardBody, CardFooter } from '@heroui/react';
+import FoilChip from '@/shared/components/foil-chip';
 import { IMagicCard } from '../../domain/types';
 
 interface MagicCardGridItemProps {
@@ -40,17 +40,7 @@ export default function MagicCardGridItem({ card, onPress }: MagicCardGridItemPr
 
           {card.isFoil && (
             <div className="absolute right-2 top-2">
-              <Chip
-                size="sm"
-                variant="flat"
-                startContent={<Icon icon="lucide:sparkles" className="text-sm" />}
-                classNames={{
-                  base: 'bg-gradient-to-r from-yellow-400/90 to-amber-500/90',
-                  content: 'text-white font-semibold',
-                }}
-              >
-                Foil
-              </Chip>
+              <FoilChip label="Foil" />
             </div>
           )}
         </div>
