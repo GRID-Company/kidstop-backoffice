@@ -9,6 +9,8 @@ import KidstopCard from '@/shared/base/heorui-overrides/card';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import BulkCardRelatedSelector from './bulk-card-related-selector';
 import BulkCardFormControls from './bulk-card-form-controls';
+import PriceMetricsSkeleton from './components/price-metrics-skeleton';
+import { useCardMetrics } from './hooks/use-card-metrics';
 import { BulkCardResultCardProps } from './types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
@@ -72,6 +74,26 @@ export default function BulkCardResultCard({
     return result.relatedCards.find((c) => c.guid === selectedCardGuid) || result.bestMatch;
   }, [selectedCardGuid, result.bestMatch, result.relatedCards]);
 
+  // Detectar si es related card y necesita métricas
+  const isRelatedCard = selectedCardGuid !== result.bestMatch?.guid;
+  const needsMetrics = tcgType === 'POKEMON' && isRelatedCard && !selectedCard?.cardMetrics?.ungradedPrice;
+  
+  // Cargar métricas solo si es necesario
+  const { metrics: loadedMetrics, loading: loadingMetrics } = useCardMetrics(
+    needsMetrics ? selectedCardGuid : null
+  );
+
+  // Combinar selectedCard con métricas cargadas
+  const selectedCardWithMetrics = useMemo(() => {
+    if (!selectedCard) return null;
+    if (!needsMetrics || !loadedMetrics) return selectedCard;
+    
+    return {
+      ...selectedCard,
+      cardMetrics: loadedMetrics,
+    };
+  }, [selectedCard, needsMetrics, loadedMetrics]);
+
   const availableRelatedCards = useMemo(() => {
     if (!result.bestMatch) return result.relatedCards;
     
@@ -114,7 +136,7 @@ export default function BulkCardResultCard({
     );
   }
 
-  if (!selectedCard) {
+  if (!selectedCardWithMetrics) {
     return (
       <KidstopCard className="w-full border-warning">
         <CardBody className="flex flex-row items-center gap-3 !p-3">
@@ -128,6 +150,8 @@ export default function BulkCardResultCard({
     );
   }
 
+  const displayCard = selectedCardWithMetrics;
+
   return (
     <KidstopCard className={`w-full border-l-4 ${isConfigured ? 'border-l-success' : 'border-l-warning'}`}>
       <Accordion
@@ -139,14 +163,14 @@ export default function BulkCardResultCard({
       >
         <AccordionItem
           key="content"
-          aria-label={selectedCard.name}
+          aria-label={displayCard.name}
           title={
             <div className="flex items-center gap-3 py-1">
               <div className="relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md bg-default-100">
-                {selectedCard.imageUri ? (
+                {displayCard.imageUri ? (
                   <img
-                    src={selectedCard.imageUri}
-                    alt={selectedCard.name}
+                    src={displayCard.imageUri}
+                    alt={displayCard.name}
                     className="absolute inset-0 h-full w-full object-contain p-1"
                   />
                 ) : (
@@ -160,78 +184,80 @@ export default function BulkCardResultCard({
                 )}
               </div>
               <div className="flex flex-1 flex-col gap-1">
-                <p className="text-sm font-semibold leading-tight">{selectedCard.name}</p>
+                <p className="text-sm font-semibold leading-tight">{displayCard.name}</p>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  {tcgType === 'POKEMON' && selectedCard.type && (
-                    <PokemonTypeIcon type={selectedCard.type} size="sm" />
+                  {tcgType === 'POKEMON' && displayCard.type && (
+                    <PokemonTypeIcon type={displayCard.type} size="sm" />
                   )}
-                  {tcgType === 'POKEMON' && selectedCard.hp && (
+                  {tcgType === 'POKEMON' && displayCard.hp && (
                     <Chip size="sm" variant="flat" className="h-4 px-1 text-[9px]">
-                      {selectedCard.hp} HP
+                      {displayCard.hp} HP
                     </Chip>
                   )}
-                  {selectedCard.variant && !selectedCard.variant.toLowerCase().includes('normal') && (
+                  {displayCard.variant && !displayCard.variant.toLowerCase().includes('normal') && (
                     <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1 text-[9px]">
-                      {selectedCard.variant}
+                      {displayCard.variant}
                     </Chip>
                   )}
                 </div>
                 <p className="text-xs text-default-500">
-                  {selectedCard.edition} · #{selectedCard.collectorNumber}
+                  {displayCard.edition} · #{displayCard.collectorNumber}
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     <Icon
                       icon="lucide:package"
                       width={12}
-                      className={selectedCard.totalStock > 0 ? 'text-success' : 'text-danger'}
+                      className={displayCard.totalStock > 0 ? 'text-success' : 'text-danger'}
                     />
                     <span className="text-xs text-default-500">
-                      {selectedCard.totalStock > 0
-                        ? `${selectedCard.totalStock} en stock`
+                      {displayCard.totalStock > 0
+                        ? `${displayCard.totalStock} en stock`
                         : 'Sin stock'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Icon icon="lucide:tag" width={12} className="text-default-400" />
-                    <span className={`text-xs ${selectedCard.sellPrice && selectedCard.sellPrice > 0 ? 'font-semibold text-accent' : 'text-default-400'}`}>
-                      {selectedCard.sellPrice && selectedCard.sellPrice > 0
-                        ? formatCurrency(selectedCard.sellPrice)
+                    <span className={`text-xs ${displayCard.sellPrice && displayCard.sellPrice > 0 ? 'font-semibold text-accent' : 'text-default-400'}`}>
+                      {displayCard.sellPrice && displayCard.sellPrice > 0
+                        ? formatCurrency(displayCard.sellPrice)
                         : 'Sin precio'}
                     </span>
                   </div>
-                  {selectedCard.referencePrice && selectedCard.referencePrice > 0 && (
+                  {displayCard.referencePrice && displayCard.referencePrice > 0 && (
                     <div className="flex items-center gap-1">
                       <Icon icon="lucide:trending-up" width={12} className="text-default-400" />
                       <span className="text-xs text-default-500">
-                        Ref: {formatCurrency(selectedCard.referencePrice)}
+                        Ref: {formatCurrency(displayCard.referencePrice)}
                       </span>
                     </div>
                   )}
                 </div>
-                {selectedCard.cardMetrics && (
+                {loadingMetrics && needsMetrics ? (
+                  <PriceMetricsSkeleton />
+                ) : displayCard.cardMetrics && (
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
-                    {selectedCard.cardMetrics.ungradedPrice && selectedCard.cardMetrics.ungradedPrice > 0 && (
+                    {displayCard.cardMetrics.ungradedPrice && displayCard.cardMetrics.ungradedPrice > 0 && (
                       <div className="flex items-center gap-0.5">
                         <Icon icon="lucide:trending-up" width={10} className="text-default-400" />
                         <span className="text-default-500">
-                          Market: {formatCurrency(selectedCard.cardMetrics.ungradedPrice)}
+                          Market: {formatCurrency(displayCard.cardMetrics.ungradedPrice)}
                         </span>
                       </div>
                     )}
-                    {selectedCard.cardMetrics.gradedPriceSeven && selectedCard.cardMetrics.gradedPriceSeven > 0 && (
+                    {displayCard.cardMetrics.gradedPriceSeven && displayCard.cardMetrics.gradedPriceSeven > 0 && (
                       <div className="flex items-center gap-0.5">
                         <Icon icon="lucide:award" width={10} className="text-warning" />
                         <span className="text-default-500">
-                          PSA 7: {formatCurrency(selectedCard.cardMetrics.gradedPriceSeven)}
+                          PSA 7: {formatCurrency(displayCard.cardMetrics.gradedPriceSeven)}
                         </span>
                       </div>
                     )}
-                    {selectedCard.cardMetrics.gradedPriceEightOrAbove && selectedCard.cardMetrics.gradedPriceEightOrAbove > 0 && (
+                    {displayCard.cardMetrics.gradedPriceEightOrAbove && displayCard.cardMetrics.gradedPriceEightOrAbove > 0 && (
                       <div className="flex items-center gap-0.5">
                         <Icon icon="lucide:star" width={10} className="text-success" />
                         <span className="text-default-500">
-                          PSA 8+: {formatCurrency(selectedCard.cardMetrics.gradedPriceEightOrAbove)}
+                          PSA 8+: {formatCurrency(displayCard.cardMetrics.gradedPriceEightOrAbove)}
                         </span>
                       </div>
                     )}

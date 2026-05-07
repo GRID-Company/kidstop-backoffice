@@ -1331,6 +1331,18 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
           purchasePrice
           sellPrice
         }
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
+        }
       }
       error
     }
@@ -1367,10 +1379,12 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 **Input Parameters:**
 
 - `searchText` (required): Multiline text in Limitless format
-- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for best match
-  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (PriceCharting)
-  - When `true`: `bestMatch.cardMetrics` includes full metrics data
-  - When `false` or omitted: `cardMetrics` field is null (faster response)
+- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for all cards
+  - ⚠️ **Performance Note:** Increases response time due to external API calls for bestMatch only
+  - When `true`: 
+    - `bestMatch.cardMetrics` includes **full metrics + external prices** from PriceCharting
+    - `relatedCards[].cardMetrics` includes **variant metrics only** (stock, wishlist, etc.) but prices are `null`
+  - When `false` or omitted: `cardMetrics` field is null for all cards (fastest response)
 
 **Response Fields:**
 
@@ -1379,8 +1393,17 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 - `parsedSet`: Extracted set code
 - `parsedNumber`: Extracted card number
 - `bestMatch`: The top matching card with full inventory details
-  - `cardMetrics` (nullable): Card metrics data (only when `withCardsMetrics: true`)
-- `relatedCards`: Up to 3 additional related cards (no metrics)
+  - `cardMetrics` (nullable): Full card metrics including external prices (when `withCardsMetrics: true`)
+    - `variantsMetrics`: Stock, wishlist count, last sell date, avg days in inventory per condition
+    - `ungradedPrice`: PriceCharting loose price
+    - `gradedPriceSeven`: PriceCharting CIB price (PSA 7 equivalent)
+    - `gradedPriceEightOrAbove`: PriceCharting new price (PSA 8+ equivalent)
+- `relatedCards`: Up to 3 additional related cards
+  - `cardMetrics` (nullable): Variant metrics only, prices are `null` (when `withCardsMetrics: true`)
+    - `variantsMetrics`: Stock, wishlist count, last sell date, avg days in inventory per condition
+    - `ungradedPrice`: `null` (not fetched for performance)
+    - `gradedPriceSeven`: `null` (not fetched for performance)
+    - `gradedPriceEightOrAbove`: `null` (not fetched for performance)
 - `error`: Error message if search failed for this line
 
 **Use Cases:**
