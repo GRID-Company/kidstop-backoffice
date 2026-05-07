@@ -63,7 +63,9 @@ export default function BulkCardRelatedSelector({
                     <PokemonTypeIcon type={card.type} size="sm" />
                   )}
                   {card.variant && !card.variant.toLowerCase().includes('normal') && (
-                    <span className="text-[9px] text-default-400">{card.variant}</span>
+                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1 text-[9px]">
+                      {card.variant}
+                    </Chip>
                   )}
                 </div>
                 <p className="text-[10px] text-default-500">
