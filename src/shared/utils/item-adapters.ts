@@ -1,5 +1,7 @@
 import { IPurchaseItem } from '@/features/purchases/domain/types';
 import { ISaleItem } from '@/features/sales/domain/types';
+import { TCGType } from '@/lib/types/tcg.types';
+import { CardCondition } from '@/lib/types/card.types';
 
 export interface AdaptedPurchaseItem {
   guid: string;
@@ -7,8 +9,8 @@ export interface AdaptedPurchaseItem {
   cardImageUrl: string;
   setName: string;
   setCode: string;
-  tcgType: string;
-  condition: string;
+  tcgType: TCGType;
+  condition: CardCondition;
   quantity: number;
   offerPrice: number;
   referencePrice?: number;
@@ -24,8 +26,8 @@ export interface AdaptedSaleItem {
   cardImageUrl: string;
   setName: string;
   setCode: string;
-  tcgType: string;
-  condition: string;
+  tcgType: TCGType;
+  condition: CardCondition;
   quantity: number;
   price: number;
   foundQuantity?: number;
