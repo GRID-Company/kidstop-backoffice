@@ -166,7 +166,9 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       const originalItem = basePurchase.items.find((item) => item.cardGuid === field.cardGuid);
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
-        const newItem = newItems.get(field.cardGuid);
+        // Try to find by cardGuid:condition key
+        const itemKey = `${field.cardGuid}:${field.condition}`;
+        const newItem = newItems.get(itemKey);
         if (newItem) {
           return {
             ...newItem,
@@ -248,8 +250,9 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   );
 
   const addItem = useCallback((item: IPurchaseItem) => {
-    // Store the complete item in newItems Map
-    setNewItems((prev) => new Map(prev).set(item.cardGuid, item));
+    // Store the complete item in newItems Map using cardGuid:condition as key
+    const itemKey = `${item.cardGuid}:${item.condition}`;
+    setNewItems((prev) => new Map(prev).set(itemKey, item));
     
     // Add to form
     itemsForm.fieldArray.append({
