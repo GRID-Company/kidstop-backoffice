@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import {
   Badge,
   Button,
@@ -64,7 +64,10 @@ function CardResultItem({
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
-  const isAlreadyAdded = existingItemIds.has(`${card.guid}:${addState.condition}`);
+  const isAlreadyAdded = useMemo(
+    () => existingItemIds.has(`${card.guid}:${addState.condition}`),
+    [existingItemIds, card.guid, addState.condition]
+  );
 
   const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
@@ -81,6 +84,7 @@ function CardResultItem({
 
   const handleAdd = useCallback(async () => {
     if (addState.unitBuyPrice <= 0 || addState.quantity < 1) return;
+    if (isAlreadyAdded) return;
     setIsAdding(true);
     try {
       await onAdd(card, addState, variantMetrics, referencePrice);
@@ -94,7 +98,7 @@ function CardResultItem({
     } finally {
       setIsAdding(false);
     }
-  }, [card, addState, onAdd, referencePrice, variantMetrics]);
+  }, [card, addState, onAdd, referencePrice, variantMetrics, isAlreadyAdded]);
 
   const displayMetrics = variantMetrics || card.metrics;
 
