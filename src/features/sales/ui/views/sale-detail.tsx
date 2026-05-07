@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Button,
@@ -32,7 +32,7 @@ import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/
 import { useSaleDetail } from '../hooks/use-sale-detail';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
-import SaleItemsTable from '../components/sale-items-table';
+import SaleItemsList from '../components/sale-items-list';
 import GeneratePdfButton from '../components/generate-pdf-button';
 import SendReadyEmailButton from '../components/send-ready-email-button';
 import CompleteSaleModal from '../components/complete-sale-modal';
@@ -58,6 +58,15 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [editedItems, setEditedItems] = useState<ISale['items']>([]);
+
+  const isEditable = sale?.status === SALE_STATUS.IN_PROGRESS;
+
+  useEffect(() => {
+    if (sale) {
+      setEditedItems(sale.items);
+    }
+  }, [sale]);
 
   const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
   const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
@@ -160,7 +169,20 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 {formatCurrency(total)}
               </span>
             </div>
-            <SaleItemsTable items={sale.items} />
+            <SaleItemsList
+              items={isEditable ? editedItems : sale.items}
+              onUpdateItem={isEditable ? (itemId, updates) => {
+                setEditedItems(prev =>
+                  prev.map(item =>
+                    item.guid === itemId ? { ...item, ...updates } : item
+                  )
+                );
+              } : undefined}
+              onRemoveItem={isEditable ? (itemId) => {
+                setEditedItems(prev => prev.filter(item => item.guid !== itemId));
+              } : undefined}
+              isReadOnly={!isEditable}
+            />
           </div>
         </EntitiesPage.CardContainer>
 
