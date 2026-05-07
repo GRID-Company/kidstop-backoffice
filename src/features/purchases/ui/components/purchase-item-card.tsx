@@ -1,11 +1,12 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Button, Tooltip } from '@heroui/react';
+import { Button, Tooltip, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
+import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
@@ -117,6 +118,26 @@ export default function PurchaseItemCard({
               <h4 className="text-sm font-semibold leading-tight text-default-900">
                 {item.cardName}
               </h4>
+              {item.tcgType === 'POKEMON' && (item.type || item.hp || item.variant) && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {item.type && (
+                    <div className="flex items-center gap-0.5">
+                      <PokemonTypeIcon type={item.type} size="sm" />
+                      <span className="text-[10px] text-default-600">{item.type}</span>
+                    </div>
+                  )}
+                  {item.hp && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      {item.hp} HP
+                    </Chip>
+                  )}
+                  {item.variant && !item.variant.toLowerCase().includes('normal') && (
+                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
+                      {item.variant}
+                    </Chip>
+                  )}
+                </div>
+              )}
               <p className="text-xs text-default-500">
                 {item.setName} · {item.setCode}
               </p>

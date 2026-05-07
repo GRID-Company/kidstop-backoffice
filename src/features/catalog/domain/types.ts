@@ -9,6 +9,11 @@ import { CardCondition } from '@/lib/types/card.types';
 
 export type { CardCondition };
 
+export interface IImageResolution {
+  resolution: string;
+  imageUrl: string;
+}
+
 export interface ICardVariant {
   id: string;
   condition: CardCondition;
@@ -65,6 +70,13 @@ export interface IPokemonCard {
   availableStock: boolean;
   totalStock: number;
   imageUri: string | null;
+  moreImages?: IImageResolution[] | null;
+  releaseDate?: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
+  cardText?: string | null;
+  artist?: string | null;
   variants: IPokemonCardVariant[];
 }
 

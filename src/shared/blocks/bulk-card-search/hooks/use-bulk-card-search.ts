@@ -66,11 +66,28 @@ const mapPokemonCardToBulkCardData = (card: PokemonCard): BulkCardData => {
     name: card.name,
     edition: card.setName || '',
     collectorNumber: card.cardNumber || '',
+    variant: card.variant,
+    type: card.type,
+    hp: card.hp,
+    stage: card.stage,
     sellPrice: card.sellPrice,
     totalStock: card.totalStock,
+    availableStock: card.availableStock,
     imageUri: card.imageUri,
     inventoryCards,
     referencePrice: card.cardMetrics?.ungradedPrice || null,
+    cardMetrics: card.cardMetrics ? {
+      variantsMetrics: card.cardMetrics.variantsMetrics?.map(v => ({
+        condition: v.condition,
+        stock: v.stock,
+        lastSellDate: v.lastSellDate as string | null,
+        avgDaysInInventory: v.avgDaysInInventory ?? null,
+        wishlistCount: v.wishlistCount,
+      })) || [],
+      ungradedPrice: card.cardMetrics.ungradedPrice,
+      gradedPriceSeven: card.cardMetrics.gradedPriceSeven,
+      gradedPriceEightOrAbove: card.cardMetrics.gradedPriceEightOrAbove,
+    } : null,
   };
 };
 
@@ -95,11 +112,28 @@ const mapPokemonRelatedCardToBulkCardData = (card: PokemonRelatedCard): BulkCard
     name: card.name,
     edition: card.setName || '',
     collectorNumber: card.cardNumber || '',
+    variant: card.variant,
+    type: card.type,
+    hp: card.hp,
+    stage: card.stage,
     sellPrice: card.sellPrice,
     totalStock: card.totalStock,
+    availableStock: card.availableStock,
     imageUri: card.imageUri,
     inventoryCards: [],
     referencePrice: null,
+    cardMetrics: card.cardMetrics ? {
+      variantsMetrics: card.cardMetrics.variantsMetrics?.map(v => ({
+        condition: v.condition,
+        stock: v.stock,
+        lastSellDate: v.lastSellDate as string | null,
+        avgDaysInInventory: v.avgDaysInInventory ?? null,
+        wishlistCount: v.wishlistCount,
+      })) || [],
+      ungradedPrice: card.cardMetrics.ungradedPrice,
+      gradedPriceSeven: card.cardMetrics.gradedPriceSeven,
+      gradedPriceEightOrAbove: card.cardMetrics.gradedPriceEightOrAbove,
+    } : null,
   };
 };
 

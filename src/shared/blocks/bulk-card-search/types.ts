@@ -19,6 +19,21 @@ export interface BulkCardMetrics {
   wishlistCount: number;
 }
 
+export interface BulkCardVariantMetrics {
+  condition: string;
+  stock: number;
+  lastSellDate: string | null;
+  avgDaysInInventory: number | null;
+  wishlistCount: number;
+}
+
+export interface BulkCardDetailMetrics {
+  variantsMetrics: BulkCardVariantMetrics[];
+  ungradedPrice: number | null;
+  gradedPriceSeven: number | null;
+  gradedPriceEightOrAbove: number | null;
+}
+
 export interface BulkCardData {
   guid: string;
   name: string;
@@ -26,11 +41,17 @@ export interface BulkCardData {
   collectorNumber: string;
   isFoil?: boolean;
   rarity?: string;
+  variant?: string | null;
   sellPrice: number | null;
   totalStock: number;
+  availableStock?: boolean;
   imageUri: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
   inventoryCards: BulkCardInventoryData[];
   referencePrice: number | null;
+  cardMetrics?: BulkCardDetailMetrics | null;
 }
 
 export interface BulkCardResult {

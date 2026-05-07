@@ -42,6 +42,13 @@ export function toPokemonCard(item: PokemonCardInternalItem): IPokemonCard {
     availableStock: item.availableStock,
     totalStock: item.totalStock,
     imageUri: item.imageUri ?? null,
+    moreImages: item.moreImages ?? null,
+    releaseDate: item.releaseDate ?? null,
+    type: item.type ?? null,
+    hp: item.hp ?? null,
+    stage: item.stage ?? null,
+    cardText: item.cardText ?? null,
+    artist: item.artist ?? null,
     variants: (item.inventoryCards ?? []).map((ic) => ({
       guid: ic.guid,
       condition: ic.condition,

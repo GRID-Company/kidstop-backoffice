@@ -823,6 +823,8 @@ export type Mutation = {
   removeCartItem: Cart;
   /** Remove a card from the most wanted list (admin only) */
   removeMostWantedCard: Scalars['Boolean']['output'];
+  /** Remove item from sale (backoffice) */
+  removeSaleItem: Sale;
   /** Remove item from wishlist (carpeta digital) */
   removeWishlistItem: Scalars['Boolean']['output'];
   /** Reorder most wanted cards priorities in bulk (admin only) */
@@ -851,6 +853,8 @@ export type Mutation = {
   updatePurchaseItems: Purchase;
   /** Transition purchase status (ADMIN/BUYER only) */
   updatePurchaseStatus: Purchase;
+  /** Update sale item quantity (backoffice) */
+  updateSaleItem: Sale;
   /** Transition sale status (backoffice) */
   updateSaleStatus: Sale;
   /** Update an existing seller */
@@ -948,6 +952,10 @@ export type MutationRemoveMostWantedCardArgs = {
   mostWantedCardGuid: Scalars['String']['input'];
 };
 
+export type MutationRemoveSaleItemArgs = {
+  removeSaleItemInput: RemoveSaleItemInput;
+};
+
 export type MutationRemoveWishlistItemArgs = {
   wishlistItemGuid: Scalars['String']['input'];
 };
@@ -998,6 +1006,10 @@ export type MutationUpdatePurchaseItemsArgs = {
 
 export type MutationUpdatePurchaseStatusArgs = {
   updatePurchaseStatusInput: UpdatePurchaseStatusInput;
+};
+
+export type MutationUpdateSaleItemArgs = {
+  updateSaleItemInput: UpdateSaleItemInput;
 };
 
 export type MutationUpdateSaleStatusArgs = {
@@ -1519,6 +1531,8 @@ export type Query = {
   recommendedMagicCards: Array<MagicCardRecommended>;
   /** Get 5 recommended Pokemon cards with highest stock (public) */
   recommendedPokemonCards: Array<PokemonCardRecommended>;
+  /** Query to resend invitation email to a user who hasn't completed registration */
+  resendEmailInvite: GenericOutput;
   /** Get sale detail by guid (backoffice) */
   sale: Sale;
   /** Get paginated list of sales (backoffice) */
@@ -1651,6 +1665,10 @@ export type QueryPurchasesArgs = {
   findPurchasesArgs: FindPurchasesArgs;
 };
 
+export type QueryResendEmailInviteArgs = {
+  guid: Scalars['String']['input'];
+};
+
 export type QuerySaleArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1684,6 +1702,10 @@ export type RegisterClientInput = {
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type RemoveSaleItemInput = {
+  saleItemGuid: Scalars['String']['input'];
 };
 
 export type ReorderMostWantedCardsInput = {
@@ -1868,6 +1890,11 @@ export type UpdatePurchaseItemsInput = {
 export type UpdatePurchaseStatusInput = {
   newStatus: Scalars['String']['input'];
   purchaseGuid: Scalars['String']['input'];
+};
+
+export type UpdateSaleItemInput = {
+  quantity: Scalars['Int']['input'];
+  saleItemGuid: Scalars['String']['input'];
 };
 
 export type UpdateSaleStatusInput = {

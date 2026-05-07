@@ -17,6 +17,9 @@ import {
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
+import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import { formatReleaseDate } from '@/lib/utils/format-date';
+import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
@@ -85,24 +88,29 @@ export default function PokemonCardDetailModal({
 
         <DrawerBody className="flex flex-col gap-6">
           <div className="flex gap-6">
-            <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
-              {imageUri ? (
-                <Image
-                  src={imageUri}
-                  alt={name}
-                  fill
-                  sizes="160px"
-                  className="object-contain p-1"
-                />
-              ) : (
-                <Image
-                  src={pokemonCardPlaceholder}
-                  alt="Pokemon card placeholder"
-                  fill
-                  sizes="160px"
-                  className="object-contain p-1"
-                />
-              )}
+            <div className="w-40 shrink-0">
+              <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
+                {(() => {
+                  const highQualityImage = getHighestQualityImage(detail?.moreImages);
+                  const displayImage = highQualityImage?.imageUrl || imageUri;
+
+                  return displayImage ? (
+                    <img
+                      src={displayImage}
+                      alt={name}
+                      className="absolute inset-0 h-full w-full object-contain p-1"
+                    />
+                  ) : (
+                    <Image
+                      src={pokemonCardPlaceholder}
+                      alt="Pokemon card placeholder"
+                      fill
+                      sizes="160px"
+                      className="object-contain p-1"
+                    />
+                  );
+                })()}
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -161,6 +169,39 @@ export default function PokemonCardDetailModal({
                   <>
                     <span className="text-default-500">Variante</span>
                     <span className="font-medium">{detail.variant}</span>
+                  </>
+                )}
+                {!loading && detail?.type && (
+                  <>
+                    <span className="text-default-500">Tipo</span>
+                    <div className="flex items-center gap-1">
+                      <PokemonTypeIcon type={detail.type} size="sm" />
+                      <span className="font-medium">{detail.type}</span>
+                    </div>
+                  </>
+                )}
+                {!loading && detail?.hp && (
+                  <>
+                    <span className="text-default-500">HP</span>
+                    <span className="font-medium">{detail.hp}</span>
+                  </>
+                )}
+                {!loading && detail?.stage && (
+                  <>
+                    <span className="text-default-500">Etapa</span>
+                    <span className="font-medium">{detail.stage}</span>
+                  </>
+                )}
+                {!loading && detail?.releaseDate && (
+                  <>
+                    <span className="text-default-500">Lanzamiento</span>
+                    <span className="font-medium">{formatReleaseDate(detail.releaseDate)}</span>
+                  </>
+                )}
+                {!loading && detail?.artist && (
+                  <>
+                    <span className="text-default-500">Artista</span>
+                    <span className="font-medium">{detail.artist}</span>
                   </>
                 )}
                 <span className="text-default-500">Stock total</span>
@@ -224,6 +265,21 @@ export default function PokemonCardDetailModal({
               </div>
             )}
           </div>
+
+          {!loading && detail?.cardText && (
+            <>
+              <Divider />
+              <div className="flex flex-col gap-2">
+                <h4 className="text-sm font-semibold">Texto de la carta</h4>
+                <div className="rounded-lg bg-default-50 p-3">
+                  <div 
+                    className="text-sm text-default-700"
+                    dangerouslySetInnerHTML={{ __html: detail.cardText }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           {selectedVariant && (
             <>

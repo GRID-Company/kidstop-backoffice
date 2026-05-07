@@ -41,6 +41,10 @@ export type PurchasesQuery = {
           cardNumber: string | null;
           rarity: string | null;
           imageUri: string | null;
+          variant: string | null;
+          type: string | null;
+          hp: string | null;
+          stage: string | null;
         } | null;
         magicCardSummary: {
           guid: string;
@@ -95,6 +99,10 @@ export type PurchaseQuery = {
         cardNumber: string | null;
         rarity: string | null;
         imageUri: string | null;
+        variant: string | null;
+        type: string | null;
+        hp: string | null;
+        stage: string | null;
       } | null;
       magicCardSummary: {
         guid: string;
@@ -138,6 +146,10 @@ export type CreatePurchaseMutation = {
         cardNumber: string | null;
         rarity: string | null;
         imageUri: string | null;
+        variant: string | null;
+        type: string | null;
+        hp: string | null;
+        stage: string | null;
       } | null;
       magicCardSummary: {
         guid: string;
@@ -201,6 +213,10 @@ export type UpdatePurchaseItemsMutation = {
         cardNumber: string | null;
         rarity: string | null;
         imageUri: string | null;
+        variant: string | null;
+        type: string | null;
+        hp: string | null;
+        stage: string | null;
       } | null;
       magicCardSummary: {
         guid: string;
@@ -500,6 +516,22 @@ export const PurchasesDocument = {
                                     kind: 'Field',
                                     name: { kind: 'Name', value: 'imageUri' },
                                   },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'variant' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'type' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'hp' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'stage' },
+                                  },
                                 ],
                               },
                             },
@@ -715,6 +747,22 @@ export const PurchaseDocument = {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
                             },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
+                            },
                           ],
                         },
                       },
@@ -900,6 +948,22 @@ export const CreatePurchaseDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
                             },
                           ],
                         },
@@ -1166,6 +1230,22 @@ export const UpdatePurchaseItemsDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
                             },
                           ],
                         },

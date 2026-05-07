@@ -1,8 +1,9 @@
 'use client';
 
-import { RadioGroup, Radio } from '@heroui/react';
+import { RadioGroup, Radio, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
+import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { BulkCardRelatedSelectorProps } from './types';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
@@ -57,6 +58,16 @@ export default function BulkCardRelatedSelector({
               </div>
               <div className="flex flex-col gap-0.5">
                 <p className="text-xs font-semibold leading-tight line-clamp-2">{card.name}</p>
+                <div className="flex flex-wrap items-center gap-1">
+                  {tcgType === 'POKEMON' && card.type && (
+                    <PokemonTypeIcon type={card.type} size="sm" />
+                  )}
+                  {card.variant && !card.variant.toLowerCase().includes('normal') && (
+                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1 text-[9px]">
+                      {card.variant}
+                    </Chip>
+                  )}
+                </div>
                 <p className="text-[10px] text-default-500">
                   {card.edition} · {card.collectorNumber}
                 </p>

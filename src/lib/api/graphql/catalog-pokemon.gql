@@ -11,6 +11,16 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       availableStock
       totalStock
       imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
       inventoryCards {
         guid
         condition
@@ -35,6 +45,16 @@ query PokemonCardInternalDetail($guid: String!) {
     sellPrice
     totalStock
     imageUri
+    moreImages {
+      resolution
+      imageUrl
+    }
+    releaseDate
+    type
+    hp
+    stage
+    cardText
+    artist
     inventoryCards {
       guid
       condition
@@ -91,20 +111,59 @@ query PokemonCardWithMetrics($guid: String!) {
 query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
     results {
-    originalLine
-    parsedQuantity
-    parsedName
-    parsedSet
-    parsedNumber
-    bestMatch {
+      originalLine
+      parsedQuantity
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        cardNumber
+        setName
+        setCode
+        variant
+        imageUri
+        moreImages {
+          resolution
+          imageUrl
+        }
+        sellPrice
+        totalStock
+        availableStock
+        releaseDate
+        type
+        hp
+        stage
+        cardText
+        artist
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
+        }
+      }
+    relatedCards {
       guid
       name
       cardNumber
       setName
       setCode
+      variant
       imageUri
       sellPrice
       totalStock
+      availableStock
+      type
+      hp
+      stage
       cardMetrics {
         variantsMetrics {
           condition
@@ -117,18 +176,8 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
         gradedPriceSeven
         gradedPriceEightOrAbove
       }
-    }
-    relatedCards {
-      guid
-      name
-      cardNumber
-      setName
-      setCode
-      imageUri
-      sellPrice
-      totalStock
-    }
-    error
+      }
+      error
     }
   }
 }
