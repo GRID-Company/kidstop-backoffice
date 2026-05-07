@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import {
   Badge,
   Button,
@@ -20,8 +20,10 @@ import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
+import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
+import { getItemKey } from '../../domain/purchases.domain';
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
@@ -51,11 +53,11 @@ const WISHLIST_HIGHLIGHT_THRESHOLD = 10;
 function CardResultItem({
   card,
   onAdd,
-  isAlreadyAdded,
+  existingItemIds,
 }: {
   card: ICardSearchResult;
   onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => void;
-  isAlreadyAdded: boolean;
+  existingItemIds: Set<string>;
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
@@ -63,6 +65,11 @@ function CardResultItem({
   });
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
+
+  const isAlreadyAdded = useMemo(
+    () => existingItemIds.has(getItemKey({ cardGuid: card.guid, condition: addState.condition })),
+    [existingItemIds, card.guid, addState.condition]
+  );
 
   const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
@@ -79,6 +86,7 @@ function CardResultItem({
 
   const handleAdd = useCallback(async () => {
     if (addState.unitBuyPrice <= 0 || addState.quantity < 1) return;
+    if (isAlreadyAdded) return;
     setIsAdding(true);
     try {
       await onAdd(card, addState, variantMetrics, referencePrice);
@@ -92,7 +100,7 @@ function CardResultItem({
     } finally {
       setIsAdding(false);
     }
-  }, [card, addState, onAdd, referencePrice, variantMetrics]);
+  }, [card, addState, onAdd, referencePrice, variantMetrics, isAlreadyAdded]);
 
   const displayMetrics = variantMetrics || card.metrics;
 
@@ -342,7 +350,7 @@ export default function CardSearchWithMetrics({
     (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
-        guid: `${card.guid}-${state.condition}-${Date.now()}`,
+        guid: generateTemporaryItemGuid(card.guid, state.condition),
         cardGuid: card.guid,
         cardName: card.name,
         cardImageUrl: card.imageUrl,
@@ -438,7 +446,7 @@ export default function CardSearchWithMetrics({
               key={card.guid}
               card={card}
               onAdd={handleAddCard}
-              isAlreadyAdded={existingItemIds.has(card.guid)}
+              existingItemIds={existingItemIds}
             />
           ))}
         </div>

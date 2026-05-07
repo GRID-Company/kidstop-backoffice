@@ -1,5 +1,5 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
-import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { CARD_CONDITION_SHORT_LABELS, CardCondition } from '@/lib/types/card.types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { buildWhatsAppUrl } from '@/lib/utils/whatsapp.utils';
@@ -21,6 +21,10 @@ export const getPurchasesVars = (
       search: filters.search || undefined,
     },
   };
+};
+
+export const getItemKey = (item: { cardGuid: string; condition: CardCondition }): string => {
+  return `${item.cardGuid}:${item.condition}`;
 };
 
 export const calculateItemSubtotal = (item: IPurchaseItem): number => {

@@ -71,6 +71,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     total,
     currentBuyerSpent,
     assignedBudget,
+    existingItemIds,
     loading,
     updateItem,
     removeItem,
@@ -94,11 +95,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       toast.error(`Error al actualizar precio: ${error.message}`);
     },
   });
-
-  const existingItemIds = useMemo(
-    () => new Set(items.map((i) => i.cardGuid)),
-    [items]
-  );
 
   const handlePaymentsConfirm = useCallback(
     (newPayments: IPaymentDetail[]) => {

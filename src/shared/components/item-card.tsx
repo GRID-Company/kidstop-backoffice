@@ -9,10 +9,11 @@ import { CardImage } from '@/shared/components/card-image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
-import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { REDACTED_VALUE, formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
+import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { useAvailableConditions } from '@/shared/hooks/use-available-conditions';
 import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
 
 type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
@@ -23,6 +24,7 @@ interface ItemCardProps {
   onRemove?: (itemId: string) => void;
   isReadOnly?: boolean;
   variant?: ItemVariant;
+  allItems?: ItemCardData[];
 }
 
 function PriceMetric({
@@ -66,6 +68,7 @@ export default function ItemCard({
   onRemove,
   isReadOnly = false,
   variant = 'purchase',
+  allItems = [],
 }: ItemCardProps) {
   const { control } = useFormContext();
   const { isPrivacyMode } = usePrivacyModeStore();
@@ -99,6 +102,8 @@ export default function ItemCard({
     }
     return false;
   }, [item, variant]);
+
+  const { usedConditions, availableConditionOptions } = useAvailableConditions(item, allItems);
 
   const displaySubtotal = formatCurrency(subtotal);
 
@@ -291,7 +296,8 @@ export default function ItemCard({
                   label: 'text-xs',
                 }}
                 aria-label="Condición de la carta"
-                items={CARD_CONDITION_OPTIONS}
+                items={availableConditionOptions}
+                disabledKeys={Array.from(usedConditions)}
               />
 
               <InputForm

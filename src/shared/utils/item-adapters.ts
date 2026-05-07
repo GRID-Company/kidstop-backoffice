@@ -7,6 +7,7 @@ export type ItemVariant = 'purchase' | 'sale';
 
 export interface AdaptedPurchaseItem {
   guid: string;
+  cardGuid: string;
   cardName: string;
   cardImageUrl: string;
   setName: string;
@@ -32,6 +33,7 @@ export interface AdaptedPurchaseItem {
 
 export interface AdaptedSaleItem {
   guid: string;
+  cardGuid: string;
   cardName: string;
   cardImageUrl: string;
   setName: string;
@@ -54,6 +56,7 @@ export interface AdaptedSaleItem {
 export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
   return {
     guid: item.guid,
+    cardGuid: item.cardGuid,
     cardName: item.cardName,
     cardImageUrl: item.cardImageUrl,
     setName: item.setName,
@@ -77,6 +80,7 @@ export function adaptSaleItem(item: ISaleItem & { foundQuantity?: number }): Ada
   
   return {
     guid: item.guid,
+    cardGuid: cardSummary?.guid || '',
     cardName: cardSummary?.name || 'Carta desconocida',
     cardImageUrl: item.pokemonCardSummary?.imageUri || item.magicCardSummary?.imageUri || '',
     setName: item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || 'Set desconocido',
