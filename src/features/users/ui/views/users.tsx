@@ -36,8 +36,9 @@ export default function Users() {
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
   const [toggleTarget, setToggleTarget] = useState<UserRow | null>(null);
+  const [resendTarget, setResendTarget] = useState<UserRow | null>(null);
 
-  const { users, totalCount, loading, creating, updating, deleting, toggleUserStatus, createUser, updateUser, deleteUser } =
+  const { users, totalCount, loading, creating, updating, deleting, resending, toggleUserStatus, createUser, updateUser, deleteUser, resendEmailInvite } =
     useUsers(page, search, filters);
 
   const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
@@ -108,6 +109,12 @@ export default function Users() {
     setToggleTarget(null);
   }, [toggleTarget, toggleUserStatus]);
 
+  const handleConfirmResend = useCallback(async () => {
+    if (!resendTarget) return;
+    await resendEmailInvite(resendTarget.guid);
+    setResendTarget(null);
+  }, [resendTarget, resendEmailInvite]);
+
   const COLS: ITableColumn[] = useMemo(() => [
     {
       key: 'name',
@@ -157,6 +164,16 @@ export default function Users() {
             >
               {row.active ? 'Desactivar' : 'Activar'}
             </DropdownItem>
+            {!row.signedUp ? (
+              <DropdownItem
+                key="resend-invite"
+                startContent={<Icon icon="lucide:mail" />}
+                onPress={() => setResendTarget(row)}
+                className="text-primary"
+              >
+                Reenviar invitación
+              </DropdownItem>
+            ) : null}
             <DropdownItem
               key="delete"
               startContent={<Icon icon="lucide:trash-2" />}
@@ -241,6 +258,17 @@ export default function Users() {
         confirmVariant={toggleTarget?.active ? 'danger' : 'primary'}
         onConfirm={handleConfirmToggle}
         isLoading={updating}
+      />
+
+      <ConfirmationModal
+        isOpen={!!resendTarget}
+        onClose={() => setResendTarget(null)}
+        title="Reenviar invitación"
+        message={`¿Deseas reenviar la invitación a ${resendTarget?.name ?? resendTarget?.emailAddress}? Se enviará un nuevo correo de registro.`}
+        confirmLabel="Reenviar"
+        confirmVariant="primary"
+        onConfirm={handleConfirmResend}
+        isLoading={resending}
       />
     </>
   );

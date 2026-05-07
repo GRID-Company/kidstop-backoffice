@@ -14,6 +14,7 @@ export type UsersQuery = {
       emailAddress: string;
       role: string;
       active: boolean;
+      signedUp: boolean;
       createdDate: unknown;
       updatedDate: unknown;
     }> | null;
@@ -46,6 +47,12 @@ export type DeleteUserMutationVariables = Types.Exact<{
 }>;
 
 export type DeleteUserMutation = { deleteUser: { message: string } };
+
+export type ResendEmailInviteQueryVariables = Types.Exact<{
+  guid: Types.Scalars['String']['input'];
+}>;
+
+export type ResendEmailInviteQuery = { resendEmailInvite: { message: string } };
 
 export const UsersDocument = {
   kind: 'Document',
@@ -105,6 +112,10 @@ export const UsersDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'active' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'signedUp' },
                       },
                       {
                         kind: 'Field',
@@ -284,3 +295,54 @@ export const DeleteUserDocument = {
     },
   ],
 } as unknown as DocumentNode<DeleteUserMutation, DeleteUserMutationVariables>;
+export const ResendEmailInviteDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'ResendEmailInvite' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'guid' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'resendEmailInvite' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'guid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'guid' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ResendEmailInviteQuery,
+  ResendEmailInviteQueryVariables
+>;

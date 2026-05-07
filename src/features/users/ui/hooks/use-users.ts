@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client/react';
 import { CombinedGraphQLErrors } from '@apollo/client';
 import toast from 'react-hot-toast';
 import {
@@ -7,6 +7,7 @@ import {
   CreateUserDocument,
   UpdateUserDocument,
   DeleteUserDocument,
+  ResendEmailInviteDocument,
 } from '@/lib/api/generated/users.generated';
 import { getUsersVars } from '../../domain/users.domain';
 import { UserFilters } from '../../domain/types';
@@ -45,6 +46,8 @@ export function useUsers(
   const [deleteMutation, { loading: deleting }] = useMutation(DeleteUserDocument, {
     refetchQueries: [UsersDocument],
   });
+
+  const [resendEmailQuery, { loading: resending }] = useLazyQuery(ResendEmailInviteDocument);
 
   const createUser = useCallback(
     async (formData: UserFormData) => {
@@ -100,6 +103,19 @@ export function useUsers(
     [deleteMutation]
   );
 
+  const resendEmailInvite = useCallback(
+    async (guid: string) => {
+      try {
+        await resendEmailQuery({ variables: { guid } });
+        toast.success('Invitación reenviada');
+      } catch (error) {
+        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        toast.error(message ?? 'Error al reenviar invitación');
+      }
+    },
+    [resendEmailQuery]
+  );
+
   return {
     users: data?.users.data ?? [],
     totalCount: data?.users.count ?? 0,
@@ -107,9 +123,11 @@ export function useUsers(
     creating,
     updating,
     deleting,
+    resending,
     createUser,
     updateUser,
     toggleUserStatus,
     deleteUser,
+    resendEmailInvite,
   };
 }

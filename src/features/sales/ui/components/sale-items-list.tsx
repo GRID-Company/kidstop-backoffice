@@ -24,6 +24,11 @@ export default function SaleItemsList({
     [items]
   );
 
+  const calculateTotalWrapper = useMemo(
+    () => () => calculateTotal(items),
+    [items]
+  );
+
   const handleUpdateItem = (itemId: string, updates: any) => {
     if (onUpdateItem) {
       onUpdateItem(itemId, updates);
@@ -41,7 +46,7 @@ export default function SaleItemsList({
       items={adaptedItems}
       onUpdateItem={handleUpdateItem}
       onRemoveItem={handleRemoveItem}
-      calculateTotal={calculateTotal}
+      calculateTotal={calculateTotalWrapper}
       isReadOnly={isReadOnly}
       variant="sale"
       totalLabel="Total pedido"

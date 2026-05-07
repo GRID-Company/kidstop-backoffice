@@ -519,6 +519,108 @@ mutation SetClientStatus($setClientStatusInput: SetClientStatusInput!) {
 
 ---
 
+### 13. Resend Email Invite
+
+**Query:** `resendEmailInvite`
+**Description:** Resend invitation email to a user who hasn't completed registration. Generates a new OTP and sends the invitation email again.
+**Roles:** `ADMIN`
+
+```graphql
+query ResendEmailInvite($guid: String!) {
+  resendEmailInvite(guid: $guid) {
+    message
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "guid": "user-guid-here"
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "resendEmailInvite": {
+      "message": "Invitación reenviada correctamente"
+    }
+  }
+}
+```
+
+**Business Rules:**
+
+- Only works for users who haven't completed registration (`signedUp === false`)
+- Only applicable to roles that require invitation: `ADMIN`, `RECEPTION`, `BUYER`
+- Generates a new OTP (valid for 1 year) and sends invitation email
+- Email contains registration link: `{backofficeURL}/registro?id={otpGuid}`
+
+**Error Cases:**
+
+| Error | Condition | Message |
+|-------|-----------|---------|
+| `NotFoundException` | User GUID not found | "Usuario no encontrado" |
+| `BadRequestException` | User already registered | "El usuario ya completó su registro" |
+| `BadRequestException` | User role doesn't require invitation (CLIENT, CLIENT_KIOSK, SUPERUSER) | "Este tipo de usuario no requiere invitación" |
+
+**Use Cases:**
+
+- User didn't receive the original invitation email
+- User lost the invitation email
+- Original invitation link expired or was deleted
+- User needs a fresh registration link
+
+---
+
+### 14. Get Client Details
+
+**Query:** `clientDetails`
+**Description:** Get sales statistics for a specific client including order counts, totals, cancellations, and last order date. Used for evaluating client reliability.
+**Roles:** `ADMIN`, `RECEPTION`, `BUYER`
+
+```graphql
+query ClientDetails($clientGuid: String!) {
+  clientDetails(clientGuid: $clientGuid) {
+    orderCount
+    totalOrdersAmount
+    completedOrdersAmount
+    unreachableCancellations
+    lastOrderDate
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "clientGuid": "client-guid-here"
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `orderCount` | `Int` | Total number of orders (sales) for the client (any status) |
+| `totalOrdersAmount` | `Float` | Sum of all order totals (any status) |
+| `completedOrdersAmount` | `Float` | Sum of only completed (COMPLETED status) order totals |
+| `unreachableCancellations` | `Int` | Number of orders cancelled with CLIENT_UNREACHABLE reason |
+| `lastOrderDate` | `DateTime` | Timestamp of the most recent order, or null if no orders |
+
+**Business Rules:**
+
+- `unreachableCancellations` counts only cancellations where the client was unreachable (not when commerce cancels)
+- Used by buyers to evaluate client reliability before making purchase offers
+- `lastOrderDate` helps identify inactive clients
+
+---
+
 ## Available Filters Summary
 
 | Filter | Type | Description |
@@ -619,6 +721,14 @@ const DELETE_USER = gql`
 const SET_CLIENT_STATUS = gql`
   mutation SetClientStatus($setClientStatusInput: SetClientStatusInput!) {
     setClientStatus(setClientStatusInput: $setClientStatusInput) {
+      message
+    }
+  }
+`;
+
+const RESEND_EMAIL_INVITE = gql`
+  query ResendEmailInvite($guid: String!) {
+    resendEmailInvite(guid: $guid) {
       message
     }
   }
@@ -751,6 +861,25 @@ const setClientStatus = async (guid: string, clientStatus: 'STANDARD' | 'VIP' | 
     await fetchUsers();
   } catch (error) {
     console.error('Error setting client status:', error);
+  }
+};
+
+// Resend Email Invite
+const resendEmailInvite = async (guid: string) => {
+  try {
+    const { data } = await client.query({
+      query: RESEND_EMAIL_INVITE,
+      variables: { guid }
+    });
+    console.log('Invitation resent:', data.resendEmailInvite.message);
+  } catch (error) {
+    console.error('Error resending invitation:', error);
+    // Handle specific errors
+    if (error.message.includes('ya completó su registro')) {
+      alert('This user has already completed registration.');
+    } else if (error.message.includes('no requiere invitación')) {
+      alert('This user type does not require an invitation.');
+    }
   }
 };
 ```

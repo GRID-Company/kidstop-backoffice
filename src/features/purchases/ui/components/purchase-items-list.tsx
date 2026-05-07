@@ -35,12 +35,17 @@ export default function PurchaseItemsList({
     [itemsWithPrices]
   );
 
+  const calculateTotalWrapper = useMemo(
+    () => () => calculateTotal(itemsWithPrices),
+    [itemsWithPrices]
+  );
+
   return (
     <ItemsList
       items={adaptedItems}
       onUpdateItem={onUpdateItem}
       onRemoveItem={onRemoveItem}
-      calculateTotal={calculateTotal}
+      calculateTotal={calculateTotalWrapper}
       isReadOnly={isReadOnly}
       variant="purchase"
       totalLabel="Total compra"
