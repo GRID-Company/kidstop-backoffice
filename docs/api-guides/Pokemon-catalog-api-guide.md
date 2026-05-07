@@ -98,11 +98,25 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
     data {
       guid
       name
+      variant
       setName
       setCode
+      cardNumber
+      rarity
       sellPrice
       availableStock
+      totalStock
       imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
     }
     count
   }
@@ -129,23 +143,26 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
 - `data`: Array of card objects
 - `count`: Total number of cards matching criteria
 - Card fields:
-  - `guid`: Unique card identifier
-  - `name`: Card name
-  - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (nullable)
-  - `setName`: Collection/set name
-  - `setCode`: Collection/set code
-  - `cardNumber`: Card number in set (e.g. `#025`)
-  - `rarity`: Card rarity (nullable)
-  - `sellPrice`: Current sell price
+  - `guid`: Unique card identifier (string)
+  - `name`: Card name (string)
+  - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (string, nullable)
+  - `setName`: Collection/set name (string, nullable)
+  - `setCode`: Collection/set code (string, nullable)
+  - `cardNumber`: Card number in set (e.g. `#025`) (string, nullable)
+  - `rarity`: Card rarity (string, nullable)
+  - `sellPrice`: Current sell price (float, nullable)
   - `availableStock`: Whether stock is available (boolean)
-  - `imageUri`: Card image URL
-  - `moreImages`: Array of image URLs at multiple resolutions (200x200, 400x400, 600x600, 800x800, 1000x1000) from TCG Player (nullable)
-  - `releaseDate`: Card release date (nullable)
-  - `type`: Card type from TCG Player (nullable)
-  - `hp`: Hit points from TCG Player (nullable)
-  - `stage`: Evolution stage from TCG Player (nullable)
-  - `cardText`: Card text/description from TCG Player (nullable)
-  - `artist`: Card artist from TCG Player (nullable)
+  - `totalStock`: Total units in stock across all conditions (integer)
+  - `imageUri`: Card image URL (string, nullable)
+  - `moreImages`: Array of image objects with multiple resolutions from TCG Player (nullable)
+    - Each object contains: `resolution` (string, e.g., "200x200") and `imageUrl` (string)
+    - Available resolutions: 200x200, 400x400, 600x600, 800x800, 1000x1000
+  - `releaseDate`: Card release date (string, nullable)
+  - `type`: Card type from TCG Player (string, nullable)
+  - `hp`: Hit points from TCG Player (string, nullable)
+  - `stage`: Evolution stage from TCG Player (string, nullable)
+  - `cardText`: Card text/description from TCG Player (string, nullable)
+  - `artist`: Card artist from TCG Player (string, nullable)
 
 ---
 
@@ -161,11 +178,25 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
     data {
       guid
       name
+      variant
       setName
       setCode
+      cardNumber
+      rarity
       sellPrice
       availableStock
+      totalStock
       imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
     }
     count
   }
@@ -717,6 +748,12 @@ query PokemonCardPublicDetail($guid: String!) {
       resolution
       imageUrl
     }
+    releaseDate
+    type
+    hp
+    stage
+    cardText
+    artist
   }
 }
 ```
@@ -766,11 +803,18 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
     data {
       guid
       name
+      variant
       setName
       setCode
+      cardNumber
+      rarity
       sellPrice
       availableStock
       imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
       inventoryCards {
         condition
         stock
@@ -790,6 +834,12 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
         gradedPriceSeven
         gradedPriceEightOrAbove
       }
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
     }
     count
   }
@@ -847,6 +897,7 @@ query PokemonTopSoldCards {
   pokemonTopSoldCards {
     guid
     name
+    variant
     setName
     setCode
     cardNumber
@@ -860,6 +911,12 @@ query PokemonTopSoldCards {
     availableStock
     totalStock
     totalSold
+    releaseDate
+    type
+    hp
+    stage
+    cardText
+    artist
   }
 }
 ```
@@ -988,12 +1045,22 @@ interface ImageResolution {
 interface PokemonCard {
   guid: string;
   name: string;
-  setName: string;
-  setCode: string;
-  sellPrice: number;
-  availableStock: number;
-  imageUri: string;
+  variant?: string;
+  setName?: string;
+  setCode?: string;
+  cardNumber?: string;
+  rarity?: string;
+  sellPrice?: number;
+  availableStock: boolean;
+  totalStock: number;
+  imageUri?: string;
   moreImages?: ImageResolution[];
+  releaseDate?: string;
+  type?: string;
+  hp?: string;
+  stage?: string;
+  cardText?: string;
+  artist?: string;
 }
 
 interface CardListResponse {
@@ -1019,8 +1086,11 @@ const GET_CARDS = gql`
         variant
         setName
         setCode
+        cardNumber
+        rarity
         sellPrice
         availableStock
+        totalStock
         imageUri
         moreImages {
           resolution

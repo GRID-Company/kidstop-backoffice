@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Accordion, AccordionItem, CardBody } from '@heroui/react';
+import { Accordion, AccordionItem, CardBody, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import BulkCardRelatedSelector from './bulk-card-related-selector';
 import BulkCardFormControls from './bulk-card-form-controls';
 import { BulkCardResultCardProps } from './types';
@@ -160,6 +161,21 @@ export default function BulkCardResultCard({
               </div>
               <div className="flex flex-1 flex-col gap-1">
                 <p className="text-sm font-semibold leading-tight">{selectedCard.name}</p>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {tcgType === 'POKEMON' && selectedCard.type && (
+                    <PokemonTypeIcon type={selectedCard.type} size="sm" />
+                  )}
+                  {tcgType === 'POKEMON' && selectedCard.hp && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1 text-[9px]">
+                      {selectedCard.hp} HP
+                    </Chip>
+                  )}
+                  {selectedCard.variant && !selectedCard.variant.toLowerCase().includes('normal') && (
+                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1 text-[9px]">
+                      {selectedCard.variant}
+                    </Chip>
+                  )}
+                </div>
                 <p className="text-xs text-default-500">
                   {selectedCard.edition} · #{selectedCard.collectorNumber}
                 </p>

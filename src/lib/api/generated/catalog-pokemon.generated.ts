@@ -19,6 +19,13 @@ export type PokemonCardInternalListQuery = {
       availableStock: boolean;
       totalStock: number;
       imageUri: string | null;
+      releaseDate: string | null;
+      type: string | null;
+      hp: string | null;
+      stage: string | null;
+      cardText: string | null;
+      artist: string | null;
+      moreImages: Array<{ resolution: string; imageUrl: string }> | null;
       inventoryCards: Array<{
         guid: string;
         condition: string;
@@ -46,6 +53,13 @@ export type PokemonCardInternalDetailQuery = {
     sellPrice: number | null;
     totalStock: number;
     imageUri: string | null;
+    releaseDate: string | null;
+    type: string | null;
+    hp: string | null;
+    stage: string | null;
+    cardText: string | null;
+    artist: string | null;
+    moreImages: Array<{ resolution: string; imageUrl: string }> | null;
     inventoryCards: Array<{
       guid: string;
       condition: string;
@@ -136,9 +150,18 @@ export type PokemonBatchCardSearchQuery = {
         cardNumber: string | null;
         setName: string | null;
         setCode: string | null;
+        variant: string | null;
         imageUri: string | null;
         sellPrice: number | null;
         totalStock: number;
+        availableStock: boolean;
+        releaseDate: string | null;
+        type: string | null;
+        hp: string | null;
+        stage: string | null;
+        cardText: string | null;
+        artist: string | null;
+        moreImages: Array<{ resolution: string; imageUrl: string }> | null;
         cardMetrics: {
           ungradedPrice: number | null;
           gradedPriceSeven: number | null;
@@ -158,9 +181,14 @@ export type PokemonBatchCardSearchQuery = {
         cardNumber: string | null;
         setName: string | null;
         setCode: string | null;
+        variant: string | null;
         imageUri: string | null;
         sellPrice: number | null;
         totalStock: number;
+        availableStock: boolean;
+        type: string | null;
+        hp: string | null;
+        stage: string | null;
       }>;
     }>;
   };
@@ -247,6 +275,38 @@ export const PokemonCardInternalListDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'imageUri' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'moreImages' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'resolution' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUrl' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'releaseDate' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'hp' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'stage' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'cardText' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'artist' },
                       },
                       {
                         kind: 'Field',
@@ -341,6 +401,29 @@ export const PokemonCardInternalDetailDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'totalStock' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'imageUri' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'moreImages' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'resolution' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'imageUrl' },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'releaseDate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'stage' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'cardText' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'artist' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'inventoryCards' },
@@ -714,7 +797,28 @@ export const PokemonBatchCardSearchDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'moreImages' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'resolution' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'imageUrl' },
+                                  },
+                                ],
+                              },
                             },
                             {
                               kind: 'Field',
@@ -723,6 +827,34 @@ export const PokemonBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'totalStock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'availableStock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'releaseDate' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardText' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'artist' },
                             },
                             {
                               kind: 'Field',
@@ -832,6 +964,10 @@ export const PokemonBatchCardSearchDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
                             },
                             {
@@ -841,6 +977,22 @@ export const PokemonBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'totalStock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'availableStock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
                             },
                           ],
                         },

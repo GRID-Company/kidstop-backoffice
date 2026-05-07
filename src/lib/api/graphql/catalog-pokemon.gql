@@ -11,6 +11,16 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       availableStock
       totalStock
       imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
       inventoryCards {
         guid
         condition
@@ -35,6 +45,16 @@ query PokemonCardInternalDetail($guid: String!) {
     sellPrice
     totalStock
     imageUri
+    moreImages {
+      resolution
+      imageUrl
+    }
+    releaseDate
+    type
+    hp
+    stage
+    cardText
+    artist
     inventoryCards {
       guid
       condition
@@ -102,9 +122,21 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
       cardNumber
       setName
       setCode
+      variant
       imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
       sellPrice
       totalStock
+      availableStock
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
       cardMetrics {
         variantsMetrics {
           condition
@@ -124,9 +156,14 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
       cardNumber
       setName
       setCode
+      variant
       imageUri
       sellPrice
       totalStock
+      availableStock
+      type
+      hp
+      stage
     }
     error
     }

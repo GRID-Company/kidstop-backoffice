@@ -62,3 +62,16 @@ export const formatFlexibleDate = (
     year: 'numeric',
   });
 };
+
+export const formatReleaseDate = (
+  dateStr: string | null | undefined,
+  fallback = ''
+): string => {
+  if (!dateStr) return fallback;
+  const date = parseFlexibleDate(dateStr);
+  if (!date) return fallback;
+  return date.toLocaleDateString('es-MX', {
+    month: 'short',
+    year: 'numeric',
+  });
+};

@@ -26,9 +26,14 @@ export interface BulkCardData {
   collectorNumber: string;
   isFoil?: boolean;
   rarity?: string;
+  variant?: string | null;
   sellPrice: number | null;
   totalStock: number;
+  availableStock?: boolean;
   imageUri: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
   inventoryCards: BulkCardInventoryData[];
   referencePrice: number | null;
 }
