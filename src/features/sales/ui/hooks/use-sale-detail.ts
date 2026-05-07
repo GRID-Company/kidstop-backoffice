@@ -197,8 +197,20 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
 
       toast.success('Cambios guardados correctamente');
       setItemsToRemove([]);
-    } catch (error) {
-      toast.error('Error al guardar los cambios');
+    } catch (error: any) {
+      let errorMessage = error?.graphQLErrors?.[0]?.message || error?.message || 'Error al guardar los cambios';
+      
+      // Traducir mensajes comunes del backend
+      if (errorMessage.includes('Insufficient stock')) {
+        const match = errorMessage.match(/Available: (\d+), requested increase: (\d+)/);
+        if (match) {
+          errorMessage = `Stock insuficiente. Disponible: ${match[1]}, incremento solicitado: ${match[2]}.`;
+        } else {
+          errorMessage = 'Stock insuficiente para completar la operación.';
+        }
+      }
+      
+      toast.error(errorMessage);
     }
   }, [sale, hasChanges, isTerminal, localItems, itemsToRemove, updateSaleItemMutation, removeSaleItemMutation]);
 

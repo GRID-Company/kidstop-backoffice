@@ -15,6 +15,10 @@ export interface AdaptedPurchaseItem {
   variant?: string | null;
   type?: string | null;
   hp?: string | null;
+  stage?: string | null;
+  rarity?: string | null;
+  isFoil?: boolean;
+  collectorNumber?: string | null;
   tcgType: TCGType;
   condition: CardCondition;
   quantity: number;
@@ -36,6 +40,10 @@ export interface AdaptedSaleItem {
   variant?: string | null;
   type?: string | null;
   hp?: string | null;
+  stage?: string | null;
+  rarity?: string | null;
+  isFoil?: boolean;
+  collectorNumber?: string | null;
   tcgType: TCGType;
   condition: CardCondition;
   quantity: number;
@@ -73,6 +81,14 @@ export function adaptSaleItem(item: ISaleItem & { foundQuantity?: number }): Ada
     cardImageUrl: item.pokemonCardSummary?.imageUri || item.magicCardSummary?.imageUri || '',
     setName: item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || 'Set desconocido',
     setCode: item.pokemonCardSummary?.setCode || item.magicCardSummary?.collectorNumber || '',
+    cardNumber: item.pokemonCardSummary?.cardNumber || item.magicCardSummary?.collectorNumber,
+    rarity: item.pokemonCardSummary?.rarity || item.magicCardSummary?.rarity,
+    hp: item.pokemonCardSummary?.hp,
+    type: item.pokemonCardSummary?.type,
+    variant: item.pokemonCardSummary?.variant,
+    stage: item.pokemonCardSummary?.stage,
+    isFoil: item.magicCardSummary?.isFoil,
+    collectorNumber: item.magicCardSummary?.collectorNumber,
     tcgType: item.tcg,
     condition: item.condition,
     quantity: item.quantity,

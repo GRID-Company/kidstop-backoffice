@@ -137,8 +137,20 @@ export default function ItemCard({
               <h4 className="text-sm font-semibold leading-tight text-default-900">
                 {item.cardName}
               </h4>
-              {item.tcgType === 'POKEMON' && (item.type || item.hp || item.variant) && (
+              
+              {/* Pokemon card info */}
+              {item.tcgType === 'POKEMON' && (item.cardNumber || item.rarity || item.type || item.hp || item.variant || item.stage) && (
                 <div className="flex flex-wrap items-center gap-1.5">
+                  {item.cardNumber && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      {item.cardNumber}
+                    </Chip>
+                  )}
+                  {item.rarity && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      {item.rarity}
+                    </Chip>
+                  )}
                   {item.type && (
                     <div className="flex items-center gap-0.5">
                       <PokemonTypeIcon type={item.type} size="sm" />
@@ -155,10 +167,37 @@ export default function ItemCard({
                       {item.variant}
                     </Chip>
                   )}
+                  {item.stage && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      {item.stage}
+                    </Chip>
+                  )}
                 </div>
               )}
+              
+              {/* Magic card info */}
+              {item.tcgType === 'MAGIC' && (item.collectorNumber || item.rarity || item.isFoil) && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {item.collectorNumber && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      #{item.collectorNumber}
+                    </Chip>
+                  )}
+                  {item.rarity && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      {item.rarity}
+                    </Chip>
+                  )}
+                  {item.isFoil && (
+                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
+                      FOIL
+                    </Chip>
+                  )}
+                </div>
+              )}
+              
               <p className="text-xs text-default-500">
-                {item.setName} · {item.setCode} {item.cardNumber ? `· #${item.cardNumber}` : ''}
+                {item.setName} · {item.setCode}
               </p>
             </div>
 

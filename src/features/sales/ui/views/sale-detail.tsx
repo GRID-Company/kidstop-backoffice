@@ -187,10 +187,23 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               <Divider />
               
               {hasChanges && (
-                <div className="flex items-center justify-between rounded-lg bg-warning-50 border border-warning-200 p-3">
+                <div 
+                  className="flex items-center justify-between rounded-lg p-3 border"
+                  style={{
+                    backgroundColor: sale.tcg === 'POKEMON' ? '#fef2f2' : '#fff7ed',
+                    borderColor: sale.tcg === 'POKEMON' ? '#fecaca' : '#fed7aa',
+                  }}
+                >
                   <div className="flex items-center gap-2">
-                    <Icon icon="lucide:alert-circle" width={18} className="text-warning-600" />
-                    <span className="text-sm font-medium text-warning-700">
+                    <Icon 
+                      icon="lucide:alert-circle" 
+                      width={18} 
+                      style={{ color: sale.tcg === 'POKEMON' ? '#dc2626' : '#ea580c' }}
+                    />
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: sale.tcg === 'POKEMON' ? '#991b1b' : '#9a3412' }}
+                    >
                       Tienes cambios sin guardar
                     </span>
                   </div>
@@ -205,7 +218,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                     </Button>
                     <Button
                       size="sm"
-                      color="primary"
+                      className="bg-accent text-white"
                       isLoading={mutating}
                       onPress={saveChanges}
                       startContent={<Icon icon="lucide:save" width={16} />}

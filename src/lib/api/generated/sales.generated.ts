@@ -42,6 +42,10 @@ export type SalesQuery = {
           cardNumber: string | null;
           rarity: string | null;
           imageUri: string | null;
+          hp: string | null;
+          type: string | null;
+          variant: string | null;
+          stage: string | null;
         } | null;
         magicCardSummary: {
           guid: string;
@@ -96,6 +100,10 @@ export type SaleQuery = {
         cardNumber: string | null;
         rarity: string | null;
         imageUri: string | null;
+        hp: string | null;
+        type: string | null;
+        variant: string | null;
+        stage: string | null;
       } | null;
       magicCardSummary: {
         guid: string;
@@ -165,6 +173,10 @@ export type UpdateSaleItemMutation = {
         cardNumber: string | null;
         rarity: string | null;
         imageUri: string | null;
+        hp: string | null;
+        type: string | null;
+        variant: string | null;
+        stage: string | null;
       } | null;
       magicCardSummary: {
         guid: string;
@@ -204,6 +216,10 @@ export type RemoveSaleItemMutation = {
         cardNumber: string | null;
         rarity: string | null;
         imageUri: string | null;
+        hp: string | null;
+        type: string | null;
+        variant: string | null;
+        stage: string | null;
       } | null;
       magicCardSummary: {
         guid: string;
@@ -381,6 +397,22 @@ export const SalesDocument = {
                                   {
                                     kind: 'Field',
                                     name: { kind: 'Name', value: 'imageUri' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'hp' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'type' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'variant' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'stage' },
                                   },
                                 ],
                               },
@@ -579,6 +611,22 @@ export const SaleDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
                             },
                           ],
                         },
@@ -868,6 +916,22 @@ export const UpdateSaleItemDocument = {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
                             },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
+                            },
                           ],
                         },
                       },
@@ -1019,6 +1083,22 @@ export const RemoveSaleItemDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'hp' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'variant' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'stage' },
                             },
                           ],
                         },
