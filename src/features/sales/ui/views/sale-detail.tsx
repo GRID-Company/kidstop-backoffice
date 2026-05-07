@@ -16,6 +16,7 @@ import { Icon } from '@iconify/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
+import { TCG_ALERT_COLORS } from '@/lib/consts/tcg-themes';
 import {
   CancelReason,
   ISale,
@@ -47,21 +48,25 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
   const router = useRouter();
   const {
     sale,
+    items,
     total,
     itemCount,
     isTerminal,
     loading,
     mutating,
+    hasChanges,
     updateStatus,
     cancelSale,
+    updateItem,
+    removeItem,
+    saveChanges,
+    discardChanges,
   } = useSaleDetail(saleId);
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-  // TODO: Enable editing when backend implements updateSaleItems mutation
-  // const isEditable = sale?.status === SALE_STATUS.IN_PROGRESS;
-  const isEditable = false;
+  const isEditable = !isTerminal;
 
   const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
   const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
@@ -165,8 +170,10 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               </span>
             </div>
             <SaleItemsList
-              items={sale.items}
-              isReadOnly={true}
+              items={items}
+              onUpdateItem={updateItem}
+              onRemoveItem={removeItem}
+              isReadOnly={!isEditable}
             />
           </div>
         </EntitiesPage.CardContainer>
@@ -179,6 +186,55 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 <span className="text-sm font-semibold">Acciones</span>
               </div>
               <Divider />
+              
+              {hasChanges && (() => {
+                const alertColors = TCG_ALERT_COLORS[sale.tcg];
+                return (
+                  <div 
+                    className="flex items-center justify-between rounded-lg p-3 border"
+                    style={{
+                      backgroundColor: alertColors.bg,
+                      borderColor: alertColors.border,
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon="lucide:alert-circle" 
+                        width={18} 
+                        style={{ color: alertColors.icon }}
+                      />
+                      <span 
+                        className="text-sm font-medium"
+                        style={{ color: alertColors.text }}
+                      >
+                        Tienes cambios sin guardar
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        onPress={discardChanges}
+                        aria-label="Descartar cambios sin guardar"
+                        startContent={<Icon icon="lucide:x" width={16} />}
+                      >
+                        Descartar
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-accent text-white"
+                        isLoading={mutating}
+                        onPress={saveChanges}
+                        aria-label="Guardar cambios en items"
+                        startContent={<Icon icon="lucide:save" width={16} />}
+                      >
+                        Guardar cambios
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-3">
                   {nextStatus && nextStatusLabel && nextStatusIcon && (
@@ -186,6 +242,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                       <Button
                         className="bg-accent text-white"
                         isLoading={mutating}
+                        isDisabled={hasChanges}
                         startContent={<Icon icon={nextStatusIcon} width={18} />}
                         onPress={handleNextStatusPress}
                       >
@@ -202,7 +259,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 <Button
                   color="danger"
                   variant="flat"
-                  isDisabled={mutating}
+                  isDisabled={mutating || hasChanges}
                   startContent={<Icon icon="lucide:x-circle" width={18} />}
                   onPress={() => setIsCancelModalOpen(true)}
                 >

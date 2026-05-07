@@ -348,9 +348,137 @@ mutation CancelSale($cancelSaleInput: CancelSaleInput!) {
 
 ---
 
+#### 5. Update Sale Item Quantity
+
+**Mutation:** `updateSaleItem`
+**Description:** Update the quantity of an existing sale item
+**Access:** ADMIN, RECEPTION
+
+```graphql
+mutation UpdateSaleItem($updateSaleItemInput: UpdateSaleItemInput!) {
+  updateSaleItem(updateSaleItemInput: $updateSaleItemInput) {
+    guid
+    saleCode
+    status
+    total
+    items {
+      guid
+      quantity
+      price
+      condition
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        cardNumber
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        imageUri
+      }
+    }
+    updatedDate
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "updateSaleItemInput": {
+    "saleItemGuid": "SALE_ITEM_GUID",
+    "quantity": 5
+  }
+}
+```
+
+**Business Rules:**
+
+- Quantity must be ≥ 1
+- Can only edit items in NEW, IN_PROGRESS, or READY status (not COMPLETED or CANCELLED)
+- When **increasing** quantity: validates against current inventory stock
+- When **decreasing** quantity: no stock validation required
+- Sale total is automatically recalculated after update
+
+**Error Messages:**
+
+- `"No se pueden editar artículos en una venta COMPLETED."` — Cannot edit completed sales
+- `"No se pueden editar artículos en una venta CANCELLED."` — Cannot edit cancelled sales
+- `"No se encontró inventario para esta carta y condición."` — Card not found in inventory
+- `"Stock insuficiente. Disponible: X, incremento solicitado: Y."` — Insufficient stock for quantity increase
+
+---
+
+#### 6. Remove Sale Item
+
+**Mutation:** `removeSaleItem`
+**Description:** Remove an item from a sale
+**Access:** ADMIN, RECEPTION
+
+```graphql
+mutation RemoveSaleItem($removeSaleItemInput: RemoveSaleItemInput!) {
+  removeSaleItem(removeSaleItemInput: $removeSaleItemInput) {
+    guid
+    saleCode
+    status
+    total
+    items {
+      guid
+      quantity
+      price
+      condition
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        cardNumber
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        imageUri
+      }
+    }
+    updatedDate
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "removeSaleItemInput": {
+    "saleItemGuid": "SALE_ITEM_GUID"
+  }
+}
+```
+
+**Business Rules:**
+
+- Can only remove items from NEW, IN_PROGRESS, or READY status (not COMPLETED or CANCELLED)
+- Sale must have at least 2 items (cannot remove the last item)
+- Sale total is automatically recalculated after removal
+
+**Error Messages:**
+
+- `"No se pueden eliminar artículos de una venta COMPLETED."` — Cannot remove from completed sales
+- `"No se pueden eliminar artículos de una venta CANCELLED."` — Cannot remove from cancelled sales
+- `"No se puede eliminar el último artículo de una venta. Una venta debe tener al menos un artículo."` — Cannot remove last item
+
+---
+
 ### Carpeta Digital Endpoints (CLIENT / CLIENT_KIOSK)
 
-#### 5. Get My Cart
+#### 7. Get My Cart
 
 **Query:** `myCart`
 **Description:** Get current user's cart for a specific TCG
@@ -411,7 +539,7 @@ query MyCart($tcg: String!) {
 
 ---
 
-#### 6. Add Cart Item
+#### 8. Add Cart Item
 
 **Mutation:** `addCartItem`
 **Description:** Add a card to the cart (or increment quantity if already exists with same condition)
@@ -485,7 +613,7 @@ mutation AddCartItem($addCartItemInput: AddCartItemInput!) {
 
 ---
 
-#### 7. Update Cart Item
+#### 9. Update Cart Item
 
 **Mutation:** `updateCartItem`
 **Description:** Update quantity of an existing cart item
@@ -527,7 +655,7 @@ mutation UpdateCartItem($updateCartItemInput: UpdateCartItemInput!) {
 
 ---
 
-#### 8. Remove Cart Item
+#### 10. Remove Cart Item
 
 **Mutation:** `removeCartItem`
 **Description:** Remove a specific item from the cart
@@ -557,7 +685,7 @@ mutation RemoveCartItem($cartItemGuid: String!) {
 
 ---
 
-#### 9. Clear Cart
+#### 11. Clear Cart
 
 **Mutation:** `clearCart`
 **Description:** Remove all items from cart for a specific TCG
@@ -585,7 +713,7 @@ mutation ClearCart($tcg: String!) {
 
 ---
 
-#### 10. Create Sale from Cart (Checkout)
+#### 12. Create Sale from Cart (Checkout)
 
 **Mutation:** `createSaleFromCart`
 **Description:** Checkout — convert cart items into a new sale (status: NEW)
@@ -682,7 +810,7 @@ mutation CreateSaleFromCart($createSaleFromCartInput: CreateSaleFromCartInput!) 
 
 ---
 
-#### 11. Get My Sales
+#### 13. Get My Sales
 
 **Query:** `mySales`
 **Description:** Get paginated list of current user's sales
@@ -767,7 +895,7 @@ query MySales($findMySalesArgs: FindMySalesArgs!) {
 
 ---
 
-#### 12. Get My Sale
+#### 14. Get My Sale
 
 **Query:** `mySale`
 **Description:** Get detailed information for a specific sale owned by current user
@@ -846,9 +974,16 @@ query MySale($saleGuid: String!) {
 1. **View new sales** → Use `sales` with `status: "NEW"` filter
 2. **Start processing** → Use `updateSaleStatus` to change NEW → IN_PROGRESS
 3. **Prepare order** → Gather cards from inventory
-4. **Mark ready** → Use `updateSaleStatus` to change IN_PROGRESS → READY (triggers email)
-5. **Customer arrives** → Use `updateSaleStatus` to change READY → COMPLETED (consumes inventory)
-6. **Handle issues** → Use `cancelSale` with appropriate reason if needed
+4. **Adjust items (if needed)** → Use `updateSaleItem` to change quantities or `removeSaleItem` to remove items
+5. **Mark ready** → Use `updateSaleStatus` to change IN_PROGRESS → READY (triggers email)
+6. **Customer arrives** → Use `updateSaleStatus` to change READY → COMPLETED (consumes inventory)
+7. **Handle issues** → Use `cancelSale` with appropriate reason if needed
+
+### Item Editing Scenarios
+
+- **Customer changes mind** → Use `updateSaleItem` to adjust quantity before completion
+- **Stock shortage discovered** → Use `updateSaleItem` to reduce quantity or `removeSaleItem` to remove unavailable items
+- **Wrong item added** → Use `removeSaleItem` to remove incorrect items (sale must keep at least 1 item)
 
 ### Cancellation Scenarios
 
@@ -865,7 +1000,10 @@ query MySale($saleGuid: String!) {
 - **Invalid status transitions:** Returns error describing allowed transitions from current status
 - **Insufficient stock on checkout:** Validation error listing unavailable items
 - **Insufficient stock on completion:** Prevents COMPLETED transition if inventory lacks stock
+- **Insufficient stock on item edit:** When increasing quantity, validates against current inventory stock
 - **Empty cart checkout:** Returns error — cart must have at least one item
+- **Removing last sale item:** Cannot remove the last item from a sale — sale must have at least 1 item
+- **Editing completed/cancelled sales:** Cannot edit or remove items from COMPLETED or CANCELLED sales
 - **Missing kiosk customer info:** CLIENT_KIOSK must provide `kioskCustomerName` when checking out
 - **Price resolution failures:** Returns error if InventoryItem not found for cart item
 - **Unauthorized access:** CLIENT users can only access their own sales/cart

@@ -31,6 +31,10 @@ export interface IPokemonCardSummary {
   cardNumber: string | null;
   rarity: string | null;
   imageUri: string | null;
+  hp: string | null;
+  type: string | null;
+  variant: string | null;
+  stage: string | null;
 }
 
 export interface IMagicCardSummary {
