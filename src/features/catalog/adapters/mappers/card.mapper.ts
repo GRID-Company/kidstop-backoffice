@@ -37,6 +37,7 @@ export function toPokemonCard(item: PokemonCardInternalItem): IPokemonCard {
     cardNumber: item.cardNumber ?? null,
     setName: item.setName ?? null,
     setCode: item.setCode ?? null,
+    variant: item.variant ?? null,
     sellPrice: item.sellPrice ?? null,
     availableStock: item.availableStock,
     totalStock: item.totalStock,
