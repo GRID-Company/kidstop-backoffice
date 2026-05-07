@@ -117,7 +117,7 @@ export default function PokemonCardDetailModal({
                 >
                   Pokemon
                 </Chip>
-                {detail?.variant && detail.variant.toLowerCase().includes('holo') && (
+                {detail?.variant && (detail.variant.toLowerCase().includes('holo') || detail.variant.toLowerCase().includes('foil')) && (
                   <Chip
                     size="sm"
                     variant="flat"

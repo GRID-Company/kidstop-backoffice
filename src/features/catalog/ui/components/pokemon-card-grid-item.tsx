@@ -45,7 +45,7 @@ export default function PokemonCardGridItem({ card, onPress }: PokemonCardGridIt
             />
           )}
 
-          {card.variant && card.variant.toLowerCase().includes('holo') && (
+          {card.variant && (card.variant.toLowerCase().includes('holo') || card.variant.toLowerCase().includes('foil')) && (
             <div className="absolute right-2 top-2">
               <Chip
                 size="sm"
