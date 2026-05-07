@@ -209,7 +209,7 @@ export default function BulkCardResultCard({
                     </div>
                   )}
                 </div>
-                {selectedCard.cardMetrics && (selectedCard.cardMetrics.ungradedPrice || selectedCard.cardMetrics.gradedPriceSeven || selectedCard.cardMetrics.gradedPriceEightOrAbove) && (
+                {selectedCard.cardMetrics && (
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
                     {selectedCard.cardMetrics.ungradedPrice && selectedCard.cardMetrics.ungradedPrice > 0 && (
                       <div className="flex items-center gap-0.5">
