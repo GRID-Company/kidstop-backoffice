@@ -65,6 +65,13 @@ export default function Purchases() {
     [setDateTo]
   );
 
+  const handleRowClick = useCallback(
+    (purchase: IPurchase) => {
+      router.push(`/compras/${purchase.guid}`);
+    },
+    [router]
+  );
+
   const columns: ITableColumn[] = useMemo(
     () => [
       {
@@ -129,17 +136,19 @@ export default function Purchases() {
         label: '',
         className: 'w-[60px]',
         customCol: (row: IPurchase) => (
-          <Tooltip content="Ver detalle">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              aria-label={`Ver compra ${row.reference}`}
-              onPress={() => router.push(`/compras/${row.guid}`)}
-            >
-              <Icon icon="lucide:eye" width={16} />
-            </Button>
-          </Tooltip>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Tooltip content="Ver detalle">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                aria-label={`Ver compra ${row.reference}`}
+                onPress={() => router.push(`/compras/${row.guid}`)}
+              >
+                <Icon icon="lucide:eye" width={16} />
+              </Button>
+            </Tooltip>
+          </div>
         ),
       },
     ],
@@ -244,7 +253,13 @@ export default function Purchases() {
         </div>
 
         <div className="mt-4">
-          <DataTable cols={columns} data={purchases} isLoading={false} />
+          <DataTable 
+            cols={columns} 
+            data={purchases} 
+            isLoading={false} 
+            rowClickable={true}
+            onRowClick={handleRowClick}
+          />
         </div>
 
         {purchases.length === 0 && (

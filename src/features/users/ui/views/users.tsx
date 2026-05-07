@@ -80,6 +80,10 @@ export default function Users() {
     setIsModalOpen(true);
   }, []);
 
+  const handleRowClick = useCallback((user: UserRow) => {
+    handleOpenEdit(user);
+  }, [handleOpenEdit]);
+
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingUser(null);
@@ -142,49 +146,51 @@ export default function Users() {
       label: '',
       className: 'w-12',
       customCol: (row: UserRow) => (
-        <Dropdown>
-          <DropdownTrigger>
-            <Button variant="light" size="sm" isIconOnly>
-              <Icon icon="lucide:more-horizontal" />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Acciones de usuario">
-            <DropdownItem
-              key="edit"
-              startContent={<Icon icon="lucide:pencil" />}
-              onPress={() => handleOpenEdit(row)}
-            >
-              Editar
-            </DropdownItem>
-            <DropdownItem
-              key="toggle-status"
-              startContent={<Icon icon={row.active ? 'lucide:user-x' : 'lucide:user-check'} />}
-              onPress={() => setToggleTarget(row)}
-              className={row.active ? 'text-warning' : 'text-success'}
-            >
-              {row.active ? 'Desactivar' : 'Activar'}
-            </DropdownItem>
-            {!row.signedUp ? (
+        <div onClick={(e) => e.stopPropagation()}>
+          <Dropdown>
+            <DropdownTrigger>
+              <Button variant="light" size="sm" isIconOnly>
+                <Icon icon="lucide:more-horizontal" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Acciones de usuario">
               <DropdownItem
-                key="resend-invite"
-                startContent={<Icon icon="lucide:mail" />}
-                onPress={() => setResendTarget(row)}
-                className="text-primary"
+                key="edit"
+                startContent={<Icon icon="lucide:pencil" />}
+                onPress={() => handleOpenEdit(row)}
               >
-                Reenviar invitación
+                Editar
               </DropdownItem>
-            ) : null}
-            <DropdownItem
-              key="delete"
-              startContent={<Icon icon="lucide:trash-2" />}
-              onPress={() => setDeleteTarget(row)}
-              className="text-danger"
-              color="danger"
-            >
-              Eliminar
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+              <DropdownItem
+                key="toggle-status"
+                startContent={<Icon icon={row.active ? 'lucide:user-x' : 'lucide:user-check'} />}
+                onPress={() => setToggleTarget(row)}
+                className={row.active ? 'text-warning' : 'text-success'}
+              >
+                {row.active ? 'Desactivar' : 'Activar'}
+              </DropdownItem>
+              {!row.signedUp ? (
+                <DropdownItem
+                  key="resend-invite"
+                  startContent={<Icon icon="lucide:mail" />}
+                  onPress={() => setResendTarget(row)}
+                  className="text-primary"
+                >
+                  Reenviar invitación
+                </DropdownItem>
+              ) : null}
+              <DropdownItem
+                key="delete"
+                startContent={<Icon icon="lucide:trash-2" />}
+                onPress={() => setDeleteTarget(row)}
+                className="text-danger"
+                color="danger"
+              >
+                Eliminar
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
       ),
     },
   ], [handleOpenEdit]);
@@ -210,6 +216,8 @@ export default function Users() {
             cols={COLS}
             data={users}
             isLoading={loading}
+            rowClickable={true}
+            onRowClick={handleRowClick}
           />
 
           {totalPages > 1 && (

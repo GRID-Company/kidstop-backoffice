@@ -19,6 +19,8 @@ type DataTableProps = {
   selectable?: boolean;
   setSelectedKeys?: (selected: any[]) => void;
   selectedKeys?: Set<string>;
+  rowClickable?: boolean;
+  onRowClick?: (item: any) => void;
 } & Partial<TableProps>;
 
 export function DataTable({
@@ -28,6 +30,8 @@ export function DataTable({
   selectable = false,
   setSelectedKeys,
   selectedKeys,
+  rowClickable = false,
+  onRowClick,
   ...tableProps
 }: PropsWithChildren<DataTableProps>) {
   return (
@@ -69,7 +73,11 @@ export function DataTable({
         }
       >
         {(item) => (
-          <TableRow key={item.guid ?? item.id ?? item.key}>
+          <TableRow 
+            key={item.guid ?? item.id ?? item.key}
+            className={rowClickable ? 'cursor-pointer hover:bg-[#F5F9FF] transition-colors duration-150' : ''}
+            onClick={rowClickable && onRowClick ? () => onRowClick(item) : undefined}
+          >
             {cols.map((col: ITableColumn) => (
               <TableCell
                 key={col.key}
