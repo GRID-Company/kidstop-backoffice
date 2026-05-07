@@ -1,4 +1,5 @@
 import { ITableSort } from '@/lib/types/datatable.types';
+import { BulkOperationType } from '@/lib/api/schema-types';
 
 export const MOVEMENT_TYPES = {
   PURCHASE_ENTRY: 'PURCHASE_ENTRY',
@@ -41,6 +42,24 @@ export const MOVEMENT_TYPE_OPTIONS = Object.values(MOVEMENT_TYPES).map((type) =>
 }));
 
 export const ADJUSTMENT_TYPE_OPTIONS = MOVEMENT_TYPE_OPTIONS;
+
+export const BULK_ADJUSTMENT_OPTIONS = [
+  {
+    key: BulkOperationType.ManualEntry,
+    label: 'Entrada Manual',
+    description: 'Suma la cantidad al stock existente',
+  },
+  {
+    key: BulkOperationType.ManualSet,
+    label: 'Establecer Stock',
+    description: 'Establece el stock al valor absoluto especificado',
+  },
+  {
+    key: BulkOperationType.ManualExit,
+    label: 'Salida Manual',
+    description: 'Resta la cantidad del stock existente',
+  },
+];
 
 export const MOVEMENT_TYPE_COLORS: Record<string, 'success' | 'warning' | 'primary'> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'success',

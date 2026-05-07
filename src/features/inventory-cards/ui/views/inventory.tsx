@@ -36,29 +36,12 @@ import AdjustmentModal from '../components/adjustment-modal';
 import MovementsContent from './movements';
 import PokemonCardDetailModal from '@/features/catalog/ui/components/pokemon-card-detail-modal';
 import MagicCardDetailModal from '@/features/catalog/ui/components/magic-card-detail-modal';
+import { BULK_ADJUSTMENT_OPTIONS } from '../../domain/constants';
 
 const INVENTORY_TABS = {
   STOCK: 'stock',
   MOVEMENTS: 'movements',
 } as const;
-
-const BULK_OPERATION_OPTIONS = [
-  {
-    key: BulkOperationType.ManualEntry,
-    label: 'Entrada Manual',
-    description: 'Suma la cantidad al stock existente',
-  },
-  {
-    key: BulkOperationType.ManualSet,
-    label: 'Establecer Stock',
-    description: 'Establece el stock al valor absoluto especificado',
-  },
-  {
-    key: BulkOperationType.ManualExit,
-    label: 'Salida Manual',
-    description: 'Resta la cantidad del stock existente',
-  },
-];
 
 export default function Inventory() {
   const [activeTab, setActiveTab] = useState<string>(INVENTORY_TABS.STOCK);
@@ -392,7 +375,7 @@ export default function Inventory() {
                 
               }}
             >
-              {BULK_OPERATION_OPTIONS.map((option) => (
+              {BULK_ADJUSTMENT_OPTIONS.map((option) => (
                 <SelectItem key={option.key} description={option.description}>
                   {option.label}
                 </SelectItem>

@@ -8,6 +8,7 @@ import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
 import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
 import { TCGType } from '@/lib/types/tcg.types';
+import { BulkOperationType } from '@/lib/api/schema-types';
 
 export interface InventoryCard {
   guid: string;
@@ -33,6 +34,7 @@ export function useCardDetailModal({
 }: UseCardDetailModalParams) {
   const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
   const [stockAdjustment, setStockAdjustment] = useState<number>(0);
+  const [movementType, setMovementType] = useState<BulkOperationType>(BulkOperationType.ManualEntry);
   const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
   const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
@@ -101,15 +103,18 @@ export function useCardDetailModal({
       condition: selectedVariant.condition,
       quantity: stockAdjustment,
       tcgType,
+      operationType: movementType,
     });
     setStockAdjustment(0);
     onRefetch();
-  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, tcgType, onRefetch]);
+  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, tcgType, movementType, onRefetch]);
 
   return {
     selectedVariant,
     stockAdjustment,
     setStockAdjustment,
+    movementType,
+    setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
     handleStockAdjust,

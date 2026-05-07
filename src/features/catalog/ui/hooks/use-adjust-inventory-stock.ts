@@ -5,6 +5,7 @@ import { CreateInventoryMovementDocument } from '@/lib/api/generated/inventory.g
 import { PokemonCardInternalDetailDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType } from '@/lib/types/tcg.types';
+import { BulkOperationType } from '@/lib/api/schema-types';
 
 interface AdjustStockParams {
   cardGuid: string;
@@ -12,6 +13,7 @@ interface AdjustStockParams {
   quantity: number;
   notes?: string;
   tcgType: TCGType;
+  operationType: BulkOperationType;
 }
 
 export function useAdjustInventoryStock() {
@@ -21,7 +23,31 @@ export function useAdjustInventoryStock() {
 
   const handleAdjustStock = useCallback(
     async (params: AdjustStockParams) => {
-      const isPositive = params.quantity > 0;
+      let movementType: string;
+      let finalQuantity: number;
+      let successMessage: string;
+
+      switch (params.operationType) {
+        case BulkOperationType.ManualEntry:
+          movementType = 'PURCHASE_ENTRY';
+          finalQuantity = Math.abs(params.quantity);
+          successMessage = `Entrada registrada: +${params.quantity}`;
+          break;
+        case BulkOperationType.ManualExit:
+          movementType = 'SALE_EXIT';
+          finalQuantity = Math.abs(params.quantity);
+          successMessage = `Salida registrada: -${params.quantity}`;
+          break;
+        case BulkOperationType.ManualSet:
+          movementType = 'MANUAL_ADJUSTMENT';
+          finalQuantity = params.quantity;
+          successMessage = `Stock establecido a: ${params.quantity}`;
+          break;
+        default:
+          movementType = 'MANUAL_ADJUSTMENT';
+          finalQuantity = params.quantity;
+          successMessage = `Stock ajustado: ${params.quantity}`;
+      }
 
       await createMovement({
         variables: {
@@ -29,14 +55,14 @@ export function useAdjustInventoryStock() {
             cardGuid: params.cardGuid,
             condition: params.condition,
             tcg: params.tcgType,
-            movementType: 'MANUAL_ADJUSTMENT',
-            quantity: isPositive ? params.quantity : -Math.abs(params.quantity),
-            notes: params.notes || `Ajuste de stock: ${params.quantity > 0 ? '+' : ''}${params.quantity}`,
+            movementType,
+            quantity: finalQuantity,
+            notes: params.notes || successMessage,
           },
         },
       });
 
-      toast.success(`Stock ajustado: ${params.quantity > 0 ? '+' : ''}${params.quantity}`);
+      toast.success(successMessage);
     },
     [createMovement]
   );

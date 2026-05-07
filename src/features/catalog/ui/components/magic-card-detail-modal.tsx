@@ -12,6 +12,8 @@ import {
   Chip,
   Divider,
   Input,
+  Select,
+  SelectItem,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useQuery } from '@apollo/client/react';
@@ -23,6 +25,8 @@ import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS } f
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
+import { BulkOperationType } from '@/lib/api/schema-types';
+import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
 
 interface MagicCardDetailModalProps {
   card: IMagicCard | null;
@@ -41,6 +45,8 @@ export default function MagicCardDetailModal({
     selectedVariant,
     stockAdjustment,
     setStockAdjustment,
+    movementType,
+    setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
     handleStockAdjust,
@@ -282,22 +288,39 @@ export default function MagicCardDetailModal({
 
               <div className="flex flex-col gap-4">
                 <h4 className="text-sm font-semibold">Ajustar stock</h4>
+                <Select
+                  label="Tipo de operación"
+                  placeholder="Selecciona el tipo de operación"
+                  selectedKeys={[movementType]}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as BulkOperationType;
+                    setMovementType(selected);
+                  }}
+                  size="sm"
+                >
+                  {BULK_ADJUSTMENT_OPTIONS.map((option) => (
+                    <SelectItem key={option.key} description={option.description}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </Select>
                 <div className="flex items-center gap-3">
                   <Input
                     type="number"
                     size="sm"
-                    label="Cantidad (+/-)"
+                    label="Cantidad"
                     value={String(stockAdjustment)}
                     onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
                     classNames={{ inputWrapper: 'border-[1px] bg-white' }}
                   />
                   <Button
                     size="sm"
-                    color="primary"
                     isDisabled={stockAdjustment === 0}
                     isLoading={adjustLoading}
                     onPress={handleStockAdjust}
                     startContent={<Icon icon="lucide:package-plus" />}
+                    className="text-white"
+                    style={{ backgroundColor: 'var(--color-accent)' }}
                   >
                     Aplicar
                   </Button>
