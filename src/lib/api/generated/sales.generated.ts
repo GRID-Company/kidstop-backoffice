@@ -140,6 +140,84 @@ export type CancelSaleMutation = {
   };
 };
 
+export type UpdateSaleItemMutationVariables = Types.Exact<{
+  updateSaleItemInput: Types.UpdateSaleItemInput;
+}>;
+
+export type UpdateSaleItemMutation = {
+  updateSaleItem: {
+    guid: string;
+    saleCode: string;
+    status: string;
+    total: number;
+    updatedDate: unknown;
+    items: Array<{
+      guid: string;
+      tcg: string;
+      condition: string;
+      quantity: number;
+      price: number;
+      pokemonCardSummary: {
+        guid: string;
+        name: string;
+        setName: string | null;
+        setCode: string | null;
+        cardNumber: string | null;
+        rarity: string | null;
+        imageUri: string | null;
+      } | null;
+      magicCardSummary: {
+        guid: string;
+        name: string;
+        edition: string | null;
+        collectorNumber: string | null;
+        rarity: string | null;
+        imageUri: string | null;
+        isFoil: boolean;
+      } | null;
+    }> | null;
+  };
+};
+
+export type RemoveSaleItemMutationVariables = Types.Exact<{
+  removeSaleItemInput: Types.RemoveSaleItemInput;
+}>;
+
+export type RemoveSaleItemMutation = {
+  removeSaleItem: {
+    guid: string;
+    saleCode: string;
+    status: string;
+    total: number;
+    updatedDate: unknown;
+    items: Array<{
+      guid: string;
+      tcg: string;
+      condition: string;
+      quantity: number;
+      price: number;
+      pokemonCardSummary: {
+        guid: string;
+        name: string;
+        setName: string | null;
+        setCode: string | null;
+        cardNumber: string | null;
+        rarity: string | null;
+        imageUri: string | null;
+      } | null;
+      magicCardSummary: {
+        guid: string;
+        name: string;
+        edition: string | null;
+        collectorNumber: string | null;
+        rarity: string | null;
+        imageUri: string | null;
+        isFoil: boolean;
+      } | null;
+    }> | null;
+  };
+};
+
 export const SalesDocument = {
   kind: 'Document',
   definitions: [
@@ -693,3 +771,307 @@ export const CancelSaleDocument = {
     },
   ],
 } as unknown as DocumentNode<CancelSaleMutation, CancelSaleMutationVariables>;
+export const UpdateSaleItemDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSaleItem' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'updateSaleItemInput' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateSaleItemInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSaleItem' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'updateSaleItemInput' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'updateSaleItemInput' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'saleCode' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'total' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'items' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'tcg' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'quantity' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'price' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'pokemonCardSummary' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setName' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setCode' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rarity' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'magicCardSummary' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'edition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'collectorNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rarity' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'isFoil' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSaleItemMutation,
+  UpdateSaleItemMutationVariables
+>;
+export const RemoveSaleItemDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'RemoveSaleItem' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'removeSaleItemInput' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'RemoveSaleItemInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'removeSaleItem' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'removeSaleItemInput' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'removeSaleItemInput' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'saleCode' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'total' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'items' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'tcg' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'quantity' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'price' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'pokemonCardSummary' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setName' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'setCode' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cardNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rarity' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'magicCardSummary' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'edition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'collectorNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rarity' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'isFoil' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  RemoveSaleItemMutation,
+  RemoveSaleItemMutationVariables
+>;

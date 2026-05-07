@@ -7,8 +7,10 @@ import {
   SalesDocument,
   UpdateSaleStatusDocument,
   CancelSaleDocument,
+  UpdateSaleItemDocument,
+  RemoveSaleItemDocument,
 } from '@/lib/api/generated/sales.generated';
-import { CancelReason, ISale, SALE_STATUS, SaleStatus } from '../../domain/types';
+import { CancelReason, ISale, ISaleItem, SALE_STATUS, SaleStatus } from '../../domain/types';
 import { calculateTotal } from '../../domain/sales.domain';
 
 interface UseSaleDetailReturn {
@@ -20,6 +22,8 @@ interface UseSaleDetailReturn {
   mutating: boolean;
   updateStatus: (newStatus: SaleStatus) => Promise<void>;
   cancelSale: (reason: CancelReason) => Promise<void>;
+  updateItem: (itemId: string, updates: Partial<ISaleItem>) => Promise<void>;
+  removeItem: (itemId: string) => Promise<void>;
 }
 
 export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
@@ -35,6 +39,16 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
 
   const [cancelSaleMutation, { loading: cancelling }] = useMutation(
     CancelSaleDocument,
+    { refetchQueries: [SaleDocument, SalesDocument] }
+  );
+
+  const [updateSaleItemMutation, { loading: updatingItem }] = useMutation(
+    UpdateSaleItemDocument,
+    { refetchQueries: [SaleDocument, SalesDocument] }
+  );
+
+  const [removeSaleItemMutation, { loading: removingItem }] = useMutation(
+    RemoveSaleItemDocument,
     { refetchQueries: [SaleDocument, SalesDocument] }
   );
 
@@ -93,14 +107,75 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     [saleGuid, cancelSaleMutation]
   );
 
+  const updateItem = useCallback(
+    async (itemId: string, updates: Partial<ISaleItem>) => {
+      if (!sale) return;
+
+      if (isTerminal) {
+        toast.error('No se pueden editar items en una venta completada o cancelada');
+        return;
+      }
+
+      if (updates.quantity !== undefined && updates.quantity < 1) {
+        toast.error('La cantidad debe ser mayor o igual a 1');
+        return;
+      }
+
+      try {
+        await updateSaleItemMutation({
+          variables: {
+            updateSaleItemInput: {
+              saleItemGuid: itemId,
+              quantity: updates.quantity!,
+            },
+          },
+        });
+      } catch (error) {
+        toast.error('Error al actualizar el item');
+      }
+    },
+    [sale, isTerminal, updateSaleItemMutation]
+  );
+
+  const removeItem = useCallback(
+    async (itemId: string) => {
+      if (!sale) return;
+
+      if (isTerminal) {
+        toast.error('No se pueden eliminar items de una venta completada o cancelada');
+        return;
+      }
+
+      if (sale.items.length < 2) {
+        toast.error('No se puede eliminar el último artículo de una venta');
+        return;
+      }
+
+      try {
+        await removeSaleItemMutation({
+          variables: {
+            removeSaleItemInput: {
+              saleItemGuid: itemId,
+            },
+          },
+        });
+      } catch (error) {
+        toast.error('Error al eliminar el item');
+      }
+    },
+    [sale, isTerminal, removeSaleItemMutation]
+  );
+
   return {
     sale,
     total,
     itemCount,
     isTerminal,
     loading,
-    mutating: updatingStatus || cancelling,
+    mutating: updatingStatus || cancelling || updatingItem || removingItem,
     updateStatus,
     cancelSale,
+    updateItem,
+    removeItem,
   };
 }

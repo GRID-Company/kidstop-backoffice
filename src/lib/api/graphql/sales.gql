@@ -123,3 +123,73 @@ mutation CancelSale($cancelSaleInput: CancelSaleInput!) {
     updatedDate
   }
 }
+
+mutation UpdateSaleItem($updateSaleItemInput: UpdateSaleItemInput!) {
+  updateSaleItem(updateSaleItemInput: $updateSaleItemInput) {
+    guid
+    saleCode
+    status
+    total
+    items {
+      guid
+      tcg
+      condition
+      quantity
+      price
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    updatedDate
+  }
+}
+
+mutation RemoveSaleItem($removeSaleItemInput: RemoveSaleItemInput!) {
+  removeSaleItem(removeSaleItemInput: $removeSaleItemInput) {
+    guid
+    saleCode
+    status
+    total
+    items {
+      guid
+      tcg
+      condition
+      quantity
+      price
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    updatedDate
+  }
+}

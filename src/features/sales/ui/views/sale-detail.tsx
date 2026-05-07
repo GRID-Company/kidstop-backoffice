@@ -54,14 +54,14 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
     mutating,
     updateStatus,
     cancelSale,
+    updateItem,
+    removeItem,
   } = useSaleDetail(saleId);
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-  // TODO: Enable editing when backend implements updateSaleItems mutation
-  // const isEditable = sale?.status === SALE_STATUS.IN_PROGRESS;
-  const isEditable = false;
+  const isEditable = !isTerminal;
 
   const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
   const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
@@ -166,7 +166,9 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
             </div>
             <SaleItemsList
               items={sale.items}
-              isReadOnly={true}
+              onUpdateItem={updateItem}
+              onRemoveItem={removeItem}
+              isReadOnly={!isEditable}
             />
           </div>
         </EntitiesPage.CardContainer>
