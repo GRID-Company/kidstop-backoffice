@@ -23,7 +23,7 @@ export function mapBulkSearchToPurchaseItems(
     const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
 
     return {
-      guid: `${selectedCard.guid}-${cardForm.condition}-${Date.now()}-${index}`,
+      guid: `temp-${selectedCard.guid}-${cardForm.condition}-${index}`,
       cardGuid: selectedCard.guid,
       cardName: selectedCard.name,
       cardImageUrl: selectedCard.imageUri || '',

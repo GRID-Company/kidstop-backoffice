@@ -23,6 +23,7 @@ interface ItemCardProps {
   onRemove?: (itemId: string) => void;
   isReadOnly?: boolean;
   variant?: ItemVariant;
+  allItems?: ItemCardData[];
 }
 
 function PriceMetric({
@@ -66,6 +67,7 @@ export default function ItemCard({
   onRemove,
   isReadOnly = false,
   variant = 'purchase',
+  allItems = [],
 }: ItemCardProps) {
   const { control } = useFormContext();
   const { isPrivacyMode } = usePrivacyModeStore();
@@ -99,6 +101,23 @@ export default function ItemCard({
     }
     return false;
   }, [item, variant]);
+
+  // Calculate which conditions are already used for this card (excluding current item)
+  const usedConditions = useMemo(() => {
+    return new Set(
+      allItems
+        .filter((i) => i.cardGuid === item.cardGuid && i.guid !== item.guid)
+        .map((i) => i.condition)
+    );
+  }, [allItems, item.cardGuid, item.guid]);
+
+  // Filter available condition options
+  const availableConditionOptions = useMemo(() => {
+    return CARD_CONDITION_OPTIONS.map((option) => ({
+      ...option,
+      isDisabled: usedConditions.has(option.value),
+    }));
+  }, [usedConditions]);
 
   const displaySubtotal = formatCurrency(subtotal);
 
@@ -291,7 +310,8 @@ export default function ItemCard({
                   label: 'text-xs',
                 }}
                 aria-label="Condición de la carta"
-                items={CARD_CONDITION_OPTIONS}
+                items={availableConditionOptions}
+                disabledKeys={Array.from(usedConditions)}
               />
 
               <InputForm

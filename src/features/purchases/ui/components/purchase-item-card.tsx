@@ -20,6 +20,7 @@ interface PurchaseItemCardProps {
   index: number;
   onRemove?: (itemId: string) => void;
   isReadOnly?: boolean;
+  allItems?: IPurchaseItem[];
 }
 
 function PriceMetric({
@@ -54,6 +55,7 @@ export default function PurchaseItemCard({
   index,
   onRemove,
   isReadOnly = false,
+  allItems = [],
 }: PurchaseItemCardProps) {
   const { control } = useFormContext();
   const { isPrivacyMode } = usePrivacyModeStore();
@@ -79,6 +81,23 @@ export default function PurchaseItemCard({
     if (!item.referencePrice || !item.currentReferencePrice) return false;
     return Math.abs(item.referencePrice - item.currentReferencePrice) > 0.01;
   }, [item.referencePrice, item.currentReferencePrice]);
+
+  // Calculate which conditions are already used for this card (excluding current item)
+  const usedConditions = useMemo(() => {
+    return new Set(
+      allItems
+        .filter((i) => i.cardGuid === item.cardGuid && i.guid !== item.guid)
+        .map((i) => i.condition)
+    );
+  }, [allItems, item.cardGuid, item.guid]);
+
+  // Filter available condition options
+  const availableConditionOptions = useMemo(() => {
+    return CARD_CONDITION_OPTIONS.map((option) => ({
+      ...option,
+      isDisabled: usedConditions.has(option.value),
+    }));
+  }, [usedConditions]);
 
   const displaySubtotal = formatCurrencyWithPrivacy(subtotal, isPrivacyMode);
 
@@ -228,7 +247,8 @@ export default function PurchaseItemCard({
                   label: 'text-xs',
                 }}
                 aria-label="Condición de la carta"
-                items={CARD_CONDITION_OPTIONS}
+                items={availableConditionOptions}
+                disabledKeys={Array.from(usedConditions)}
               />
 
               <InputForm

@@ -130,6 +130,7 @@ export default function ItemsList({
                   onRemove={isReadOnly ? undefined : onRemoveItem}
                   isReadOnly={isReadOnly}
                   variant={variant}
+                  allItems={items}
                 />
               ))}
             </div>

@@ -46,6 +46,7 @@ interface UsePurchaseDetailReturn {
   currentBuyerSpent: number;
   assignedBudget: number;
   budgetUtilization: number;
+  existingItemIds: Set<string>;
   loading: boolean;
   error: Error | undefined;
   updateItem: (itemId: string, updates: Partial<IPurchaseItem>) => void;
@@ -162,8 +163,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     if (!basePurchase) return [];
     
     return itemsForm.fieldArray.fields.map((field) => {
-      // Find the original item by cardGuid to get all the metadata
-      const originalItem = basePurchase.items.find((item) => item.cardGuid === field.cardGuid);
+      // Find the original item by BOTH cardGuid AND condition to support multiple conditions of same card
+      const originalItem = basePurchase.items.find(
+        (item) => item.cardGuid === field.cardGuid && item.condition === field.condition
+      );
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
         // Try to find by cardGuid:condition key
@@ -172,14 +175,18 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         if (newItem) {
           return {
             ...newItem,
+            guid: (field as any).id || newItem.guid, // Use React Hook Form's unique field id
             condition: field.condition,
             quantity: field.quantity,
             offerPrice: field.offerPrice,
             referencePrice: field.referencePrice,
           };
         }
-        // Fallback for items without metadata
-        return field as unknown as IPurchaseItem;
+        // Fallback for items without metadata - use field.id as guid
+        return {
+          ...(field as unknown as IPurchaseItem),
+          guid: (field as any).id || `temp-${field.cardGuid}-${field.condition}`,
+        };
       }
       
       // Merge form values with original item data
@@ -448,6 +455,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     currentBuyerSpent,
     assignedBudget,
     budgetUtilization,
+    existingItemIds,
     loading,
     error,
     updateItem,

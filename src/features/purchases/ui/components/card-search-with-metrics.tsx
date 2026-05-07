@@ -348,7 +348,7 @@ export default function CardSearchWithMetrics({
     (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
-        guid: `${card.guid}-${state.condition}-${Date.now()}`,
+        guid: `temp-${card.guid}-${state.condition}`,
         cardGuid: card.guid,
         cardName: card.name,
         cardImageUrl: card.imageUrl,
