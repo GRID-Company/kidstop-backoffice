@@ -54,7 +54,7 @@ export const PasswordFormLayout = ({
       <form className='flex w-full flex-col gap-6' onSubmit={onSubmit}>
         <PasswordForm<PasswordConfirmationForm>
           label='Nueva contraseña'
-          placeholder='••••••••'
+          placeholder=''
           isDisabled={loading}
           hasTooltip
           tooltipType='criteria'
@@ -63,7 +63,7 @@ export const PasswordFormLayout = ({
 
         <PasswordForm<PasswordConfirmationForm>
           label='Confirmar contraseña'
-          placeholder='••••••••'
+          placeholder=''
           isDisabled={loading}
           hasTooltip
           tooltipType='match'
