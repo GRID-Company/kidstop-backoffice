@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
+
+import { translateGraphQLError } from '@/lib/utils/graphql-error-handler';
 
 import {
   SaleDocument,
@@ -58,18 +60,20 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
 
   const sale = useMemo(() => {
     if (!data?.sale) return undefined;
-    return data.sale as unknown as ISale;
+    return data.sale as ISale;
   }, [data]);
 
   const [localItems, setLocalItems] = useState<ISaleItem[]>([]);
   const [itemsToRemove, setItemsToRemove] = useState<string[]>([]);
+  const prevGuidRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (sale?.items) {
+    if (sale?.guid && sale.guid !== prevGuidRef.current) {
+      prevGuidRef.current = sale.guid;
       setLocalItems(sale.items);
       setItemsToRemove([]);
     }
-  }, [sale?.guid]);
+  }, [sale]);
 
   const total = useMemo(
     () => calculateTotal(localItems),
@@ -171,46 +175,44 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     }
 
     try {
-      for (const itemId of itemsToRemove) {
-        await removeSaleItemMutation({
+      const removeMutations = itemsToRemove.map(itemId =>
+        removeSaleItemMutation({
           variables: {
             removeSaleItemInput: {
               saleItemGuid: itemId,
             },
           },
-        });
-      }
+        })
+      );
 
-      for (const localItem of localItems) {
-        const serverItem = sale.items.find((i) => i.guid === localItem.guid);
-        if (serverItem && serverItem.quantity !== localItem.quantity) {
-          await updateSaleItemMutation({
+      const updateMutations = localItems
+        .filter(localItem => {
+          const serverItem = sale.items.find((i) => i.guid === localItem.guid);
+          return serverItem && serverItem.quantity !== localItem.quantity;
+        })
+        .map(localItem =>
+          updateSaleItemMutation({
             variables: {
               updateSaleItemInput: {
                 saleItemGuid: localItem.guid,
                 quantity: localItem.quantity,
               },
             },
-          });
-        }
-      }
+          })
+        );
+
+      await Promise.all([...removeMutations, ...updateMutations]);
 
       toast.success('Cambios guardados correctamente');
       setItemsToRemove([]);
-    } catch (error: any) {
-      let errorMessage = error?.graphQLErrors?.[0]?.message || error?.message || 'Error al guardar los cambios';
-      
-      // Traducir mensajes comunes del backend
-      if (errorMessage.includes('Insufficient stock')) {
-        const match = errorMessage.match(/Available: (\d+), requested increase: (\d+)/);
-        if (match) {
-          errorMessage = `Stock insuficiente. Disponible: ${match[1]}, incremento solicitado: ${match[2]}.`;
-        } else {
-          errorMessage = 'Stock insuficiente para completar la operación.';
-        }
-      }
-      
+    } catch (error: unknown) {
+      const errorMessage = translateGraphQLError(error as { graphQLErrors?: Array<{ message: string }>; message?: string }, 'Error al guardar los cambios');
       toast.error(errorMessage);
+      
+      if (sale?.items) {
+        setLocalItems(sale.items);
+        setItemsToRemove([]);
+      }
     }
   }, [sale, hasChanges, isTerminal, localItems, itemsToRemove, updateSaleItemMutation, removeSaleItemMutation]);
 

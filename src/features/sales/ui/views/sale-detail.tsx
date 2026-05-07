@@ -16,6 +16,7 @@ import { Icon } from '@iconify/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
+import { TCG_ALERT_COLORS } from '@/lib/consts/tcg-themes';
 import {
   CancelReason,
   ISale,
@@ -186,48 +187,53 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               </div>
               <Divider />
               
-              {hasChanges && (
-                <div 
-                  className="flex items-center justify-between rounded-lg p-3 border"
-                  style={{
-                    backgroundColor: sale.tcg === 'POKEMON' ? '#fef2f2' : '#fff7ed',
-                    borderColor: sale.tcg === 'POKEMON' ? '#fecaca' : '#fed7aa',
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <Icon 
-                      icon="lucide:alert-circle" 
-                      width={18} 
-                      style={{ color: sale.tcg === 'POKEMON' ? '#dc2626' : '#ea580c' }}
-                    />
-                    <span 
-                      className="text-sm font-medium"
-                      style={{ color: sale.tcg === 'POKEMON' ? '#991b1b' : '#9a3412' }}
-                    >
-                      Tienes cambios sin guardar
-                    </span>
+              {hasChanges && (() => {
+                const alertColors = TCG_ALERT_COLORS[sale.tcg];
+                return (
+                  <div 
+                    className="flex items-center justify-between rounded-lg p-3 border"
+                    style={{
+                      backgroundColor: alertColors.bg,
+                      borderColor: alertColors.border,
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon="lucide:alert-circle" 
+                        width={18} 
+                        style={{ color: alertColors.icon }}
+                      />
+                      <span 
+                        className="text-sm font-medium"
+                        style={{ color: alertColors.text }}
+                      >
+                        Tienes cambios sin guardar
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        onPress={discardChanges}
+                        aria-label="Descartar cambios sin guardar"
+                        startContent={<Icon icon="lucide:x" width={16} />}
+                      >
+                        Descartar
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-accent text-white"
+                        isLoading={mutating}
+                        onPress={saveChanges}
+                        aria-label="Guardar cambios en items"
+                        startContent={<Icon icon="lucide:save" width={16} />}
+                      >
+                        Guardar cambios
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="flat"
-                      onPress={discardChanges}
-                      startContent={<Icon icon="lucide:x" width={16} />}
-                    >
-                      Descartar
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="bg-accent text-white"
-                      isLoading={mutating}
-                      onPress={saveChanges}
-                      startContent={<Icon icon="lucide:save" width={16} />}
-                    >
-                      Guardar cambios
-                    </Button>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-3">

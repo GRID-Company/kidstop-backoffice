@@ -138,7 +138,6 @@ export default function ItemCard({
                 {item.cardName}
               </h4>
               
-              {/* Pokemon card info */}
               {item.tcgType === 'POKEMON' && (item.cardNumber || item.rarity || item.type || item.hp || item.variant || item.stage) && (
                 <div className="flex flex-wrap items-center gap-1.5">
                   {item.cardNumber && (
@@ -175,7 +174,6 @@ export default function ItemCard({
                 </div>
               )}
               
-              {/* Magic card info */}
               {item.tcgType === 'MAGIC' && (item.collectorNumber || item.rarity || item.isFoil) && (
                 <div className="flex flex-wrap items-center gap-1.5">
                   {item.collectorNumber && (

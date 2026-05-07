@@ -24,3 +24,25 @@ export const TCG_THEMES: Record<TCGType, TCGTheme> = {
     pageBg: '#f5f5f5',
   },
 };
+
+type TCGAlertColors = {
+  bg: string;
+  border: string;
+  icon: string;
+  text: string;
+};
+
+export const TCG_ALERT_COLORS: Record<TCGType, TCGAlertColors> = {
+  [TCG_TYPES.POKEMON]: {
+    bg: '#fef2f2',
+    border: '#fecaca',
+    icon: '#dc2626',
+    text: '#991b1b',
+  },
+  [TCG_TYPES.MAGIC]: {
+    bg: '#fff7ed',
+    border: '#fed7aa',
+    icon: '#ea580c',
+    text: '#9a3412',
+  },
+};
