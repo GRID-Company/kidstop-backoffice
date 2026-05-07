@@ -11,37 +11,9 @@ import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS, CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { REDACTED_VALUE, formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
-import { TCGType } from '@/lib/types/tcg.types';
-import { CardCondition } from '@/lib/types/card.types';
+import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
 
-export type ItemVariant = 'purchase' | 'sale';
-
-interface BaseCardData {
-  guid: string;
-  cardName: string;
-  cardImageUrl: string;
-  setName: string;
-  setCode: string;
-  tcgType: TCGType;
-  condition: CardCondition;
-  quantity: number;
-}
-
-interface PurchaseCardData extends BaseCardData {
-  offerPrice: number;
-  referencePrice?: number;
-  currentReferencePrice?: number;
-  metrics?: {
-    currentStock?: number;
-  };
-}
-
-interface SaleCardData extends BaseCardData {
-  price: number;
-  foundQuantity?: number;
-}
-
-type ItemCardData = PurchaseCardData | SaleCardData;
+type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
 
 interface ItemCardProps {
   item: ItemCardData;
@@ -78,11 +50,11 @@ function PriceMetric({
   );
 }
 
-function isPurchaseItem(item: ItemCardData): item is PurchaseCardData {
+function isPurchaseItem(item: ItemCardData): item is AdaptedPurchaseItem {
   return 'offerPrice' in item;
 }
 
-function isSaleItem(item: ItemCardData): item is SaleCardData {
+function isSaleItem(item: ItemCardData): item is AdaptedSaleItem {
   return 'price' in item;
 }
 

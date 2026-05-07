@@ -3,6 +3,8 @@ import { ISaleItem } from '@/features/sales/domain/types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
 
+export type ItemVariant = 'purchase' | 'sale';
+
 export interface AdaptedPurchaseItem {
   guid: string;
   cardName: string;
@@ -50,7 +52,7 @@ export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
   };
 }
 
-export function adaptSaleItem(item: ISaleItem): AdaptedSaleItem {
+export function adaptSaleItem(item: ISaleItem & { foundQuantity?: number }): AdaptedSaleItem {
   const cardSummary = item.pokemonCardSummary || item.magicCardSummary;
   
   return {
@@ -63,6 +65,6 @@ export function adaptSaleItem(item: ISaleItem): AdaptedSaleItem {
     condition: item.condition,
     quantity: item.quantity,
     price: item.price,
-    foundQuantity: (item as any).foundQuantity,
+    foundQuantity: item.foundQuantity,
   };
 }

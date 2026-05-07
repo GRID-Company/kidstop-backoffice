@@ -6,17 +6,15 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Accordion, AccordionItem } from '@heroui/react';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import ItemCard from './item-card';
-import { AdaptedPurchaseItem, AdaptedSaleItem } from '@/shared/utils/item-adapters';
-
-export type ItemVariant = 'purchase' | 'sale';
+import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
 
 type AdaptedItem = AdaptedPurchaseItem | AdaptedSaleItem;
 
 interface ItemsListProps {
   items: AdaptedItem[];
-  onUpdateItem: (itemId: string, updates: any) => void;
+  onUpdateItem: (itemId: string, updates: Record<string, unknown>) => void;
   onRemoveItem: (itemId: string) => void;
-  calculateTotal: (items: any[]) => number;
+  calculateTotal: (items: AdaptedItem[]) => number;
   isReadOnly?: boolean;
   variant?: ItemVariant;
   totalLabel?: string;
