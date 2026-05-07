@@ -34,7 +34,7 @@ import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
 import SaleItemsList from '../components/sale-items-list';
 import GeneratePdfButton from '../components/generate-pdf-button';
-import SendReadyEmailButton from '../components/send-ready-email-button';
+import SendReadyWhatsAppButton from '../components/send-ready-whatsapp-button';
 import CompleteSaleModal from '../components/complete-sale-modal';
 import CancelSaleModal from '../components/cancel-sale-modal';
 import SaleTimeline from '../components/sale-timeline';
@@ -211,7 +211,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
                   <GeneratePdfButton sale={sale} />
 
-                  <SendReadyEmailButton sale={sale} />
+                  <SendReadyWhatsAppButton sale={sale} />
                 </div>
 
                 <Button
