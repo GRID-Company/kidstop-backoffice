@@ -228,10 +228,10 @@ export default function BulkCardResultCard({
                 {loadingMetrics && needsMetrics ? (
                   <PriceMetricsSkeleton />
                 ) : displayCard.cardMetrics && (displayCard.cardMetrics.ungradedPrice || displayCard.cardMetrics.gradedPriceSeven || displayCard.cardMetrics.gradedPriceEightOrAbove) && (
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                     {displayCard.cardMetrics.ungradedPrice && displayCard.cardMetrics.ungradedPrice > 0 && (
                       <div className="flex items-center gap-0.5">
-                        <Icon icon="lucide:trending-up" width={10} className="text-default-400" />
+                        <Icon icon="lucide:trending-up" width={12} className="text-default-400" />
                         <span className="text-default-500">
                           Market: {formatCurrency(displayCard.cardMetrics.ungradedPrice)}
                         </span>
@@ -239,7 +239,7 @@ export default function BulkCardResultCard({
                     )}
                     {displayCard.cardMetrics.gradedPriceSeven && displayCard.cardMetrics.gradedPriceSeven > 0 && (
                       <div className="flex items-center gap-0.5">
-                        <Icon icon="lucide:award" width={10} className="text-warning" />
+                        <Icon icon="lucide:award" width={12} className="text-warning" />
                         <span className="text-default-500">
                           PSA 7: {formatCurrency(displayCard.cardMetrics.gradedPriceSeven)}
                         </span>
@@ -247,7 +247,7 @@ export default function BulkCardResultCard({
                     )}
                     {displayCard.cardMetrics.gradedPriceEightOrAbove && displayCard.cardMetrics.gradedPriceEightOrAbove > 0 && (
                       <div className="flex items-center gap-0.5">
-                        <Icon icon="lucide:star" width={10} className="text-success" />
+                        <Icon icon="lucide:star" width={12} className="text-success" />
                         <span className="text-default-500">
                           PSA 8+: {formatCurrency(displayCard.cardMetrics.gradedPriceEightOrAbove)}
                         </span>
