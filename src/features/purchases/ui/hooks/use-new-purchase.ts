@@ -64,7 +64,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
   const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
   const existingItemIds = useMemo(
-    () => new Set(items.map((i: IPurchaseItem) => i.cardGuid)),
+    () => new Set(items.map((i: IPurchaseItem) => `${i.cardGuid}:${i.condition}`)),
     [items]
   );
 

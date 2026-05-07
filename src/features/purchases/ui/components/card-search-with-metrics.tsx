@@ -51,11 +51,11 @@ const WISHLIST_HIGHLIGHT_THRESHOLD = 10;
 function CardResultItem({
   card,
   onAdd,
-  isAlreadyAdded,
+  existingItemIds,
 }: {
   card: ICardSearchResult;
   onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => void;
-  isAlreadyAdded: boolean;
+  existingItemIds: Set<string>;
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
@@ -63,6 +63,8 @@ function CardResultItem({
   });
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
+
+  const isAlreadyAdded = existingItemIds.has(`${card.guid}:${addState.condition}`);
 
   const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
     card.guid,
@@ -438,7 +440,7 @@ export default function CardSearchWithMetrics({
               key={card.guid}
               card={card}
               onAdd={handleAddCard}
-              isAlreadyAdded={existingItemIds.has(card.guid)}
+              existingItemIds={existingItemIds}
             />
           ))}
         </div>

@@ -243,7 +243,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const canReturnToDraft = status === PURCHASE_STATUS.REJECTED;
 
   const existingItemIds = useMemo(
-    () => new Set(items.map((i) => i.cardGuid)),
+    () => new Set(items.map((i) => `${i.cardGuid}:${i.condition}`)),
     [items]
   );
 
