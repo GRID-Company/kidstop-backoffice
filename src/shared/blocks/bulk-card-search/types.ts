@@ -23,7 +23,7 @@ export interface BulkCardVariantMetrics {
   condition: string;
   stock: number;
   lastSellDate: string | null;
-  avgDaysInInventory: number;
+  avgDaysInInventory: number | null;
   wishlistCount: number;
 }
 
