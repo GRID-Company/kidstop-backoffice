@@ -2,6 +2,7 @@ import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { buildWhatsAppUrl } from '@/lib/utils/whatsapp.utils';
 import { DEFAULT_BUDGET_LIMIT, DEFAULT_INVENTORY_LIMIT } from './constants';
 import { IPaymentDetail, IPurchaseItem, ISeller, PurchaseFilters } from './types';
 
@@ -96,9 +97,6 @@ const TCG_LABELS: Record<TCGType, string> = {
   MAGIC: 'Magic: The Gathering',
 };
 
-const sanitizePhone = (phone: string): string =>
-  phone.replace(/[^0-9]/g, '');
-
 export interface WhatsAppQuoteParams {
   seller: ISeller;
   items: IPurchaseItem[];
@@ -133,16 +131,8 @@ export const buildWhatsAppQuoteMessage = (params: WhatsAppQuoteParams): string =
 };
 
 export const buildWhatsAppQuoteUrl = (params: WhatsAppQuoteParams): string => {
-  const phone = sanitizePhone(params.seller.phone);
   const text = buildWhatsAppQuoteMessage(params);
-
-  const url = new URL('https://api.whatsapp.com/send/');
-  url.searchParams.set('phone', phone);
-  url.searchParams.set('text', text);
-  url.searchParams.set('type', 'phone_number');
-  url.searchParams.set('app_absent', '0');
-
-  return url.toString();
+  return buildWhatsAppUrl(params.seller.phone, text);
 };
 
 export interface WhatsAppQuoteValidation {

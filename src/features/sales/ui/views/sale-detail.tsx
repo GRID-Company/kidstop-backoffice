@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Button,
@@ -32,9 +32,9 @@ import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/
 import { useSaleDetail } from '../hooks/use-sale-detail';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
-import SaleItemsTable from '../components/sale-items-table';
+import SaleItemsList from '../components/sale-items-list';
 import GeneratePdfButton from '../components/generate-pdf-button';
-import SendReadyEmailButton from '../components/send-ready-email-button';
+import SendReadyWhatsAppButton from '../components/send-ready-whatsapp-button';
 import CompleteSaleModal from '../components/complete-sale-modal';
 import CancelSaleModal from '../components/cancel-sale-modal';
 import SaleTimeline from '../components/sale-timeline';
@@ -58,6 +58,10 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
+  // TODO: Enable editing when backend implements updateSaleItems mutation
+  // const isEditable = sale?.status === SALE_STATUS.IN_PROGRESS;
+  const isEditable = false;
 
   const nextStatus = sale ? NEXT_STATUS[sale.status] : undefined;
   const nextStatusLabel = sale ? NEXT_STATUS_LABELS[sale.status] : undefined;
@@ -160,7 +164,10 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 {formatCurrency(total)}
               </span>
             </div>
-            <SaleItemsTable items={sale.items} />
+            <SaleItemsList
+              items={sale.items}
+              isReadOnly={true}
+            />
           </div>
         </EntitiesPage.CardContainer>
 
@@ -189,7 +196,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
 
                   <GeneratePdfButton sale={sale} />
 
-                  <SendReadyEmailButton sale={sale} />
+                  <SendReadyWhatsAppButton sale={sale} />
                 </div>
 
                 <Button
