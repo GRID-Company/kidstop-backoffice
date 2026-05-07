@@ -22,6 +22,7 @@ export interface ICustomer {
 
 export interface CustomerFilters {
   clientStatus?: ClientStatus;
+  role?: CustomerRole;
   search?: string;
 }
 

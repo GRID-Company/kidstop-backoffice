@@ -7,7 +7,7 @@ import Select from '@/shared/base/heorui-overrides/select';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { ICustomer } from '../../domain/types';
-import { CLIENT_STATUS_FILTER_OPTIONS } from '../../domain/constants';
+import { CLIENT_STATUS_FILTER_OPTIONS, CUSTOMER_ROLE_FILTER_OPTIONS } from '../../domain/constants';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import CustomerTypeBadge from './customer-type-badge';
@@ -61,20 +61,26 @@ export default function CustomersList({
 }: CustomersListProps) {
   return (
     <div className="flex flex-col gap-4">
-      <Search
-        label="Buscar cliente"
-        placeholder="Nombre, email o teléfono"
-        onValueChange={onSearchChange}
-        aria-label="Buscar cliente por nombre, email o teléfono"
-      />
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <Search
+          label="Buscar cliente"
+          placeholder="Nombre, email o teléfono"
+          onValueChange={onSearchChange}
+          aria-label="Buscar cliente por nombre, email o teléfono"
+        />
         <Select
           placeholder="Todos los estados"
           label="Estado"
           items={CLIENT_STATUS_FILTER_OPTIONS}
           onChange={(e) => onFilterChange('clientStatus', e.target.value)}
           aria-label="Filtrar por estado del cliente"
+        />
+        <Select
+          placeholder="Todos los tipos"
+          label="Tipo"
+          items={CUSTOMER_ROLE_FILTER_OPTIONS}
+          onChange={(e) => onFilterChange('role', e.target.value)}
+          aria-label="Filtrar por tipo de cliente"
         />
       </div>
 

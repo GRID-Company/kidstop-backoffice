@@ -54,6 +54,11 @@ export const CLIENT_STATUS_FILTER_OPTIONS = Object.values(CLIENT_STATUSES).map((
   }[status],
 }));
 
+export const CUSTOMER_ROLE_FILTER_OPTIONS = Object.values(CUSTOMER_ROLES).map((role) => ({
+  value: role,
+  label: CUSTOMER_ROLE_LABELS[role],
+}));
+
 export const DEFAULT_CUSTOMERS_SORT: ITableSort = {
   column: 'name',
   order: 'ASC',
