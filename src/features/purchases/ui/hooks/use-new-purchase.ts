@@ -55,7 +55,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     },
   });
 
-  const items = form.getValues('items') as IPurchaseItem[];
+  const items = fieldArray.fields as unknown as IPurchaseItem[];
 
   const total = useMemo(() => calculateTotal(items), [items]);
 
