@@ -158,19 +158,17 @@ function CardResultItem({
                     : 'font-semibold'
                 }
               />
-              <div className="flex items-center gap-1">
-                <MetricItem
-                  icon="lucide:heart"
-                  label="Wishlist"
-                  value={String(displayMetrics.wishlistCount)}
-                  valueClassName={
-                    displayMetrics.wishlistCount >= 10
-                      ? 'text-accent font-semibold'
-                      : ''
-                  }
-                />
-                <CardConditionBreakdownPopover variantsMetrics={variantsMetrics} />
-              </div>
+              <MetricItem
+                icon="lucide:heart"
+                label="Wishlist"
+                value={String(displayMetrics.wishlistCount)}
+                valueClassName={
+                  displayMetrics.wishlistCount >= 10
+                    ? 'text-accent font-semibold'
+                    : ''
+                }
+                endContent={<CardConditionBreakdownPopover variantsMetrics={variantsMetrics} />}
+              />
               <div className="hidden xl:block">
                 <MetricItem
                   icon="lucide:calendar"
@@ -296,11 +294,13 @@ function MetricItem({
   label,
   value,
   valueClassName = '',
+  endContent,
 }: {
   icon: string;
   label: string;
   value: string;
   valueClassName?: string;
+  endContent?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-0.5">
@@ -308,7 +308,10 @@ function MetricItem({
         <Icon icon={icon} width={12} className="text-default-400" />
         <span className="text-[10px] text-default-400">{label}</span>
       </div>
-      <span className={`text-xs ${valueClassName}`}>{value}</span>
+      <div className="flex items-center gap-1">
+        <span className={`text-xs ${valueClassName}`}>{value}</span>
+        {endContent}
+      </div>
     </div>
   );
 }
