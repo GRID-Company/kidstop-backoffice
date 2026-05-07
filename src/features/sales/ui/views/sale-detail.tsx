@@ -47,15 +47,19 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
   const router = useRouter();
   const {
     sale,
+    items,
     total,
     itemCount,
     isTerminal,
     loading,
     mutating,
+    hasChanges,
     updateStatus,
     cancelSale,
     updateItem,
     removeItem,
+    saveChanges,
+    discardChanges,
   } = useSaleDetail(saleId);
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
@@ -165,7 +169,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               </span>
             </div>
             <SaleItemsList
-              items={sale.items}
+              items={items}
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}
               isReadOnly={!isEditable}
@@ -181,6 +185,37 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 <span className="text-sm font-semibold">Acciones</span>
               </div>
               <Divider />
+              
+              {hasChanges && (
+                <div className="flex items-center justify-between rounded-lg bg-warning-50 border border-warning-200 p-3">
+                  <div className="flex items-center gap-2">
+                    <Icon icon="lucide:alert-circle" width={18} className="text-warning-600" />
+                    <span className="text-sm font-medium text-warning-700">
+                      Tienes cambios sin guardar
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      onPress={discardChanges}
+                      startContent={<Icon icon="lucide:x" width={16} />}
+                    >
+                      Descartar
+                    </Button>
+                    <Button
+                      size="sm"
+                      color="primary"
+                      isLoading={mutating}
+                      onPress={saveChanges}
+                      startContent={<Icon icon="lucide:save" width={16} />}
+                    >
+                      Guardar cambios
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-3">
                   {nextStatus && nextStatusLabel && nextStatusIcon && (
@@ -188,6 +223,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                       <Button
                         className="bg-accent text-white"
                         isLoading={mutating}
+                        isDisabled={hasChanges}
                         startContent={<Icon icon={nextStatusIcon} width={18} />}
                         onPress={handleNextStatusPress}
                       >
@@ -204,7 +240,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                 <Button
                   color="danger"
                   variant="flat"
-                  isDisabled={mutating}
+                  isDisabled={mutating || hasChanges}
                   startContent={<Icon icon="lucide:x-circle" width={18} />}
                   onPress={() => setIsCancelModalOpen(true)}
                 >
