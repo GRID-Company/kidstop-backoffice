@@ -37,6 +37,7 @@ import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
+import ConditionBreakdownPopover from '../components/condition-breakdown-popover';
 
 interface PurchaseDetailProps {
   purchaseId: string;
@@ -152,6 +153,28 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     }
   }, [updateItemsOnly, items]);
 
+  const finalizeTooltipMessage = useMemo(() => {
+    if (purchase?.status !== PURCHASE_STATUS.WAITING_PRICE) {
+      return 'Finalizar la compra y registrar en inventario';
+    }
+
+    const missingPayments = payments.length === 0;
+    const allPricesAdjusted = items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
+    const missingPrices = !allPricesAdjusted;
+
+    if (missingPayments && missingPrices) {
+      return 'Debes registrar pagos y ajustar precios de venta en todos los items';
+    }
+    if (missingPayments) {
+      return 'Debes registrar al menos un pago';
+    }
+    if (missingPrices) {
+      return 'Debes ajustar precios de venta en todos los items';
+    }
+
+    return 'Finalizar la compra y registrar en inventario';
+  }, [purchase?.status, payments.length, items]);
+
   if (loading) {
     return (
       <EntitiesPage>
@@ -262,6 +285,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 <Chip size="sm" variant="flat">
                   {items.length} {items.length === 1 ? 'carta' : 'cartas'}
                 </Chip>
+                <ConditionBreakdownPopover items={items} />
               </div>
             </div>
             <PurchaseItemsList
@@ -328,9 +352,19 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         {!isTerminal && (
           <EntitiesPage.CardContainer>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <Icon icon="lucide:zap" width={18} className="text-accent" />
-                <span className="text-sm font-semibold">Acciones</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Icon icon="lucide:zap" width={18} className="text-accent" />
+                  <span className="text-sm font-semibold">Acciones</span>
+                </div>
+                {(canSendQuote || canResendQuote) && (
+                  <WhatsAppQuoteButton
+                    seller={purchase.seller}
+                    items={items}
+                    tcgType={purchase.tcgType}
+                    label={canResendQuote ? "Reenviar cotización" : undefined}
+                  />
+                )}
               </div>
               <Divider />
               <div className="flex flex-wrap gap-3">
@@ -357,23 +391,6 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                   </Button>
                 )}
 
-                {canSendQuote && (
-                  <WhatsAppQuoteButton
-                    seller={purchase.seller}
-                    items={items}
-                    tcgType={purchase.tcgType}
-                  />
-                )}
-
-                {canResendQuote && (
-                  <WhatsAppQuoteButton
-                    seller={purchase.seller}
-                    items={items}
-                    tcgType={purchase.tcgType}
-                    label="Reenviar cotización"
-                  />
-                )}
-
                 {canAcceptQuote && (
                   <Button
                     className="bg-success text-white"
@@ -391,7 +408,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                     startContent={<Icon icon="lucide:wallet" width={18} />}
                     onPress={() => setIsPaymentModalOpen(true)}
                   >
-                    Registrar pago
+                    {payments.length > 0 ? 'Editar pago' : 'Registrar pago'}
                   </Button>
                 )}
 
@@ -406,12 +423,13 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                   </Button>
                 )}
 
-                {canFinalize && (
-                  <Tooltip content="Finalizar la compra y registrar en inventario">
+                {(canFinalize || purchase.status === PURCHASE_STATUS.WAITING_PRICE) && (
+                  <Tooltip content={finalizeTooltipMessage}>
                     <Button
                       className="bg-accent text-white"
                       startContent={<Icon icon="lucide:check-circle" width={18} />}
                       onPress={handleFinalize}
+                      isDisabled={!canFinalize}
                     >
                       Finalizar compra
                     </Button>
