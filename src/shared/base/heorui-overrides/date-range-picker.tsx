@@ -20,9 +20,10 @@ export default function OverrideDateRangePicker(props: OverrideDateRangePickerPr
         classNames: {
           ...props.calendarProps?.classNames,
           cellButton: [
-            'data-[selected=true]:bg-accent data-[selected=true]:text-white',
+            'data-[selected=true]:bg-accent data-[selected=true]:!text-white',
             'data-[hover=true]:bg-accent/20',
-            'data-[selection-start=true]:bg-accent data-[selection-end=true]:bg-accent',
+            'data-[selection-start=true]:bg-accent data-[selection-start=true]:!text-white',
+            'data-[selection-end=true]:bg-accent data-[selection-end=true]:!text-white',
             props.calendarProps?.classNames?.cellButton ?? '',
           ].join(' '),
           title: `text-accent ${props.calendarProps?.classNames?.title ?? ''}`,
