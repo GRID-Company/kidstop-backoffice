@@ -69,12 +69,14 @@ export function useInventorySearch() {
         filters: {
           tcg: selectedTCG,
           condition: filters.condition || undefined,
-          ...(dateRange && {
-            lastSellDate: {
-              filterType: ':daterange:',
-              range: { from: dateRange.start, to: dateRange.end },
-            },
-          }),
+          // TODO: Backend no soporta lastSellDate como DateRangeFilter
+          // Error: invalid input syntax for type timestamp
+          // ...(dateRange && {
+          //   lastSellDate: {
+          //     filterType: ':daterange:',
+          //     range: { from: dateRange.start, to: dateRange.end },
+          //   },
+          // }),
           ...(filters.rarity && {
             pokemonFilters: { rarity: filters.rarity },
           }),

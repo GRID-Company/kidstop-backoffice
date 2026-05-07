@@ -85,7 +85,7 @@ export default function InventoryFilters({
         aria-label="Buscar en inventario por nombre, set o identificador"
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Select
           placeholder="Todas las condiciones"
           label="Condición"
@@ -100,13 +100,14 @@ export default function InventoryFilters({
           onChange={(e) => onFilterChange('rarity', e.target.value)}
           aria-label="Filtrar por rareza"
         />
-        <DateRangePicker
+        {/* TODO: Oculto temporalmente - Backend no soporta filtro lastSellDate como DateRangeFilter */}
+        {/* <DateRangePicker
           label="Última venta"
           value={dateRangeValue}
           onChange={handleDateChange}
           maxValue={today(getLocalTimeZone())}
           aria-label="Filtrar por rango de fecha de última venta"
-        />
+        /> */}
       </div>
 
       <div className="flex items-center justify-between">
