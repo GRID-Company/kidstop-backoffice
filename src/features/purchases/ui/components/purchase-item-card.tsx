@@ -118,6 +118,26 @@ export default function PurchaseItemCard({
               <h4 className="text-sm font-semibold leading-tight text-default-900">
                 {item.cardName}
               </h4>
+              {item.tcgType === 'POKEMON' && (item.type || item.hp || item.variant) && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {item.type && (
+                    <div className="flex items-center gap-0.5">
+                      <PokemonTypeIcon type={item.type} size="sm" />
+                      <span className="text-[10px] text-default-600">{item.type}</span>
+                    </div>
+                  )}
+                  {item.hp && (
+                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                      {item.hp} HP
+                    </Chip>
+                  )}
+                  {item.variant && !item.variant.toLowerCase().includes('normal') && (
+                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
+                      {item.variant}
+                    </Chip>
+                  )}
+                </div>
+              )}
               <p className="text-xs text-default-500">
                 {item.setName} · {item.setCode}
               </p>

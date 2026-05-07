@@ -17,7 +17,6 @@ import {
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
-import ImageGallery from '@/shared/components/image-gallery';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { IPokemonCard, CardCondition } from '../../domain/types';
@@ -89,17 +88,24 @@ export default function PokemonCardDetailModal({
         <DrawerBody className="flex flex-col gap-6">
           <div className="flex gap-6">
             <div className="w-40 shrink-0">
-              {detail?.moreImages && detail.moreImages.length > 0 ? (
-                <ImageGallery images={detail.moreImages} alt={name} minResolution={400} />
-              ) : (
-                <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
-                  {imageUri ? (
-                    <Image
-                      src={imageUri}
+              <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
+                {(() => {
+                  // Usar la imagen de mayor calidad disponible
+                  const highQualityImage = detail?.moreImages && detail.moreImages.length > 0
+                    ? detail.moreImages.reduce((prev, current) => {
+                        const prevRes = parseInt(prev.resolution.split('x')[0]);
+                        const currentRes = parseInt(current.resolution.split('x')[0]);
+                        return currentRes > prevRes ? current : prev;
+                      })
+                    : null;
+
+                  const displayImage = highQualityImage?.imageUrl || imageUri;
+
+                  return displayImage ? (
+                    <img
+                      src={displayImage}
                       alt={name}
-                      fill
-                      sizes="160px"
-                      className="object-contain p-1"
+                      className="absolute inset-0 h-full w-full object-contain p-1"
                     />
                   ) : (
                     <Image
@@ -109,9 +115,9 @@ export default function PokemonCardDetailModal({
                       sizes="160px"
                       className="object-contain p-1"
                     />
-                  )}
-                </div>
-              )}
+                  );
+                })()}
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -273,9 +279,10 @@ export default function PokemonCardDetailModal({
               <div className="flex flex-col gap-2">
                 <h4 className="text-sm font-semibold">Texto de la carta</h4>
                 <div className="rounded-lg bg-default-50 p-3">
-                  <p className="whitespace-pre-wrap text-sm text-default-700">
-                    {detail.cardText}
-                  </p>
+                  <div 
+                    className="text-sm text-default-700"
+                    dangerouslySetInnerHTML={{ __html: detail.cardText }}
+                  />
                 </div>
               </div>
             </>

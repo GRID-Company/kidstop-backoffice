@@ -41,6 +41,10 @@ export interface IPurchaseItem {
   setName: string;
   setCode: string;
   tcgType: TCGType;
+  variant?: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
   condition: CardCondition;
   quantity: number;
   offerPrice: number;

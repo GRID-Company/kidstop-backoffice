@@ -34,6 +34,10 @@ query Purchases($findPurchasesArgs: FindPurchasesArgs!) {
           cardNumber
           rarity
           imageUri
+          variant
+          type
+          hp
+          stage
         }
         magicCardSummary {
           guid
@@ -91,6 +95,10 @@ query Purchase($guid: String!) {
         cardNumber
         rarity
         imageUri
+        variant
+        type
+        hp
+        stage
       }
       magicCardSummary {
         guid
@@ -137,6 +145,10 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
         cardNumber
         rarity
         imageUri
+        variant
+        type
+        hp
+        stage
       }
       magicCardSummary {
         guid
@@ -199,6 +211,10 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
         cardNumber
         rarity
         imageUri
+        variant
+        type
+        hp
+        stage
       }
       magicCardSummary {
         guid
