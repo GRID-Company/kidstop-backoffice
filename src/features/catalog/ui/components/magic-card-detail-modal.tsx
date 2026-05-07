@@ -17,6 +17,7 @@ import { Icon } from '@iconify/react';
 import { useQuery } from '@apollo/client/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
+import FoilChip from '@/shared/components/foil-chip';
 import { IMagicCard } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS } from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
@@ -130,17 +131,7 @@ export default function MagicCardDetailModal({
                   </Chip>
                 )}
                 {isFoil && (
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    startContent={<Icon icon="lucide:sparkles" className="text-xs" />}
-                    classNames={{
-                      base: 'bg-gradient-to-r from-yellow-400/20 to-amber-500/20',
-                      content: 'text-amber-600 font-semibold',
-                    }}
-                  >
-                    Foil
-                  </Chip>
+                  <FoilChip label="Foil" variant="subtle" />
                 )}
               </div>
 

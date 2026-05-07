@@ -4,6 +4,7 @@ import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import { CardBody } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import FoilChip from '@/shared/components/foil-chip';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 
@@ -42,6 +43,12 @@ export default function PokemonCardGridItem({ card, onPress }: PokemonCardGridIt
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="object-contain p-2"
             />
+          )}
+
+          {card.variant && (card.variant.toLowerCase().includes('holo') || card.variant.toLowerCase().includes('foil')) && (
+            <div className="absolute right-2 top-2">
+              <FoilChip label={card.variant} />
+            </div>
           )}
         </div>
 

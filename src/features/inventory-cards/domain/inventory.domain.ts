@@ -11,7 +11,6 @@ export const getInventoryVars = (
       ...args,
       filters: {
         condition: filters.condition || undefined,
-        stockStatus: filters.stockStatus || undefined,
         search: filters.search || undefined,
       },
     },

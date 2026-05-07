@@ -122,6 +122,7 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
       const mappedResults: BulkCardResult[] = magicData.magicBatchCardSearch.results.map(
         (result) => ({
           originalLine: result.originalLine,
+          parsedQuantity: result.parsedQuantity,
           parsedName: result.parsedName,
           parsedSet: result.parsedSet,
           parsedNumber: result.parsedNumber,
@@ -140,6 +141,7 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
       const mappedResults: BulkCardResult[] = pokemonData.pokemonBatchCardSearch.results.map(
         (result) => ({
           originalLine: result.originalLine,
+          parsedQuantity: result.parsedQuantity,
           parsedName: result.parsedName,
           parsedSet: result.parsedSet,
           parsedNumber: result.parsedNumber,

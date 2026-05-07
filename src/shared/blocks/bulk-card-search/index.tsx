@@ -80,7 +80,7 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   const { search, results, loading, error, reset: resetSearch } = useBulkCardSearch();
 
-  const { form, fields, initializeCards, resetForm } = useBulkSearchForm(variant, onConfirm as any);
+  const { form, fields, initializeCards, resetForm } = useBulkSearchForm(variant);
 
   useEffect(() => {
     if (results.length > 0) {

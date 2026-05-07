@@ -35,6 +35,7 @@ export interface BulkCardData {
 
 export interface BulkCardResult {
   originalLine: string;
+  parsedQuantity?: number | null;
   parsedName: string | null;
   parsedSet: string | null;
   parsedNumber: string | null;

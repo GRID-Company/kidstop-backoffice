@@ -131,6 +131,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
 - Card fields:
   - `guid`: Unique card identifier
   - `name`: Card name
+  - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (nullable)
   - `setName`: Collection/set name
   - `setCode`: Collection/set code
   - `cardNumber`: Card number in set (e.g. `#025`)
@@ -138,6 +139,13 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
   - `sellPrice`: Current sell price
   - `availableStock`: Whether stock is available (boolean)
   - `imageUri`: Card image URL
+  - `moreImages`: Array of image URLs at multiple resolutions (200x200, 400x400, 600x600, 800x800, 1000x1000) from TCG Player (nullable)
+  - `releaseDate`: Card release date (nullable)
+  - `type`: Card type from TCG Player (nullable)
+  - `hp`: Hit points from TCG Player (nullable)
+  - `stage`: Evolution stage from TCG Player (nullable)
+  - `cardText`: Card text/description from TCG Player (nullable)
+  - `artist`: Card artist from TCG Player (nullable)
 
 ---
 
@@ -705,6 +713,10 @@ query PokemonCardPublicDetail($guid: String!) {
       sellPrice
     }
     imageUri
+    moreImages {
+      resolution
+      imageUrl
+    }
   }
 }
 ```
@@ -720,11 +732,19 @@ query PokemonCardPublicDetail($guid: String!) {
 **Response Fields:**
 
 - All basic card info plus:
-  - `variant`: Card variant
+  - `variant`: Card variant (e.g., "Normal", "Reverse Holo")
   - `setGuid`: UUID of the card's collection/set (nullable)
   - `cardNumber`: Number in set
   - `rarity`: Card rarity
   - `inventoryCards`: Array of inventory items with different conditions
+  - `imageUri`: Primary card image URL
+  - `moreImages`: Array of image URLs at multiple resolutions (200x200, 400x400, 600x600, 800x800, 1000x1000) from TCG Player (nullable)
+  - `releaseDate`: Card release date (nullable)
+  - `type`: Card type from TCG Player (nullable)
+  - `hp`: Hit points from TCG Player (nullable)
+  - `stage`: Evolution stage from TCG Player (nullable)
+  - `cardText`: Card text/description from TCG Player (nullable)
+  - `artist`: Card artist from TCG Player (nullable)
 
 ---
 
@@ -832,6 +852,10 @@ query PokemonTopSoldCards {
     cardNumber
     rarity
     imageUri
+    moreImages {
+      resolution
+      imageUrl
+    }
     sellPrice
     availableStock
     totalStock
@@ -844,15 +868,23 @@ query PokemonTopSoldCards {
 
 - `guid`: Unique card identifier
 - `name`: Card name
+- `variant`: Card variant (e.g., "Normal", "Reverse Holo") (nullable)
 - `setName`: Collection/set name (nullable)
 - `setCode`: Collection/set code (nullable)
 - `cardNumber`: Card number in set (e.g. `#025`) (nullable)
 - `rarity`: Card rarity (nullable)
 - `imageUri`: Card image URL (nullable)
+- `moreImages`: Array of image URLs at multiple resolutions (200x200, 400x400, 600x600, 800x800, 1000x1000) from TCG Player (nullable)
 - `sellPrice`: Lowest current sell price across all conditions (nullable)
 - `availableStock`: Whether any stock is currently available (boolean)
 - `totalStock`: Total units in stock across all conditions
 - `totalSold`: Total number of completed sales this card appears in
+- `releaseDate`: Card release date (nullable)
+- `type`: Card type from TCG Player (nullable)
+- `hp`: Hit points from TCG Player (nullable)
+- `stage`: Evolution stage from TCG Player (nullable)
+- `cardText`: Card text/description from TCG Player (nullable)
+- `artist`: Card artist from TCG Player (nullable)
 
 **Notes:**
 
@@ -948,6 +980,11 @@ Prices are fetched from PriceCharting API in USD (converted from cents) and then
 
 ```typescript
 // Types
+interface ImageResolution {
+  resolution: string;
+  imageUrl: string;
+}
+
 interface PokemonCard {
   guid: string;
   name: string;
@@ -956,6 +993,7 @@ interface PokemonCard {
   sellPrice: number;
   availableStock: number;
   imageUri: string;
+  moreImages?: ImageResolution[];
 }
 
 interface CardListResponse {
@@ -978,11 +1016,22 @@ const GET_CARDS = gql`
       data {
         guid
         name
+        variant
         setName
         setCode
         sellPrice
         availableStock
         imageUri
+        moreImages {
+          resolution
+          imageUrl
+        }
+        releaseDate
+        type
+        hp
+        stage
+        cardText
+        artist
       }
       count
     }
@@ -1142,9 +1191,29 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
     results {
       originalLine
+      parsedQuantity
       parsedName
       parsedSet
       parsedNumber
+      data {
+        guid
+        name
+        variant
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+        sellPrice
+        availableStock
+        totalStock
+        releaseDate
+        type
+        hp
+        stage
+        cardText
+        artist
+      }
       bestMatch {
         guid
         name
@@ -1260,6 +1329,7 @@ const BATCH_SEARCH_POKEMON = gql`
     pokemonBatchCardSearch(input: $input) {
       results {
         originalLine
+        parsedQuantity
         parsedName
         bestMatch {
           guid

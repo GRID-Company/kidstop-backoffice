@@ -22,7 +22,6 @@ import {
   MAGIC_RARITY_OPTIONS,
 } from '@/lib/types/card.types';
 import { DateRange } from '@/lib/types/date.types';
-import { STOCK_STATUS_OPTIONS } from '../../domain/constants';
 
 interface InventoryFiltersProps {
   onSearchChange: SearchFn;
@@ -86,7 +85,7 @@ export default function InventoryFilters({
         aria-label="Buscar en inventario por nombre, set o identificador"
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Select
           placeholder="Todas las condiciones"
           label="Condición"
@@ -100,13 +99,6 @@ export default function InventoryFilters({
           items={rarityOptions}
           onChange={(e) => onFilterChange('rarity', e.target.value)}
           aria-label="Filtrar por rareza"
-        />
-        <Select
-          placeholder="Todos los estados"
-          label="Estado de stock"
-          items={STOCK_STATUS_OPTIONS}
-          onChange={(e) => onFilterChange('stockStatus', e.target.value)}
-          aria-label="Filtrar por estado de stock"
         />
         <DateRangePicker
           label="Última venta"
