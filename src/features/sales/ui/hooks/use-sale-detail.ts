@@ -90,11 +90,23 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     if (itemsToRemove.length > 0) return true;
     if (localItems.length !== sale.items.length) return true;
 
-    return localItems.some((localItem) => {
+    const result = localItems.some((localItem) => {
       const serverItem = sale.items.find((i) => i.guid === localItem.guid);
       if (!serverItem) return true;
-      return localItem.quantity !== serverItem.quantity;
+      const changed = localItem.quantity !== serverItem.quantity;
+      if (changed) {
+        console.log('🟡 Item changed detected:', {
+          guid: localItem.guid,
+          localQuantity: localItem.quantity,
+          localType: typeof localItem.quantity,
+          serverQuantity: serverItem.quantity,
+          serverType: typeof serverItem.quantity,
+        });
+      }
+      return changed;
     });
+    console.log('🟡 hasChanges:', result, { localItems, saleItems: sale.items, itemsToRemove });
+    return result;
   }, [sale, localItems, itemsToRemove]);
 
   const isTerminal =
@@ -139,16 +151,29 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<ISaleItem>) => {
-      if (updates.quantity !== undefined && updates.quantity < 1) {
-        toast.error('La cantidad debe ser mayor o igual a 1');
-        return;
+      console.log('🔵 updateItem called:', { itemId, updates });
+      const normalizedUpdates = { ...updates };
+      
+      if (normalizedUpdates.quantity !== undefined) {
+        const originalQuantity = normalizedUpdates.quantity;
+        normalizedUpdates.quantity = typeof normalizedUpdates.quantity === 'string' 
+          ? parseInt(normalizedUpdates.quantity, 10) 
+          : normalizedUpdates.quantity;
+        console.log('🔵 Quantity normalized:', { originalQuantity, normalized: normalizedUpdates.quantity });
+        
+        if (isNaN(normalizedUpdates.quantity) || normalizedUpdates.quantity < 1) {
+          toast.error('La cantidad debe ser mayor o igual a 1');
+          return;
+        }
       }
 
-      setLocalItems((prev) =>
-        prev.map((item) =>
-          item.guid === itemId ? { ...item, ...updates } : item
-        )
-      );
+      setLocalItems((prev) => {
+        const updated = prev.map((item) =>
+          item.guid === itemId ? { ...item, ...normalizedUpdates } : item
+        );
+        console.log('🔵 LocalItems updated:', updated);
+        return updated;
+      });
     },
     []
   );

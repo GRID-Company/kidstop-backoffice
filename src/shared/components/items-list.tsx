@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { Icon } from '@iconify/react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { Accordion, AccordionItem } from '@heroui/react';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import ItemCard from './item-card';
@@ -42,6 +42,18 @@ export default function ItemsList({
     },
   });
 
+  const { fields } = useFieldArray({
+    control: form.control,
+    name: 'cards',
+  });
+
+  const watchedCards = useWatch({
+    control: form.control,
+    name: 'cards',
+  }) as Array<{ condition: string; quantity: number; offerPrice?: number }> | undefined;
+
+  const prevWatchedCardsRef = useRef<typeof watchedCards>(undefined);
+
   useEffect(() => {
     form.reset({
       cards: items.map((item: AdaptedItem) => ({
@@ -50,33 +62,41 @@ export default function ItemsList({
         ...(variant === 'purchase' && 'offerPrice' in item ? { offerPrice: (item as AdaptedPurchaseItem).offerPrice } : {}),
       })),
     });
+    prevWatchedCardsRef.current = watchedCards;
   }, [items, form, variant]);
 
   useEffect(() => {
-    if (!isReadOnly) {
-      const subscription = form.watch((value, { name }) => {
-        if (name && name.startsWith('cards.')) {
-          const match = name.match(/^cards\\.(\d+)\\.(.+)$/);
-          if (match) {
-            const index = parseInt(match[1], 10);
-            const field = match[2];
-            const item = items[index];
-            
-            if (item) {
-              const cardData = value.cards?.[index];
-              if (cardData) {
-                onUpdateItem(item.guid, {
-                  [field]: cardData[field as keyof typeof cardData],
-                });
-              }
-            }
-          }
-        }
-      });
-
-      return () => subscription.unsubscribe();
+    if (isReadOnly || !watchedCards || !prevWatchedCardsRef.current) {
+      prevWatchedCardsRef.current = watchedCards;
+      return;
     }
-  }, [form, items, onUpdateItem, isReadOnly]);
+
+    watchedCards.forEach((cardData, index) => {
+      const item = items[index];
+      const prevCardData = prevWatchedCardsRef.current?.[index];
+      if (!item || !cardData || !prevCardData) return;
+
+      const changes: Record<string, unknown> = {};
+
+      if (cardData.condition !== prevCardData.condition) {
+        changes.condition = cardData.condition;
+      }
+      if (cardData.quantity !== prevCardData.quantity) {
+        changes.quantity = cardData.quantity;
+      }
+      if (variant === 'purchase' && 'offerPrice' in cardData && 'offerPrice' in prevCardData) {
+        if (cardData.offerPrice !== prevCardData.offerPrice) {
+          changes.offerPrice = cardData.offerPrice;
+        }
+      }
+
+      if (Object.keys(changes).length > 0) {
+        onUpdateItem(item.guid, changes);
+      }
+    });
+
+    prevWatchedCardsRef.current = watchedCards;
+  }, [watchedCards, items, onUpdateItem, isReadOnly, variant]);
 
   const total = useMemo(() => calculateTotal(items), [items, calculateTotal]);
   const [isExpanded, setIsExpanded] = useState(true);
