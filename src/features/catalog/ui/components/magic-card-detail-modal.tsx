@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -15,6 +14,7 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { useQuery } from '@apollo/client/react';
 
@@ -84,7 +84,7 @@ export default function MagicCardDetailModal({
   );
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">{name}</span>
@@ -372,6 +372,6 @@ export default function MagicCardDetailModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

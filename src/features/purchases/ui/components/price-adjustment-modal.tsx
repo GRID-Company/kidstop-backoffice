@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -12,6 +11,7 @@ import {
   Divider,
   Chip,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
@@ -149,7 +149,7 @@ export default function PriceAdjustmentModal({
   );
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">
@@ -339,6 +339,6 @@ export default function PriceAdjustmentModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

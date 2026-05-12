@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -12,6 +11,7 @@ import {
   Chip,
   Progress,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
@@ -126,7 +126,7 @@ export default function PaymentSplitModal({
   }, [validation, total]);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="lg">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">
@@ -295,6 +295,6 @@ export default function PaymentSplitModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

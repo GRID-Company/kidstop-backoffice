@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -10,6 +9,7 @@ import {
   Button,
   Divider,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 
 import { formatDate } from '@/lib/utils/format-date';
@@ -49,7 +49,7 @@ export default function SetVipModal({
   if (!customer) return null;
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="md">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">
@@ -143,6 +143,6 @@ export default function SetVipModal({
           )}
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

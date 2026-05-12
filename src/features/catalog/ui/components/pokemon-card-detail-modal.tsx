@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -16,6 +15,7 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
@@ -82,7 +82,7 @@ export default function PokemonCardDetailModal({
   const sellPrice = detail?.sellPrice ?? card.sellPrice;
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">{name}</span>
@@ -437,6 +437,6 @@ export default function PokemonCardDetailModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

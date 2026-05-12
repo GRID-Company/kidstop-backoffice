@@ -4,7 +4,6 @@ import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -13,6 +12,7 @@ import {
   Chip,
   Divider,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 
 import { formatUnixDateTime } from '@/lib/utils/format-date';
@@ -40,7 +40,7 @@ export default function MovementDetailDrawer({
   const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="md">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="md">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">Detalle del movimiento</span>
@@ -135,6 +135,6 @@ export default function MovementDetailDrawer({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

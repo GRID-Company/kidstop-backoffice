@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -12,6 +11,7 @@ import {
   ScrollShadow,
   Skeleton,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 
 import Search from '@/shared/base/heorui-overrides/search';
@@ -147,7 +147,7 @@ export default function AddCardModal({
   const { control, formState } = form;
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">
@@ -283,6 +283,6 @@ export default function AddCardModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }
