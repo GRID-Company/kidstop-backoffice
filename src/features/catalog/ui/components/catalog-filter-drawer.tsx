@@ -2,13 +2,13 @@
 
 import { useMemo } from 'react';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
   Button,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import Select from '@/shared/base/heorui-overrides/select';
 import AutocompleteFilter from '@/shared/base/heorui-overrides/autocomplete-filter';
@@ -82,7 +82,7 @@ export default function CatalogFilterDrawer({
   };
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="sm">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} placement="right" size="sm">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">Filtros avanzados</span>
@@ -219,6 +219,6 @@ export default function CatalogFilterDrawer({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

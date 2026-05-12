@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect } from 'react';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -10,6 +9,7 @@ import {
   Button,
   Divider,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
@@ -61,7 +61,7 @@ export default function SellerEditDrawer({
   }, [reset, onClose]);
 
   return (
-    <Drawer isOpen={isOpen} onClose={handleClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={handleClose} size="lg">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">
@@ -134,6 +134,6 @@ export default function SellerEditDrawer({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }
