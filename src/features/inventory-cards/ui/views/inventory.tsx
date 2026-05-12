@@ -12,7 +12,8 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
 import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
-import { Drawer, DrawerContent, DrawerHeader, DrawerBody, Select, SelectItem } from '@heroui/react';
+import { DrawerContent, DrawerHeader, DrawerBody, Select, SelectItem } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
@@ -349,7 +350,7 @@ export default function Inventory() {
         onClose={handleCloseDetailModal}
       />
 
-      <Drawer
+      <KidstopDrawer
         isOpen={isBulkAddDrawerOpen}
         onClose={handleBulkAddCancel}
         size="xl"
@@ -392,7 +393,7 @@ export default function Inventory() {
             />
           </DrawerBody>
         </DrawerContent>
-      </Drawer>
+      </KidstopDrawer>
     </>
   );
 }

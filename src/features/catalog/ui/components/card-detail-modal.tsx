@@ -5,7 +5,6 @@ import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -14,6 +13,7 @@ import {
   Chip,
   Divider,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
@@ -88,7 +88,7 @@ export default function CardDetailModal({
   const totalStock = card.variants.reduce((sum, v) => sum + v.stock, 0);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">{card.name}</span>
@@ -269,6 +269,6 @@ export default function CardDetailModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }

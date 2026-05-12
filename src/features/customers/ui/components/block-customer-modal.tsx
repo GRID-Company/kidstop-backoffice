@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 import {
-  Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerBody,
@@ -11,6 +10,7 @@ import {
   Chip,
   Divider,
 } from '@heroui/react';
+import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
@@ -76,7 +76,7 @@ export default function BlockCustomerModal({
   if (!customer) return null;
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="md">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">
@@ -196,6 +196,6 @@ export default function BlockCustomerModal({
           )}
         </DrawerFooter>
       </DrawerContent>
-    </Drawer>
+    </KidstopDrawer>
   );
 }
