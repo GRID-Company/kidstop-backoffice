@@ -16,7 +16,7 @@ export const useProcessLogin = () => {
 
     setSession({ user: data.user, token: data.access_token });
     await setTokenCookie(data.access_token, data.user.role);
-    router.push('/usuarios');
+    router.push('/catalogo');
   };
 
   return { processLogin };
