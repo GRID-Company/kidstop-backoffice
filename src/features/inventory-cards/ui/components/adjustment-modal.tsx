@@ -23,9 +23,13 @@ import { useQuery } from '@apollo/client/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { CARD_CONDITION_SHORT_LABELS, CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { InventoryItemsDocument } from '@/lib/api/generated/inventory.generated';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
+import { PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
+import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
+import { toPokemonCard, toMagicCard } from '@/features/catalog/adapters/mappers/card.mapper';
+import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { IInventoryItem } from '../../domain/types';
 import { fromApiInventoryItem } from '../../adapters/mappers/inventory.mapper';
 import {
@@ -47,6 +51,8 @@ interface AdjustmentModalProps {
   onSubmit?: (data: InventoryAdjustmentFormData) => void | Promise<void>;
 }
 
+type CatalogCard = IPokemonCard | IMagicCard;
+
 export default function AdjustmentModal({
   item,
   isOpen,
@@ -57,35 +63,100 @@ export default function AdjustmentModal({
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [resolvedItem, setResolvedItem] = useState<IInventoryItem | null>(item);
   const [itemSearch, setItemSearch] = useState('');
+  const [selectedCard, setSelectedCard] = useState<CatalogCard | null>(null);
+  const [selectedCondition, setSelectedCondition] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
       setResolvedItem(item);
       setItemSearch('');
+      setSelectedCard(null);
+      setSelectedCondition('');
     }
   }, [isOpen, item]);
 
-  const { data: searchData, loading: searchLoading } = useQuery(InventoryItemsDocument, {
+  const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
+
+  const { data: pokemonData, loading: pokemonLoading } = useQuery(PokemonCardInternalListDocument, {
     variables: {
-      findInventoryItemsArgs: {
+      findPokemonCardsPublicArgs: {
         skip: 0,
         limit: 6,
         search: itemSearch.trim() || undefined,
-        sort: { column: 'name', order: 'ASC' },
-        filters: { tcg: selectedTCG },
+        sort: { column: 'releaseDate', order: 'DESC' },
+        filters: {},
       },
     },
-    skip: !!resolvedItem || itemSearch.trim().length < 2,
+    skip: !isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
     fetchPolicy: 'network-only',
   });
 
-  const searchResults = useMemo<IInventoryItem[]>(() => {
-    const raw = searchData?.inventoryItems?.data;
-    if (!raw) return [];
-    return raw
-      .filter((i): i is NonNullable<typeof i> => i != null)
-      .map((i) => fromApiInventoryItem(i as Parameters<typeof fromApiInventoryItem>[0]));
-  }, [searchData]);
+  const { data: magicData, loading: magicLoading } = useQuery(MagicCardInternalListDocument, {
+    variables: {
+      findMagicCardsPublicArgs: {
+        skip: 0,
+        limit: 6,
+        search: itemSearch.trim() || undefined,
+        sort: { column: 'releaseDate', order: 'DESC' },
+        filters: {},
+      },
+    },
+    skip: isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
+    fetchPolicy: 'network-only',
+  });
+
+  const searchLoading = isPokemon ? pokemonLoading : magicLoading;
+
+  const searchResults = useMemo<CatalogCard[]>(() => {
+    if (isPokemon) {
+      const raw = pokemonData?.pokemonCardInternalList?.data;
+      if (!raw) return [];
+      return raw
+        .filter((card): card is NonNullable<typeof card> => card != null)
+        .map(toPokemonCard);
+    } else {
+      const raw = magicData?.magicCardInternalList?.data;
+      if (!raw) return [];
+      return raw
+        .filter((card): card is NonNullable<typeof card> => card != null)
+        .map(toMagicCard);
+    }
+  }, [isPokemon, pokemonData, magicData]);
+
+  const handleCardSelect = useCallback((card: CatalogCard) => {
+    setSelectedCard(card);
+    setSelectedCondition('');
+  }, []);
+
+  const handleConditionSelect = useCallback((condition: string) => {
+    if (!selectedCard) return;
+    
+    const variant = selectedCard.variants.find(v => v.condition === condition);
+    const stock = variant?.stock ?? 0;
+    
+    const simulatedItem: IInventoryItem = {
+      guid: variant?.guid ?? '',
+      cardGuid: selectedCard.guid,
+      name: selectedCard.name,
+      setName: 'setName' in selectedCard ? selectedCard.setName ?? '' : selectedCard.edition ?? '',
+      setCode: 'setCode' in selectedCard ? selectedCard.setCode ?? '' : '',
+      number: 'cardNumber' in selectedCard ? selectedCard.cardNumber ?? '' : selectedCard.collectorNumber ?? '',
+      rarity: ('rarity' in selectedCard ? selectedCard.rarity : null) ?? '',
+      imageUrl: selectedCard.imageUri ?? '',
+      tcg: selectedTCG,
+      condition: condition as any,
+      stock,
+      stockStatus: stock > 0 ? 'AVAILABLE' : 'UNAVAILABLE',
+      purchasePrice: variant?.purchasePrice ?? 0,
+      sellPrice: variant?.sellPrice ?? selectedCard.sellPrice ?? 0,
+      lastSellDate: null,
+      avgDaysInInventory: null,
+    };
+    
+    setResolvedItem(simulatedItem);
+    setSelectedCard(null);
+    setSelectedCondition('');
+  }, [selectedCard, selectedTCG]);
 
   const { control, handleSubmit, formState, reset, watch } = useAdjustmentForm();
 
@@ -133,7 +204,7 @@ export default function AdjustmentModal({
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
-          {!resolvedItem ? (
+          {!resolvedItem && !selectedCard ? (
             <div className="flex flex-col gap-4">
               <Input
                 placeholder="Buscar carta por nombre, set o código..."
@@ -153,51 +224,55 @@ export default function AdjustmentModal({
 
               {!searchLoading && itemSearch.trim().length >= 2 && searchResults.length === 0 && (
                 <p className="text-center text-sm text-default-400">
-                  No se encontraron cartas en inventario
+                  No se encontraron cartas en el catálogo
                 </p>
               )}
 
               {searchResults.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  {searchResults.map((result) => (
-                    <button
-                      key={result.guid}
-                      type="button"
-                      onClick={() => setResolvedItem(result)}
-                      className="flex items-center gap-3 rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
-                    >
-                      <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
-                        {result.imageUrl ? (
-                          <img
-                            src={result.imageUrl}
-                            alt={result.name}
-                            className="absolute inset-0 h-full w-full object-contain"
-                          />
-                        ) : (
-                          <Image
-                            src={result.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-                            alt="Card placeholder"
-                            fill
-                            sizes="32px"
-                            className="object-contain"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{result.name}</p>
-                        <p className="truncate text-xs text-default-500">
-                          {result.setName} · #{result.number} · {CARD_CONDITION_SHORT_LABELS[result.condition] ?? result.condition}
-                        </p>
-                      </div>
-                      <Chip
-                        size="sm"
-                        variant="flat"
-                        color={STOCK_STATUS_COLORS[result.stockStatus] ?? 'default'}
+                  {searchResults.map((result) => {
+                    const setName = 'setName' in result ? result.setName : result.edition;
+                    const number = 'cardNumber' in result ? result.cardNumber : result.collectorNumber;
+                    return (
+                      <button
+                        key={result.guid}
+                        type="button"
+                        onClick={() => handleCardSelect(result)}
+                        className="flex items-center gap-3 rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
                       >
-                        {result.stock}
-                      </Chip>
-                    </button>
-                  ))}
+                        <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
+                          {result.imageUri ? (
+                            <img
+                              src={result.imageUri}
+                              alt={result.name}
+                              className="absolute inset-0 h-full w-full object-contain"
+                            />
+                          ) : (
+                            <Image
+                              src={isPokemon ? pokemonCardPlaceholder : magicCardPlaceholder}
+                              alt="Card placeholder"
+                              fill
+                              sizes="32px"
+                              className="object-contain"
+                            />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{result.name}</p>
+                          <p className="truncate text-xs text-default-500">
+                            {setName} · #{number}
+                          </p>
+                        </div>
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          color={result.totalStock > 0 ? 'success' : 'default'}
+                        >
+                          {result.totalStock}
+                        </Chip>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -207,7 +282,71 @@ export default function AdjustmentModal({
                 </p>
               )}
             </div>
-          ) : (
+          ) : selectedCard ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4 rounded-lg bg-default-50 p-4">
+                <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
+                  {selectedCard.imageUri ? (
+                    <img
+                      src={selectedCard.imageUri}
+                      alt={selectedCard.name}
+                      className="absolute inset-0 h-full w-full object-contain"
+                    />
+                  ) : (
+                    <Image
+                      src={isPokemon ? pokemonCardPlaceholder : magicCardPlaceholder}
+                      alt="Card placeholder"
+                      fill
+                      sizes="48px"
+                      className="object-contain"
+                    />
+                  )}
+                </div>
+
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <p className="truncate text-sm font-semibold">{selectedCard.name}</p>
+                  <p className="truncate text-xs text-default-500">
+                    {'setName' in selectedCard ? selectedCard.setName : selectedCard.edition} · #{'cardNumber' in selectedCard ? selectedCard.cardNumber : selectedCard.collectorNumber}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => { setSelectedCard(null); setItemSearch(''); }}
+                  className="self-start text-default-400 hover:text-default-700"
+                  aria-label="Cambiar carta"
+                >
+                  <Icon icon="lucide:x" />
+                </button>
+              </div>
+
+              <Divider />
+
+              <div className="flex flex-col gap-3">
+                <p className="text-sm font-medium">Selecciona la condición</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {CARD_CONDITION_OPTIONS.map((option) => {
+                    const variant = selectedCard.variants.find(v => v.condition === option.value);
+                    const stock = variant?.stock ?? 0;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleConditionSelect(option.value)}
+                        className="flex items-center justify-between rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
+                      >
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">{option.label}</p>
+                          <p className="text-xs text-default-500">Stock: {stock}</p>
+                        </div>
+                        <Icon icon="lucide:chevron-right" className="text-default-400" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : resolvedItem ? (
             <>
               <div className="flex gap-4 rounded-lg bg-default-50 p-4">
                 <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
@@ -252,15 +391,15 @@ export default function AdjustmentModal({
                 </div>
 
                 {!item && (
-                  <button
-                    type="button"
-                    onClick={() => { setResolvedItem(null); setItemSearch(''); }}
-                    className="self-start text-default-400 hover:text-default-700"
-                    aria-label="Cambiar carta"
-                  >
-                    <Icon icon="lucide:x" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => { setResolvedItem(null); setItemSearch(''); }}
+                  className="self-start text-default-400 hover:text-default-700"
+                  aria-label="Cambiar carta"
+                >
+                  <Icon icon="lucide:x" />
+                </button>
+              )}
               </div>
 
               <Divider />
@@ -301,7 +440,7 @@ export default function AdjustmentModal({
                 />
               </form>
             </>
-          )}
+          ) : null}
         </DrawerBody>
 
         <DrawerFooter className="flex justify-between">
