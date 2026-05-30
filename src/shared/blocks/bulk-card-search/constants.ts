@@ -1,0 +1,1 @@
+export const DEFAULT_OFFER_PERCENTAGE = 0.6;

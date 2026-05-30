@@ -1,6 +1,6 @@
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
-import Logo from '@/assets/img/logo-white.png';
+import Logo from '@/assets/img/logo.png';
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -19,7 +19,8 @@ import { PROJECT_VERSION } from '@/lib/consts/version';
 import { UserRole } from '@/lib/auth/user-roles';
 import { useLogout } from '@/lib/auth/use-process-logout';
 import { useAuthStore } from '@/lib/store/auth';
-import BranchSelector from './branch-selector';
+import TcgSelector from '@/shared/base/tcg-selector';
+import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import UserPresenter from './user-presenter';
 
 export default function Topbar({ className }: { className?: string }) {
@@ -37,11 +38,11 @@ export default function Topbar({ className }: { className?: string }) {
   return (
     <>
       <Navbar
-        className={`shadow-none ${className} bg-brand-2 sticky top-0`}
+        className={`shadow-none ${className} sticky top-0 z-40 bg-page-bg/80 backdrop-blur-lg backdrop-saturate-150 border-b border-divider`}
         isBlurred={false}
         classNames={{
           wrapper:
-            'px-4 lg:px-0 h-12 xl:h-22 max-w-full border-b border-white/60',
+            'px-4 lg:px-0 h-12 xl:h-22 max-w-full',
         }}
         isMenuOpen={isMenuOpen}
         onMenuOpenChange={setIsMenuOpen}
@@ -51,27 +52,33 @@ export default function Topbar({ className }: { className?: string }) {
             <h1 className=''>
               <Image
                 src={Logo.src}
-                alt='CANALVI'
+                alt='Kidstop'
                 width={220}
                 height={77}
                 decoding='sync'
+                className='h-8 w-auto xl:h-auto xl:w-[220px]'
               />
             </h1>
           </div>
         </NavbarContent>
 
         <NavbarContent justify='end' className='hidden gap-6 pr-6 xl:flex'>
-          <BranchSelector />
+          <TcgSelector />
           <UserPresenter />
         </NavbarContent>
 
         <NavbarContent justify='end' className='xl:hidden'>
+          <TcgSelector />
           <NavbarMenuToggle
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           />
         </NavbarContent>
 
-        <NavbarMenu className='top-12 px-4 py-8 xl:hidden'>
+        <NavbarMenu className='top-12 !bg-page-bg px-4 py-8 xl:hidden'>
+          <NavbarMenuItem key='tcg-selector' className='mb-2'>
+            <TcgSegmentedSelector />
+          </NavbarMenuItem>
+
           {(MENU_ROUTES?.[role as UserRole] ?? []).map((option, index) => {
             const isActive = pathname.includes(option.route);
             return (

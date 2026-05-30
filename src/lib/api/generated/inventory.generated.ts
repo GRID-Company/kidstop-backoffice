@@ -1,115 +1,146 @@
 import type * as Types from '../schema-types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type GetProfileVariantsQueryVariables = Types.Exact<{
-  findProfilesArgs: Types.FindProfilesArgs;
+export type InventoryItemsQueryVariables = Types.Exact<{
+  findInventoryItemsArgs: Types.FindInventoryItemsArgs;
 }>;
 
-export type GetProfileVariantsQuery = {
-  getProfileVariants: {
+export type InventoryItemsQuery = {
+  inventoryItems: {
     count: number | null;
     data: Array<{
-      createdDate: unknown;
       guid: string;
-      size: number;
-      updatedDate: unknown;
-      stock: Array<{ guid: string; minStock: number; stock: number }> | null;
-      profileGroup: {
-        category: string;
-        color: string;
+      tcg: string;
+      condition: string;
+      stock: number;
+      purchasePrice: number | null;
+      sellPrice: number | null;
+      lastSellDate: unknown | null;
+      avgDaysInInventory: number | null;
+      pokemonCardSummary: {
         guid: string;
         name: string;
-        line: string;
-        price: number;
-        sku: string;
-        supplier: string;
-        createdDate: unknown;
-        updatedDate: unknown;
+        cardNumber: string | null;
+        setName: string | null;
+        setCode: string | null;
+        rarity: string | null;
+        imageUri: string | null;
+      } | null;
+      magicCardSummary: {
+        guid: string;
+        name: string;
+        edition: string | null;
+        collectorNumber: string | null;
+        rarity: string | null;
+        imageUri: string | null;
+        isFoil: boolean;
+      } | null;
+    }> | null;
+  };
+};
+
+export type InventoryMovementsQueryVariables = Types.Exact<{
+  findInventoryMovementsArgs: Types.FindInventoryMovementsArgs;
+}>;
+
+export type InventoryMovementsQuery = {
+  inventoryMovements: {
+    count: number | null;
+    data: Array<{
+      guid: string;
+      movementType: string;
+      quantity: number;
+      reference: string | null;
+      notes: string;
+      createdDate: unknown;
+      createdBy: { name: string | null } | null;
+      inventoryItem: {
+        guid: string;
+        tcg: string;
+        condition: string;
+        stock: number;
+        pokemonCardSummary: {
+          guid: string;
+          name: string;
+          cardNumber: string | null;
+          setName: string | null;
+          setCode: string | null;
+          imageUri: string | null;
+        } | null;
+        magicCardSummary: {
+          guid: string;
+          name: string;
+          edition: string | null;
+          collectorNumber: string | null;
+          imageUri: string | null;
+          isFoil: boolean;
+        } | null;
       };
     }> | null;
   };
 };
 
-export type GetChapesQueryVariables = Types.Exact<{
-  findChapesArgs: Types.FindChapesArgs;
+export type IndicatorsInventoryItemsQueryVariables = Types.Exact<{
+  tcg?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  forceRefresh?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
 }>;
 
-export type GetChapesQuery = {
-  getChapes: {
-    count: number | null;
-    data: Array<{
-      category: string;
-      color: string;
-      createdDate: unknown;
-      guid: string;
-      line: string;
-      name: string;
-      price: number;
-      sku: string;
-      supplier: string;
-      unitMeasure: string;
-      updatedDate: unknown;
-      stock: Array<{ guid: string; minStock: number; stock: number }> | null;
-    }> | null;
+export type IndicatorsInventoryItemsQuery = {
+  indicatorsInventoryItems: {
+    totalStock: number;
+    lastSellDate: unknown | null;
+    avgDaysInInventory: number | null;
+    lastRefresh: unknown;
   };
 };
 
-export type GetGlassesQueryVariables = Types.Exact<{
-  findGlassesArgs: Types.FindGlassesArgs;
+export type CreateInventoryMovementMutationVariables = Types.Exact<{
+  createInventoryMovementInput: Types.CreateInventoryMovementInput;
 }>;
 
-export type GetGlassesQuery = {
-  getGlasses: {
-    count: number | null;
-    data: Array<{
-      category: string;
-      guid: string;
-      name: string;
-      price: number;
-      sku: string;
-      thickness: number;
-      stock: Array<{ minStock: number; stock: number }> | null;
-    }> | null;
+export type CreateInventoryMovementMutation = {
+  createInventoryMovement: {
+    guid: string;
+    movementType: string;
+    quantity: number;
+    reference: string | null;
+    notes: string;
+    createdDate: unknown;
   };
 };
 
-export type CreateProfileMutationVariables = Types.Exact<{
-  createProfileInput: Types.CreateProfileInput;
+export type BulkLoadInventoryMutationVariables = Types.Exact<{
+  input: Types.BulkLoadInventoryInput;
 }>;
 
-export type CreateProfileMutation = { createProfile: { guid: string } };
+export type BulkLoadInventoryMutation = {
+  bulkLoadInventory: {
+    success: boolean;
+    createdCount: number;
+    updatedCount: number;
+    errors: Array<string>;
+  };
+};
 
-export type CreateChapeMutationVariables = Types.Exact<{
-  createChapeInput: Types.CreateChapeInput;
-}>;
-
-export type CreateChapeMutation = { createChape: { guid: string } };
-
-export type CreateGlassMutationVariables = Types.Exact<{
-  createGlassInput: Types.CreateGlassInput;
-}>;
-
-export type CreateGlassMutation = { createGlass: { guid: string } };
-
-export const GetProfileVariantsDocument = {
+export const InventoryItemsDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'GetProfileVariants' },
+      name: { kind: 'Name', value: 'InventoryItems' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'findProfilesArgs' },
+            name: { kind: 'Name', value: 'findInventoryItemsArgs' },
           },
           type: {
             kind: 'NonNullType',
             type: {
               kind: 'NamedType',
-              name: { kind: 'Name', value: 'FindProfilesArgs' },
+              name: { kind: 'Name', value: 'FindInventoryItemsArgs' },
             },
           },
         },
@@ -119,72 +150,55 @@ export const GetProfileVariantsDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'getProfileVariants' },
+            name: { kind: 'Name', value: 'inventoryItems' },
             arguments: [
               {
                 kind: 'Argument',
-                name: { kind: 'Name', value: 'findProfilesArgs' },
+                name: { kind: 'Name', value: 'findInventoryItemsArgs' },
                 value: {
                   kind: 'Variable',
-                  name: { kind: 'Name', value: 'findProfilesArgs' },
+                  name: { kind: 'Name', value: 'findInventoryItemsArgs' },
                 },
               },
             ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'data' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'createdDate' },
-                      },
                       { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'size' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'tcg' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'updatedDate' },
+                        name: { kind: 'Name', value: 'condition' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'purchasePrice' },
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'stock' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'guid' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'minStock' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'stock' },
-                            },
-                          ],
-                        },
+                        name: { kind: 'Name', value: 'sellPrice' },
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'profileGroup' },
+                        name: { kind: 'Name', value: 'lastSellDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'avgDaysInInventory' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'pokemonCardSummary' },
                         selectionSet: {
                           kind: 'SelectionSet',
                           selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'category' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'color' },
-                            },
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'guid' },
@@ -195,123 +209,30 @@ export const GetProfileVariantsDocument = {
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'line' },
+                              name: { kind: 'Name', value: 'cardNumber' },
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'price' },
+                              name: { kind: 'Name', value: 'setName' },
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'sku' },
+                              name: { kind: 'Name', value: 'setCode' },
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'supplier' },
+                              name: { kind: 'Name', value: 'rarity' },
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'createdDate' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'updatedDate' },
+                              name: { kind: 'Name', value: 'imageUri' },
                             },
                           ],
                         },
                       },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  GetProfileVariantsQuery,
-  GetProfileVariantsQueryVariables
->;
-export const GetChapesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetChapes' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'findChapesArgs' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'FindChapesArgs' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'getChapes' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'findChapesArgs' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'findChapesArgs' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'data' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'category' },
-                      },
-                      { kind: 'Field', name: { kind: 'Name', value: 'color' } },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'createdDate' },
-                      },
-                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'line' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'price' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'sku' } },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'supplier' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'unitMeasure' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'updatedDate' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'stock' },
+                        name: { kind: 'Name', value: 'magicCardSummary' },
                         selectionSet: {
                           kind: 'SelectionSet',
                           selections: [
@@ -321,11 +242,27 @@ export const GetChapesDocument = {
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'minStock' },
+                              name: { kind: 'Name', value: 'name' },
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'stock' },
+                              name: { kind: 'Name', value: 'edition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'collectorNumber' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rarity' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'imageUri' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'isFoil' },
                             },
                           ],
                         },
@@ -333,6 +270,7 @@ export const GetChapesDocument = {
                     ],
                   },
                 },
+                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
               ],
             },
           },
@@ -340,26 +278,26 @@ export const GetChapesDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<GetChapesQuery, GetChapesQueryVariables>;
-export const GetGlassesDocument = {
+} as unknown as DocumentNode<InventoryItemsQuery, InventoryItemsQueryVariables>;
+export const InventoryMovementsDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'query',
-      name: { kind: 'Name', value: 'GetGlasses' },
+      name: { kind: 'Name', value: 'InventoryMovements' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'findGlassesArgs' },
+            name: { kind: 'Name', value: 'findInventoryMovementsArgs' },
           },
           type: {
             kind: 'NonNullType',
             type: {
               kind: 'NamedType',
-              name: { kind: 'Name', value: 'FindGlassesArgs' },
+              name: { kind: 'Name', value: 'FindInventoryMovementsArgs' },
             },
           },
         },
@@ -369,52 +307,150 @@ export const GetGlassesDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'getGlasses' },
+            name: { kind: 'Name', value: 'inventoryMovements' },
             arguments: [
               {
                 kind: 'Argument',
-                name: { kind: 'Name', value: 'findGlassesArgs' },
+                name: { kind: 'Name', value: 'findInventoryMovementsArgs' },
                 value: {
                   kind: 'Variable',
-                  name: { kind: 'Name', value: 'findGlassesArgs' },
+                  name: { kind: 'Name', value: 'findInventoryMovementsArgs' },
                 },
               },
             ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'data' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'category' },
-                      },
                       { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'price' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'sku' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'thickness' },
+                        name: { kind: 'Name', value: 'movementType' },
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'stock' },
+                        name: { kind: 'Name', value: 'quantity' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'reference' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdBy' },
                         selectionSet: {
                           kind: 'SelectionSet',
                           selections: [
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'minStock' },
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'inventoryItem' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'tcg' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'condition' },
                             },
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'stock' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'pokemonCardSummary',
+                              },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'guid' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'name' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'cardNumber' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'setName' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'setCode' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'imageUri' },
+                                  },
+                                ],
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'magicCardSummary' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'guid' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'name' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'edition' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'collectorNumber',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'imageUri' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'isFoil' },
+                                  },
+                                ],
+                              },
                             },
                           ],
                         },
@@ -422,57 +458,7 @@ export const GetGlassesDocument = {
                     ],
                   },
                 },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetGlassesQuery, GetGlassesQueryVariables>;
-export const CreateProfileDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateProfile' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'createProfileInput' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreateProfileInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'createProfile' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'createProfileInput' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'createProfileInput' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
               ],
             },
           },
@@ -481,28 +467,98 @@ export const CreateProfileDocument = {
     },
   ],
 } as unknown as DocumentNode<
-  CreateProfileMutation,
-  CreateProfileMutationVariables
+  InventoryMovementsQuery,
+  InventoryMovementsQueryVariables
 >;
-export const CreateChapeDocument = {
+export const IndicatorsInventoryItemsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'IndicatorsInventoryItems' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'tcg' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'forceRefresh' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Boolean' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'indicatorsInventoryItems' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'tcg' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'tcg' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'forceRefresh' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'forceRefresh' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'totalStock' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'lastSellDate' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'avgDaysInInventory' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'lastRefresh' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  IndicatorsInventoryItemsQuery,
+  IndicatorsInventoryItemsQueryVariables
+>;
+export const CreateInventoryMovementDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateChape' },
+      name: { kind: 'Name', value: 'CreateInventoryMovement' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'createChapeInput' },
+            name: { kind: 'Name', value: 'createInventoryMovementInput' },
           },
           type: {
             kind: 'NonNullType',
             type: {
               kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreateChapeInput' },
+              name: { kind: 'Name', value: 'CreateInventoryMovementInput' },
             },
           },
         },
@@ -512,14 +568,14 @@ export const CreateChapeDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'createChape' },
+            name: { kind: 'Name', value: 'createInventoryMovement' },
             arguments: [
               {
                 kind: 'Argument',
-                name: { kind: 'Name', value: 'createChapeInput' },
+                name: { kind: 'Name', value: 'createInventoryMovementInput' },
                 value: {
                   kind: 'Variable',
-                  name: { kind: 'Name', value: 'createChapeInput' },
+                  name: { kind: 'Name', value: 'createInventoryMovementInput' },
                 },
               },
             ],
@@ -527,6 +583,14 @@ export const CreateChapeDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'movementType' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'reference' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
               ],
             },
           },
@@ -534,26 +598,29 @@ export const CreateChapeDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<CreateChapeMutation, CreateChapeMutationVariables>;
-export const CreateGlassDocument = {
+} as unknown as DocumentNode<
+  CreateInventoryMovementMutation,
+  CreateInventoryMovementMutationVariables
+>;
+export const BulkLoadInventoryDocument = {
   kind: 'Document',
   definitions: [
     {
       kind: 'OperationDefinition',
       operation: 'mutation',
-      name: { kind: 'Name', value: 'CreateGlass' },
+      name: { kind: 'Name', value: 'BulkLoadInventory' },
       variableDefinitions: [
         {
           kind: 'VariableDefinition',
           variable: {
             kind: 'Variable',
-            name: { kind: 'Name', value: 'createGlassInput' },
+            name: { kind: 'Name', value: 'input' },
           },
           type: {
             kind: 'NonNullType',
             type: {
               kind: 'NamedType',
-              name: { kind: 'Name', value: 'CreateGlassInput' },
+              name: { kind: 'Name', value: 'BulkLoadInventoryInput' },
             },
           },
         },
@@ -563,21 +630,30 @@ export const CreateGlassDocument = {
         selections: [
           {
             kind: 'Field',
-            name: { kind: 'Name', value: 'createGlass' },
+            name: { kind: 'Name', value: 'bulkLoadInventory' },
             arguments: [
               {
                 kind: 'Argument',
-                name: { kind: 'Name', value: 'createGlassInput' },
+                name: { kind: 'Name', value: 'input' },
                 value: {
                   kind: 'Variable',
-                  name: { kind: 'Name', value: 'createGlassInput' },
+                  name: { kind: 'Name', value: 'input' },
                 },
               },
             ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'createdCount' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'updatedCount' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'errors' } },
               ],
             },
           },
@@ -585,4 +661,7 @@ export const CreateGlassDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<CreateGlassMutation, CreateGlassMutationVariables>;
+} as unknown as DocumentNode<
+  BulkLoadInventoryMutation,
+  BulkLoadInventoryMutationVariables
+>;

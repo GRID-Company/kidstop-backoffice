@@ -1,0 +1,62 @@
+import { z } from 'zod';
+import { CARD_CONDITIONS } from '../../domain/constants';
+import { PURCHASE_STATUS, PAYMENT_METHOD } from '../../domain/types';
+
+const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string[]];
+const paymentMethodValues = Object.values(PAYMENT_METHOD) as [string, ...string[]];
+
+const purchaseItemSchema = z.object({
+  cardGuid: z.string().min(1, 'La carta es obligatoria'),
+  cardName: z.string().min(1, 'El nombre es obligatorio'),
+  cardImageUrl: z.string(),
+  setName: z.string(),
+  setCode: z.string(),
+  condition: z.enum(cardConditionValues, {
+    message: 'La condición es obligatoria',
+  }),
+  quantity: z.coerce
+    .number()
+    .int()
+    .refine(val => val === 0 || val >= 1, {
+      message: 'La cantidad debe ser al menos 1',
+    }),
+  offerPrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0, {
+      message: 'El precio de compra debe ser mayor o igual a 0',
+    }),
+  referencePrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0, {
+      message: 'El precio debe ser mayor o igual a 0',
+    })
+    .optional(),
+  sellPrice: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0, {
+      message: 'El precio debe ser mayor o igual a 0',
+    })
+    .optional(),
+});
+
+const paymentDetailSchema = z.object({
+  method: z.enum(paymentMethodValues, {
+    message: 'El método de pago es obligatorio',
+  }),
+  amount: z.coerce
+    .number()
+    .refine(val => val === 0 || val >= 0.01, {
+      message: 'El monto debe ser mayor a 0',
+    }),
+});
+
+export const purchaseFormSchema = z.object({
+  sellerGuid: z.string().min(1, 'El vendedor es obligatorio'),
+  items: z.array(purchaseItemSchema).min(1, 'Debe agregar al menos una carta'),
+  payments: z.array(paymentDetailSchema).optional(),
+  notes: z.string().optional(),
+});
+
+export type PurchaseFormData = z.infer<typeof purchaseFormSchema>;
+export type PurchaseItemFormData = z.infer<typeof purchaseItemSchema>;
+export type PaymentDetailFormData = z.infer<typeof paymentDetailSchema>;

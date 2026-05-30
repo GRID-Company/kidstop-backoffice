@@ -1,0 +1,114 @@
+query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) {
+  magicCardInternalList(findMagicCardsPublicArgs: $findMagicCardsPublicArgs) {
+    data {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+    }
+    count
+  }
+}
+
+query MagicCardInternalDetail($guid: String!) {
+  magicCardInternalDetail(guid: $guid) {
+    guid
+    name
+    edition
+    collectorNumber
+    isFoil
+    rarity
+    sellPrice
+    totalStock
+    imageUri
+    inventoryCards {
+      guid
+      condition
+      stock
+      purchasePrice
+      sellPrice
+    }
+  }
+}
+
+query MagicCardCollections {
+  magicCardCollections {
+    guid
+    name
+    editionIconUri
+  }
+}
+
+query MagicCardRarities {
+  magicCardRarities
+}
+
+query MagicCardWithMetrics($guid: String!) {
+  magicCardWithMetrics(guid: $guid) {
+    variantsMetrics {
+      condition
+      stock
+      lastSellDate
+      avgDaysInInventory
+      wishlistCount
+    }
+    priceRetail
+    priceBuy
+  }
+}
+
+query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
+  magicBatchCardSearch(input: $input) {
+    results {
+    originalLine
+    parsedQuantity
+    parsedName
+    parsedSet
+    parsedNumber
+    bestMatch {
+      guid
+      name
+      edition
+      collectorNumber
+      imageUri
+      isFoil
+      sellPrice
+      totalStock
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        priceRetail
+        priceBuy
+      }
+    }
+    relatedCards {
+      guid
+      name
+      edition
+      collectorNumber
+      imageUri
+      isFoil
+      sellPrice
+      totalStock
+    }
+    error
+    }
+  }
+}

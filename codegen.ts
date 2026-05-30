@@ -1,10 +1,14 @@
+import 'dotenv/config';
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   overwrite: true,
   schema: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'https://your-api.com/graphql',
 
-  documents: ['src/lib/api/graphql/**/*.{graphql,gql}'],
+  documents: [
+    'src/lib/api/graphql/**/*.{graphql,gql}',
+    'src/shared/blocks/**/api/**/*.{graphql,gql}',
+  ],
 
   generates: {
     'src/lib/api/schema-types.ts': {

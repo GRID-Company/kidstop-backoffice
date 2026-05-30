@@ -1,7 +1,7 @@
 import { UploadFileDocument } from '@/lib/api/generated/files.generated';
 import { ERROR_MESSAGES } from '@/lib/consts/error-messages';
 import { FileCategory, FileType } from '@/lib/types/file.types';
-import CanalviButton from '@/shared/base/heorui-overrides/button';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
@@ -62,7 +62,7 @@ export default function UploadImageButton({
         accept='image/*'
       />
 
-      <CanalviButton
+      <KidstopButton
         size='sm'
         variant='bordered'
         isLoading={loading}
@@ -70,7 +70,7 @@ export default function UploadImageButton({
         onPress={handleButtonClick}
       >
         Seleccionar
-      </CanalviButton>
+      </KidstopButton>
     </>
   );
 }

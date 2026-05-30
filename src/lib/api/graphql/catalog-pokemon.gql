@@ -1,0 +1,183 @@
+query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
+  pokemonCardInternalList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+    data {
+      guid
+      name
+      cardNumber
+      setName
+      setCode
+      variant
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      moreImages {
+        resolution
+        imageUrl
+      }
+      releaseDate
+      type
+      hp
+      stage
+      cardText
+      artist
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+    }
+    count
+  }
+}
+
+query PokemonCardInternalDetail($guid: String!) {
+  pokemonCardInternalDetail(guid: $guid) {
+    guid
+    name
+    cardNumber
+    rarity
+    variant
+    setName
+    setCode
+    sellPrice
+    totalStock
+    imageUri
+    moreImages {
+      resolution
+      imageUrl
+    }
+    releaseDate
+    type
+    hp
+    stage
+    cardText
+    artist
+    inventoryCards {
+      guid
+      condition
+      stock
+      purchasePrice
+      sellPrice
+    }
+  }
+}
+
+query PokemonCardCollections {
+  pokemonCardCollections {
+    guid
+    name
+    code
+  }
+}
+
+query PokemonCardRarities {
+  pokemonCardRarities
+}
+
+query PokemonCardVariants {
+  pokemonCardVariants
+}
+
+query PokemonCardGenres {
+  pokemonCardGenres
+}
+
+mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
+  updateInventoryItemPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+    guid
+    purchasePrice
+    sellPrice
+  }
+}
+
+query PokemonCardWithMetrics($guid: String!) {
+  pokemonCardWithMetrics(guid: $guid) {
+    variantsMetrics {
+      condition
+      stock
+      lastSellDate
+      avgDaysInInventory
+      wishlistCount
+    }
+    ungradedPrice
+    gradedPriceSeven
+    gradedPriceEightOrAbove
+  }
+}
+
+query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
+  pokemonBatchCardSearch(input: $input) {
+    results {
+      originalLine
+      parsedQuantity
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        cardNumber
+        setName
+        setCode
+        variant
+        imageUri
+        moreImages {
+          resolution
+          imageUrl
+        }
+        sellPrice
+        totalStock
+        availableStock
+        releaseDate
+        type
+        hp
+        stage
+        cardText
+        artist
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
+        }
+      }
+    relatedCards {
+      guid
+      name
+      cardNumber
+      setName
+      setCode
+      variant
+      imageUri
+      sellPrice
+      totalStock
+      availableStock
+      type
+      hp
+      stage
+      cardMetrics {
+        variantsMetrics {
+          condition
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
+      }
+      error
+    }
+  }
+}

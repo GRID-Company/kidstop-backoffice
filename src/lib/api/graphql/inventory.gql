@@ -1,88 +1,101 @@
-query GetProfileVariants($findProfilesArgs: FindProfilesArgs!) {
-  getProfileVariants(findProfilesArgs: $findProfilesArgs) {
-    count
+query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
+  inventoryItems(findInventoryItemsArgs: $findInventoryItemsArgs) {
     data {
-      createdDate
       guid
-      size
-      updatedDate
-      stock {
-        guid
-        minStock
-        stock
-      }
-      profileGroup {
-        category
-        color
+      tcg
+      condition
+      stock
+      purchasePrice
+      sellPrice
+      lastSellDate
+      avgDaysInInventory
+      pokemonCardSummary {
         guid
         name
-        line
-        price
-        sku
-        supplier
-        createdDate
-        updatedDate
+        cardNumber
+        setName
+        setCode
+        rarity
+        imageUri
       }
-    }
-  }
-}
-
-query GetChapes($findChapesArgs: FindChapesArgs!) {
-  getChapes(findChapesArgs: $findChapesArgs) {
-    count
-    data {
-      category
-      color
-      createdDate
-      guid
-      line
-      name
-      price
-      sku
-      supplier
-      unitMeasure
-      updatedDate
-      stock {
+      magicCardSummary {
         guid
-        minStock
-        stock
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
       }
     }
-  }
-}
-
-query GetGlasses($findGlassesArgs: FindGlassesArgs!) {
-  getGlasses(findGlassesArgs: $findGlassesArgs) {
     count
+  }
+}
+
+query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs!) {
+  inventoryMovements(findInventoryMovementsArgs: $findInventoryMovementsArgs) {
     data {
-      category
       guid
-      name
-      price
-      sku
-      thickness
-      stock {
-        minStock
+      movementType
+      quantity
+      reference
+      notes
+      createdDate
+      createdBy {
+        name
+      }
+      inventoryItem {
+        guid
+        tcg
+        condition
         stock
+        pokemonCardSummary {
+          guid
+          name
+          cardNumber
+          setName
+          setCode
+          imageUri
+        }
+        magicCardSummary {
+          guid
+          name
+          edition
+          collectorNumber
+          imageUri
+          isFoil
+        }
       }
     }
+    count
   }
 }
 
-mutation CreateProfile($createProfileInput: CreateProfileInput!) {
-  createProfile(createProfileInput: $createProfileInput) {
-    guid
+query IndicatorsInventoryItems($tcg: String, $forceRefresh: Boolean) {
+  indicatorsInventoryItems(tcg: $tcg, forceRefresh: $forceRefresh) {
+    totalStock
+    lastSellDate
+    avgDaysInInventory
+    lastRefresh
   }
 }
 
-mutation CreateChape($createChapeInput: CreateChapeInput!) {
-  createChape(createChapeInput: $createChapeInput) {
+mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryMovementInput!) {
+  createInventoryMovement(createInventoryMovementInput: $createInventoryMovementInput) {
     guid
+    movementType
+    quantity
+    reference
+    notes
+    createdDate
   }
 }
 
-mutation CreateGlass($createGlassInput: CreateGlassInput!) {
-  createGlass(createGlassInput: $createGlassInput) {
-    guid
+mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
+  bulkLoadInventory(input: $input) {
+    success
+    createdCount
+    updatedCount
+    errors
   }
 }

@@ -5,7 +5,7 @@ import {
   InMemoryCache,
 } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react';
-import { useMemo, PropsWithChildren } from 'react';
+import { useMemo, useRef, PropsWithChildren } from 'react';
 import { SetContextLink } from '@apollo/client/link/context';
 import { ErrorLink } from '@apollo/client/link/error';
 import { RemoveTypenameFromVariablesLink } from '@apollo/client/link/remove-typename';
@@ -16,6 +16,7 @@ import { useLogout } from '@/lib/auth/use-process-logout';
 export default function ApolloClientProvider({ children }: PropsWithChildren) {
   const token = useAuthStore((state) => state.token);
   const { logout } = useLogout();
+  const redirectRef = useRef(false);
 
   const client = useMemo(() => {
     const authLink = new SetContextLink(({ headers }) => {
@@ -30,13 +31,18 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
 
     const errorLink = new ErrorLink(({ error, operation }) => {
       if (CombinedGraphQLErrors.is(error)) {
+        const code = error.extensions?.code;
+        const message = error.message;
         const isAuthError =
-          error.extensions?.code === 'UNAUTHENTICATED' ||
-          error.extensions?.code === 'FORBIDDEN' ||
-          error.extensions?.code === 401;
+          code === 'UNAUTHENTICATED' ||
+          code === 'FORBIDDEN' ||
+          code === 401 ||
+          message === 'Unauthorized';
 
-        if (isAuthError && !window.location.href.includes('/login')) {
-          logout();
+        if (isAuthError && !redirectRef.current && !window.location.href.includes('/login')) {
+          redirectRef.current = true;
+          logout('Sesión expirada. Por favor inicia sesión nuevamente.', false);
+          window.location.href = '/login';
         }
       }
     });

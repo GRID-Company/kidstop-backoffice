@@ -1,14 +1,14 @@
 import { extendVariants, Table } from '@heroui/react';
 
-export const CanalviTable: any = extendVariants(Table, {
+export const KidstopTable: any = extendVariants(Table, {
   variants: {
     color: {
       default: {
-        base: ['h-full', 'bg-transarent'],
-        wrapper: ['p-0', 'bg-transarent', 'rounded-none'],
-        thead: ['h-[55px] uppercase'],
-        th: [],
-        tbody: [, 'rounded-xl', 'overflow-hidden'],
+        base: ['h-full', 'bg-transparent'],
+        wrapper: ['p-0', 'bg-transparent', 'rounded-none'],
+        thead: ['h-[55px]', 'uppercase', 'rounded-t-lg'],
+        th: ['!text-white', '!font-semibold', '!bg-accent'],
+        tbody: ['rounded-xl', 'overflow-hidden'],
         tr: [
           'border-b-2',
           'border-[#F5F6F8]',

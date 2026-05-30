@@ -5,9 +5,10 @@
  * This script ONLY reads data, it does NOT modify anything
  */
 
-const ClickUpAPI = require('./clickup-api');
+import ClickUpAPI from './clickup-api.js';
+import dotenv from 'dotenv';
 
-require('dotenv').config();
+dotenv.config();
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -240,8 +241,8 @@ async function testConnection() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   testConnection();
 }
 
-module.exports = testConnection;
+export default testConnection;

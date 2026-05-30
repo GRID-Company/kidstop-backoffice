@@ -9,7 +9,7 @@ import {
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { ISelectOption } from '../heorui-overrides/select';
 import { AutocompleteProps } from '@heroui/react';
-import CanalviAutocomplete from '../heorui-overrides/autocomplete';
+import KidstopAutocomplete from '../heorui-overrides/autocomplete';
 import { ControlWithFormProps } from '@/lib/types/controller.types';
 
 function BaseFormAutocomplete({
@@ -77,7 +77,7 @@ function BaseFormAutocomplete({
   };
 
   return (
-    <CanalviAutocomplete
+    <KidstopAutocomplete
       {...autocompleteProps}
       items={items}
       isInvalid={invalid}

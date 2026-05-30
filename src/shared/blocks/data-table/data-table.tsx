@@ -9,7 +9,7 @@ import {
   TableProps,
   TableRow,
 } from '@heroui/react';
-import { CanalviTable } from '@/shared/base/heorui-overrides/table';
+import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 
 type DataTableProps = {
@@ -19,6 +19,8 @@ type DataTableProps = {
   selectable?: boolean;
   setSelectedKeys?: (selected: any[]) => void;
   selectedKeys?: Set<string>;
+  rowClickable?: boolean;
+  onRowClick?: (item: any) => void;
 } & Partial<TableProps>;
 
 export function DataTable({
@@ -28,10 +30,12 @@ export function DataTable({
   selectable = false,
   setSelectedKeys,
   selectedKeys,
+  rowClickable = false,
+  onRowClick,
   ...tableProps
 }: PropsWithChildren<DataTableProps>) {
   return (
-    <CanalviTable
+    <KidstopTable
       {...tableProps}
       aria-label='Tabla'
       className='animate-in fade-in'
@@ -69,7 +73,11 @@ export function DataTable({
         }
       >
         {(item) => (
-          <TableRow key={item.guid ?? '-'}>
+          <TableRow 
+            key={item.guid ?? item.id ?? item.key}
+            className={rowClickable ? 'cursor-pointer hover:bg-[#F5F9FF] transition-colors duration-150' : ''}
+            onClick={rowClickable && onRowClick ? () => onRowClick(item) : undefined}
+          >
             {cols.map((col: ITableColumn) => (
               <TableCell
                 key={col.key}
@@ -83,6 +91,6 @@ export function DataTable({
           </TableRow>
         )}
       </TableBody>
-    </CanalviTable>
+    </KidstopTable>
   );
 }

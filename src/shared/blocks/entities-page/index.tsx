@@ -10,7 +10,7 @@ type ToolbarProps = Props & {
   label: string;
 };
 
-type EntitiesPageCompound = React.FC<any> & {
+type EntitiesPageCompound = React.FC<Props> & {
   Title: typeof Title;
   CardContainer: typeof CardContainer;
   Toolbar: React.FC<ToolbarProps>;
@@ -33,18 +33,16 @@ EntitiesPage.Toolbar = function Toolbar({
 }: ToolbarProps) {
   return (
     <div
-      className={`mb-6 flex items-center justify-between gap-2 px-4 ${className}`}
+      className={`w-full mb-6 flex items-center justify-between gap-2 px-4 ${className}`}
     >
-      <EntitiesPage.FlexRow>
-        <EntitiesPage.Title label={label} />
-      </EntitiesPage.FlexRow>
-      <EntitiesPage.FlexRow>{children}</EntitiesPage.FlexRow>
+      {label && (
+        <EntitiesPage.FlexRow>
+          <EntitiesPage.Title label={label} />
+        </EntitiesPage.FlexRow>
+      )}
+      {children}
     </div>
   );
-};
-
-EntitiesPage.FlexRow = function FlexRow({ children }: Props) {
-  return <div className='flex items-center gap-4'>{children}</div>;
 };
 
 export { EntitiesPage };

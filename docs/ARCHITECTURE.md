@@ -1,12 +1,13 @@
 # Architecture Documentation
 
-Documentación completa de la arquitectura del GRID Frontend Template.
+Documentación de la arquitectura del **Kidstop Backoffice** — panel administrativo de Kidstop Singles Platform.
 
 ## Tabla de Contenidos
 
 - [Visión General](#visión-general)
 - [Stack Tecnológico](#stack-tecnológico)
 - [Arquitectura Feature-First](#arquitectura-feature-first)
+- [Módulos del Sistema](#módulos-del-sistema)
 - [Estructura de Capas](#estructura-de-capas)
 - [Patrones de Código](#patrones-de-código)
 - [Convenciones](#convenciones)
@@ -16,7 +17,9 @@ Documentación completa de la arquitectura del GRID Frontend Template.
 
 ## Visión General
 
-Este proyecto implementa una arquitectura **Feature-First** con separación clara de responsabilidades en tres capas principales: **Adapters**, **Domain** y **UI**.
+Panel administrativo web para operar compras de singles, administración de inventario y procesos de venta de cartas de **Pokémon TCG** y **Magic: The Gathering**, con roles **Administrador**, **Recepción** y **Comprador**.
+
+El proyecto implementa una arquitectura **Feature-First** con separación clara de responsabilidades en tres capas principales: **Adapters**, **Domain** y **UI**.
 
 ### Principios Fundamentales
 
@@ -30,34 +33,41 @@ Este proyecto implementa una arquitectura **Feature-First** con separación clar
 
 ### Core
 
-- **Next.js 16** - Framework React con App Router
-- **React 19** - Biblioteca UI con Server Components
-- **TypeScript 5** - Tipado estático
-- **Tailwind CSS 4** - Utility-first CSS framework
+- **Next.js 16** — Framework React con App Router
+- **React 19** — Biblioteca UI con Server Components
+- **TypeScript 5** — Tipado estático
+- **Tailwind CSS 4** — Utility-first CSS framework
 
 ### UI Components
 
-- **HeroUI 2.8+** - Componentes UI base
-- **Framer Motion** - Animaciones
-- **React Hook Form** - Gestión de formularios
-- **Zod** - Validación de schemas
+- **HeroUI 2.8+** — Componentes UI base
+- **Framer Motion** — Animaciones
+- **React Hook Form** — Gestión de formularios
+- **Zod** — Validación de schemas
+- **@iconify/react** — Iconos (Lucide, Material Design, etc.)
 
 ### State Management
 
-- **Zustand** - State management global
-- **RxJS** - Programación reactiva
+- **Zustand** — State management global (auth, TCG context, privacy mode)
 
 ### API & Data
 
-- **Apollo Client** - Cliente GraphQL
-- **GraphQL Codegen** - Generación automática de tipos
-- **Apollo Upload Client** - Upload de archivos
+- **Apollo Client 4** — Cliente GraphQL
+- **GraphQL Codegen** — Generación automática de tipos desde el schema del backend
+- **Apollo Upload Client** — Upload de archivos
+
+### Utilidades
+
+- **dayjs** — Manipulación de fechas
+- **jspdf** — Generación de PDF (picking list)
+- **@dnd-kit** — Drag & drop (Most Wanted)
+- **react-hot-toast** — Notificaciones toast
 
 ### Development
 
-- **ESLint** - Linting
-- **Prettier** - Formateo de código
-- **TypeScript ESLint** - Reglas TypeScript
+- **ESLint** — Linting con reglas TypeScript
+- **Prettier** — Formateo de código con plugin Tailwind
+- **eslint-plugin-unused-imports** — Limpieza de imports
 
 ## Arquitectura Feature-First
 
@@ -65,27 +75,80 @@ Este proyecto implementa una arquitectura **Feature-First** con separación clar
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── (authenticated)/   # Rutas protegidas
-│   ├── (not-authenticated)/ # Rutas públicas
-│   └── api/               # API routes
-├── features/              # Features del negocio
-│   ├── auth/
-│   ├── inventory/
-│   └── windows/
-├── lib/                   # Utilidades y configuración
-│   ├── api/              # GraphQL setup
-│   ├── auth/             # Autenticación
-│   ├── consts/           # Constantes globales
-│   ├── store/            # Zustand stores
-│   ├── types/            # Tipos globales
-│   └── utils/            # Utilidades
-└── shared/               # Componentes compartidos
-    ├── base/             # Componentes base
-    ├── blocks/           # Bloques compuestos
-    ├── layouts/          # Layouts
-    └── providers/        # Providers
+├── app/                        # Next.js App Router
+│   ├── (authenticated)/        # Rutas protegidas
+│   │   ├── catalogo/
+│   │   ├── compras/
+│   │   ├── ventas/
+│   │   ├── inventario-cartas/
+│   │   ├── clientes/
+│   │   ├── usuarios/
+│   │   ├── most-wanted/
+│   │   ├── configuracion/
+│   │   └── deck-builder/
+│   ├── (not-authenticated)/    # Rutas públicas
+│   │   └── login/
+│   └── api/                    # API routes (login/logout cookies)
+├── features/                   # Features del negocio
+│   ├── login/                  # Autenticación
+│   ├── users/                  # Gestión de usuarios internos
+│   ├── catalog/                # Catálogo de cartas
+│   ├── purchases/              # Compras (buylist/negociación)
+│   ├── inventory-cards/        # Inventario y movimientos
+│   ├── sales/                  # Ventas/pedidos
+│   ├── customers/              # Gestión de clientes
+│   ├── most-wanted/            # Most Wanted (config + preview)
+│   └── settings/               # Configuración global
+├── lib/                        # Utilidades y configuración
+│   ├── api/                    # Apollo Client + GraphQL codegen
+│   │   ├── graphql/            # Archivos .gql (queries/mutations)
+│   │   ├── generated/          # Tipos auto-generados por codegen
+│   │   └── schema-types.ts     # Tipos del schema GraphQL
+│   ├── auth/                   # Hooks de autenticación
+│   ├── consts/                 # Constantes globales
+│   ├── hooks/                  # Hooks globales
+│   ├── store/                  # Zustand stores
+│   ├── types/                  # Tipos globales compartidos
+│   └── utils/                  # Utilidades
+└── shared/                     # Componentes compartidos
+    ├── base/                   # Componentes base (buttons, search, card, skeleton)
+    ├── blocks/                 # Bloques compuestos (EntitiesPage, DataTable)
+    ├── layouts/                # Layouts (sidebar, authenticated layout)
+    └── providers/              # Providers (Apollo, HeroUI)
 ```
+
+## Módulos del Sistema
+
+### login
+Autenticación con email/contraseña, manejo de sesión via cookies y recuperación de contraseña.
+
+### users
+CRUD de usuarios internos del backoffice. Roles: Administrador, Recepción, Comprador. Activar/desactivar usuarios.
+
+### catalog
+Búsqueda y consulta de cartas singles con contexto TCG (Pokémon/Magic). Catálogo interno con respaldo de proveedores externos (Price Charting, Card Kingdom). Configuración de precio de venta al público. Incluye buscador avanzado (deck builder) para importar listas de cartas.
+
+### purchases
+Flujo de compra de singles: Draft → Cotizado → Esperando precio → Finalizado / Rechazado. Incluye búsqueda con métricas operativas, control de presupuesto por comprador, envío de cotización por WhatsApp, modo privacidad y registro de pago.
+
+### inventory-cards
+Control de stock por Carta + Variante + Condición. Registro de movimientos (entrada por compra, salida por venta, ajuste manual). Historial con filtros. Métricas: última venta, tiempo promedio en inventario.
+
+### sales
+Gestión de pedidos originados en la Carpeta Digital. Estados: Nuevo → En surtido → Listo para recolección → Completado / Cancelado. Generación de PDF (picking list), notificación por email, código de venta para Shopify.
+
+### customers
+Gestión de clientes con clasificación VIP, bloqueos por pedidos no concretados y validación de ubicación. Historial de pedidos por cliente.
+
+### most-wanted
+Configuración de páginas públicas "Most Wanted" por TCG. Agregar/quitar/ordenar cartas con drag & drop. Preview en tiempo real.
+
+### settings
+Configuración global: geofence, umbrales de bloqueo, presupuestos por comprador, límites de inventario, horarios de operación.
+
+### Estado Actual de Integración
+
+Todos los features de Kidstop operan actualmente con **datos mock** (`*.mock.ts`). El feature `windows` (heredado del template base) es el único con integración Apollo real y sirve como referencia del patrón. Ver `docs/MOCK_TO_APOLLO_MIGRATION.md` para la guía de migración.
 
 ### Feature Structure
 
@@ -582,34 +645,29 @@ const [selectedId, setSelectedId] = useState<string | null>(null);
 
 ### Global State (Zustand)
 
-Para estado compartido entre componentes:
+Tres stores globales con persistencia:
 
+**auth.ts** — Sesión del usuario (user, token, role):
 ```typescript
-// lib/store/auth.ts
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  setUser: (user: User) => void;
-  logout: () => void;
-}
+const { user, token, setSession, clearSession } = useAuthStore();
+```
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token: null,
-  setUser: (user) => set({ user }),
-  logout: () => set({ user: null, token: null }),
-}));
+**selected-tcg.ts** — Contexto de juego activo (Pokémon/Magic):
+```typescript
+const { selectedTCG, setTCG } = useSelectedTCGStore();
+```
 
-// Uso
-const { user, setUser } = useAuthStore();
+**privacy-mode.ts** — Modo privacidad en compras:
+```typescript
+const { isPrivacyMode, togglePrivacyMode } = usePrivacyModeStore();
 ```
 
 ### Server State (Apollo Client)
 
-Para datos del servidor:
+Para datos del servidor (actualmente en migración de mocks a Apollo):
 
 ```typescript
-const { data, loading, error, refetch } = useQuery(GET_INVENTORIES, {
+const { data, loading, error, refetch } = useQuery(DocumentNode, {
   variables: { args },
   fetchPolicy: 'cache-and-network',
 });
@@ -782,13 +840,19 @@ Para listas largas, usar virtualización.
 - Validar en cliente (Zod)
 - Validar en servidor (siempre)
 
-## Deployment
+## Documentación Relacionada
 
-Ver `docs/DEPLOYMENT.md` para guía completa de deployment.
+- [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) — Contexto del proyecto, glosario, roles y módulos
+- [BACKEND_SPEC.md](BACKEND_SPEC.md) — Especificación GraphQL del backend (NestJS)
+- [MOCK_TO_APOLLO_MIGRATION.md](MOCK_TO_APOLLO_MIGRATION.md) — Guía de migración mock → Apollo
+- [CARPETA_DIGITAL_TEMPLATE.md](CARPETA_DIGITAL_TEMPLATE.md) — Template para el repo de la Carpeta Digital
+- [KSP - Alcance y requerimientos del MVP.md](KSP%20-%20Alcance%20y%20requerimientos%20del%20MVP.md) — Documento de alcance completo
 
-## Referencias
+## Referencias Externas
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [React Documentation](https://react.dev)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs)
 - [Apollo Client Documentation](https://www.apollographql.com/docs/react)
+- [HeroUI Documentation](https://heroui.com)
+- [Zustand Documentation](https://zustand.docs.pmnd.rs)

@@ -1,0 +1,57 @@
+query GlobalConfig {
+  globalConfig {
+    guid
+    config {
+      inventoryLimit
+      purchasePercentage
+      saleCancellationBlockThreshold
+      geofence {
+        latitude
+        longitude
+        radius
+      }
+      operationSchedule {
+        monday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+        tuesday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+        wednesday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+        thursday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+        friday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+        saturday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+        sunday {
+          opening { hour minute period }
+          closing { hour minute period }
+        }
+      }
+      bannerGuids {
+        pokemon
+        magic
+      }
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation UpdateGlobalConfig($updateGlobalConfigInput: UpdateGlobalConfigInput!) {
+  updateGlobalConfig(updateGlobalConfigInput: $updateGlobalConfigInput) {
+    message
+  }
+}

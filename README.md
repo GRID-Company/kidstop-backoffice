@@ -1,29 +1,31 @@
-# GRID Frontend Template
+# Kidstop Backoffice
 
-Template base para proyectos frontend con Next.js 16, React 19, TypeScript 5 y sistema de automatización integrado.
+Panel administrativo de **Kidstop Singles Platform** para operar compras, inventario y ventas de cartas singles de Pokémon TCG y Magic: The Gathering.
 
 ## Stack Tecnológico
 
-- **Next.js 16** - Framework React
-- **React 19** - Biblioteca UI
-- **TypeScript 5** - Tipado estático
-- **Tailwind CSS 4** - Estilos
-- **HeroUI** - Componentes UI
-- **Zustand** - State management
-- **Apollo Client** - GraphQL client
-- **GraphQL Codegen** - Generación de tipos
+- **Next.js 16** — Framework React con App Router
+- **React 19** — Server Components
+- **TypeScript 5** — Tipado estático
+- **Tailwind CSS 4** — Utility-first CSS
+- **HeroUI 2.8+** — Componentes UI
+- **Zustand** — State management
+- **Apollo Client 4** — Cliente GraphQL
+- **GraphQL Codegen** — Generación automática de tipos
 
-## Arquitectura
+## Módulos
 
-Este proyecto sigue una arquitectura **Feature-First** con capas bien definidas:
-
-```
-src/features/
-├── {feature-name}/
-│   ├── adapters/     # API calls, forms, mappers
-│   ├── domain/       # Types, constants, business logic
-│   └── ui/           # Components, views, hooks
-```
+| Módulo | Descripción |
+|--------|-------------|
+| **Login** | Autenticación, sesión via cookies, recuperación de contraseña |
+| **Usuarios** | CRUD de staff (Admin, Recepción, Comprador) |
+| **Catálogo** | Búsqueda de cartas con contexto TCG, catálogo interno, precios públicos |
+| **Compras** | Buylist con negociación, presupuesto, cotización WhatsApp, modo privacidad |
+| **Inventario** | Stock por Carta + Variante + Condición, movimientos, métricas |
+| **Ventas** | Pedidos desde Carpeta Digital, picking list PDF, código Shopify |
+| **Clientes** | Clasificación VIP, bloqueos, validación de ubicación |
+| **Most Wanted** | Configuración de páginas públicas por TCG con drag & drop |
+| **Configuración** | Geofence, umbrales, presupuestos, límites de inventario |
 
 ## Configuración Inicial
 
@@ -36,26 +38,14 @@ npm install
 ### 2. Configurar Variables de Entorno
 
 ```bash
-# Copiar template
 cp .env.template .env
-
-# Editar .env con tus valores
-nano .env
 ```
 
 **Variables mínimas requeridas:**
-- `PROJECT_NAME` - Nombre del proyecto
-- `NEXT_PUBLIC_GRAPHQL_ENDPOINT` - URL del API GraphQL
+- `NEXT_PUBLIC_GRAPHQL_ENDPOINT` — URL del API GraphQL
+- `NEXT_PUBLIC_API_URL` — URL del API para Apollo Client
 
-### 3. Validar Configuración
-
-```bash
-./scripts/setup/validate-env.sh
-```
-
-Este script verificará que todas las variables necesarias estén configuradas correctamente.
-
-### 4. Ejecutar Servidor de Desarrollo
+### 3. Ejecutar Servidor de Desarrollo
 
 ```bash
 npm run dev
@@ -63,23 +53,7 @@ npm run dev
 
 Abrir [http://localhost:3000](http://localhost:3000) en el navegador.
 
-## Sistema de Automatización
-
-Este template incluye un sistema completo de automatización que integra:
-
-- ✅ **ClickUp** - Gestión de tareas
-- ✅ **GitHub Actions** - CI/CD automatizado
-- ✅ **AWS Amplify** - Deploy automático
-- ✅ **SendGrid** - Notificaciones por email
-
-### Configuración de Automatización
-
-Ver guías detalladas:
-
-- **[Environment Setup](docs/ENVIRONMENT_SETUP.md)** - Configuración de variables de entorno
-- **[GitHub Secrets Setup](docs/GITHUB_SECRETS_SETUP.md)** - Configuración de secrets para CI/CD
-
-### Scripts Disponibles
+## Scripts Disponibles
 
 ```bash
 # Desarrollo
@@ -93,125 +67,100 @@ npm run format           # Formatear código
 npm run format:check     # Verificar formato
 
 # GraphQL
-npm run codegen          # Generar tipos de GraphQL
-
-# Validación
-./scripts/setup/validate-env.sh           # Validar variables de entorno
-./scripts/setup/setup-github-secrets.sh   # Configurar GitHub Secrets
+npm run codegen          # Generar tipos desde el schema del backend
 ```
 
-## Features Incluidas
+## Arquitectura
 
-### 🔐 Authentication
-- Login/Logout
-- Cookie-based auth
-- Protected routes
-
-### 📦 Inventory
-- CRUD operations
-- Filtros y búsqueda
-- Paginación
-
-### 🪟 Windows
-- Gestión de ventanas
-- Configuración de perfiles
-- Upload de imágenes
-
-## Estructura del Proyecto
+Arquitectura **Feature-First** con tres capas por módulo:
 
 ```
-template-front-end/
-├── .github/              # GitHub Actions workflows (próximamente)
-├── docs/                 # Documentación
-│   ├── ENVIRONMENT_SETUP.md
-│   └── GITHUB_SECRETS_SETUP.md
-├── public/               # Assets estáticos
-├── scripts/              # Scripts de automatización
-│   └── setup/
-│       ├── validate-env.sh
-│       └── setup-github-secrets.sh
+src/features/{feature}/
+├── adapters/          # API (queries/mutations), forms (Zod), mappers
+├── domain/            # Tipos, constantes, lógica de negocio
+└── ui/                # Componentes, vistas, hooks
+```
+
+### Estructura del Proyecto
+
+```
+kidstop-backoffice/
+├── docs/                       # Documentación del proyecto
+├── scripts/                    # Scripts de automatización
 ├── src/
-│   ├── app/             # Next.js App Router
-│   ├── features/        # Features (feature-first)
-│   ├── lib/             # Utilidades, API, tipos
-│   └── shared/          # Componentes compartidos
-├── .env.template        # Template de variables
-├── .env.example         # Ejemplo con documentación
+│   ├── app/
+│   │   ├── (authenticated)/    # Rutas protegidas (todos los módulos)
+│   │   ├── (not-authenticated)/ # Login
+│   │   └── api/                # API routes (cookies de sesión)
+│   ├── features/               # Módulos del negocio
+│   │   ├── login/
+│   │   ├── users/
+│   │   ├── catalog/
+│   │   ├── purchases/
+│   │   ├── inventory-cards/
+│   │   ├── sales/
+│   │   ├── customers/
+│   │   ├── most-wanted/
+│   │   └── settings/
+│   ├── lib/                    # Core compartido
+│   │   ├── api/                # Apollo Client + codegen
+│   │   ├── auth/               # Hooks de autenticación
+│   │   ├── store/              # Zustand (auth, TCG context, privacy mode)
+│   │   ├── types/              # Tipos globales (TCG, card, inventory)
+│   │   ├── consts/             # Constantes (rutas, temas, opciones TCG)
+│   │   └── utils/              # Utilidades (formato, PDF, paginación)
+│   └── shared/                 # Componentes compartidos
+│       ├── base/               # Componentes base
+│       ├── blocks/             # EntitiesPage, DataTable
+│       ├── layouts/            # Sidebar, authenticated layout
+│       └── providers/          # Apollo, HeroUI
+├── codegen.ts                  # Configuración de GraphQL Codegen
+├── hero.ts                     # Plugin HeroUI para Tailwind
 └── package.json
 ```
 
-## Desarrollo
+## Estado Actual
 
-### Crear Nueva Feature
+Los módulos de Kidstop operan con **datos mock** mientras se desarrolla el backend. El feature `windows` (del template base) sirve como referencia del flujo completo con Apollo.
 
-```bash
-src/features/
-└── my-feature/
-    ├── adapters/
-    │   ├── api/          # Queries y mutations GraphQL
-    │   ├── forms/        # Schemas y hooks de formularios
-    │   └── mappers/      # Transformación de datos
-    ├── domain/
-    │   ├── types.ts      # Tipos TypeScript
-    │   └── constants.ts  # Constantes
-    └── ui/
-        ├── components/   # Componentes React
-        ├── views/        # Páginas/vistas
-        └── hooks/        # Custom hooks
-```
+Ver [docs/MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) para la guía de migración.
 
-### Convenciones
+## Convenciones
 
-- **Nombres de archivos**: kebab-case (`my-component.tsx`)
+- **Archivos**: kebab-case (`my-component.tsx`)
 - **Componentes**: PascalCase (`MyComponent`)
 - **Funciones/variables**: camelCase (`myFunction`)
 - **Constantes**: UPPER_SNAKE_CASE (`MY_CONSTANT`)
 - **Tipos**: PascalCase con prefijo I (`IMyType`)
 
-## Recursos
+## Documentación
 
-### Documentación
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [React Documentation](https://react.dev)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [HeroUI Documentation](https://heroui.com)
-
-### Guías del Proyecto
-
-- [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md)
-- [GitHub Secrets Setup Guide](docs/GITHUB_SECRETS_SETUP.md)
+| Documento | Descripción |
+|-----------|-------------|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura, patrones, capas y convenciones |
+| [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) | Contexto del proyecto, glosario, roles y módulos |
+| [BACKEND_SPEC.md](docs/BACKEND_SPEC.md) | Especificación GraphQL del backend (NestJS) |
+| [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) | Guía de migración mock → Apollo |
+| [CARPETA_DIGITAL_TEMPLATE.md](docs/CARPETA_DIGITAL_TEMPLATE.md) | Template para el repo de la Carpeta Digital |
+| [KSP - Alcance y requerimientos del MVP.md](docs/KSP%20-%20Alcance%20y%20requerimientos%20del%20MVP.md) | Documento de alcance completo del MVP |
+| [ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) | Configuración de variables de entorno |
 
 ## Troubleshooting
 
-### Error: Variables de entorno no se cargan
+### GraphQL types desactualizados
 
 ```bash
-# Verificar que .env existe
-ls -la .env
-
-# Validar configuración
-./scripts/setup/validate-env.sh
-
-# Reiniciar servidor
-npm run dev
-```
-
-### Error: GraphQL types desactualizados
-
-```bash
-# Regenerar tipos
 npm run codegen
 ```
 
-### Error: Permisos en scripts
+### Variables de entorno no se cargan
 
 ```bash
-# Dar permisos de ejecución
-chmod +x scripts/setup/*.sh
+ls -la .env
+./scripts/setup/validate-env.sh
+npm run dev
 ```
 
 ## Licencia
 
-Privado - GRID Company
+Privado — GRID Company / Kidstop

@@ -1,0 +1,211 @@
+query Sales($findSalesArgs: FindSalesArgs!) {
+  sales(findSalesArgs: $findSalesArgs) {
+    data {
+      guid
+      saleCode
+      status
+      tcg
+      total
+      notes
+      cancelReason
+      emailNotificationSent
+      customer {
+        guid
+        name
+        emailAddress
+        phone
+      }
+      kioskCustomerName
+      kioskCustomerEmail
+      items {
+        guid
+        tcg
+        condition
+        quantity
+        price
+        pokemonCardSummary {
+          guid
+          name
+          setName
+          setCode
+          cardNumber
+          rarity
+          imageUri
+          hp
+          type
+          variant
+          stage
+        }
+        magicCardSummary {
+          guid
+          name
+          edition
+          collectorNumber
+          rarity
+          imageUri
+          isFoil
+        }
+      }
+      statusTimestamps
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
+
+query Sale($guid: String!) {
+  sale(guid: $guid) {
+    guid
+    saleCode
+    status
+    tcg
+    total
+    notes
+    cancelReason
+    emailNotificationSent
+    customer {
+      guid
+      name
+      emailAddress
+      phone
+    }
+    kioskCustomerName
+    kioskCustomerEmail
+    items {
+      guid
+      tcg
+      condition
+      quantity
+      price
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+        hp
+        type
+        variant
+        stage
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    statusTimestamps
+    createdBy {
+      guid
+      name
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+mutation UpdateSaleStatus($updateSaleStatusInput: UpdateSaleStatusInput!) {
+  updateSaleStatus(updateSaleStatusInput: $updateSaleStatusInput) {
+    guid
+    saleCode
+    status
+    statusTimestamps
+    emailNotificationSent
+    updatedDate
+  }
+}
+
+mutation CancelSale($cancelSaleInput: CancelSaleInput!) {
+  cancelSale(cancelSaleInput: $cancelSaleInput) {
+    guid
+    saleCode
+    status
+    cancelReason
+    updatedDate
+  }
+}
+
+mutation UpdateSaleItem($updateSaleItemInput: UpdateSaleItemInput!) {
+  updateSaleItem(updateSaleItemInput: $updateSaleItemInput) {
+    guid
+    saleCode
+    status
+    total
+    items {
+      guid
+      tcg
+      condition
+      quantity
+      price
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+        hp
+        type
+        variant
+        stage
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    updatedDate
+  }
+}
+
+mutation RemoveSaleItem($removeSaleItemInput: RemoveSaleItemInput!) {
+  removeSaleItem(removeSaleItemInput: $removeSaleItemInput) {
+    guid
+    saleCode
+    status
+    total
+    items {
+      guid
+      tcg
+      condition
+      quantity
+      price
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+        hp
+        type
+        variant
+        stage
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
+      }
+    }
+    updatedDate
+  }
+}
