@@ -59,8 +59,8 @@ export function toAdjustInventoryPayload(data: InventoryAdjustmentFormData) {
       tcg: data.tcg,
       condition: data.condition,
       quantity: data.quantity,
-      movementType: data.movementType,
-      notes: data.notes ?? '',
+      bulkOperationType: data.bulkOperationType as any,
+      ...(data.notes && { notes: data.notes }),
     },
   };
 }

@@ -5,12 +5,16 @@ export const MOVEMENT_TYPES = {
   PURCHASE_ENTRY: 'PURCHASE_ENTRY',
   SALE_EXIT: 'SALE_EXIT',
   MANUAL_ADJUSTMENT: 'MANUAL_ADJUSTMENT',
+  MANUAL_ENTRY: 'MANUAL_ENTRY',
+  MANUAL_EXIT: 'MANUAL_EXIT',
 } as const;
 
 export const MOVEMENT_TYPE_LABELS: Record<string, string> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'Entrada por compra',
   [MOVEMENT_TYPES.SALE_EXIT]: 'Salida por venta',
   [MOVEMENT_TYPES.MANUAL_ADJUSTMENT]: 'Ajuste manual',
+  [MOVEMENT_TYPES.MANUAL_ENTRY]: 'Entrada manual',
+  [MOVEMENT_TYPES.MANUAL_EXIT]: 'Salida manual',
 };
 
 export const STOCK_STATUSES = {
@@ -41,23 +45,24 @@ export const MOVEMENT_TYPE_OPTIONS = Object.values(MOVEMENT_TYPES).map((type) =>
   label: MOVEMENT_TYPE_LABELS[type],
 }));
 
-export const ADJUSTMENT_TYPE_OPTIONS = MOVEMENT_TYPE_OPTIONS;
-
 export const BULK_ADJUSTMENT_OPTIONS = [
   {
     key: BulkOperationType.ManualEntry,
+    value: BulkOperationType.ManualEntry,
     label: 'Entrada Manual',
     description: 'Suma la cantidad al stock existente',
   },
   {
-    key: BulkOperationType.ManualSet,
-    label: 'Establecer Stock',
-    description: 'Establece el stock al valor absoluto especificado',
-  },
-  {
     key: BulkOperationType.ManualExit,
+    value: BulkOperationType.ManualExit,
     label: 'Salida Manual',
     description: 'Resta la cantidad del stock existente',
+  },
+  {
+    key: BulkOperationType.ManualSet,
+    value: BulkOperationType.ManualSet,
+    label: 'Establecer Stock',
+    description: 'Establece el stock al valor absoluto especificado',
   },
 ];
 

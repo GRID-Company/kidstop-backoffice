@@ -33,8 +33,7 @@ import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { IInventoryItem } from '../../domain/types';
 import { fromApiInventoryItem } from '../../adapters/mappers/inventory.mapper';
 import {
-  MOVEMENT_TYPES,
-  ADJUSTMENT_TYPE_OPTIONS,
+  BULK_ADJUSTMENT_OPTIONS,
   STOCK_STATUS_LABELS,
   STOCK_STATUS_COLORS,
 } from '../../domain/constants';
@@ -42,6 +41,7 @@ import { validateStock } from '../../domain/inventory.domain';
 import { useAdjustmentForm } from '../../adapters/forms/use-adjustment-form';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import { toAdjustmentFormDefaults } from '../../adapters/mappers/inventory.mapper';
+import { BulkOperationType } from '@/lib/api/schema-types';
 
 interface AdjustmentModalProps {
   item: IInventoryItem | null;
@@ -165,16 +165,16 @@ export default function AdjustmentModal({
       reset({
         ...toAdjustmentFormDefaults(resolvedItem),
         quantity: 1,
-        movementType: MOVEMENT_TYPES.MANUAL_ADJUSTMENT,
+        bulkOperationType: BulkOperationType.ManualEntry,
         notes: '',
       });
     }
   }, [resolvedItem, reset]);
 
-  const movementType = watch('movementType');
+  const bulkOperationType = watch('bulkOperationType');
   const quantity = watch('quantity');
 
-  const isExit = movementType === MOVEMENT_TYPES.SALE_EXIT;
+  const isExit = bulkOperationType === BulkOperationType.ManualExit;
 
   const stockError = useMemo(() => {
     if (!resolvedItem || !isExit) return null;
@@ -187,7 +187,7 @@ export default function AdjustmentModal({
   const handleFormSubmit: SubmitHandler<InventoryAdjustmentFormData> = useCallback(
     (data) => {
       if (!resolvedItem || !onSubmit) return;
-      if (data.movementType === MOVEMENT_TYPES.SALE_EXIT && !validateStock(resolvedItem.stock, -data.quantity)) return;
+      if (data.bulkOperationType === BulkOperationType.ManualExit && !validateStock(resolvedItem.stock, -data.quantity)) return;
       onSubmit(data);
     },
     [resolvedItem, onSubmit]
@@ -410,18 +410,18 @@ export default function AdjustmentModal({
                 className="flex flex-col gap-4"
               >
                 <SelectForm
-                  label="Tipo de ajuste"
-                  placeholder="Selecciona el tipo de movimiento"
-                  items={ADJUSTMENT_TYPE_OPTIONS}
-                  controlProps={{ control, name: 'movementType' }}
+                  label="Tipo de operación"
+                  placeholder="Selecciona el tipo de operación"
+                  items={BULK_ADJUSTMENT_OPTIONS}
+                  controlProps={{ control, name: 'bulkOperationType' }}
                   isRequired
-                  aria-label="Tipo de ajuste de inventario"
+                  aria-label="Tipo de operación de inventario"
                 />
 
                 <InputForm
                   label="Cantidad"
                   type="number"
-                  min={1}
+                  min={bulkOperationType === BulkOperationType.ManualSet ? 0 : 1}
                   controlProps={{ control, name: 'quantity' }}
                   isRequired
                   description={isExit ? `Stock disponible: ${resolvedItem.stock}` : undefined}
@@ -431,7 +431,7 @@ export default function AdjustmentModal({
                 />
 
                 <TextareaForm
-                  label="Notas / Razón"
+                  label="Notas / Razón (opcional)"
                   placeholder="Describe el motivo del ajuste"
                   controlProps={{ control, name: 'notes' }}
                   minRows={3}
