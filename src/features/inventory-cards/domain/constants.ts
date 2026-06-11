@@ -4,7 +4,7 @@ import { BulkOperationType } from '@/lib/api/schema-types';
 export const MOVEMENT_TYPES = {
   PURCHASE_ENTRY: 'PURCHASE_ENTRY',
   SALE_EXIT: 'SALE_EXIT',
-  MANUAL_ADJUSTMENT: 'MANUAL_ADJUSTMENT',
+  MANUAL_SET: 'MANUAL_SET',
   MANUAL_ENTRY: 'MANUAL_ENTRY',
   MANUAL_EXIT: 'MANUAL_EXIT',
 } as const;
@@ -12,7 +12,7 @@ export const MOVEMENT_TYPES = {
 export const MOVEMENT_TYPE_LABELS: Record<string, string> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'Entrada por compra',
   [MOVEMENT_TYPES.SALE_EXIT]: 'Salida por venta',
-  [MOVEMENT_TYPES.MANUAL_ADJUSTMENT]: 'Ajuste manual',
+  [MOVEMENT_TYPES.MANUAL_SET]: 'Ajuste manual',
   [MOVEMENT_TYPES.MANUAL_ENTRY]: 'Entrada manual',
   [MOVEMENT_TYPES.MANUAL_EXIT]: 'Salida manual',
 };
@@ -69,7 +69,7 @@ export const BULK_ADJUSTMENT_OPTIONS = [
 export const MOVEMENT_TYPE_COLORS: Record<string, 'success' | 'warning' | 'primary'> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'success',
   [MOVEMENT_TYPES.SALE_EXIT]: 'warning',
-  [MOVEMENT_TYPES.MANUAL_ADJUSTMENT]: 'primary',
+  [MOVEMENT_TYPES.MANUAL_SET]: 'primary',
 };
 
 export const DEFAULT_INVENTORY_SORT: ITableSort = {
@@ -89,7 +89,7 @@ export const DEFAULT_INVENTORY_LIMIT = 20;
 export const MOVEMENT_TYPE_ICONS: Record<string, string> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'lucide:arrow-down-circle',
   [MOVEMENT_TYPES.SALE_EXIT]: 'lucide:arrow-up-circle',
-  [MOVEMENT_TYPES.MANUAL_ADJUSTMENT]: 'lucide:settings-2',
+  [MOVEMENT_TYPES.MANUAL_SET]: 'lucide:settings-2',
 };
 
 export function formatMovementQuantity(movement: { movementType: string; quantity: number }): {
@@ -98,7 +98,7 @@ export function formatMovementQuantity(movement: { movementType: string; quantit
 } {
   const isPositive =
     movement.movementType === MOVEMENT_TYPES.PURCHASE_ENTRY ||
-    (movement.movementType === MOVEMENT_TYPES.MANUAL_ADJUSTMENT && movement.quantity > 0);
+    (movement.movementType === MOVEMENT_TYPES.MANUAL_SET && movement.quantity > 0);
   return {
     text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,
     className: isPositive ? 'text-success' : 'text-danger',
