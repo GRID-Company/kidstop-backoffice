@@ -130,6 +130,7 @@ export default function InventoryAdjustmentConfirmationModal({
           <Button
             color="primary"
             isLoading={loading}
+            isDisabled={loading}
             startContent={!loading ? <Icon icon="lucide:check" width={18} /> : undefined}
             onPress={onConfirm}
             className="text-white"

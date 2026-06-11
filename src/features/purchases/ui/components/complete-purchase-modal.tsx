@@ -94,6 +94,7 @@ export default function CompletePurchaseModal({
           <Button
             color="success"
             isLoading={loading}
+            isDisabled={loading}
             startContent={!loading ? <Icon icon="lucide:check-circle" width={18} /> : undefined}
             onPress={handleConfirm}
             className="text-white"
