@@ -220,7 +220,7 @@ export const validatePriceAdjustment = (
 
   if (itemsWithoutPrice.length > 0) {
     errors.push(
-      `${itemsWithoutPrice.length} item(s) sin precio público definido`
+      `${itemsWithoutPrice.length} item(s) sin precio de venta definido`
     );
   }
 
