@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
@@ -15,7 +15,6 @@ import {
   Input,
   Select,
   SelectItem,
-  Spinner,
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
@@ -25,7 +24,7 @@ import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard, CardCondition } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
+import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_SEARCH_LIMIT } from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
@@ -35,7 +34,8 @@ import { BulkOperationType } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toPokemonCard } from '../../adapters/mappers/card.mapper';
-import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
+import CardSearch from '@/shared/blocks/card-search';
+import ConditionSelector from '@/shared/blocks/condition-selector';
 
 interface PokemonCardDetailModalProps {
   card: IPokemonCard | null;
@@ -50,13 +50,15 @@ export default function PokemonCardDetailModal({
 }: PokemonCardDetailModalProps) {
   const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
-  const [selectedCondition, setSelectedCondition] = useState<string>('');
+  const prevIsOpenRef = useRef(isOpen);
   
   useEffect(() => {
-    if (isOpen) {
+    const wasOpen = prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+    
+    if (isOpen && !wasOpen) {
       setSelectedCard(card);
       setItemSearch('');
-      setSelectedCondition('');
     }
   }, [isOpen, card]);
 
@@ -85,14 +87,6 @@ export default function PokemonCardDetailModal({
     onRefetch: refetch,
   });
 
-  useEffect(() => {
-    if (selectedCondition && detail?.inventoryCards) {
-      const variant = detail.inventoryCards.find(v => v.condition === selectedCondition);
-      if (variant) {
-        handleVariantSelect(variant);
-      }
-    }
-  }, [selectedCondition, detail, handleVariantSelect]);
 
   const handleStockAdjustClick = useCallback(() => {
     if (stockAdjustment === 0) return;
@@ -108,7 +102,7 @@ export default function PokemonCardDetailModal({
     variables: {
       findPokemonCardsPublicArgs: {
         skip: 0,
-        limit: 6,
+        limit: CARD_SEARCH_LIMIT,
         search: itemSearch.trim() || undefined,
         sort: { column: 'releaseDate', order: 'DESC' },
         filters: {},
@@ -128,13 +122,8 @@ export default function PokemonCardDetailModal({
 
   const handleCardSelect = useCallback((card: IPokemonCard) => {
     setSelectedCard(card);
-    setSelectedCondition('');
   }, []);
 
-  const handleConditionSelect = useCallback((condition: string) => {
-    setSelectedCondition(condition);
-    setItemSearch('');
-  }, []);
 
   const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
     variables: { guid: selectedCard?.guid ?? '' },
@@ -154,15 +143,13 @@ export default function PokemonCardDetailModal({
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{name ?? 'Ajuste de inventario'}</span>
+          <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
           <span className="text-sm font-normal text-default-500">
-            {selectedCard && !selectedCondition ? (
+            {selectedCard ? (
               <>
                 {[setName, setCode].filter(Boolean).join(' · ')}
                 {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
               </>
-            ) : selectedCard && selectedCondition ? (
-              'Selecciona la condición de la carta'
             ) : (
               'Buscar carta por nombre, set o código'
             )}
@@ -171,148 +158,51 @@ export default function PokemonCardDetailModal({
 
         <DrawerBody className="flex flex-col gap-6">
           {!selectedCard && (
-            <div className="flex flex-col gap-4">
-              <Input
-                placeholder="Buscar carta por nombre, set o código..."
-                value={itemSearch}
-                onValueChange={setItemSearch}
-                startContent={<Icon icon="lucide:search" className="text-default-400" />}
-                isClearable
-                onClear={() => setItemSearch('')}
-                autoFocus
-              />
-
-              {searchLoading && (
-                <div className="flex justify-center py-4">
-                  <Spinner size="sm" />
-                </div>
+            <CardSearch
+              searchValue={itemSearch}
+              onSearchChange={setItemSearch}
+              results={searchResults}
+              loading={searchLoading}
+              onCardSelect={handleCardSelect}
+              placeholder="Buscar carta por nombre, set o código..."
+              renderCard={(result) => (
+                <>
+                  <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
+                    {result.imageUri ? (
+                      <img
+                        src={result.imageUri}
+                        alt={result.name}
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={pokemonCardPlaceholder}
+                        alt="Card placeholder"
+                        fill
+                        sizes="32px"
+                        className="object-contain"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{result.name}</p>
+                    <p className="truncate text-xs text-default-500">
+                      {result.setName} · #{result.cardNumber}
+                    </p>
+                  </div>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={result.totalStock > 0 ? 'success' : 'default'}
+                  >
+                    {result.totalStock}
+                  </Chip>
+                </>
               )}
-
-              {!searchLoading && itemSearch.trim().length >= 2 && searchResults.length === 0 && (
-                <p className="text-center text-sm text-default-400">
-                  No se encontraron cartas en el catálogo
-                </p>
-              )}
-
-              {searchResults.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  {searchResults.map((result) => (
-                    <button
-                      key={result.guid}
-                      type="button"
-                      onClick={() => handleCardSelect(result)}
-                      className="flex items-center gap-3 rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
-                    >
-                      <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
-                        {result.imageUri ? (
-                          <img
-                            src={result.imageUri}
-                            alt={result.name}
-                            className="absolute inset-0 h-full w-full object-contain"
-                          />
-                        ) : (
-                          <Image
-                            src={pokemonCardPlaceholder}
-                            alt="Card placeholder"
-                            fill
-                            sizes="32px"
-                            className="object-contain"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{result.name}</p>
-                        <p className="truncate text-xs text-default-500">
-                          {result.setName} · #{result.cardNumber}
-                        </p>
-                      </div>
-                      <Chip
-                        size="sm"
-                        variant="flat"
-                        color={result.totalStock > 0 ? 'success' : 'default'}
-                      >
-                        {result.totalStock}
-                      </Chip>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {itemSearch.trim().length < 2 && (
-                <p className="text-center text-sm text-default-400">
-                  Escribe al menos 2 caracteres para buscar
-                </p>
-              )}
-            </div>
+            />
           )}
 
-          {selectedCard && !selectedCondition && (
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-4 rounded-lg bg-default-50 p-4">
-                <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
-                  {selectedCard.imageUri ? (
-                    <img
-                      src={selectedCard.imageUri}
-                      alt={selectedCard.name}
-                      className="absolute inset-0 h-full w-full object-contain"
-                    />
-                  ) : (
-                    <Image
-                      src={pokemonCardPlaceholder}
-                      alt="Card placeholder"
-                      fill
-                      sizes="48px"
-                      className="object-contain"
-                    />
-                  )}
-                </div>
-
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="truncate text-sm font-semibold">{selectedCard.name}</p>
-                  <p className="truncate text-xs text-default-500">
-                    {selectedCard.setName} · #{selectedCard.cardNumber}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => { setSelectedCard(null); setItemSearch(''); }}
-                  className="self-start text-default-400 hover:text-default-700"
-                  aria-label="Cambiar carta"
-                >
-                  <Icon icon="lucide:x" />
-                </button>
-              </div>
-
-              <Divider />
-
-              <div className="flex flex-col gap-3">
-                <p className="text-sm font-medium">Selecciona la condición</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {CARD_CONDITION_OPTIONS.map((option) => {
-                    const variant = selectedCard.variants.find(v => v.condition === option.value);
-                    const stock = variant?.stock ?? 0;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => handleConditionSelect(option.value)}
-                        className="flex items-center justify-between rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
-                      >
-                        <div className="flex flex-col gap-1">
-                          <p className="text-sm font-medium">{option.label}</p>
-                          <p className="text-xs text-default-500">Stock: {stock}</p>
-                        </div>
-                        <Icon icon="lucide:chevron-right" className="text-default-400" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {selectedCard && selectedCondition && (
+          {selectedCard && (
           <>
           <div className="flex gap-6">
             <div className="w-40 shrink-0">

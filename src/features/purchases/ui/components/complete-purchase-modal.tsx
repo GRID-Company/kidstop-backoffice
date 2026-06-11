@@ -24,6 +24,14 @@ interface CompletePurchaseModalProps {
   loading?: boolean;
 }
 
+/**
+ * Custom confirmation modal for completing a purchase.
+ * 
+ * Note: This is a custom implementation instead of using the shared ConfirmationModal
+ * because it requires domain-specific layout to display purchase details (reference,
+ * seller, item count, total paid) in a structured format that helps users verify
+ * the purchase information before finalizing.
+ */
 export default function CompletePurchaseModal({
   purchase,
   itemCount,

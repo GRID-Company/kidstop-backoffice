@@ -26,6 +26,17 @@ interface InventoryAdjustmentConfirmationModalProps {
   currentStock: number;
 }
 
+/**
+ * Custom confirmation modal for inventory adjustments.
+ * 
+ * Note: This is a custom implementation instead of using the shared ConfirmationModal
+ * because it requires domain-specific calculations and display of:
+ * - Current stock vs resulting stock comparison
+ * - Stock change indicators (arrows, colors)
+ * - Operation type details (Manual Entry/Exit/Set)
+ * - Card condition and quantity breakdown
+ * This structured information is critical for inventory accuracy verification.
+ */
 export default function InventoryAdjustmentConfirmationModal({
   isOpen,
   onClose,
