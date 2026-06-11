@@ -279,7 +279,7 @@ export default function PriceAdjustmentModal({
 
                     <div className="flex flex-1 flex-col gap-1">
                       <InputForm
-                        label="Precio público"
+                        label="Precio de venta"
                         type="number"
                         placeholder="0.00"
                         controlProps={{
@@ -291,7 +291,7 @@ export default function PriceAdjustmentModal({
                           <span className="text-sm text-default-400">$</span>
                         }
                         size="sm"
-                        aria-label={`Precio público de ${item.cardName}`}
+                        aria-label={`Precio de venta de ${item.cardName}`}
                       />
                       {autoCalculatedItems.has(item.guid) && (
                         <p className="text-xs text-default-500">

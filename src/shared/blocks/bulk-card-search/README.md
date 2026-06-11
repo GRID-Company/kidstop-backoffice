@@ -10,7 +10,7 @@ Componente compartido para búsqueda masiva de cartas con soporte para formatos 
 - ✅ Selección de cartas alternativas mediante radio group
 - ✅ Configuración por carta: condición, cantidad, precio
 - ✅ Validación completa con Zod y react-hook-form
-- ✅ Variantes: purchases (oferta) e inventory (precio público)
+- ✅ Variantes: purchases (oferta) e inventory (precio de venta)
 - ✅ Compound components pattern para flexibilidad
 
 ## Uso
@@ -141,7 +141,7 @@ bulk-card-search/
 - Botón "Agregar bulk" en toolbar
 - Drawer con componente
 - Variante: `inventory`
-- Campos: condición, cantidad, precio público
+- Campos: condición, cantidad, precio de venta
 
 ## Validaciones
 
