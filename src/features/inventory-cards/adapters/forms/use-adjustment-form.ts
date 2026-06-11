@@ -1,7 +1,7 @@
 import { Resolver, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
-import { MOVEMENT_TYPES } from '../../domain/constants';
+import { BulkOperationType } from '@/lib/api/schema-types';
 import {
   InventoryAdjustmentFormData,
   inventoryAdjustmentFormSchema,
@@ -14,7 +14,7 @@ export function useAdjustmentForm(defaults?: Partial<InventoryAdjustmentFormData
       cardGuid: '',
       condition: CARD_CONDITIONS.NEAR_MINT,
       quantity: 1,
-      movementType: MOVEMENT_TYPES.MANUAL_ADJUSTMENT,
+      bulkOperationType: BulkOperationType.ManualEntry,
       notes: '',
       ...defaults,
     },

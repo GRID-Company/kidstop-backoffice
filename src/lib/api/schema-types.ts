@@ -123,6 +123,7 @@ export type BuyerBudgetWithUsage = {
   buyer: User;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
+  draftAndQuotedAmount: Scalars['Float']['output'];
   guid: Scalars['String']['output'];
   tcg: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
@@ -189,12 +190,14 @@ export type ClientDetailsOutput = {
 };
 
 export type CreateInventoryMovementInput = {
+  bulkOperationType: BulkOperationType;
   cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
-  movementType: Scalars['String']['input'];
-  notes: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  purchasePrice?: InputMaybe<Scalars['Float']['input']>;
   quantity: Scalars['Int']['input'];
   reference?: InputMaybe<Scalars['String']['input']>;
+  sellPrice?: InputMaybe<Scalars['Float']['input']>;
   tcg: Scalars['String']['input'];
 };
 
@@ -611,6 +614,10 @@ export type MagicCardBatchSearchItem = {
 export type MagicCardBatchSearchResult = {
   /** Search results for each line */
   results: Array<MagicCardBatchSearchItem>;
+  /** Number of successfully matched cards (with bestMatch and no error) */
+  successfulCount: Scalars['Float']['output'];
+  /** Total number of cards detected (parsed lines) */
+  totalCount: Scalars['Float']['output'];
 };
 
 export type MagicCardCollection = {
@@ -1203,6 +1210,10 @@ export type PokemonCardBatchSearchItem = {
 export type PokemonCardBatchSearchResult = {
   /** Search results for each line */
   results: Array<PokemonCardBatchSearchItem>;
+  /** Number of successfully matched cards (with bestMatch and no error) */
+  successfulCount: Scalars['Float']['output'];
+  /** Total number of cards detected (parsed lines) */
+  totalCount: Scalars['Float']['output'];
 };
 
 export type PokemonCardCollection = {
@@ -1916,6 +1927,8 @@ export type UpdateUserInput = {
   emailAddress?: InputMaybe<Scalars['String']['input']>;
   guid?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  /** Set a new password for the user (admin only) */
+  password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
 };
