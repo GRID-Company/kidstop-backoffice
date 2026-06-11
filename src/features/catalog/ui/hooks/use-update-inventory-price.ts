@@ -8,6 +8,7 @@ import {
 } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType } from '@/lib/types/tcg.types';
+import { BulkOperationType } from '@/lib/api/schema-types';
 
 interface UpdatePriceParams {
   cardGuid: string;
@@ -65,7 +66,7 @@ export function useUpdateInventoryPrice() {
                     cardGuid: params.cardGuid,
                     condition: params.condition,
                     tcg: params.tcgType,
-                    movementType: 'MANUAL_ADJUSTMENT',
+                    bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
                     notes: 'Creación automática para establecer precios',
                   },

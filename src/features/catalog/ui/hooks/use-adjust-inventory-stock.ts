@@ -23,28 +23,28 @@ export function useAdjustInventoryStock() {
 
   const handleAdjustStock = useCallback(
     async (params: AdjustStockParams) => {
-      let movementType: string;
+      let bulkOperationType: BulkOperationType;
       let finalQuantity: number;
       let successMessage: string;
 
       switch (params.operationType) {
         case BulkOperationType.ManualEntry:
-          movementType = 'PURCHASE_ENTRY';
+          bulkOperationType = BulkOperationType.ManualEntry;
           finalQuantity = Math.abs(params.quantity);
           successMessage = `Entrada registrada: +${params.quantity}`;
           break;
         case BulkOperationType.ManualExit:
-          movementType = 'SALE_EXIT';
+          bulkOperationType = BulkOperationType.ManualExit;
           finalQuantity = Math.abs(params.quantity);
           successMessage = `Salida registrada: -${params.quantity}`;
           break;
         case BulkOperationType.ManualSet:
-          movementType = 'MANUAL_ADJUSTMENT';
+          bulkOperationType = BulkOperationType.ManualSet;
           finalQuantity = params.quantity;
           successMessage = `Stock establecido a: ${params.quantity}`;
           break;
         default:
-          movementType = 'MANUAL_ADJUSTMENT';
+          bulkOperationType = BulkOperationType.ManualEntry;
           finalQuantity = params.quantity;
           successMessage = `Stock ajustado: ${params.quantity}`;
       }
@@ -55,7 +55,7 @@ export function useAdjustInventoryStock() {
             cardGuid: params.cardGuid,
             condition: params.condition,
             tcg: params.tcgType,
-            movementType,
+            bulkOperationType,
             quantity: finalQuantity,
             notes: params.notes || successMessage,
           },
