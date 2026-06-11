@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
@@ -23,14 +24,18 @@ import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard, CardCondition } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
+import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_SEARCH_LIMIT } from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { useQuery } from '@apollo/client/react';
-import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
+import { PokemonCardWithMetricsDocument, PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { BulkOperationType } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
+import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
+import { toPokemonCard } from '../../adapters/mappers/card.mapper';
+import CardSearch from '@/shared/blocks/card-search';
+import ConditionSelector from '@/shared/blocks/condition-selector';
 
 interface PokemonCardDetailModalProps {
   card: IPokemonCard | null;
@@ -43,7 +48,22 @@ export default function PokemonCardDetailModal({
   isOpen,
   onClose,
 }: PokemonCardDetailModalProps) {
-  const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
+  const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
+  const [itemSearch, setItemSearch] = useState('');
+  const prevIsOpenRef = useRef(isOpen);
+  
+  useEffect(() => {
+    const wasOpen = prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+    
+    if (isOpen && !wasOpen) {
+      setSelectedCard(card);
+      setItemSearch('');
+    }
+  }, [isOpen, card]);
+
+  const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
     selectedVariant,
@@ -53,46 +73,137 @@ export default function PokemonCardDetailModal({
     setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
-    handleStockAdjust,
+    executeStockAdjust,
     control,
     handleSubmit,
     formState,
     updatingPrice,
     adjustLoading,
+    cardName,
   } = useCardDetailModal({
     detail,
-    card,
+    card: selectedCard,
     tcgType: 'POKEMON',
     onRefetch: refetch,
   });
 
+
+  const handleStockAdjustClick = useCallback(() => {
+    if (stockAdjustment === 0) return;
+    setIsConfirmModalOpen(true);
+  }, [stockAdjustment]);
+
+  const handleConfirmAdjustment = useCallback(async () => {
+    await executeStockAdjust();
+    setIsConfirmModalOpen(false);
+  }, [executeStockAdjust]);
+
+  const { data: searchData, loading: searchLoading } = useQuery(PokemonCardInternalListDocument, {
+    variables: {
+      findPokemonCardsPublicArgs: {
+        skip: 0,
+        limit: CARD_SEARCH_LIMIT,
+        search: itemSearch.trim() || undefined,
+        sort: { column: 'releaseDate', order: 'DESC' },
+        filters: {},
+      },
+    },
+    skip: !!selectedCard || itemSearch.trim().length < 2,
+    fetchPolicy: 'network-only',
+  });
+
+  const searchResults = useMemo<IPokemonCard[]>(() => {
+    const raw = searchData?.pokemonCardInternalList?.data;
+    if (!raw) return [];
+    return raw
+      .filter((card): card is NonNullable<typeof card> => card != null)
+      .map(toPokemonCard);
+  }, [searchData]);
+
+  const handleCardSelect = useCallback((card: IPokemonCard) => {
+    setSelectedCard(card);
+  }, []);
+
+
   const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
-    variables: { guid: card?.guid ?? '' },
-    skip: !card?.guid || !isOpen,
+    variables: { guid: selectedCard?.guid ?? '' },
+    skip: !selectedCard?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
 
-  if (!card) return null;
-
-  const imageUri = detail?.imageUri ?? card.imageUri;
-  const name = detail?.name ?? card.name;
-  const setName = detail?.setName ?? card.setName;
-  const setCode = detail?.setCode ?? card.setCode;
-  const totalStock = detail?.totalStock ?? card.totalStock;
-  const sellPrice = detail?.sellPrice ?? card.sellPrice;
+  const imageUri = detail?.imageUri ?? selectedCard?.imageUri;
+  const name = detail?.name ?? selectedCard?.name;
+  const setName = detail?.setName ?? selectedCard?.setName;
+  const setCode = detail?.setCode ?? selectedCard?.setCode;
+  const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
+  const sellPrice = detail?.sellPrice ?? selectedCard?.sellPrice;
 
   return (
+    <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{name}</span>
+          <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
           <span className="text-sm font-normal text-default-500">
-            {[setName, setCode].filter(Boolean).join(' · ')}
-            {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+            {selectedCard ? (
+              <>
+                {[setName, setCode].filter(Boolean).join(' · ')}
+                {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+              </>
+            ) : (
+              'Buscar carta por nombre, set o código'
+            )}
           </span>
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
+          {!selectedCard && (
+            <CardSearch
+              searchValue={itemSearch}
+              onSearchChange={setItemSearch}
+              results={searchResults}
+              loading={searchLoading}
+              onCardSelect={handleCardSelect}
+              placeholder="Buscar carta por nombre, set o código..."
+              renderCard={(result) => (
+                <>
+                  <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
+                    {result.imageUri ? (
+                      <img
+                        src={result.imageUri}
+                        alt={result.name}
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={pokemonCardPlaceholder}
+                        alt="Card placeholder"
+                        fill
+                        sizes="32px"
+                        className="object-contain"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{result.name}</p>
+                    <p className="truncate text-xs text-default-500">
+                      {result.setName} · #{result.cardNumber}
+                    </p>
+                  </div>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={result.totalStock > 0 ? 'success' : 'default'}
+                  >
+                    {result.totalStock}
+                  </Chip>
+                </>
+              )}
+            />
+          )}
+
+          {selectedCard && (
+          <>
           <div className="flex gap-6">
             <div className="w-40 shrink-0">
               <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
@@ -222,9 +333,9 @@ export default function PokemonCardDetailModal({
                 <Chip
                   size="sm"
                   variant="flat"
-                  color={card.availableStock ? 'success' : 'default'}
+                  color={selectedCard?.availableStock ? 'success' : 'default'}
                 >
-                  {card.availableStock ? 'Sí' : 'No'}
+                  {selectedCard?.availableStock ? 'Sí' : 'No'}
                 </Chip>
               </div>
             </div>
@@ -381,8 +492,7 @@ export default function PokemonCardDetailModal({
                   <Button
                     size="sm"
                     isDisabled={stockAdjustment === 0}
-                    isLoading={adjustLoading}
-                    onPress={handleStockAdjust}
+                    onPress={handleStockAdjustClick}
                     startContent={<Icon icon="lucide:package-plus" />}
                     className="text-white"
                     style={{ backgroundColor: 'var(--color-accent)' }}
@@ -429,6 +539,8 @@ export default function PokemonCardDetailModal({
               </form>
             </>
           )}
+          </>
+          )}
         </DrawerBody>
 
         <DrawerFooter className="flex justify-end">
@@ -438,5 +550,20 @@ export default function PokemonCardDetailModal({
         </DrawerFooter>
       </DrawerContent>
     </KidstopDrawer>
+
+    {selectedVariant && (
+      <InventoryAdjustmentConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmAdjustment}
+        loading={adjustLoading}
+        cardName={cardName ?? name}
+        condition={selectedVariant.condition}
+        operationType={movementType}
+        quantity={stockAdjustment}
+        currentStock={selectedVariant.stock}
+      />
+    )}
+  </>
   );
 }

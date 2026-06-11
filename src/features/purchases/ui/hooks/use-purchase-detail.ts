@@ -49,6 +49,7 @@ interface UsePurchaseDetailReturn {
   budgetUtilization: number;
   existingItemIds: Set<string>;
   loading: boolean;
+  mutating: boolean;
   error: Error | undefined;
   updateItem: (itemId: string, updates: Partial<IPurchaseItem>) => void;
   removeItem: (itemId: string) => void;
@@ -141,6 +142,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const paymentsForm = usePaymentSplitForm();
   const [status, setStatus] = useState<PurchaseStatus>(PURCHASE_STATUS.DRAFT);
   const [newItems, setNewItems] = useState<Map<string, IPurchaseItem>>(new Map());
+  const [mutating, setMutating] = useState(false);
 
   useEffect(() => {
     if (basePurchase) {
@@ -397,6 +399,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, refetch]);
 
   const updateStatus = useCallback(async (newStatus: PurchaseStatus) => {
+    setMutating(true);
     try {
       const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
       const pendingItems = items.filter((i) => !serverItemGuids.has(i.guid));
@@ -432,6 +435,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       setStatus(newStatus);
       void refetchBudget();
     } catch {
+    } finally {
+      setMutating(false);
     }
   }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, updatePurchaseStatusMutation, refetchBudget]);
 
@@ -458,6 +463,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     budgetUtilization,
     existingItemIds,
     loading,
+    mutating,
     error,
     updateItem,
     removeItem,

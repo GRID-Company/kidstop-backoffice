@@ -96,7 +96,7 @@ export function useCardDetailModal({
     [detail, selectedVariant, handleUpdatePrice, tcgType, onRefetch]
   );
 
-  const handleStockAdjust = useCallback(async () => {
+  const executeStockAdjust = useCallback(async () => {
     if (!detail || !selectedVariant || stockAdjustment === 0) return;
     await handleAdjustStock({
       cardGuid: detail.guid,
@@ -117,11 +117,12 @@ export function useCardDetailModal({
     setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
-    handleStockAdjust,
+    executeStockAdjust,
     control,
     handleSubmit,
     formState,
     updatingPrice,
     adjustLoading,
+    cardName: detail?.name,
   };
 }

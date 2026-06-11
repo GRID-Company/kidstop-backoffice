@@ -27,6 +27,8 @@ export const DEFAULT_CARDS_SORT: ITableSort = {
 
 export const DEFAULT_PAGE_SIZE = 20;
 
+export const CARD_SEARCH_LIMIT = 6;
+
 export const POKEMON_SORT_OPTIONS = [
   { label: 'Nombre A → Z', value: 'name_ASC' },
   { label: 'Nombre Z → A', value: 'name_DESC' },
