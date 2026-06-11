@@ -66,10 +66,12 @@ export const BULK_ADJUSTMENT_OPTIONS = [
   },
 ];
 
-export const MOVEMENT_TYPE_COLORS: Record<string, 'success' | 'warning' | 'primary'> = {
+export const MOVEMENT_TYPE_COLORS: Record<string, 'success' | 'warning' | 'primary' | 'danger'> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'success',
   [MOVEMENT_TYPES.SALE_EXIT]: 'warning',
   [MOVEMENT_TYPES.MANUAL_SET]: 'primary',
+  [MOVEMENT_TYPES.MANUAL_ENTRY]: 'success',
+  [MOVEMENT_TYPES.MANUAL_EXIT]: 'danger',
 };
 
 export const DEFAULT_INVENTORY_SORT: ITableSort = {
@@ -90,6 +92,8 @@ export const MOVEMENT_TYPE_ICONS: Record<string, string> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'lucide:arrow-down-circle',
   [MOVEMENT_TYPES.SALE_EXIT]: 'lucide:arrow-up-circle',
   [MOVEMENT_TYPES.MANUAL_SET]: 'lucide:settings-2',
+  [MOVEMENT_TYPES.MANUAL_ENTRY]: 'lucide:arrow-down-circle',
+  [MOVEMENT_TYPES.MANUAL_EXIT]: 'lucide:arrow-up-circle',
 };
 
 export function formatMovementQuantity(movement: { movementType: string; quantity: number }): {
@@ -98,6 +102,7 @@ export function formatMovementQuantity(movement: { movementType: string; quantit
 } {
   const isPositive =
     movement.movementType === MOVEMENT_TYPES.PURCHASE_ENTRY ||
+    movement.movementType === MOVEMENT_TYPES.MANUAL_ENTRY ||
     (movement.movementType === MOVEMENT_TYPES.MANUAL_SET && movement.quantity > 0);
   return {
     text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,

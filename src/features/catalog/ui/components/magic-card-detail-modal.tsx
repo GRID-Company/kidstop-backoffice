@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
@@ -21,12 +22,16 @@ import { useQuery } from '@apollo/client/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
 import { IMagicCard } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS } from '../../domain/constants';
+import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS, CARD_SEARCH_LIMIT } from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
-import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
+import { MagicCardWithMetricsDocument, MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { BulkOperationType } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
+import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
+import { toMagicCard } from '../../adapters/mappers/card.mapper';
+import CardSearch from '@/shared/blocks/card-search';
+import ConditionSelector from '@/shared/blocks/condition-selector';
 
 interface MagicCardDetailModalProps {
   card: IMagicCard | null;
@@ -39,7 +44,22 @@ export default function MagicCardDetailModal({
   isOpen,
   onClose,
 }: MagicCardDetailModalProps) {
-  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (card?.guid ?? null) : null);
+  const [selectedCard, setSelectedCard] = useState<IMagicCard | null>(card);
+  const [itemSearch, setItemSearch] = useState('');
+  const prevIsOpenRef = useRef(isOpen);
+  
+  useEffect(() => {
+    const wasOpen = prevIsOpenRef.current;
+    prevIsOpenRef.current = isOpen;
+    
+    if (isOpen && !wasOpen) {
+      setSelectedCard(card);
+      setItemSearch('');
+    }
+  }, [isOpen, card]);
+
+  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
     selectedVariant,
@@ -49,57 +69,147 @@ export default function MagicCardDetailModal({
     setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
-    handleStockAdjust,
+    executeStockAdjust,
     control,
     handleSubmit,
     formState,
     updatingPrice,
     adjustLoading,
+    cardName,
   } = useCardDetailModal({
     detail,
-    card,
+    card: selectedCard,
     tcgType: 'MAGIC',
     onRefetch: refetch,
   });
 
+
+  const handleStockAdjustClick = useCallback(() => {
+    if (stockAdjustment === 0) return;
+    setIsConfirmModalOpen(true);
+  }, [stockAdjustment]);
+
+  const handleConfirmAdjustment = useCallback(async () => {
+    await executeStockAdjust();
+    setIsConfirmModalOpen(false);
+  }, [executeStockAdjust]);
+
+  const { data: searchData, loading: searchLoading } = useQuery(MagicCardInternalListDocument, {
+    variables: {
+      findMagicCardsPublicArgs: {
+        skip: 0,
+        limit: CARD_SEARCH_LIMIT,
+        search: itemSearch.trim() || undefined,
+        sort: { column: 'releaseDate', order: 'DESC' },
+        filters: {},
+      },
+    },
+    skip: !!selectedCard || itemSearch.trim().length < 2,
+    fetchPolicy: 'network-only',
+  });
+
+  const searchResults = useMemo<IMagicCard[]>(() => {
+    const raw = searchData?.magicCardInternalList?.data;
+    if (!raw) return [];
+    return raw
+      .filter((card): card is NonNullable<typeof card> => card != null)
+      .map(toMagicCard);
+  }, [searchData]);
+
+  const handleCardSelect = useCallback((card: IMagicCard) => {
+    setSelectedCard(card);
+  }, []);
+
   const { data: metricsData } = useQuery(MagicCardWithMetricsDocument, {
-    variables: { guid: card?.guid ?? '' },
-    skip: !card?.guid || !isOpen,
+    variables: { guid: selectedCard?.guid ?? '' },
+    skip: !selectedCard?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
 
-  if (!card) return null;
-
-  const imageUri = detail?.imageUri ?? card.imageUri;
-  const name = detail?.name ?? card.name;
-  const edition = detail?.edition ?? card.edition;
-  const collectorNumber = detail?.collectorNumber ?? card.collectorNumber;
-  const rarity = detail?.rarity ?? card.rarity;
-  const isFoil = detail?.isFoil ?? card.isFoil;
-  const totalStock = detail?.totalStock ?? card.totalStock;
-  const variants = detail?.inventoryCards ?? card.variants;
+  const imageUri = detail?.imageUri ?? selectedCard?.imageUri;
+  const name = detail?.name ?? selectedCard?.name;
+  const edition = detail?.edition ?? selectedCard?.edition;
+  const collectorNumber = detail?.collectorNumber ?? selectedCard?.collectorNumber;
+  const rarity = detail?.rarity ?? selectedCard?.rarity;
+  const isFoil = detail?.isFoil ?? selectedCard?.isFoil;
+  const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
+  const variants = detail?.inventoryCards ?? selectedCard?.variants ?? [];
 
   const variantMetrics = metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
     (v) => v?.condition === selectedVariant?.condition
   );
 
   return (
+    <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{name}</span>
+          <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
           <div className="flex items-center gap-2 text-sm font-normal text-default-500">
-            {edition && <span>{edition}</span>}
-            {collectorNumber && (
+            {selectedCard ? (
               <>
-                <span>·</span>
-                <span>#{collectorNumber}</span>
+                {edition && <span>{edition}</span>}
+                {collectorNumber && (
+                  <>
+                    <span>·</span>
+                    <span>#{collectorNumber}</span>
+                  </>
+                )}
               </>
+            ) : (
+              <span>Buscar carta por nombre, edición o código</span>
             )}
           </div>
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
+          {!selectedCard && (
+            <CardSearch
+              searchValue={itemSearch}
+              onSearchChange={setItemSearch}
+              results={searchResults}
+              loading={searchLoading}
+              onCardSelect={handleCardSelect}
+              placeholder="Buscar carta por nombre, edición o código..."
+              renderCard={(result) => (
+                <>
+                  <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
+                    {result.imageUri ? (
+                      <img
+                        src={result.imageUri}
+                        alt={result.name}
+                        className="absolute inset-0 h-full w-full object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={magicCardPlaceholder}
+                        alt="Card placeholder"
+                        fill
+                        sizes="32px"
+                        className="object-contain"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{result.name}</p>
+                    <p className="truncate text-xs text-default-500">
+                      {result.edition} · #{result.collectorNumber}
+                    </p>
+                  </div>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={result.totalStock > 0 ? 'success' : 'default'}
+                  >
+                    {result.totalStock}
+                  </Chip>
+                </>
+              )}
+            />
+          )}
+
+          {selectedCard && (
+          <>
           <div className="flex gap-6">
             <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
               {imageUri ? (
@@ -316,8 +426,7 @@ export default function MagicCardDetailModal({
                   <Button
                     size="sm"
                     isDisabled={stockAdjustment === 0}
-                    isLoading={adjustLoading}
-                    onPress={handleStockAdjust}
+                    onPress={handleStockAdjustClick}
                     startContent={<Icon icon="lucide:package-plus" />}
                     className="text-white"
                     style={{ backgroundColor: 'var(--color-accent)' }}
@@ -364,6 +473,8 @@ export default function MagicCardDetailModal({
               </form>
             </>
           )}
+          </>
+          )}
         </DrawerBody>
 
         <DrawerFooter className="flex justify-end">
@@ -373,5 +484,20 @@ export default function MagicCardDetailModal({
         </DrawerFooter>
       </DrawerContent>
     </KidstopDrawer>
+
+    {selectedVariant && (
+      <InventoryAdjustmentConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmAdjustment}
+        loading={adjustLoading}
+        cardName={cardName ?? name}
+        condition={selectedVariant.condition}
+        operationType={movementType}
+        quantity={stockAdjustment}
+        currentStock={selectedVariant.stock}
+      />
+    )}
+  </>
   );
 }
