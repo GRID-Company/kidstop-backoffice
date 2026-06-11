@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
@@ -15,6 +15,7 @@ import {
   Input,
   Select,
   SelectItem,
+  Spinner,
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
@@ -29,10 +30,12 @@ import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { useQuery } from '@apollo/client/react';
-import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
+import { PokemonCardWithMetricsDocument, PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { BulkOperationType } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
+import { toPokemonCard } from '../../adapters/mappers/card.mapper';
+import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
 
 interface PokemonCardDetailModalProps {
   card: IPokemonCard | null;
@@ -45,7 +48,19 @@ export default function PokemonCardDetailModal({
   isOpen,
   onClose,
 }: PokemonCardDetailModalProps) {
-  const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
+  const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
+  const [itemSearch, setItemSearch] = useState('');
+  const [selectedCondition, setSelectedCondition] = useState<string>('');
+  
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCard(card);
+      setItemSearch('');
+      setSelectedCondition('');
+    }
+  }, [isOpen, card]);
+
+  const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
@@ -65,10 +80,19 @@ export default function PokemonCardDetailModal({
     cardName,
   } = useCardDetailModal({
     detail,
-    card,
+    card: selectedCard,
     tcgType: 'POKEMON',
     onRefetch: refetch,
   });
+
+  useEffect(() => {
+    if (selectedCondition && detail?.inventoryCards) {
+      const variant = detail.inventoryCards.find(v => v.condition === selectedCondition);
+      if (variant) {
+        handleVariantSelect(variant);
+      }
+    }
+  }, [selectedCondition, detail, handleVariantSelect]);
 
   const handleStockAdjustClick = useCallback(() => {
     if (stockAdjustment === 0) return;
@@ -80,18 +104,50 @@ export default function PokemonCardDetailModal({
     setIsConfirmModalOpen(false);
   }, [executeStockAdjust]);
 
+  const { data: searchData, loading: searchLoading } = useQuery(PokemonCardInternalListDocument, {
+    variables: {
+      findPokemonCardsPublicArgs: {
+        skip: 0,
+        limit: 6,
+        search: itemSearch.trim() || undefined,
+        sort: { column: 'releaseDate', order: 'DESC' },
+        filters: {},
+      },
+    },
+    skip: !!selectedCard || itemSearch.trim().length < 2,
+    fetchPolicy: 'network-only',
+  });
+
+  const searchResults = useMemo<IPokemonCard[]>(() => {
+    const raw = searchData?.pokemonCardInternalList?.data;
+    if (!raw) return [];
+    return raw
+      .filter((card): card is NonNullable<typeof card> => card != null)
+      .map(toPokemonCard);
+  }, [searchData]);
+
+  const handleCardSelect = useCallback((card: IPokemonCard) => {
+    setSelectedCard(card);
+    setSelectedCondition('');
+  }, []);
+
+  const handleConditionSelect = useCallback((condition: string) => {
+    setSelectedCondition(condition);
+    setItemSearch('');
+  }, []);
+
   const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
-    variables: { guid: card?.guid ?? '' },
-    skip: !card?.guid || !isOpen,
+    variables: { guid: selectedCard?.guid ?? '' },
+    skip: !selectedCard?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
 
-  const imageUri = detail?.imageUri ?? card?.imageUri;
-  const name = detail?.name ?? card?.name;
-  const setName = detail?.setName ?? card?.setName;
-  const setCode = detail?.setCode ?? card?.setCode;
-  const totalStock = detail?.totalStock ?? card?.totalStock;
-  const sellPrice = detail?.sellPrice ?? card?.sellPrice;
+  const imageUri = detail?.imageUri ?? selectedCard?.imageUri;
+  const name = detail?.name ?? selectedCard?.name;
+  const setName = detail?.setName ?? selectedCard?.setName;
+  const setCode = detail?.setCode ?? selectedCard?.setCode;
+  const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
+  const sellPrice = detail?.sellPrice ?? selectedCard?.sellPrice;
 
   return (
     <>
@@ -100,33 +156,163 @@ export default function PokemonCardDetailModal({
         <DrawerHeader className="flex flex-col gap-1">
           <span className="text-lg font-semibold text-accent">{name ?? 'Ajuste de inventario'}</span>
           <span className="text-sm font-normal text-default-500">
-            {card ? (
+            {selectedCard && !selectedCondition ? (
               <>
                 {[setName, setCode].filter(Boolean).join(' · ')}
                 {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
               </>
+            ) : selectedCard && selectedCondition ? (
+              'Selecciona la condición de la carta'
             ) : (
-              'Selecciona una carta del inventario para ajustar stock o precios'
+              'Buscar carta por nombre, set o código'
             )}
           </span>
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
-          {!card && (
-            <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
-              <Icon icon="lucide:search" width={48} className="text-default-300" />
-              <div className="flex flex-col gap-2">
-                <p className="text-lg font-semibold text-default-600">
-                  Selecciona una carta
+          {!selectedCard && (
+            <div className="flex flex-col gap-4">
+              <Input
+                placeholder="Buscar carta por nombre, set o código..."
+                value={itemSearch}
+                onValueChange={setItemSearch}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
+                isClearable
+                onClear={() => setItemSearch('')}
+                autoFocus
+              />
+
+              {searchLoading && (
+                <div className="flex justify-center py-4">
+                  <Spinner size="sm" />
+                </div>
+              )}
+
+              {!searchLoading && itemSearch.trim().length >= 2 && searchResults.length === 0 && (
+                <p className="text-center text-sm text-default-400">
+                  No se encontraron cartas en el catálogo
                 </p>
-                <p className="text-sm text-default-400">
-                  Haz click en cualquier carta del grid de inventario<br />
-                  para ver sus detalles y realizar ajustes
+              )}
+
+              {searchResults.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {searchResults.map((result) => (
+                    <button
+                      key={result.guid}
+                      type="button"
+                      onClick={() => handleCardSelect(result)}
+                      className="flex items-center gap-3 rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
+                    >
+                      <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
+                        {result.imageUri ? (
+                          <img
+                            src={result.imageUri}
+                            alt={result.name}
+                            className="absolute inset-0 h-full w-full object-contain"
+                          />
+                        ) : (
+                          <Image
+                            src={pokemonCardPlaceholder}
+                            alt="Card placeholder"
+                            fill
+                            sizes="32px"
+                            className="object-contain"
+                          />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{result.name}</p>
+                        <p className="truncate text-xs text-default-500">
+                          {result.setName} · #{result.cardNumber}
+                        </p>
+                      </div>
+                      <Chip
+                        size="sm"
+                        variant="flat"
+                        color={result.totalStock > 0 ? 'success' : 'default'}
+                      >
+                        {result.totalStock}
+                      </Chip>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {itemSearch.trim().length < 2 && (
+                <p className="text-center text-sm text-default-400">
+                  Escribe al menos 2 caracteres para buscar
                 </p>
+              )}
+            </div>
+          )}
+
+          {selectedCard && !selectedCondition && (
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4 rounded-lg bg-default-50 p-4">
+                <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
+                  {selectedCard.imageUri ? (
+                    <img
+                      src={selectedCard.imageUri}
+                      alt={selectedCard.name}
+                      className="absolute inset-0 h-full w-full object-contain"
+                    />
+                  ) : (
+                    <Image
+                      src={pokemonCardPlaceholder}
+                      alt="Card placeholder"
+                      fill
+                      sizes="48px"
+                      className="object-contain"
+                    />
+                  )}
+                </div>
+
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <p className="truncate text-sm font-semibold">{selectedCard.name}</p>
+                  <p className="truncate text-xs text-default-500">
+                    {selectedCard.setName} · #{selectedCard.cardNumber}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => { setSelectedCard(null); setItemSearch(''); }}
+                  className="self-start text-default-400 hover:text-default-700"
+                  aria-label="Cambiar carta"
+                >
+                  <Icon icon="lucide:x" />
+                </button>
+              </div>
+
+              <Divider />
+
+              <div className="flex flex-col gap-3">
+                <p className="text-sm font-medium">Selecciona la condición</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {CARD_CONDITION_OPTIONS.map((option) => {
+                    const variant = selectedCard.variants.find(v => v.condition === option.value);
+                    const stock = variant?.stock ?? 0;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleConditionSelect(option.value)}
+                        className="flex items-center justify-between rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
+                      >
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium">{option.label}</p>
+                          <p className="text-xs text-default-500">Stock: {stock}</p>
+                        </div>
+                        <Icon icon="lucide:chevron-right" className="text-default-400" />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
-          {card && (
+
+          {selectedCard && selectedCondition && (
           <>
           <div className="flex gap-6">
             <div className="w-40 shrink-0">
@@ -257,9 +443,9 @@ export default function PokemonCardDetailModal({
                 <Chip
                   size="sm"
                   variant="flat"
-                  color={card.availableStock ? 'success' : 'default'}
+                  color={selectedCard?.availableStock ? 'success' : 'default'}
                 >
-                  {card.availableStock ? 'Sí' : 'No'}
+                  {selectedCard?.availableStock ? 'Sí' : 'No'}
                 </Chip>
               </div>
             </div>
