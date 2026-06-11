@@ -82,16 +82,14 @@ export default function MagicCardDetailModal({
     fetchPolicy: 'cache-and-network',
   });
 
-  if (!card) return null;
-
-  const imageUri = detail?.imageUri ?? card.imageUri;
-  const name = detail?.name ?? card.name;
-  const edition = detail?.edition ?? card.edition;
-  const collectorNumber = detail?.collectorNumber ?? card.collectorNumber;
-  const rarity = detail?.rarity ?? card.rarity;
-  const isFoil = detail?.isFoil ?? card.isFoil;
-  const totalStock = detail?.totalStock ?? card.totalStock;
-  const variants = detail?.inventoryCards ?? card.variants;
+  const imageUri = detail?.imageUri ?? card?.imageUri;
+  const name = detail?.name ?? card?.name;
+  const edition = detail?.edition ?? card?.edition;
+  const collectorNumber = detail?.collectorNumber ?? card?.collectorNumber;
+  const rarity = detail?.rarity ?? card?.rarity;
+  const isFoil = detail?.isFoil ?? card?.isFoil;
+  const totalStock = detail?.totalStock ?? card?.totalStock;
+  const variants = detail?.inventoryCards ?? card?.variants ?? [];
 
   const variantMetrics = metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
     (v) => v?.condition === selectedVariant?.condition
@@ -102,19 +100,41 @@ export default function MagicCardDetailModal({
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{name}</span>
+          <span className="text-lg font-semibold text-accent">{name ?? 'Ajuste de inventario'}</span>
           <div className="flex items-center gap-2 text-sm font-normal text-default-500">
-            {edition && <span>{edition}</span>}
-            {collectorNumber && (
+            {card ? (
               <>
-                <span>·</span>
-                <span>#{collectorNumber}</span>
+                {edition && <span>{edition}</span>}
+                {collectorNumber && (
+                  <>
+                    <span>·</span>
+                    <span>#{collectorNumber}</span>
+                  </>
+                )}
               </>
+            ) : (
+              <span>Selecciona una carta del inventario para ajustar stock o precios</span>
             )}
           </div>
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
+          {!card && (
+            <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+              <Icon icon="lucide:search" width={48} className="text-default-300" />
+              <div className="flex flex-col gap-2">
+                <p className="text-lg font-semibold text-default-600">
+                  Selecciona una carta
+                </p>
+                <p className="text-sm text-default-400">
+                  Haz click en cualquier carta del grid de inventario<br />
+                  para ver sus detalles y realizar ajustes
+                </p>
+              </div>
+            </div>
+          )}
+          {card && (
+          <>
           <div className="flex gap-6">
             <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
               {imageUri ? (
@@ -377,6 +397,8 @@ export default function MagicCardDetailModal({
                 </Button>
               </form>
             </>
+          )}
+          </>
           )}
         </DrawerBody>
 

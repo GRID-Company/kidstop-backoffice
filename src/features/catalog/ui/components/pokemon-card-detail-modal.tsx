@@ -86,28 +86,48 @@ export default function PokemonCardDetailModal({
     fetchPolicy: 'cache-and-network',
   });
 
-  if (!card) return null;
-
-  const imageUri = detail?.imageUri ?? card.imageUri;
-  const name = detail?.name ?? card.name;
-  const setName = detail?.setName ?? card.setName;
-  const setCode = detail?.setCode ?? card.setCode;
-  const totalStock = detail?.totalStock ?? card.totalStock;
-  const sellPrice = detail?.sellPrice ?? card.sellPrice;
+  const imageUri = detail?.imageUri ?? card?.imageUri;
+  const name = detail?.name ?? card?.name;
+  const setName = detail?.setName ?? card?.setName;
+  const setCode = detail?.setCode ?? card?.setCode;
+  const totalStock = detail?.totalStock ?? card?.totalStock;
+  const sellPrice = detail?.sellPrice ?? card?.sellPrice;
 
   return (
     <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{name}</span>
+          <span className="text-lg font-semibold text-accent">{name ?? 'Ajuste de inventario'}</span>
           <span className="text-sm font-normal text-default-500">
-            {[setName, setCode].filter(Boolean).join(' · ')}
-            {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+            {card ? (
+              <>
+                {[setName, setCode].filter(Boolean).join(' · ')}
+                {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+              </>
+            ) : (
+              'Selecciona una carta del inventario para ajustar stock o precios'
+            )}
           </span>
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
+          {!card && (
+            <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+              <Icon icon="lucide:search" width={48} className="text-default-300" />
+              <div className="flex flex-col gap-2">
+                <p className="text-lg font-semibold text-default-600">
+                  Selecciona una carta
+                </p>
+                <p className="text-sm text-default-400">
+                  Haz click en cualquier carta del grid de inventario<br />
+                  para ver sus detalles y realizar ajustes
+                </p>
+              </div>
+            </div>
+          )}
+          {card && (
+          <>
           <div className="flex gap-6">
             <div className="w-40 shrink-0">
               <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
@@ -442,6 +462,8 @@ export default function PokemonCardDetailModal({
                 </Button>
               </form>
             </>
+          )}
+          </>
           )}
         </DrawerBody>
 
