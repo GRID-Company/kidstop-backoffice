@@ -131,6 +131,18 @@ export default function PokemonCardDetailModal({
     fetchPolicy: 'cache-and-network',
   });
 
+  const variantMetrics = metricsData?.pokemonCardWithMetrics?.variantsMetrics?.find(
+    (v) => v?.condition === selectedVariant?.condition
+  );
+
+  const totalWishlistCount = useMemo(() => {
+    if (!metricsData?.pokemonCardWithMetrics?.variantsMetrics) return 0;
+    return metricsData.pokemonCardWithMetrics.variantsMetrics.reduce(
+      (sum, variant) => sum + (variant?.wishlistCount ?? 0),
+      0
+    );
+  }, [metricsData]);
+
   const imageUri = detail?.imageUri ?? selectedCard?.imageUri;
   const name = detail?.name ?? selectedCard?.name;
   const setName = detail?.setName ?? selectedCard?.setName;
@@ -453,6 +465,18 @@ export default function PokemonCardDetailModal({
                           {metricsData.pokemonCardWithMetrics.gradedPriceSeven
                             ? `$${metricsData.pokemonCardWithMetrics.gradedPriceSeven.toFixed(2)}`
                             : 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">Total en wishlist</span>
+                        <span className="font-bold text-purple-600">
+                          {totalWishlistCount}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">En wishlist (variante)</span>
+                        <span className="font-bold text-purple-600">
+                          {variantMetrics?.wishlistCount ?? 0}
                         </span>
                       </div>
                     </div>

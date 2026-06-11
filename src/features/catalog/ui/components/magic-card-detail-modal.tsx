@@ -139,6 +139,14 @@ export default function MagicCardDetailModal({
     (v) => v?.condition === selectedVariant?.condition
   );
 
+  const totalWishlistCount = useMemo(() => {
+    if (!metricsData?.magicCardWithMetrics?.variantsMetrics) return 0;
+    return metricsData.magicCardWithMetrics.variantsMetrics.reduce(
+      (sum, variant) => sum + (variant?.wishlistCount ?? 0),
+      0
+    );
+  }, [metricsData]);
+
   return (
     <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
@@ -387,6 +395,20 @@ export default function MagicCardDetailModal({
                           {metricsData.magicCardWithMetrics.priceBuy
                             ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
                             : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">Total en wishlist</span>
+                        <span className="font-bold text-purple-600">
+                          {totalWishlistCount}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-default-500">En wishlist (variante)</span>
+                        <span className="font-bold text-purple-600">
+                          {variantMetrics?.wishlistCount ?? 0}
                         </span>
                       </div>
                     </div>
