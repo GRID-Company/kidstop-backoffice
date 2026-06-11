@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
@@ -31,6 +32,7 @@ import { useQuery } from '@apollo/client/react';
 import { PokemonCardWithMetricsDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { BulkOperationType } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
+import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 
 interface PokemonCardDetailModalProps {
   card: IPokemonCard | null;
@@ -44,6 +46,7 @@ export default function PokemonCardDetailModal({
   onClose,
 }: PokemonCardDetailModalProps) {
   const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (card?.guid ?? null) : null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
     selectedVariant,
@@ -53,18 +56,29 @@ export default function PokemonCardDetailModal({
     setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
-    handleStockAdjust,
+    executeStockAdjust,
     control,
     handleSubmit,
     formState,
     updatingPrice,
     adjustLoading,
+    cardName,
   } = useCardDetailModal({
     detail,
     card,
     tcgType: 'POKEMON',
     onRefetch: refetch,
   });
+
+  const handleStockAdjustClick = useCallback(() => {
+    if (stockAdjustment === 0) return;
+    setIsConfirmModalOpen(true);
+  }, [stockAdjustment]);
+
+  const handleConfirmAdjustment = useCallback(async () => {
+    await executeStockAdjust();
+    setIsConfirmModalOpen(false);
+  }, [executeStockAdjust]);
 
   const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
     variables: { guid: card?.guid ?? '' },
@@ -82,6 +96,7 @@ export default function PokemonCardDetailModal({
   const sellPrice = detail?.sellPrice ?? card.sellPrice;
 
   return (
+    <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
@@ -381,8 +396,7 @@ export default function PokemonCardDetailModal({
                   <Button
                     size="sm"
                     isDisabled={stockAdjustment === 0}
-                    isLoading={adjustLoading}
-                    onPress={handleStockAdjust}
+                    onPress={handleStockAdjustClick}
                     startContent={<Icon icon="lucide:package-plus" />}
                     className="text-white"
                     style={{ backgroundColor: 'var(--color-accent)' }}
@@ -438,5 +452,20 @@ export default function PokemonCardDetailModal({
         </DrawerFooter>
       </DrawerContent>
     </KidstopDrawer>
+
+    {selectedVariant && (
+      <InventoryAdjustmentConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmAdjustment}
+        loading={adjustLoading}
+        cardName={cardName ?? name}
+        condition={selectedVariant.condition}
+        operationType={movementType}
+        quantity={stockAdjustment}
+        currentStock={selectedVariant.stock}
+      />
+    )}
+  </>
   );
 }

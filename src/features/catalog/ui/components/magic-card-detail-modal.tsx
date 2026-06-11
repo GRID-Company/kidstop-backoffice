@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
@@ -27,6 +28,7 @@ import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-moda
 import { MagicCardWithMetricsDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { BulkOperationType } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
+import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 
 interface MagicCardDetailModalProps {
   card: IMagicCard | null;
@@ -40,6 +42,7 @@ export default function MagicCardDetailModal({
   onClose,
 }: MagicCardDetailModalProps) {
   const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (card?.guid ?? null) : null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
     selectedVariant,
@@ -49,18 +52,29 @@ export default function MagicCardDetailModal({
     setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
-    handleStockAdjust,
+    executeStockAdjust,
     control,
     handleSubmit,
     formState,
     updatingPrice,
     adjustLoading,
+    cardName,
   } = useCardDetailModal({
     detail,
     card,
     tcgType: 'MAGIC',
     onRefetch: refetch,
   });
+
+  const handleStockAdjustClick = useCallback(() => {
+    if (stockAdjustment === 0) return;
+    setIsConfirmModalOpen(true);
+  }, [stockAdjustment]);
+
+  const handleConfirmAdjustment = useCallback(async () => {
+    await executeStockAdjust();
+    setIsConfirmModalOpen(false);
+  }, [executeStockAdjust]);
 
   const { data: metricsData } = useQuery(MagicCardWithMetricsDocument, {
     variables: { guid: card?.guid ?? '' },
@@ -84,6 +98,7 @@ export default function MagicCardDetailModal({
   );
 
   return (
+    <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
         <DrawerHeader className="flex flex-col gap-1">
@@ -316,8 +331,7 @@ export default function MagicCardDetailModal({
                   <Button
                     size="sm"
                     isDisabled={stockAdjustment === 0}
-                    isLoading={adjustLoading}
-                    onPress={handleStockAdjust}
+                    onPress={handleStockAdjustClick}
                     startContent={<Icon icon="lucide:package-plus" />}
                     className="text-white"
                     style={{ backgroundColor: 'var(--color-accent)' }}
@@ -373,5 +387,20 @@ export default function MagicCardDetailModal({
         </DrawerFooter>
       </DrawerContent>
     </KidstopDrawer>
+
+    {selectedVariant && (
+      <InventoryAdjustmentConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmAdjustment}
+        loading={adjustLoading}
+        cardName={cardName ?? name}
+        condition={selectedVariant.condition}
+        operationType={movementType}
+        quantity={stockAdjustment}
+        currentStock={selectedVariant.stock}
+      />
+    )}
+  </>
   );
 }

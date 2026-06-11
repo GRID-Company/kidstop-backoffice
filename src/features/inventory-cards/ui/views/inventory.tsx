@@ -16,24 +16,20 @@ import { DrawerContent, DrawerHeader, DrawerBody, Select, SelectItem } from '@he
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
-import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { mapBulkSearchToInventoryInput } from '../../adapters/mappers/bulk-search-to-inventory.mapper';
 import { BulkOperationType } from '@/lib/api/schema-types';
 import {
-  CreateInventoryMovementDocument,
   InventoryItemsDocument,
   InventoryMovementsDocument,
   IndicatorsInventoryItemsDocument,
   BulkLoadInventoryDocument,
 } from '@/lib/api/generated/inventory.generated';
-import { toAdjustInventoryPayload } from '../../adapters/mappers/inventory.mapper';
 import { useInventorySearch } from '../hooks/use-inventory-search';
 import { useInventoryIndicators } from '../hooks/use-inventory-indicators';
 import InventoryMetrics from '../components/inventory-metrics';
 import InventoryFilters from '../components/inventory-filters';
 import InventoryGrid from '../components/inventory-grid';
-import AdjustmentModal from '../components/adjustment-modal';
 import MovementsContent from './movements';
 import PokemonCardDetailModal from '@/features/catalog/ui/components/pokemon-card-detail-modal';
 import MagicCardDetailModal from '@/features/catalog/ui/components/magic-card-detail-modal';
@@ -68,8 +64,6 @@ export default function Inventory() {
 
   const { refresh: refreshIndicators, ...indicators } = useInventoryIndicators(selectedTCG);
 
-  const [selectedItem, setSelectedItem] = useState<IInventoryItem | null>(null);
-  const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
   const [detailModalItem, setDetailModalItem] = useState<IPokemonCard | IMagicCard | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isBulkAddDrawerOpen, setIsBulkAddDrawerOpen] = useState(false);
@@ -132,36 +126,7 @@ export default function Inventory() {
     void refreshIndicators();
   }, [refetch, refreshIndicators]);
 
-  const handleCloseAdjustment = useCallback(() => {
-    setIsAdjustmentOpen(false);
-    setSelectedItem(null);
-  }, []);
-
   const [bulkLoadInventory, { loading: bulkLoading }] = useMutation(BulkLoadInventoryDocument);
-  
-  const [createMovement, { loading: adjusting }] = useMutation(
-    CreateInventoryMovementDocument,
-    {
-      refetchQueries: [
-        InventoryItemsDocument,
-        InventoryMovementsDocument,
-        IndicatorsInventoryItemsDocument,
-      ],
-    }
-  );
-
-  const handleAdjustmentSubmit = useCallback(
-    async (data: InventoryAdjustmentFormData) => {
-      try {
-        await createMovement({ variables: toAdjustInventoryPayload(data) });
-        toast.success('Movimiento registrado correctamente');
-        handleCloseAdjustment();
-      } catch {
-        toast.error('Error al registrar el movimiento');
-      }
-    },
-    [createMovement, handleCloseAdjustment]
-  );
 
   const handleTabChange = useCallback((key: Key) => {
     setActiveTab(key as string);
@@ -227,7 +192,7 @@ export default function Inventory() {
                 className="text-white"
                 style={{ backgroundColor: 'var(--color-accent)' }}
                 startContent={<Icon icon="lucide:plus" />}
-                onPress={() => setIsAdjustmentOpen(true)}
+                onPress={() => setIsDetailModalOpen(true)}
               >
                 Ajuste manual
               </Button>
@@ -330,23 +295,15 @@ export default function Inventory() {
         </EntitiesPage.CardContainer>
       </EntitiesPage>
 
-      <AdjustmentModal
-        item={selectedItem}
-        isOpen={isAdjustmentOpen}
-        isSubmitting={adjusting}
-        onClose={handleCloseAdjustment}
-        onSubmit={handleAdjustmentSubmit}
-      />
-
       <PokemonCardDetailModal
         card={detailModalItem && 'setName' in detailModalItem ? detailModalItem : null}
-        isOpen={isDetailModalOpen && detailModalItem !== null && 'setName' in detailModalItem}
+        isOpen={isDetailModalOpen && (detailModalItem === null || 'setName' in detailModalItem) && selectedTCG === 'POKEMON'}
         onClose={handleCloseDetailModal}
       />
 
       <MagicCardDetailModal
         card={detailModalItem && 'edition' in detailModalItem ? detailModalItem : null}
-        isOpen={isDetailModalOpen && detailModalItem !== null && 'edition' in detailModalItem}
+        isOpen={isDetailModalOpen && (detailModalItem === null || 'edition' in detailModalItem) && selectedTCG === 'MAGIC'}
         onClose={handleCloseDetailModal}
       />
 

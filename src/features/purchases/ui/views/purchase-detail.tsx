@@ -42,6 +42,7 @@ import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
+import CompletePurchaseModal from '../components/complete-purchase-modal';
 
 interface PurchaseDetailProps {
   purchaseId: string;
@@ -84,6 +85,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
   const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
 
@@ -136,7 +138,12 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   }, [updateStatus]);
 
   const handleFinalize = useCallback(() => {
-    updateStatus(PURCHASE_STATUS.FINALIZED);
+    setIsCompleteModalOpen(true);
+  }, []);
+
+  const handleCompleteConfirm = useCallback(async () => {
+    await updateStatus(PURCHASE_STATUS.FINALIZED);
+    setIsCompleteModalOpen(false);
   }, [updateStatus]);
 
   const handleReject = useCallback(() => {
@@ -463,9 +470,10 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                     <span>
                       <Button
                         className="bg-accent text-white"
-                        startContent={<Icon icon="lucide:check-circle" width={18} />}
+                        startContent={!loading ? <Icon icon="lucide:check-circle" width={18} /> : undefined}
                         onPress={handleFinalize}
-                        isDisabled={!canFinalize}
+                        isDisabled={!canFinalize || loading}
+                        isLoading={loading}
                       >
                         Finalizar compra
                       </Button>
@@ -543,6 +551,16 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         }}
         seller={purchase.seller}
         isLoading={updatingSeller}
+      />
+
+      <CompletePurchaseModal
+        purchase={purchase}
+        itemCount={items.length}
+        payments={payments}
+        isOpen={isCompleteModalOpen}
+        onClose={() => setIsCompleteModalOpen(false)}
+        onConfirm={handleCompleteConfirm}
+        loading={loading}
       />
     </EntitiesPage>
   );
