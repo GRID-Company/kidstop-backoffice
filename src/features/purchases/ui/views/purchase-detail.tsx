@@ -70,6 +70,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canReturnToDraft,
     hasItemChanges,
     total,
+    mutating,
     currentBuyerSpent,
     assignedBudget,
     existingItemIds,
@@ -470,10 +471,10 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                     <span>
                       <Button
                         className="bg-accent text-white"
-                        startContent={!loading ? <Icon icon="lucide:check-circle" width={18} /> : undefined}
+                        startContent={!mutating ? <Icon icon="lucide:check-circle" width={18} /> : undefined}
                         onPress={handleFinalize}
-                        isDisabled={!canFinalize || loading}
-                        isLoading={loading}
+                        isDisabled={!canFinalize || mutating}
+                        isLoading={mutating}
                       >
                         Finalizar compra
                       </Button>
@@ -560,7 +561,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         isOpen={isCompleteModalOpen}
         onClose={() => setIsCompleteModalOpen(false)}
         onConfirm={handleCompleteConfirm}
-        loading={loading}
+        loading={mutating}
       />
     </EntitiesPage>
   );
