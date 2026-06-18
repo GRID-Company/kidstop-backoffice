@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { useMutation } from '@apollo/client/react';
+import { useCallback, useEffect } from 'react';
+import { useLazyQuery } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
 import { ExportSalesDocument } from '@/lib/api/generated/sales.generated';
@@ -11,14 +11,24 @@ interface UseExportSalesReturn {
 }
 
 export function useExportSales(): UseExportSalesReturn {
-  const [exportSales, { loading: exporting }] = useMutation(ExportSalesDocument, {
-    onCompleted: () => {
+  const [exportSales, { loading: exporting, data, error }] = useLazyQuery(
+    ExportSalesDocument,
+    {
+      fetchPolicy: 'network-only',
+    }
+  );
+
+  useEffect(() => {
+    if (data?.exportSales?.success) {
       toast.success('Exportación iniciada. Recibirás el archivo por correo electrónico.');
-    },
-    onError: () => {
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (error) {
       toast.error('Error al iniciar la exportación. Intenta nuevamente.');
-    },
-  });
+    }
+  }, [error]);
 
   const handleExport = useCallback(
     (findSalesArgs: FindSalesArgs) => {

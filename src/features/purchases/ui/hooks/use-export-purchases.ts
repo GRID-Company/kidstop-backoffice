@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { useMutation } from '@apollo/client/react';
+import { useCallback, useEffect } from 'react';
+import { useLazyQuery } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
 import { ExportPurchasesDocument } from '@/lib/api/generated/purchases.generated';
@@ -11,14 +11,24 @@ interface UseExportPurchasesReturn {
 }
 
 export function useExportPurchases(): UseExportPurchasesReturn {
-  const [exportPurchases, { loading: exporting }] = useMutation(ExportPurchasesDocument, {
-    onCompleted: () => {
+  const [exportPurchases, { loading: exporting, data, error }] = useLazyQuery(
+    ExportPurchasesDocument,
+    {
+      fetchPolicy: 'network-only',
+    }
+  );
+
+  useEffect(() => {
+    if (data?.exportPurchases?.success) {
       toast.success('Exportación iniciada. Recibirás el archivo por correo electrónico.');
-    },
-    onError: () => {
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (error) {
       toast.error('Error al iniciar la exportación. Intenta nuevamente.');
-    },
-  });
+    }
+  }, [error]);
 
   const handleExport = useCallback(
     (findPurchasesArgs: FindPurchasesArgs) => {
