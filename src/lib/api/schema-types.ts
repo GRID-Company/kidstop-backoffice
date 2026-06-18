@@ -278,6 +278,10 @@ export type DayScheduleInput = {
   opening?: InputMaybe<TimeInput>;
 };
 
+export type ExportRequestOutput = {
+  success: Scalars['Boolean']['output'];
+};
+
 export type File = {
   /** Accepted values: TECHNICAL_IMAGE, SAMPLE_IMAGE */
   category: Scalars['String']['output'];
@@ -1465,6 +1469,10 @@ export type Query = {
   buyerBudgets: Array<BuyerBudgetWithUsage>;
   /** Get client sales statistics (orders count, totals, cancellations, last order date) */
   clientDetails: ClientDetailsOutput;
+  /** Export purchases to xlsx (async, sends download link via email) */
+  exportPurchases: ExportRequestOutput;
+  /** Export sales to xlsx (async, sends download link via email) */
+  exportSales: ExportRequestOutput;
   /** Get banner file for a specific TCG */
   getBanner?: Maybe<File>;
   /** Query to get the global config */
@@ -1573,6 +1581,14 @@ export type QueryBuyerBudgetsArgs = {
 
 export type QueryClientDetailsArgs = {
   clientGuid: Scalars['String']['input'];
+};
+
+export type QueryExportPurchasesArgs = {
+  findPurchasesArgs: FindPurchasesArgs;
+};
+
+export type QueryExportSalesArgs = {
+  findSalesArgs: FindSalesArgs;
 };
 
 export type QueryGetBannerArgs = {

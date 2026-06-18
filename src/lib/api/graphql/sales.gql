@@ -209,3 +209,9 @@ mutation RemoveSaleItem($removeSaleItemInput: RemoveSaleItemInput!) {
     updatedDate
   }
 }
+
+query ExportSales($findSalesArgs: FindSalesArgs!) {
+  exportSales(findSalesArgs: $findSalesArgs) {
+    success
+  }
+}
