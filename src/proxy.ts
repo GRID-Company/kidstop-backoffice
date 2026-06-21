@@ -67,7 +67,11 @@ export function proxy(request: NextRequest) {
   if (startsWithAny(pathname, PROTECTED_PREFIXES) && !token) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    return NextResponse.redirect(url);
+
+    const res = NextResponse.redirect(url);
+    res.cookies.delete('jwt');
+    res.cookies.delete('role');
+    return res;
   }
 
   if (role && ROLE_ROUTES[role]) {
