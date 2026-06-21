@@ -42,7 +42,9 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
         if (isAuthError && !redirectRef.current && !window.location.href.includes('/login')) {
           redirectRef.current = true;
           logout('Sesión expirada. Por favor inicia sesión nuevamente.', false);
-          window.location.href = '/login';
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 150);
         }
       }
     });
