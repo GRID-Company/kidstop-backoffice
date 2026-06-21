@@ -24,6 +24,8 @@ import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import SellerDeleteModal from '../components/seller-delete-modal';
+import { DuplicateItemsConfirmationModal } from '../components/duplicate-items-confirmation-modal';
+import { useDuplicateValidation } from '../hooks/use-duplicate-validation';
 
 export default function PurchaseNew() {
   const router = useRouter();
@@ -54,18 +56,27 @@ export default function PurchaseNew() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
 
+  const { 
+    duplicateConfirmation, 
+    validateAndAddItems, 
+    handleConfirmDuplicates, 
+    handleCancelDuplicates 
+  } = useDuplicateValidation(
+    existingItemIds, 
+    addItem, 
+    () => setIsAdvancedSearchEnabled(false)
+  );
+
   const handleBulkSearchConfirm = useCallback(
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
-        newItems.forEach((item) => addItem(item));
-        toast.success(`${newItems.length} cartas agregadas exitosamente`);
-        setIsAdvancedSearchEnabled(false);
+        validateAndAddItems(newItems);
       } catch (error) {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },
-    [addItem, selectedTCG]
+    [validateAndAddItems, selectedTCG]
   );
 
   const handleBulkSearchCancel = useCallback(() => {
@@ -354,6 +365,14 @@ export default function PurchaseNew() {
         onConfirm={handleDeleteSeller}
         seller={seller}
         isLoading={deleting}
+      />
+
+      <DuplicateItemsConfirmationModal
+        isOpen={duplicateConfirmation !== null}
+        uniqueItems={duplicateConfirmation?.uniqueItems || []}
+        duplicateItems={duplicateConfirmation?.duplicateItems || []}
+        onConfirm={handleConfirmDuplicates}
+        onCancel={handleCancelDuplicates}
       />
     </EntitiesPage>
   );
