@@ -12,7 +12,8 @@ import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/sc
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { ISeller } from '../../domain/types';
+import { ISeller, IPurchaseItem } from '../../domain/types';
+import { getItemKey } from '../../domain/purchases.domain';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
@@ -24,6 +25,7 @@ import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import SellerDeleteModal from '../components/seller-delete-modal';
+import { DuplicateItemsConfirmationModal } from '../components/duplicate-items-confirmation-modal';
 
 export default function PurchaseNew() {
   const router = useRouter();
@@ -53,23 +55,68 @@ export default function PurchaseNew() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
+  const [duplicateConfirmation, setDuplicateConfirmation] = useState<{
+    uniqueItems: IPurchaseItem[];
+    duplicateItems: IPurchaseItem[];
+  } | null>(null);
 
   const handleBulkSearchConfirm = useCallback(
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
-        newItems.forEach((item) => addItem(item));
-        toast.success(`${newItems.length} cartas agregadas exitosamente`);
+        
+        // Separar items únicos y duplicados
+        const uniqueItems: IPurchaseItem[] = [];
+        const duplicateItems: IPurchaseItem[] = [];
+        
+        newItems.forEach(item => {
+          const itemKey = getItemKey(item);
+          if (existingItemIds.has(itemKey)) {
+            duplicateItems.push(item);
+          } else {
+            uniqueItems.push(item);
+          }
+        });
+        
+        // Si hay duplicados, mostrar modal de confirmación
+        if (duplicateItems.length > 0) {
+          setDuplicateConfirmation({ uniqueItems, duplicateItems });
+          return;
+        }
+        
+        // Si no hay items únicos, mostrar error
+        if (uniqueItems.length === 0) {
+          toast.error('Todas las cartas ya están agregadas a la compra');
+          return;
+        }
+        
+        // Agregar items únicos directamente
+        uniqueItems.forEach((item) => addItem(item));
+        toast.success(`${uniqueItems.length} cartas agregadas exitosamente`);
         setIsAdvancedSearchEnabled(false);
       } catch (error) {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },
-    [addItem, selectedTCG]
+    [addItem, selectedTCG, existingItemIds]
   );
 
   const handleBulkSearchCancel = useCallback(() => {
     setIsAdvancedSearchEnabled(false);
+  }, []);
+
+  const handleConfirmDuplicates = useCallback(() => {
+    if (!duplicateConfirmation) return;
+    
+    duplicateConfirmation.uniqueItems.forEach((item) => addItem(item));
+    toast.success(`${duplicateConfirmation.uniqueItems.length} cartas agregadas exitosamente`);
+    
+    setDuplicateConfirmation(null);
+    setIsAdvancedSearchEnabled(false);
+  }, [duplicateConfirmation, addItem]);
+
+  const handleCancelDuplicates = useCallback(() => {
+    setDuplicateConfirmation(null);
   }, []);
 
   const handleConfirmSeller = useCallback(() => {
@@ -354,6 +401,14 @@ export default function PurchaseNew() {
         onConfirm={handleDeleteSeller}
         seller={seller}
         isLoading={deleting}
+      />
+
+      <DuplicateItemsConfirmationModal
+        isOpen={duplicateConfirmation !== null}
+        uniqueItems={duplicateConfirmation?.uniqueItems || []}
+        duplicateItems={duplicateConfirmation?.duplicateItems || []}
+        onConfirm={handleConfirmDuplicates}
+        onCancel={handleCancelDuplicates}
       />
     </EntitiesPage>
   );
