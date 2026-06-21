@@ -27,7 +27,7 @@ import {
   PURCHASE_STATUS_LABELS,
   PAYMENT_METHOD_LABELS,
 } from '../../domain/constants';
-import { calculateTotal, getItemKey } from '../../domain/purchases.domain';
+import { calculateTotal } from '../../domain/purchases.domain';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
@@ -44,6 +44,7 @@ import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import CompletePurchaseModal from '../components/complete-purchase-modal';
 import { DuplicateItemsConfirmationModal } from '../components/duplicate-items-confirmation-modal';
+import { useDuplicateValidation } from '../hooks/use-duplicate-validation';
 
 interface PurchaseDetailProps {
   purchaseId: string;
@@ -89,10 +90,17 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
-  const [duplicateConfirmation, setDuplicateConfirmation] = useState<{
-    uniqueItems: IPurchaseItem[];
-    duplicateItems: IPurchaseItem[];
-  } | null>(null);
+
+  const { 
+    duplicateConfirmation, 
+    validateAndAddItems, 
+    handleConfirmDuplicates, 
+    handleCancelDuplicates 
+  } = useDuplicateValidation(
+    existingItemIds, 
+    addItem, 
+    () => setIsAdvancedSearchEnabled(false)
+  );
   const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
 
   const { updateSeller, updating: updatingSeller } = useSellers();
@@ -171,59 +179,16 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
-        
-        // Separar items únicos y duplicados
-        const uniqueItems: IPurchaseItem[] = [];
-        const duplicateItems: IPurchaseItem[] = [];
-        
-        newItems.forEach(item => {
-          const itemKey = getItemKey(item);
-          if (existingItemIds.has(itemKey)) {
-            duplicateItems.push(item);
-          } else {
-            uniqueItems.push(item);
-          }
-        });
-        
-        // Si hay duplicados, mostrar modal de confirmación
-        if (duplicateItems.length > 0) {
-          setDuplicateConfirmation({ uniqueItems, duplicateItems });
-          return;
-        }
-        
-        // Si no hay items únicos, mostrar error
-        if (uniqueItems.length === 0) {
-          toast.error('Todas las cartas ya están agregadas a la compra');
-          return;
-        }
-        
-        // Agregar items únicos directamente
-        uniqueItems.forEach((item) => addItem(item));
-        toast.success(`${uniqueItems.length} cartas agregadas exitosamente`);
-        setIsAdvancedSearchEnabled(false);
+        validateAndAddItems(newItems);
       } catch (error) {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },
-    [purchase?.tcgType, addItem, existingItemIds]
+    [purchase?.tcgType, validateAndAddItems]
   );
 
   const handleBulkSearchCancel = useCallback(() => {
     setIsAdvancedSearchEnabled(false);
-  }, []);
-
-  const handleConfirmDuplicates = useCallback(() => {
-    if (!duplicateConfirmation) return;
-    
-    duplicateConfirmation.uniqueItems.forEach((item) => addItem(item));
-    toast.success(`${duplicateConfirmation.uniqueItems.length} cartas agregadas exitosamente`);
-    
-    setDuplicateConfirmation(null);
-    setIsAdvancedSearchEnabled(false);
-  }, [duplicateConfirmation, addItem]);
-
-  const handleCancelDuplicates = useCallback(() => {
-    setDuplicateConfirmation(null);
   }, []);
 
   const finalizeTooltipMessage = useMemo(() => {

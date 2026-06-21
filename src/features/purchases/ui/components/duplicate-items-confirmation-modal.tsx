@@ -44,7 +44,6 @@ export function DuplicateItemsConfirmationModal({
 
         <ModalBody className="py-4">
           <div className="flex flex-col gap-6">
-            {/* Sección de items únicos */}
             {uniqueItems.length > 0 && (
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2">
@@ -73,7 +72,6 @@ export function DuplicateItemsConfirmationModal({
               </div>
             )}
 
-            {/* Sección de items duplicados */}
             {duplicateItems.length > 0 && (
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2">

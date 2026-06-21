@@ -12,8 +12,7 @@ import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/sc
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { ISeller, IPurchaseItem } from '../../domain/types';
-import { getItemKey } from '../../domain/purchases.domain';
+import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useSellers } from '../hooks/use-sellers';
@@ -26,6 +25,7 @@ import SellerSelector from '../components/seller-selector';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import SellerDeleteModal from '../components/seller-delete-modal';
 import { DuplicateItemsConfirmationModal } from '../components/duplicate-items-confirmation-modal';
+import { useDuplicateValidation } from '../hooks/use-duplicate-validation';
 
 export default function PurchaseNew() {
   const router = useRouter();
@@ -55,68 +55,32 @@ export default function PurchaseNew() {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
-  const [duplicateConfirmation, setDuplicateConfirmation] = useState<{
-    uniqueItems: IPurchaseItem[];
-    duplicateItems: IPurchaseItem[];
-  } | null>(null);
+
+  const { 
+    duplicateConfirmation, 
+    validateAndAddItems, 
+    handleConfirmDuplicates, 
+    handleCancelDuplicates 
+  } = useDuplicateValidation(
+    existingItemIds, 
+    addItem, 
+    () => setIsAdvancedSearchEnabled(false)
+  );
 
   const handleBulkSearchConfirm = useCallback(
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
-        
-        // Separar items únicos y duplicados
-        const uniqueItems: IPurchaseItem[] = [];
-        const duplicateItems: IPurchaseItem[] = [];
-        
-        newItems.forEach(item => {
-          const itemKey = getItemKey(item);
-          if (existingItemIds.has(itemKey)) {
-            duplicateItems.push(item);
-          } else {
-            uniqueItems.push(item);
-          }
-        });
-        
-        // Si hay duplicados, mostrar modal de confirmación
-        if (duplicateItems.length > 0) {
-          setDuplicateConfirmation({ uniqueItems, duplicateItems });
-          return;
-        }
-        
-        // Si no hay items únicos, mostrar error
-        if (uniqueItems.length === 0) {
-          toast.error('Todas las cartas ya están agregadas a la compra');
-          return;
-        }
-        
-        // Agregar items únicos directamente
-        uniqueItems.forEach((item) => addItem(item));
-        toast.success(`${uniqueItems.length} cartas agregadas exitosamente`);
-        setIsAdvancedSearchEnabled(false);
+        validateAndAddItems(newItems);
       } catch (error) {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },
-    [addItem, selectedTCG, existingItemIds]
+    [validateAndAddItems, selectedTCG]
   );
 
   const handleBulkSearchCancel = useCallback(() => {
     setIsAdvancedSearchEnabled(false);
-  }, []);
-
-  const handleConfirmDuplicates = useCallback(() => {
-    if (!duplicateConfirmation) return;
-    
-    duplicateConfirmation.uniqueItems.forEach((item) => addItem(item));
-    toast.success(`${duplicateConfirmation.uniqueItems.length} cartas agregadas exitosamente`);
-    
-    setDuplicateConfirmation(null);
-    setIsAdvancedSearchEnabled(false);
-  }, [duplicateConfirmation, addItem]);
-
-  const handleCancelDuplicates = useCallback(() => {
-    setDuplicateConfirmation(null);
   }, []);
 
   const handleConfirmSeller = useCallback(() => {
