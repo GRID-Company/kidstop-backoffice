@@ -24,11 +24,14 @@ import { ISale, SaleStatus } from '../../domain/types';
 import { SALE_STATUS_OPTIONS } from '../../domain/constants';
 import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { useSales } from '../hooks/use-sales';
+import { useExportSales } from '../hooks/use-export-sales';
 import SaleStatusBadge from '../components/sale-status-badge';
 
 export default function Sales() {
   const router = useRouter();
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const {
     sales,
     totalCount,
@@ -45,6 +48,7 @@ export default function Sales() {
     loading,
     error,
   } = useSales();
+  const { handleExport, exporting } = useExportSales();
 
   useEffect(() => {
     if (error) {
@@ -80,6 +84,31 @@ export default function Sales() {
     },
     [router]
   );
+
+  const handleExportClick = useCallback(() => {
+    handleExport({
+      skip: 0,
+      limit: 0,
+      sort: { column: 'createdDate', order: 'DESC' },
+      search: filters.search?.trim() || undefined,
+      filters: {
+        tcg: selectedTCG,
+        status: filters.status || undefined,
+        customer: filters.customer || undefined,
+        ...(filters.dateFrom || filters.dateTo
+          ? {
+              createdDate: {
+                filterType: ':daterange:',
+                range: {
+                  from: filters.dateFrom,
+                  to: filters.dateTo,
+                },
+              },
+            }
+          : {}),
+      },
+    });
+  }, [handleExport, selectedTCG, filters]);
 
   const columns: ITableColumn[] = useMemo(
     () => [
@@ -172,7 +201,18 @@ export default function Sales() {
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="Pedidos / Ventas">
-        <></>
+        <Tooltip content="El archivo XLSX se enviará a tu correo electrónico">
+          <Button
+            className="bg-accent text-white"
+            startContent={<Icon icon="solar:download-minimalistic-bold" width={16} />}
+            size="sm"
+            onPress={handleExportClick}
+            isLoading={exporting}
+            isDisabled={exporting}
+          >
+            Exportar
+          </Button>
+        </Tooltip>
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>

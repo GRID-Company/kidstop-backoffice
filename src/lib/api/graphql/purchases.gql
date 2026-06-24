@@ -316,3 +316,9 @@ mutation UpdateSeller($updateSellerInput: UpdateSellerInput!) {
 mutation DeleteSeller($guid: String!) {
   deleteSeller(guid: $guid)
 }
+
+query ExportPurchases($findPurchasesArgs: FindPurchasesArgs!) {
+  exportPurchases(findPurchasesArgs: $findPurchasesArgs) {
+    success
+  }
+}
