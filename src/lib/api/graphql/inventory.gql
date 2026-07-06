@@ -99,3 +99,25 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
     errors
   }
 }
+
+query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHistoryArgs!) {
+  inventoryItemSellPriceHistory(findSellPriceHistoryArgs: $findSellPriceHistoryArgs) {
+    data {
+      guid
+      previousPrice
+      newPrice
+      reason
+      notes
+      createdDate
+      createdBy {
+        name
+      }
+      inventoryItem {
+        guid
+        tcg
+        condition
+      }
+    }
+    count
+  }
+}

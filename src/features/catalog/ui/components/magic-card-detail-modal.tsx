@@ -14,6 +14,7 @@ import {
   Input,
   Select,
   SelectItem,
+  Textarea,
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
@@ -32,6 +33,8 @@ import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/
 import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import ConditionSelector from '@/shared/blocks/condition-selector';
+import InventoryMovementsTable from './inventory-movements-table';
+import SellPriceHistoryTable from './sell-price-history-table';
 
 interface MagicCardDetailModalProps {
   card: IMagicCard | null;
@@ -65,6 +68,8 @@ export default function MagicCardDetailModal({
     selectedVariant,
     stockAdjustment,
     setStockAdjustment,
+    stockNotes,
+    setStockNotes,
     movementType,
     setMovementType,
     handleVariantSelect,
@@ -436,26 +441,33 @@ export default function MagicCardDetailModal({
                     </SelectItem>
                   ))}
                 </Select>
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="number"
-                    size="sm"
-                    label="Cantidad"
-                    value={String(stockAdjustment)}
-                    onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
-                    classNames={{ inputWrapper: 'border-[1px] bg-white' }}
-                  />
-                  <Button
-                    size="sm"
-                    isDisabled={stockAdjustment === 0}
-                    onPress={handleStockAdjustClick}
-                    startContent={<Icon icon="lucide:package-plus" />}
-                    className="text-white"
-                    style={{ backgroundColor: 'var(--color-accent)' }}
-                  >
-                    Aplicar
-                  </Button>
-                </div>
+                <Input
+                  type="number"
+                  size="sm"
+                  label="Cantidad"
+                  value={String(stockAdjustment)}
+                  onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
+                  classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                />
+                <Textarea
+                  label="Notas (opcional)"
+                  placeholder="Ej: Recibido de proveedor, Daño en transporte, etc."
+                  value={stockNotes}
+                  onValueChange={setStockNotes}
+                  size="sm"
+                  maxRows={3}
+                  classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                />
+                <Button
+                  size="sm"
+                  isDisabled={stockAdjustment === 0}
+                  onPress={handleStockAdjustClick}
+                  startContent={<Icon icon="lucide:package-plus" />}
+                  className="text-white"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                >
+                  Aplicar
+                </Button>
               </div>
 
               <Divider />
@@ -493,6 +505,19 @@ export default function MagicCardDetailModal({
                   Guardar precios
                 </Button>
               </form>
+
+              <Divider />
+
+              <InventoryMovementsTable
+                inventoryItemGuid={selectedVariant.guid}
+                tcg="MAGIC"
+              />
+
+              <Divider />
+
+              <SellPriceHistoryTable
+                inventoryItemGuid={selectedVariant.guid}
+              />
             </>
           )}
           </>
