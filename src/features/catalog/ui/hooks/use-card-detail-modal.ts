@@ -11,7 +11,8 @@ import { TCGType } from '@/lib/types/tcg.types';
 import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 
 export interface InventoryCard {
-  guid: string;
+  cardGuid: string;
+  inventoryItemGuid?: string;
   isNew?: boolean;
   condition: string;
   language: CardLanguage;
@@ -43,11 +44,19 @@ export function useCardDetailModal({
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
 
   const availableVariants = useMemo(() => {
-    if (!detail?.inventoryCards) return [];
-    return detail.inventoryCards.filter(
-      (card: InventoryCard) => card.language === selectedLanguage
-    );
-  }, [detail?.inventoryCards, selectedLanguage]);
+    if (!detail?.inventoryCards || !card?.guid) return [];
+    return detail.inventoryCards
+      .map((ic: any) => ({
+        cardGuid: card.guid,
+        inventoryItemGuid: ic.guid,
+        condition: ic.condition,
+        language: ic.language,
+        stock: ic.stock,
+        purchasePrice: ic.purchasePrice,
+        sellPrice: ic.sellPrice,
+      }))
+      .filter((item: InventoryCard) => item.language === selectedLanguage);
+  }, [detail?.inventoryCards, selectedLanguage, card?.guid]);
 
   useEffect(() => {
     if (availableVariants.length > 0) {
@@ -57,7 +66,8 @@ export function useCardDetailModal({
       setSelectedVariant(nmVariant ?? availableVariants[0]);
     } else if (card?.guid) {
       setSelectedVariant({
-        guid: `${card.guid}-${selectedLanguage}-${CARD_CONDITIONS.NEAR_MINT}`,
+        cardGuid: card.guid,
+        inventoryItemGuid: undefined,
         isNew: true,
         condition: CARD_CONDITIONS.NEAR_MINT,
         language: selectedLanguage,
@@ -96,11 +106,9 @@ export function useCardDetailModal({
     async (data) => {
       if (!detail || !selectedVariant) return;
 
-      const existingInventoryItemGuid = selectedVariant.isNew ? undefined : selectedVariant.guid;
-
       await handleUpdatePrice({
-        cardGuid: detail.guid,
-        inventoryItemGuid: existingInventoryItemGuid,
+        cardGuid: selectedVariant.cardGuid,
+        inventoryItemGuid: selectedVariant.inventoryItemGuid,
         condition: selectedVariant.condition,
         language: selectedVariant.language,
         purchasePrice: data.buyPrice,
@@ -115,7 +123,7 @@ export function useCardDetailModal({
   const executeStockAdjust = useCallback(async () => {
     if (!detail || !selectedVariant || stockAdjustment === 0) return;
     await handleAdjustStock({
-      cardGuid: detail.guid,
+      cardGuid: selectedVariant.cardGuid,
       condition: selectedVariant.condition,
       language: selectedVariant.language,
       quantity: stockAdjustment,

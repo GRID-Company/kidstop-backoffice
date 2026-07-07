@@ -386,7 +386,8 @@ export default function PokemonCardDetailModal({
                 {Object.values(CARD_CONDITIONS).map((condition) => {
                   const existing = availableVariants.find((v: InventoryCard) => v.condition === condition);
                   const variant: InventoryCard = existing ?? {
-                    guid: `${card?.guid}-${selectedLanguage}-${condition}`,
+                    cardGuid: selectedCard?.guid ?? '',
+                    inventoryItemGuid: undefined,
                     isNew: true,
                     condition,
                     language: selectedLanguage,
@@ -591,16 +592,20 @@ export default function PokemonCardDetailModal({
 
               <Divider />
 
-              <InventoryMovementsTable
-                inventoryItemGuid={selectedVariant.guid}
-                tcg="POKEMON"
-              />
+              {selectedVariant.inventoryItemGuid && (
+                <>
+                  <InventoryMovementsTable
+                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                    tcg="POKEMON"
+                  />
 
-              <Divider />
+                  <Divider />
 
-              <SellPriceHistoryTable
-                inventoryItemGuid={selectedVariant.guid}
-              />
+                  <SellPriceHistoryTable
+                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                  />
+                </>
+              )}
             </>
           )}
           </>

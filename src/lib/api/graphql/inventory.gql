@@ -5,6 +5,7 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
       tcg
       condition
       stock
+      language
       purchasePrice
       sellPrice
       lastSellDate

@@ -307,7 +307,8 @@ export default function MagicCardDetailModal({
               {Object.values(CARD_CONDITIONS).map((condition) => {
                 const existing = availableVariants.find((v: InventoryCard) => v.condition === condition);
                 const variant: InventoryCard = existing ?? {
-                  guid: `${card?.guid}-${selectedLanguage}-${condition}`,
+                  cardGuid: selectedCard?.guid ?? '',
+                  inventoryItemGuid: undefined,
                   isNew: true,
                   condition,
                   language: selectedLanguage,
@@ -523,16 +524,20 @@ export default function MagicCardDetailModal({
 
               <Divider />
 
-              <InventoryMovementsTable
-                inventoryItemGuid={selectedVariant.guid}
-                tcg="MAGIC"
-              />
+              {selectedVariant.inventoryItemGuid && (
+                <>
+                  <InventoryMovementsTable
+                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                    tcg="MAGIC"
+                  />
 
-              <Divider />
+                  <Divider />
 
-              <SellPriceHistoryTable
-                inventoryItemGuid={selectedVariant.guid}
-              />
+                  <SellPriceHistoryTable
+                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                  />
+                </>
+              )}
             </>
           )}
           </>
