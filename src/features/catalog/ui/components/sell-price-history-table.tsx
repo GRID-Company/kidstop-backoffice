@@ -7,7 +7,12 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { InventoryItemSellPriceHistoryDocument } from '@/lib/api/generated/inventory.generated';
 import { formatDate } from '@/lib/utils/format-date';
+import { DEFAULT_HISTORY_LIMIT } from '../../domain/constants';
 
+/**
+ * Displays sell price change history for a specific inventory item
+ * @param inventoryItemGuid - GUID of the inventory item to show price history for
+ */
 interface SellPriceHistoryTableProps {
   inventoryItemGuid: string;
 }
@@ -27,11 +32,11 @@ const REASON_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'default
 export default function SellPriceHistoryTable({
   inventoryItemGuid,
 }: SellPriceHistoryTableProps) {
-  const { data, loading } = useQuery(InventoryItemSellPriceHistoryDocument, {
+  const { data, loading, error } = useQuery(InventoryItemSellPriceHistoryDocument, {
     variables: {
       findSellPriceHistoryArgs: {
         skip: 0,
-        limit: 50,
+        limit: DEFAULT_HISTORY_LIMIT,
         sort: { column: 'createdDate', order: 'DESC' },
         filters: {
           inventoryItemGuid,
@@ -112,6 +117,17 @@ export default function SellPriceHistoryTable({
     ],
     []
   );
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-3">
+        <h4 className="text-sm font-semibold">Historial de precios de venta</h4>
+        <p className="text-center text-sm text-danger py-4">
+          Error al cargar historial de precios: {error.message}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">

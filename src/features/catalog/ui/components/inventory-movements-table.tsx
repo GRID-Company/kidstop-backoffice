@@ -7,37 +7,28 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { InventoryMovementsDocument } from '@/lib/api/generated/inventory.generated';
 import { formatDate } from '@/lib/utils/format-date';
+import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '@/features/inventory-cards/domain/constants';
+import { DEFAULT_HISTORY_LIMIT } from '../../domain/constants';
 
+/**
+ * Displays inventory movement history for a specific inventory item
+ * @param inventoryItemGuid - GUID of the inventory item to show movements for
+ * @param tcg - TCG type (POKEMON or MAGIC)
+ */
 interface InventoryMovementsTableProps {
   inventoryItemGuid: string;
   tcg: 'POKEMON' | 'MAGIC';
 }
 
-const MOVEMENT_TYPE_LABELS: Record<string, string> = {
-  PURCHASE_ENTRY: 'Compra',
-  SALE_EXIT: 'Venta',
-  MANUAL_ENTRY: 'Entrada manual',
-  MANUAL_EXIT: 'Salida manual',
-  MANUAL_SET: 'Ajuste manual',
-};
-
-const MOVEMENT_TYPE_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'> = {
-  PURCHASE_ENTRY: 'success',
-  SALE_EXIT: 'danger',
-  MANUAL_ENTRY: 'success',
-  MANUAL_EXIT: 'warning',
-  MANUAL_SET: 'default',
-};
-
 export default function InventoryMovementsTable({
   inventoryItemGuid,
   tcg,
 }: InventoryMovementsTableProps) {
-  const { data, loading } = useQuery(InventoryMovementsDocument, {
+  const { data, loading, error } = useQuery(InventoryMovementsDocument, {
     variables: {
       findInventoryMovementsArgs: {
         skip: 0,
-        limit: 50,
+        limit: DEFAULT_HISTORY_LIMIT,
         sort: { column: 'createdDate', order: 'DESC' },
         filters: {
           tcg,
@@ -115,6 +106,17 @@ export default function InventoryMovementsTable({
     ],
     []
   );
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-3">
+        <h4 className="text-sm font-semibold">Historial de movimientos</h4>
+        <p className="text-center text-sm text-danger py-4">
+          Error al cargar movimientos: {error.message}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">
