@@ -48,6 +48,7 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
 | `cardGuid` | `UUID!` | Yes | GUID of the Pokemon or Magic card |
 | `tcg` | `TCGType!` | Yes | Card game type: `POKEMON` or `MAGIC` |
 | `condition` | `CardCondition!` | Yes | Card condition (see conditions below) |
+| `language` | `CardLanguage!` | Yes | Card language (ENGLISH, SPANISH, JAPANESE, KOREAN, CHINESE). Magic: ENGLISH or SPANISH only. Pokemon: must match the card's original language. |
 | `quantity` | `Int!` | Yes | Quantity value (meaning depends on operation type) |
 | `purchasePrice` | `Float` | No | Purchase price per unit |
 | `sellPrice` | `Float` | No | Selling price per unit |
@@ -81,6 +82,7 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
 The mutation automatically detects whether an inventory item exists based on:
 - Card ID (Pokemon or Magic)
 - Card condition
+- Language
 
 Behavior depends on operation type:
 - **MANUAL_ENTRY & MANUAL_SET:** Creates new item if it doesn't exist
@@ -151,6 +153,7 @@ mutation {
         cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         tcg: POKEMON
         condition: NEAR_MINT
+        language: ENGLISH
         quantity: 25
         purchasePrice: 4.50
         sellPrice: 10.99
@@ -159,6 +162,7 @@ mutation {
         cardGuid: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
         tcg: MAGIC
         condition: LIGHTLY_PLAYED
+        language: ENGLISH
         quantity: 15
         purchasePrice: 2.00
         sellPrice: 6.50
@@ -198,6 +202,7 @@ mutation {
         cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         tcg: POKEMON
         condition: NEAR_MINT
+        language: ENGLISH
         quantity: 10
         sellPrice: 12.99
       }
@@ -238,6 +243,7 @@ mutation {
         cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         tcg: POKEMON
         condition: NEAR_MINT
+        language: ENGLISH
         quantity: 5
       }
     ]
@@ -263,6 +269,7 @@ mutation {
         cardGuid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         tcg: POKEMON
         condition: NEAR_MINT
+        language: ENGLISH
         quantity: 50
       }
     ]
@@ -288,18 +295,21 @@ mutation {
         cardGuid: "valid-card-guid-1"
         tcg: POKEMON
         condition: NEAR_MINT
+        language: ENGLISH
         quantity: 10
       },
       {
         cardGuid: "invalid-card-guid"
         tcg: MAGIC
         condition: DAMAGED
+        language: ENGLISH
         quantity: 5
       },
       {
         cardGuid: "valid-card-guid-2"
         tcg: POKEMON
         condition: HEAVILY_PLAYED
+        language: ENGLISH
         quantity: 3
       }
     ]
@@ -354,6 +364,7 @@ Common error scenarios:
 | "Card not found" | Card GUID doesn't exist in catalog | Ensure card is synced to catalog first |
 | "Invalid TCG type" | TCG doesn't match card type | Verify card belongs to specified TCG |
 | "Invalid condition" | Condition enum value is wrong | Use valid CardCondition enum value |
+| "Invalid language for TCG" | Language not allowed for that TCG/card | Magic: use ENGLISH or SPANISH. Pokemon: use card's original language |
 | "Quantity must be greater than 0" | Zero or negative quantity for ENTRY/EXIT | Provide positive quantity value |
 | "Quantity must be >= 0" | Negative quantity for SET | Provide non-negative quantity value |
 | "Cannot perform MANUAL_EXIT on..." | Item doesn't exist for EXIT operation | Use MANUAL_ENTRY or MANUAL_SET to create item first |

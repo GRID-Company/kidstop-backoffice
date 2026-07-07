@@ -48,6 +48,16 @@ WAITING_PRICE → FINALIZED  (ADMIN/BUYER — all items need sellPrice, payments
 - `HEAVILY_PLAYED`
 - `DAMAGED`
 
+### Card Languages
+
+- `ENGLISH`
+- `SPANISH`
+- `JAPANESE`
+- `KOREAN`
+- `CHINESE`
+
+> **Language rules:** Magic cards accept `ENGLISH` or `SPANISH` only. Pokemon card language must match the card's original language.
+
 ---
 
 ## Available Endpoints
@@ -82,6 +92,7 @@ query Purchases($findPurchasesArgs: FindPurchasesArgs!) {
       items {
         guid
         condition
+        language
         offerPrice
         referencePrice
         sellPrice
@@ -198,18 +209,23 @@ query Purchase($guid: String!) {
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       sellPrice
       quantity
       tcg
-      pokemonCard {
-        guid
-        titleName
-      }
-      magicCard {
+      pokemonCardSummary {
         guid
         name
+        setName
+        cardNumber
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
       }
     }
     payments {
@@ -260,6 +276,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       quantity
@@ -297,6 +314,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
       {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
+        "language": "ENGLISH",
         "offerPrice": 10.00,
         "referencePrice": 15.00,
         "quantity": 1
@@ -323,6 +341,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
       {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
+        "language": "ENGLISH",
         "offerPrice": 10.00,
         "quantity": 1
       }
@@ -340,6 +359,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
 - `items`: Required array with:
   - `pokemonCardGuid` or `magicCardGuid`: Card identifier (based on tcg)
   - `condition`: Card condition enum
+  - `language`: Required — Card language enum (see Language Rules above)
   - `offerPrice`: Price offered to seller per unit
   - `referencePrice`: Optional market/reference price
   - `quantity`: Number of units (> 0)
@@ -428,14 +448,15 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       quantity
-      pokemonCard {
+      pokemonCardSummary {
         guid
-        titleName
+        name
       }
-      magicCard {
+      magicCardSummary {
         guid
         name
       }
@@ -454,6 +475,7 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
       {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
+        "language": "ENGLISH",
         "offerPrice": 5.00,
         "referencePrice": 8.00,
         "quantity": 2
@@ -605,7 +627,7 @@ mutation FinalizePurchase($purchaseGuid: String!) {
 - All items must have `sellPrice` set (non-null)
 - If payments are provided, sum must equal the purchase total
 - For each item:
-  - Finds or creates matching InventoryItem (card + tcg + condition)
+  - Finds or creates matching InventoryItem (card + tcg + condition + language)
   - Increments stock by item quantity
   - Updates InventoryItem `purchasePrice` and `sellPrice`
   - Creates InventoryMovement (PURCHASE_ENTRY)

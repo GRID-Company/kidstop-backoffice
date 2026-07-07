@@ -14,6 +14,7 @@ interface UpdatePriceParams {
   cardGuid: string;
   inventoryItemGuid?: string;
   condition: string;
+  language: CardLanguage;
   purchasePrice: number;
   sellPrice: number;
   tcgType: TCGType;
@@ -66,10 +67,7 @@ export function useUpdateInventoryPrice() {
                     cardGuid: params.cardGuid,
                     condition: params.condition,
                     tcg: params.tcgType,
-                    // TODO: Agregar selector de idioma (English/Spanish) en UI
-                    // - Solo habilitado para cartas que tengan language English
-                    // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
-                    language: CardLanguage.English,
+                    language: params.language,
                     bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
                     notes: 'Creación automática para establecer precios',

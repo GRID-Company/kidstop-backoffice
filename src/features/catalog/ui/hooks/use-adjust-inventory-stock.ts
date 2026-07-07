@@ -10,11 +10,11 @@ import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 interface AdjustStockParams {
   cardGuid: string;
   condition: string;
+  language: CardLanguage;
   quantity: number;
   notes?: string;
   tcgType: TCGType;
   operationType: BulkOperationType;
-  language?: CardLanguage;
 }
 
 export function useAdjustInventoryStock() {
@@ -56,10 +56,7 @@ export function useAdjustInventoryStock() {
             cardGuid: params.cardGuid,
             condition: params.condition,
             tcg: params.tcgType,
-            // TODO: Agregar selector de idioma (English/Spanish) en UI
-            // - Solo habilitado para cartas que tengan language English
-            // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
-            language: params.language || CardLanguage.English,
+            language: params.language,
             bulkOperationType,
             quantity: finalQuantity,
             notes: params.notes || successMessage,

@@ -62,6 +62,14 @@ Format: `KSS-YYYY-XXXXX` (e.g., KSS-2025-00001)
 - `HEAVILY_PLAYED`
 - `DAMAGED`
 
+### Card Languages
+
+- `ENGLISH`
+- `SPANISH`
+- `JAPANESE`
+- `KOREAN`
+- `CHINESE`
+
 ---
 
 ## Available Endpoints
@@ -98,6 +106,7 @@ query Sales($findSalesArgs: FindSalesArgs!) {
         guid
         tcg
         condition
+        language
         quantity
         price
         pokemonCardSummary {
@@ -215,6 +224,7 @@ query Sale($guid: String!) {
       guid
       tcg
       condition
+      language
       quantity
       price
       pokemonCardSummary {
@@ -366,6 +376,7 @@ mutation UpdateSaleItem($updateSaleItemInput: UpdateSaleItemInput!) {
       quantity
       price
       condition
+      language
       pokemonCardSummary {
         guid
         name
@@ -432,6 +443,7 @@ mutation RemoveSaleItem($removeSaleItemInput: RemoveSaleItemInput!) {
       quantity
       price
       condition
+      language
       pokemonCardSummary {
         guid
         name
@@ -497,6 +509,7 @@ query MyCart($tcg: String!) {
       guid
       tcg
       condition
+      language
       quantity
       pokemonCardSummary {
         guid
@@ -554,6 +567,7 @@ mutation AddCartItem($addCartItemInput: AddCartItemInput!) {
       guid
       tcg
       condition
+      language
       quantity
       pokemonCardSummary {
         guid
@@ -580,6 +594,7 @@ mutation AddCartItem($addCartItemInput: AddCartItemInput!) {
     "tcg": "POKEMON",
     "pokemonCardGuid": "POKEMON_CARD_GUID",
     "condition": "NEAR_MINT",
+    "language": "ENGLISH",
     "quantity": 2
   }
 }
@@ -593,6 +608,7 @@ mutation AddCartItem($addCartItemInput: AddCartItemInput!) {
     "tcg": "MAGIC",
     "magicCardGuid": "MAGIC_CARD_GUID",
     "condition": "LIGHTLY_PLAYED",
+    "language": "ENGLISH",
     "quantity": 1
   }
 }
@@ -603,11 +619,12 @@ mutation AddCartItem($addCartItemInput: AddCartItemInput!) {
 - `tcg`: Required — POKEMON or MAGIC
 - `pokemonCardGuid` or `magicCardGuid`: Card identifier (based on tcg)
 - `condition`: Card condition enum
+- `language`: Required — Card language enum (ENGLISH, SPANISH, JAPANESE, KOREAN, CHINESE)
 - `quantity`: Number of units to add (≥ 1)
 
 **Business Rules:**
 
-- If same card+condition already in cart, quantity is incremented
+- If same card+condition+language already in cart, quantity is incremented
 - Otherwise, new cart item is created
 - Cart is auto-created if it doesn't exist
 
@@ -738,6 +755,7 @@ mutation CreateSaleFromCart($createSaleFromCartInput: CreateSaleFromCartInput!) 
       guid
       tcg
       condition
+      language
       quantity
       price
       pokemonCardSummary {
@@ -828,6 +846,7 @@ query MySales($findMySalesArgs: FindMySalesArgs!) {
       items {
         guid
         condition
+        language
         quantity
         price
         pokemonCardSummary {
@@ -913,6 +932,7 @@ query MySale($saleGuid: String!) {
       guid
       tcg
       condition
+      language
       quantity
       price
       pokemonCardSummary {
@@ -1010,7 +1030,7 @@ query MySale($saleGuid: String!) {
 
 ### Stock Management
 
-- **Checkout validation:** Checks stock availability but does NOT reserve stock
+- **Checkout validation:** Checks stock availability (by card + condition + language) but does NOT reserve stock
 - **Completion:** COMPLETED transition creates SALE_EXIT movements and consumes stock using FIFO batch logic
 - **Batches:** Inventory is tracked in batches; oldest batches consumed first
 
