@@ -425,6 +425,7 @@ query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs
         guid
         tcg
         condition
+        language
         stock
       }
     }
@@ -483,6 +484,7 @@ query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHist
         guid
         tcg
         condition
+        language
       }
     }
     count
