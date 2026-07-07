@@ -24,6 +24,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       inventoryCards {
         guid
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -58,6 +59,7 @@ query PokemonCardInternalDetail($guid: String!) {
     inventoryCards {
       guid
       condition
+      language
       stock
       purchasePrice
       sellPrice

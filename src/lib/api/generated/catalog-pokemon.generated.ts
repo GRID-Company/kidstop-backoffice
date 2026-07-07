@@ -29,6 +29,7 @@ export type PokemonCardInternalListQuery = {
       inventoryCards: Array<{
         guid: string;
         condition: string;
+        language: string;
         stock: number;
         purchasePrice: number | null;
         sellPrice: number | null;
@@ -63,6 +64,7 @@ export type PokemonCardInternalDetailQuery = {
     inventoryCards: Array<{
       guid: string;
       condition: string;
+      language: string;
       stock: number;
       purchasePrice: number | null;
       sellPrice: number | null;
@@ -336,6 +338,10 @@ export const PokemonCardInternalListDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'stock' },
                             },
                             {
@@ -446,6 +452,10 @@ export const PokemonCardInternalDetailDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {

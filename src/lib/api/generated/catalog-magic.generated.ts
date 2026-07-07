@@ -21,6 +21,7 @@ export type MagicCardInternalListQuery = {
       inventoryCards: Array<{
         guid: string;
         condition: string;
+        language: string;
         stock: number;
         purchasePrice: number | null;
         sellPrice: number | null;
@@ -47,6 +48,7 @@ export type MagicCardInternalDetailQuery = {
     inventoryCards: Array<{
       guid: string;
       condition: string;
+      language: string;
       stock: number;
       purchasePrice: number | null;
       sellPrice: number | null;
@@ -232,6 +234,10 @@ export const MagicCardInternalListDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'stock' },
                             },
                             {
@@ -321,6 +327,10 @@ export const MagicCardInternalDetailDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {

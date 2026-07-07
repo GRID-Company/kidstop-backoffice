@@ -13,6 +13,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
       inventoryCards {
         guid
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -36,6 +37,7 @@ query MagicCardInternalDetail($guid: String!) {
     inventoryCards {
       guid
       condition
+      language
       stock
       purchasePrice
       sellPrice

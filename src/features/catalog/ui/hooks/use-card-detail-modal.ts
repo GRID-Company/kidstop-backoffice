@@ -50,7 +50,7 @@ export function useCardDetailModal({
         cardGuid: card.guid,
         inventoryItemGuid: ic.guid,
         condition: ic.condition,
-        language: ic.language ?? CardLanguage.English,
+        language: ic.language,
         stock: ic.stock,
         purchasePrice: ic.purchasePrice,
         sellPrice: ic.sellPrice,

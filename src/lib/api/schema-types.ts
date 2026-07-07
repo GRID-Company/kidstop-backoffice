@@ -729,6 +729,7 @@ export type MagicCardInternalItem = {
 export type MagicCardInventoryItemInternal = {
   condition: Scalars['String']['output'];
   guid: Scalars['String']['output'];
+  language: Scalars['String']['output'];
   purchasePrice?: Maybe<Scalars['Float']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Int']['output'];
@@ -736,6 +737,7 @@ export type MagicCardInventoryItemInternal = {
 
 export type MagicCardInventoryItemPublic = {
   condition: Scalars['String']['output'];
+  language: Scalars['String']['output'];
   sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Int']['output'];
 };
@@ -1348,6 +1350,7 @@ export type PokemonCardInternalItem = {
 export type PokemonCardInventoryItemInternal = {
   condition: Scalars['String']['output'];
   guid: Scalars['String']['output'];
+  language: Scalars['String']['output'];
   purchasePrice?: Maybe<Scalars['Float']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Int']['output'];
@@ -1355,6 +1358,7 @@ export type PokemonCardInventoryItemInternal = {
 
 export type PokemonCardInventoryItemPublic = {
   condition: Scalars['String']['output'];
+  language: Scalars['String']['output'];
   sellPrice?: Maybe<Scalars['Float']['output']>;
   stock: Scalars['Int']['output'];
 };
@@ -1947,6 +1951,7 @@ export type UpdateGlobalConfigInput = {
 
 export type UpdateInventoryItemPricesInput = {
   inventoryItemGuid: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
   purchasePrice?: InputMaybe<Scalars['Float']['input']>;
   sellPrice?: InputMaybe<Scalars['Float']['input']>;
 };
