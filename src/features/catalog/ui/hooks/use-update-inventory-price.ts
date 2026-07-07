@@ -45,7 +45,11 @@ export function useUpdateInventoryPrice() {
                 skip: 0,
                 limit: 200,
                 sort: { column: 'createdDate', order: 'DESC' },
-                filters: { tcg: params.tcgType, condition: params.condition },
+                filters: { 
+                  tcg: params.tcgType, 
+                  condition: params.condition,
+                  language: params.language,
+                },
               },
             },
           });
@@ -85,7 +89,11 @@ export function useUpdateInventoryPrice() {
                   skip: 0,
                   limit: 200,
                   sort: { column: 'createdDate', order: 'DESC' },
-                  filters: { tcg: params.tcgType, condition: params.condition },
+                  filters: { 
+                    tcg: params.tcgType, 
+                    condition: params.condition,
+                    language: params.language,
+                  },
                 },
               },
             });
