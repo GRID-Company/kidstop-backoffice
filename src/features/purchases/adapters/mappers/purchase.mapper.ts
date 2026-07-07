@@ -1,4 +1,4 @@
-import type { CreatePurchaseInput, UpdatePurchaseInput } from '@/lib/api/schema-types';
+import type { CreatePurchaseInput, UpdatePurchaseInput, CardLanguage } from '@/lib/api/schema-types';
 import { IPurchase } from '../../domain/types';
 import { PurchaseFormData } from '../forms/purchase-form.schema';
 
@@ -14,6 +14,10 @@ export function toCreatePurchasePayload(data: PurchaseFormData, tcgType: string)
           : { magicCardGuid: item.cardGuid }
         ),
         condition: item.condition,
+        // TODO: Agregar selector de idioma (English/Spanish) en UI de compras
+        // - Solo habilitado para cartas que tengan language English
+        // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
+        language: 'ENGLISH' as CardLanguage,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
