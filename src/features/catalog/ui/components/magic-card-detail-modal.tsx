@@ -33,6 +33,7 @@ import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/
 import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import ConditionSelector from '@/shared/blocks/condition-selector';
+import LanguageSelector from '@/shared/components/language-selector';
 import InventoryMovementsTable from './inventory-movements-table';
 import SellPriceHistoryTable from './sell-price-history-table';
 
@@ -66,6 +67,9 @@ export default function MagicCardDetailModal({
 
   const {
     selectedVariant,
+    selectedLanguage,
+    availableVariants,
+    handleLanguageChange,
     stockAdjustment,
     setStockAdjustment,
     stockNotes,
@@ -288,14 +292,25 @@ export default function MagicCardDetailModal({
           <Divider />
 
           <div className="flex flex-col gap-3">
+            <h4 className="text-sm font-semibold">Idioma y condición</h4>
+            <LanguageSelector
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+              currentLanguage={selectedVariant?.language}
+              size="sm"
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
             <h4 className="text-sm font-semibold">Variantes por condición</h4>
             <div className="flex flex-wrap gap-2">
               {Object.values(CARD_CONDITIONS).map((condition) => {
-                const existing = variants.find((v) => v.condition === condition);
+                const existing = availableVariants.find((v: InventoryCard) => v.condition === condition);
                 const variant: InventoryCard = existing ?? {
-                  guid: `${card?.guid}-${condition}`,
+                  guid: `${card?.guid}-${selectedLanguage}-${condition}`,
                   isNew: true,
                   condition,
+                  language: selectedLanguage,
                   stock: 0,
                   purchasePrice: null,
                   sellPrice: null,
