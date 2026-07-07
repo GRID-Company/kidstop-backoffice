@@ -52,3 +52,5 @@ export const STOCK_STATUS_OPTIONS = [
   { label: 'No disponible', value: 'UNAVAILABLE' },
   { label: 'Esperando recolección', value: 'AWAITING_PICKUP' },
 ];
+
+export const DEFAULT_HISTORY_LIMIT = 50;
