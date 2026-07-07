@@ -8,7 +8,7 @@ import {
 } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType } from '@/lib/types/tcg.types';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 
 interface UpdatePriceParams {
   cardGuid: string;
@@ -66,6 +66,10 @@ export function useUpdateInventoryPrice() {
                     cardGuid: params.cardGuid,
                     condition: params.condition,
                     tcg: params.tcgType,
+                    // TODO: Agregar selector de idioma (English/Spanish) en UI
+                    // - Solo habilitado para cartas que tengan language English
+                    // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
+                    language: CardLanguage.English,
                     bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
                     notes: 'Creación automática para establecer precios',
