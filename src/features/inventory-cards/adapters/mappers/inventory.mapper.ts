@@ -2,6 +2,7 @@ import { InventoryItemsQuery, InventoryMovementsQuery } from '@/lib/api/generate
 import { IInventoryItem, IInventoryMovement } from '../../domain/types';
 import { STOCK_STATUSES } from '../../domain/constants';
 import { InventoryAdjustmentFormData } from '../forms/inventory-adjustment.form.schema';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 type ApiInventoryItem = NonNullable<NonNullable<InventoryItemsQuery['inventoryItems']['data']>[number]>;
 type ApiInventoryMovement = NonNullable<NonNullable<InventoryMovementsQuery['inventoryMovements']['data']>[number]>;
@@ -58,6 +59,10 @@ export function toAdjustInventoryPayload(data: InventoryAdjustmentFormData) {
       cardGuid: data.cardGuid,
       tcg: data.tcg,
       condition: data.condition,
+      // TODO: Agregar selector de idioma (English/Spanish) en UI de ajuste de inventario
+      // - Solo habilitado para cartas que tengan language English
+      // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
+      language: CardLanguage.English,
       quantity: data.quantity,
       bulkOperationType: data.bulkOperationType as any,
       ...(data.notes && { notes: data.notes }),

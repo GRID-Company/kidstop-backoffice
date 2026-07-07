@@ -34,6 +34,7 @@ export function useCardDetailModal({
 }: UseCardDetailModalParams) {
   const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
   const [stockAdjustment, setStockAdjustment] = useState<number>(0);
+  const [stockNotes, setStockNotes] = useState<string>('');
   const [movementType, setMovementType] = useState<BulkOperationType>(BulkOperationType.ManualEntry);
   const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
   const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
@@ -102,17 +103,21 @@ export function useCardDetailModal({
       cardGuid: detail.guid,
       condition: selectedVariant.condition,
       quantity: stockAdjustment,
+      notes: stockNotes.trim() || undefined,
       tcgType,
       operationType: movementType,
     });
     setStockAdjustment(0);
+    setStockNotes('');
     onRefetch();
-  }, [detail, selectedVariant, stockAdjustment, handleAdjustStock, tcgType, movementType, onRefetch]);
+  }, [detail, selectedVariant, stockAdjustment, stockNotes, handleAdjustStock, tcgType, movementType, onRefetch]);
 
   return {
     selectedVariant,
     stockAdjustment,
     setStockAdjustment,
+    stockNotes,
+    setStockNotes,
     movementType,
     setMovementType,
     handleVariantSelect,

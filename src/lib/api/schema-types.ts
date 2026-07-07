@@ -33,6 +33,7 @@ export type Scalars = {
 
 export type AddCartItemInput = {
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   magicCardGuid?: InputMaybe<Scalars['String']['input']>;
   pokemonCardGuid?: InputMaybe<Scalars['String']['input']>;
   quantity: Scalars['Int']['input'];
@@ -49,6 +50,7 @@ export type AddMostWantedCardInput = {
 
 export type AddPurchaseItemInput = {
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   magicCardGuid?: InputMaybe<Scalars['String']['input']>;
   offerPrice: Scalars['Float']['input'];
   pokemonCardGuid?: InputMaybe<Scalars['String']['input']>;
@@ -59,6 +61,7 @@ export type AddPurchaseItemInput = {
 export type AddWishlistItemInput = {
   cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   tcg: Scalars['String']['input'];
 };
 
@@ -98,6 +101,7 @@ export type BulkLoadInventoryInput = {
 export type BulkLoadInventoryItemInput = {
   cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   purchasePrice?: InputMaybe<Scalars['Float']['input']>;
   quantity: Scalars['Int']['input'];
   sellPrice?: InputMaybe<Scalars['Float']['input']>;
@@ -137,6 +141,15 @@ export type CancelSaleInput = {
   saleGuid: Scalars['String']['input'];
 };
 
+/** Language of a trading card */
+export enum CardLanguage {
+  Chinese = 'CHINESE',
+  English = 'ENGLISH',
+  Japanese = 'JAPANESE',
+  Korean = 'KOREAN',
+  Spanish = 'SPANISH',
+}
+
 export type CardOrderInput = {
   mostWantedCardGuid: Scalars['String']['input'];
   priority: Scalars['String']['input'];
@@ -159,6 +172,7 @@ export type CartItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
+  language: CardLanguage;
   magicCardSummary?: Maybe<MagicCardSummary>;
   pokemonCardSummary?: Maybe<PokemonCardSummary>;
   quantity: Scalars['Int']['output'];
@@ -193,6 +207,7 @@ export type CreateInventoryMovementInput = {
   bulkOperationType: BulkOperationType;
   cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   notes?: InputMaybe<Scalars['String']['input']>;
   purchasePrice?: InputMaybe<Scalars['Float']['input']>;
   quantity: Scalars['Int']['input'];
@@ -211,6 +226,7 @@ export type CreatePurchaseInput = {
 
 export type CreatePurchaseItemInput = {
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   magicCardGuid?: InputMaybe<Scalars['String']['input']>;
   offerPrice: Scalars['Float']['input'];
   pokemonCardGuid?: InputMaybe<Scalars['String']['input']>;
@@ -278,6 +294,10 @@ export type DayScheduleInput = {
   opening?: InputMaybe<TimeInput>;
 };
 
+export type ExportRequestOutput = {
+  success: Scalars['Boolean']['output'];
+};
+
 export type File = {
   /** Accepted values: TECHNICAL_IMAGE, SAMPLE_IMAGE */
   category: Scalars['String']['output'];
@@ -293,6 +313,8 @@ export type File = {
 export type FindInventoryItemsArgs = {
   filters?: InputMaybe<FindInventoryItemsFilter>;
   limit: Scalars['Int']['input'];
+  /** When true and search is provided, sort results by relevance first. */
+  prioritizeSearch?: InputMaybe<Scalars['Boolean']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
@@ -300,6 +322,7 @@ export type FindInventoryItemsArgs = {
 
 export type FindInventoryItemsFilter = {
   condition?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<CardLanguage>;
   lastSellDate?: InputMaybe<DateRangeFilter>;
   magicFilters?: InputMaybe<MagicFilters>;
   pokemonFilters?: InputMaybe<PokemonFilters>;
@@ -317,6 +340,7 @@ export type FindInventoryMovementsArgs = {
 
 export type FindInventoryMovementsFilter = {
   createdDate?: InputMaybe<DateRangeFilter>;
+  inventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
   movementType?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
 };
@@ -377,12 +401,15 @@ export type FindMyWishlistArgs = {
 
 export type FindMyWishlistFilter = {
   condition?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<CardLanguage>;
   tcg: Scalars['String']['input'];
 };
 
 export type FindPokemonCardsPublicArgs = {
   filters?: InputMaybe<FindPokemonCardsPublicFilter>;
   limit: Scalars['Int']['input'];
+  /** When true and search is provided, sort results by relevance first. */
+  prioritizeSearch?: InputMaybe<Scalars['Boolean']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
   skip: Scalars['Int']['input'];
   sort: SortType;
@@ -430,6 +457,20 @@ export type FindSalesFilter = {
   customer?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
+};
+
+export type FindSellPriceHistoryArgs = {
+  filters?: InputMaybe<FindSellPriceHistoryFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindSellPriceHistoryFilter = {
+  createdDate?: InputMaybe<DateRangeFilter>;
+  inventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
+  reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FindSellersArgs = {
@@ -523,14 +564,29 @@ export type InventoryItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
+  language: CardLanguage;
   lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
   magicCardSummary?: Maybe<MagicCardSummary>;
   movements?: Maybe<Array<InventoryMovement>>;
   pokemonCardSummary?: Maybe<PokemonCardSummary>;
   purchasePrice?: Maybe<Scalars['Float']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
+  sellPriceHistory?: Maybe<Array<InventoryItemSellPriceHistory>>;
   stock: Scalars['Float']['output'];
   tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type InventoryItemSellPriceHistory = {
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  guid: Scalars['String']['output'];
+  inventoryItem: InventoryItem;
+  newPrice: Scalars['Float']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  previousPrice?: Maybe<Scalars['Float']['output']>;
+  reason: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
 };
@@ -1139,6 +1195,11 @@ export type PaginatedSales = {
   data?: Maybe<Array<Sale>>;
 };
 
+export type PaginatedSellPriceHistory = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<InventoryItemSellPriceHistory>>;
+};
+
 export type PaginatedSellers = {
   count?: Maybe<Scalars['Float']['output']>;
   data?: Maybe<Array<Seller>>;
@@ -1172,6 +1233,7 @@ export type PokemonCard = {
   hpTcgPlayer?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryItems?: Maybe<Array<InventoryItem>>;
+  language: CardLanguage;
   loosePrice?: Maybe<Scalars['Float']['output']>;
   moreImagesTcgPlayer?: Maybe<Array<ImageResolution>>;
   newPrice?: Maybe<Scalars['Float']['output']>;
@@ -1441,6 +1503,7 @@ export type PurchaseItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
+  language: CardLanguage;
   magicCardSummary?: Maybe<MagicCardSummary>;
   offerPrice: Scalars['Float']['output'];
   pokemonCardSummary?: Maybe<PokemonCardSummary>;
@@ -1465,6 +1528,10 @@ export type Query = {
   buyerBudgets: Array<BuyerBudgetWithUsage>;
   /** Get client sales statistics (orders count, totals, cancellations, last order date) */
   clientDetails: ClientDetailsOutput;
+  /** Export purchases to xlsx (async, sends download link via email) */
+  exportPurchases: ExportRequestOutput;
+  /** Export sales to xlsx (async, sends download link via email) */
+  exportSales: ExportRequestOutput;
   /** Get banner file for a specific TCG */
   getBanner?: Maybe<File>;
   /** Query to get the global config */
@@ -1473,6 +1540,8 @@ export type Query = {
   indicatorsInventoryItems: InventoryIndicatorsOutput;
   /** Get inventory item detail by guid */
   inventoryItem: InventoryItem;
+  /** Get paginated sell price change history for inventory items */
+  inventoryItemSellPriceHistory: PaginatedSellPriceHistory;
   /** Get paginated list of inventory items */
   inventoryItems: PaginatedInventoryItems;
   /** Get paginated list of inventory movements */
@@ -1575,6 +1644,14 @@ export type QueryClientDetailsArgs = {
   clientGuid: Scalars['String']['input'];
 };
 
+export type QueryExportPurchasesArgs = {
+  findPurchasesArgs: FindPurchasesArgs;
+};
+
+export type QueryExportSalesArgs = {
+  findSalesArgs: FindSalesArgs;
+};
+
 export type QueryGetBannerArgs = {
   tcg: TcgType;
 };
@@ -1586,6 +1663,10 @@ export type QueryIndicatorsInventoryItemsArgs = {
 
 export type QueryInventoryItemArgs = {
   guid: Scalars['String']['input'];
+};
+
+export type QueryInventoryItemSellPriceHistoryArgs = {
+  findSellPriceHistoryArgs: FindSellPriceHistoryArgs;
 };
 
 export type QueryInventoryItemsArgs = {
@@ -1757,6 +1838,7 @@ export type SaleItem = {
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   guid: Scalars['String']['output'];
+  language: CardLanguage;
   magicCardSummary?: Maybe<MagicCardSummary>;
   pokemonCardSummary?: Maybe<PokemonCardSummary>;
   price: Scalars['Float']['output'];
@@ -1886,6 +1968,7 @@ export type UpdatePurchaseInput = {
 export type UpdatePurchaseItemDetailInput = {
   condition?: InputMaybe<Scalars['String']['input']>;
   itemGuid: Scalars['String']['input'];
+  language?: InputMaybe<CardLanguage>;
   offerPrice?: InputMaybe<Scalars['Float']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
   referencePrice?: InputMaybe<Scalars['Float']['input']>;
@@ -1997,6 +2080,7 @@ export type UserFinishSignupInput = {
 export type WishlistCountArgs = {
   cardGuid: Scalars['String']['input'];
   condition: Scalars['String']['input'];
+  language: CardLanguage;
   tcg: Scalars['String']['input'];
 };
 
@@ -2011,6 +2095,7 @@ export type WishlistItem = {
   createdDate: Scalars['Timestamp']['output'];
   customer: User;
   guid: Scalars['String']['output'];
+  language: CardLanguage;
   magicCardSummary?: Maybe<MagicCardSummary>;
   pokemonCardSummary?: Maybe<PokemonCardSummary>;
   sellPrice?: Maybe<Scalars['Float']['output']>;

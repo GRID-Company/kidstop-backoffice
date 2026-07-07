@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 import { useAuthStore } from '@/lib/store/auth';
 import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
@@ -376,6 +377,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
                 ? { pokemonCardGuid: item.cardGuid }
                 : { magicCardGuid: item.cardGuid }),
               condition: item.condition,
+              // TODO: Agregar selector de idioma (English/Spanish) en UI de detalle de compra
+              // - Solo habilitado para cartas que tengan language English
+              // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
+              language: CardLanguage.English,
               quantity: item.quantity,
               offerPrice: item.offerPrice,
               referencePrice: item.referencePrice,
@@ -415,6 +420,10 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
                   ? { pokemonCardGuid: item.cardGuid }
                   : { magicCardGuid: item.cardGuid }),
                 condition: item.condition,
+                // TODO: Agregar selector de idioma (English/Spanish) en UI de detalle de compra (pending items)
+                // - Solo habilitado para cartas que tengan language English
+                // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
+                language: CardLanguage.English,
                 quantity: item.quantity,
                 offerPrice: item.offerPrice,
                 referencePrice: item.referencePrice,
