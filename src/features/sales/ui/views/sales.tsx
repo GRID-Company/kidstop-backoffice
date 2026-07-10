@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import Search from '@/shared/base/heorui-overrides/search';
+import { ExportButton } from '@/shared/base/export-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
@@ -87,25 +88,27 @@ export default function Sales() {
 
   const handleExportClick = useCallback(() => {
     handleExport({
-      skip: 0,
-      limit: 0,
-      sort: { column: 'createdDate', order: 'DESC' },
-      search: filters.search?.trim() || undefined,
-      filters: {
-        tcg: selectedTCG,
-        status: filters.status || undefined,
-        customer: filters.customer || undefined,
-        ...(filters.dateFrom || filters.dateTo
-          ? {
-              createdDate: {
-                filterType: ':daterange:',
-                range: {
-                  from: filters.dateFrom,
-                  to: filters.dateTo,
+      findSalesArgs: {
+        skip: 0,
+        limit: 0,
+        sort: { column: 'createdDate', order: 'DESC' },
+        search: filters.search?.trim() || undefined,
+        filters: {
+          tcg: selectedTCG,
+          status: filters.status || undefined,
+          customer: filters.customer || undefined,
+          ...(filters.dateFrom || filters.dateTo
+            ? {
+                createdDate: {
+                  filterType: ':daterange:',
+                  range: {
+                    from: filters.dateFrom,
+                    to: filters.dateTo,
+                  },
                 },
-              },
-            }
-          : {}),
+              }
+            : {}),
+        },
       },
     });
   }, [handleExport, selectedTCG, filters]);
@@ -201,18 +204,7 @@ export default function Sales() {
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="Pedidos / Ventas">
-        <Tooltip content="El archivo XLSX se enviará a tu correo electrónico">
-          <Button
-            className="bg-accent text-white"
-            startContent={<Icon icon="solar:download-minimalistic-bold" width={16} />}
-            size="sm"
-            onPress={handleExportClick}
-            isLoading={exporting}
-            isDisabled={exporting}
-          >
-            Exportar
-          </Button>
-        </Tooltip>
+        <ExportButton onPress={handleExportClick} isLoading={exporting} />
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>

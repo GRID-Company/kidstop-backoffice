@@ -15,6 +15,7 @@ import { Icon } from '@iconify/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import Search from '@/shared/base/heorui-overrides/search';
+import { ExportButton } from '@/shared/base/export-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { IPurchase, PurchaseStatus } from '../../domain/types';
 import { PURCHASE_STATUS_OPTIONS } from '../../domain/constants';
@@ -78,15 +79,17 @@ export default function Purchases() {
 
   const handleExportClick = useCallback(() => {
     handleExport({
-      skip: 0,
-      limit: 0,
-      sort: { column: 'createdDate', order: 'DESC' },
-      filters: {
-        tcg: selectedTCG,
-        status: filters.status,
-        buyer: filters.buyerGuid,
+      findPurchasesArgs: {
+        skip: 0,
+        limit: 0,
+        sort: { column: 'createdDate', order: 'DESC' },
+        filters: {
+          tcg: selectedTCG,
+          status: filters.status,
+          buyer: filters.buyerGuid,
+        },
+        search: filters.search?.trim() || undefined,
       },
-      search: filters.search?.trim() || undefined,
     });
   }, [handleExport, selectedTCG, filters]);
 
@@ -185,18 +188,7 @@ export default function Purchases() {
           >
             Nueva compra
           </Button>
-          <Tooltip content="El archivo XLSX se enviará a tu correo electrónico">
-            <Button
-              className="bg-accent text-white"
-              startContent={<Icon icon="solar:download-minimalistic-bold" width={16} />}
-              size="sm"
-              onPress={handleExportClick}
-              isLoading={exporting}
-              isDisabled={exporting}
-            >
-              Exportar
-            </Button>
-          </Tooltip>
+          <ExportButton onPress={handleExportClick} isLoading={exporting} />
         </div>
       </EntitiesPage.Toolbar>
 
