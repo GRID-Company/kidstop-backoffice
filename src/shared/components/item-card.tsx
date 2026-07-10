@@ -72,7 +72,7 @@ export default function ItemCard({
   allItems = [],
 }: ItemCardProps) {
   const { control } = useFormContext();
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyModeStore();
 
   const quantity = useWatch({
     control,
