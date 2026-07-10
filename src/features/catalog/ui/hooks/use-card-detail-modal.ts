@@ -22,9 +22,27 @@ export interface InventoryCard {
   sellPrice: number | null;
 }
 
+interface CardDetail {
+  language?: CardLanguage;
+  inventoryCards?: Array<{
+    guid: string;
+    condition: string;
+    language: CardLanguage;
+    stock: number;
+    purchasePrice: number | null;
+    sellPrice: number | null;
+  }>;
+  name?: string;
+}
+
+interface CardBasic {
+  guid: string;
+  language?: CardLanguage;
+}
+
 interface UseCardDetailModalParams {
-  detail: any;
-  card: any;
+  detail: CardDetail | null;
+  card: CardBasic | null;
   tcgType: TCGType;
   onRefetch: () => void;
 }
@@ -57,7 +75,7 @@ export function useCardDetailModal({
   const availableVariants = useMemo(() => {
     if (!detail?.inventoryCards || !card?.guid) return [];
     return detail.inventoryCards
-      .map((ic: any) => ({
+      .map((ic) => ({
         cardGuid: card.guid,
         inventoryItemGuid: ic.guid,
         condition: ic.condition,
@@ -130,7 +148,7 @@ export function useCardDetailModal({
         });
         setPriceNotes('');
         onRefetch();
-      } catch (error) {
+      } catch (_error) {
         // Error ya manejado en handleUpdatePrice
       }
     },
@@ -152,7 +170,7 @@ export function useCardDetailModal({
       setStockAdjustment(0);
       setStockNotes('');
       onRefetch();
-    } catch (error) {
+    } catch (_error) {
       // Error ya manejado en handleAdjustStock
     }
   }, [detail, selectedVariant, stockAdjustment, stockNotes, handleAdjustStock, tcgType, movementType, onRefetch]);
