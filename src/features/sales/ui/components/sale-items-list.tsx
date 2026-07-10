@@ -29,7 +29,7 @@ export default function SaleItemsList({
     [items]
   );
 
-  const handleUpdateItem = (itemId: string, updates: any) => {
+  const handleUpdateItem = (itemId: string, updates: Partial<ISaleItem>) => {
     if (onUpdateItem) {
       onUpdateItem(itemId, updates);
     }

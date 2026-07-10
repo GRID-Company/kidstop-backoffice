@@ -442,6 +442,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       setStatus(newStatus);
       void refetchBudget();
     } catch {
+      // Error already handled by mutation onError callback
     } finally {
       setMutating(false);
     }
