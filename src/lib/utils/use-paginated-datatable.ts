@@ -8,7 +8,7 @@ import {
 
 interface IUsePaginatedDatatable {
   defaultSort: ITableSort;
-  defaultFilters?: any;
+  defaultFilters?: Record<string, unknown>;
   onFiltersChange?: () => void;
 }
 
@@ -28,7 +28,7 @@ export const usePaginatedDatatable = ({
   );
 
   const filtersMap = useRef(new Map());
-  const searchTimeout = useRef<any>(null);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const [paginatedArgs, setPaginatedArgs] =
     useState<IPaginatedApiArgs>(defaultArgs);

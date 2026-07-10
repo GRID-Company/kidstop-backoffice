@@ -6,11 +6,11 @@ interface UseCardMetricsCacheOptions {
   cardGuids: string[];
   query: DocumentNode;
   cacheKey: string;
-  dataExtractor: (data: any) => number | null;
+  dataExtractor: (data: unknown) => number | null;
 }
 
 interface UseCardMetricsCacheReturn {
-  metricsCache: Record<string, any>;
+  metricsCache: Record<string, unknown>;
   loading: boolean;
 }
 
@@ -20,7 +20,7 @@ export function useCardMetricsCache({
   cacheKey,
   dataExtractor: _dataExtractor,
 }: UseCardMetricsCacheOptions): UseCardMetricsCacheReturn {
-  const [metricsCache, setMetricsCache] = useState<Record<string, any>>({});
+  const [metricsCache, setMetricsCache] = useState<Record<string, unknown>>({});
   const fetchedGuidsRef = useRef<Set<string>>(new Set());
 
   const [fetchMetrics, { loading }] = useLazyQuery(query, {
@@ -37,7 +37,7 @@ export function useCardMetricsCache({
           variables: { guid },
         });
 
-        const dataRecord = data as Record<string, any> | null | undefined;
+        const dataRecord = data as Record<string, unknown> | null | undefined;
         if (dataRecord && cacheKey in dataRecord && dataRecord[cacheKey]) {
           setMetricsCache((prev) => ({
             ...prev,
