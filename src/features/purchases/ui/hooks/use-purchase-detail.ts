@@ -192,7 +192,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         // Fallback for items without metadata - use field.id as guid
         return {
           ...(field as unknown as IPurchaseItem),
-          guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition, field.language),
+          guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition, (field as any).language),
         };
       }
       
@@ -306,6 +306,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       items: newItems.map((item) => ({
         cardGuid: item.cardGuid,
         condition: item.condition,
+        language: item.language,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
