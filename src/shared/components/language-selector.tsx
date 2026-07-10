@@ -2,7 +2,7 @@
 
 import { Select, SelectItem } from '@heroui/react';
 import { CardLanguage } from '@/lib/api/schema-types';
-import { LANGUAGE_LABELS, isLanguageModifiable } from '@/lib/types/language.types';
+import { LANGUAGE_LABELS, MODIFIABLE_LANGUAGES, isLanguageModifiable } from '@/lib/types/language.types';
 
 interface LanguageSelectorProps {
   value: CardLanguage;
@@ -14,7 +14,7 @@ interface LanguageSelectorProps {
   className?: string;
 }
 
-export default function LanguageSelector({
+export function LanguageSelector({
   value,
   onChange,
   disabled = false,
@@ -30,7 +30,7 @@ export default function LanguageSelector({
   const isDisabled = disabled || !isModifiable;
 
   // Determinar qué idiomas mostrar
-  const availableLanguages = [CardLanguage.English, CardLanguage.Spanish];
+  const availableLanguages: CardLanguage[] = [...MODIFIABLE_LANGUAGES];
   
   // Si el idioma no es modificable, agregar el idioma actual a las opciones
   if (!isModifiable && currentLanguage) {
