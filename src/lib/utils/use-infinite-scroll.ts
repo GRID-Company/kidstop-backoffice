@@ -4,7 +4,6 @@ import {
   SetStateAction,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 import { InfiniteScrollData } from '../types/datatable.types';
 

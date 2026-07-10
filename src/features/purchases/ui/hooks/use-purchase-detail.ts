@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { CardLanguage } from '@/lib/api/schema-types';
 
@@ -23,9 +22,8 @@ import {
   CardCondition,
 } from '../../domain/types';
 import { calculateTotal, getItemKey } from '../../domain/purchases.domain';
-import { usePurchaseItemsForm, PurchaseItemsFormData } from '../../adapters/forms/use-purchase-items-form';
-import { usePaymentSplitForm, PaymentSplitFormData } from '../../adapters/forms/use-payment-split-form';
-import { mapFormItemToPurchaseItem } from '../../adapters/mappers/item-mapper';
+import { usePurchaseItemsForm } from '../../adapters/forms/use-purchase-items-form';
+import { usePaymentSplitForm } from '../../adapters/forms/use-payment-split-form';
 
 interface UsePurchaseDetailReturn {
   purchase: IPurchase | null;

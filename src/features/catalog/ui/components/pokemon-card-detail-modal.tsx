@@ -36,7 +36,6 @@ import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/const
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toPokemonCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
-import ConditionSelector from '@/shared/blocks/condition-selector';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import InventoryMovementsTable from './inventory-movements-table';

@@ -3,7 +3,6 @@ import {
   AutocompleteItem,
   Autocomplete,
 } from '@heroui/react';
-import { type ISelectOption } from './select';
 
 export interface IAutocompleteOption {
   value: string;

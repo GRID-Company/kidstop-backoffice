@@ -27,7 +27,6 @@ import {
   PURCHASE_STATUS_LABELS,
   PAYMENT_METHOD_LABELS,
 } from '../../domain/constants';
-import { calculateTotal } from '../../domain/purchases.domain';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';

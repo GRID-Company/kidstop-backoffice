@@ -33,7 +33,6 @@ import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic
 import { toPokemonCard, toMagicCard } from '@/features/catalog/adapters/mappers/card.mapper';
 import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { IInventoryItem } from '../../domain/types';
-import { fromApiInventoryItem } from '../../adapters/mappers/inventory.mapper';
 import {
   BULK_ADJUSTMENT_OPTIONS,
   STOCK_STATUS_LABELS,

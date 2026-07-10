@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Input, Spinner, Chip } from '@heroui/react';
+import { Input, Spinner } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 interface CardSearchProps<T extends { guid: string }> {

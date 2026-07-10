@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/lib/store/auth';
-import { UserRole } from './user-roles';
 import { useAuthCookie } from './use-auth-cookie';
 import { LoginOutput } from '../api/schema-types';
 import { ERROR_MESSAGES } from '../consts/error-messages';

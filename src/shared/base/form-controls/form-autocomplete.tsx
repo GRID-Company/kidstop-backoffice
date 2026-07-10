@@ -1,10 +1,8 @@
 'use client';
 import { type Key, type ReactNode, useEffect, useState } from 'react';
 import {
-  type Control,
   Controller,
   FieldValues,
-  type RegisterOptions,
 } from 'react-hook-form';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { ISelectOption } from '../heorui-overrides/select';

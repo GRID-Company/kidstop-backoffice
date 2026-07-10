@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { CARD_CONDITIONS } from '../../domain/constants';
-import { PURCHASE_STATUS, PAYMENT_METHOD } from '../../domain/types';
+import { PAYMENT_METHOD } from '../../domain/types';
 
 const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string[]];
 const paymentMethodValues = Object.values(PAYMENT_METHOD) as [string, ...string[]];

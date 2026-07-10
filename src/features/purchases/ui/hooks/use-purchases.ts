@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { PurchasesDocument } from '@/lib/api/generated/purchases.generated';
