@@ -95,6 +95,7 @@ export interface ICardSearchResult {
   rarity: string;
   imageUrl: string;
   tcgType: TCGType;
+  language: CardLanguage;
   metrics: ICardSearchMetrics;
 }
 
