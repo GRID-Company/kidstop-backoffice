@@ -92,8 +92,10 @@ export default function PokemonCardDetailModal({
     adjustLoading,
     cardName,
   } = useCardDetailModal({
-    detail,
-    card: selectedCard,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    detail: detail as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    card: selectedCard as any,
     tcgType: 'POKEMON',
     onRefetch: refetch,
   });
@@ -657,7 +659,7 @@ export default function PokemonCardDetailModal({
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmAdjustment}
         loading={adjustLoading}
-        cardName={cardName ?? name}
+        cardName={cardName ?? name ?? ''}
         condition={selectedVariant.condition}
         operationType={movementType}
         quantity={stockAdjustment}

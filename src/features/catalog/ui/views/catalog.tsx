@@ -93,7 +93,7 @@ export default function Catalog() {
 
           {isPokemon ? (
             <PokemonCardGrid
-              cards={pokemon.cards}
+              cards={pokemon.cards as any}
               loading={pokemon.loading}
               page={pokemon.page}
               totalPages={pokemon.totalPages}
@@ -102,7 +102,7 @@ export default function Catalog() {
             />
           ) : (
             <MagicCardGrid
-              cards={magic.cards}
+              cards={magic.cards as any}
               loading={magic.loading}
               page={magic.page}
               totalPages={magic.totalPages}

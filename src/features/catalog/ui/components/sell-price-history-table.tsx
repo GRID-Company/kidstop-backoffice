@@ -56,63 +56,79 @@ export default function SellPriceHistoryTable({
         key: 'previousPrice',
         label: 'Precio anterior',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-sm">
-            {item.previousPrice !== null ? `$${item.previousPrice.toFixed(2)}` : '—'}
-          </span>
-        ),
+        customCol: (item: unknown) => {
+          const history = item as { previousPrice?: number | null };
+          return (
+            <span className="text-sm">
+              {history.previousPrice !== null && history.previousPrice !== undefined ? `$${history.previousPrice.toFixed(2)}` : '—'}
+            </span>
+          );
+        },
       },
       {
         key: 'newPrice',
         label: 'Precio nuevo',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-sm font-medium text-accent">
-            ${item.newPrice.toFixed(2)}
-          </span>
-        ),
+        customCol: (item: unknown) => {
+          const history = item as { newPrice: number };
+          return (
+            <span className="text-sm font-medium text-accent">
+              ${history.newPrice.toFixed(2)}
+            </span>
+          );
+        },
       },
       {
         key: 'reason',
         label: 'Razón',
         allowSorting: false,
-        customCol: (item) => (
-          <Chip
-            size="sm"
-            variant="flat"
-            color={REASON_COLORS[item.reason] ?? 'default'}
-          >
-            {REASON_LABELS[item.reason] ?? item.reason}
-          </Chip>
-        ),
+        customCol: (item: unknown) => {
+          const history = item as { reason: string };
+          return (
+            <Chip
+              size="sm"
+              variant="flat"
+              color={REASON_COLORS[history.reason as keyof typeof REASON_COLORS] ?? 'default'}
+            >
+              {REASON_LABELS[history.reason as keyof typeof REASON_LABELS] ?? history.reason}
+            </Chip>
+          );
+        },
       },
       {
         key: 'notes',
         label: 'Notas',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs text-default-500 max-w-50 truncate block">
-            {item.notes ?? '—'}
-          </span>
-        ),
+        customCol: (item: unknown) => {
+          const history = item as { notes?: string };
+          return (
+            <span className="text-xs text-default-500 max-w-50 truncate block">
+              {history.notes ?? '—'}
+            </span>
+          );
+        },
       },
       {
         key: 'createdDate',
         label: 'Fecha',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs">{formatDate(item.createdDate as string)}</span>
-        ),
+        customCol: (item: unknown) => {
+          const history = item as { createdDate: string };
+          return <span className="text-xs">{formatDate(history.createdDate)}</span>;
+        },
       },
       {
         key: 'createdBy',
         label: 'Usuario',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs text-default-500">
-            {item.createdBy?.name ?? '—'}
-          </span>
-        ),
+        customCol: (item: unknown) => {
+          const history = item as { createdBy?: { name: string } };
+          return (
+            <span className="text-xs text-default-500">
+              {history.createdBy?.name ?? '—'}
+            </span>
+          );
+        },
       },
     ],
     []
