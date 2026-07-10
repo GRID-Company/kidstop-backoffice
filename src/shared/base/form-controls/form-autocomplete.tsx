@@ -26,11 +26,11 @@ function BaseFormAutocomplete({
     items: [] as ISelectOption[],
     selectedKey: '',
     inputValue: '',
-    indexedItems: {} as any,
+    indexedItems: {} as Record<string, ISelectOption>,
   });
 
   useEffect(() => {
-    const indexed: any = items.reduce((acc: any, item: any) => {
+    const indexed: Record<string, ISelectOption> = items.reduce((acc: Record<string, ISelectOption>, item: ISelectOption) => {
       acc[item.value] = item;
       return acc;
     }, {});

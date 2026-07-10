@@ -13,20 +13,20 @@ import { useQuery } from '@apollo/client/react';
 import { DocumentNode } from 'graphql';
 
 type AsyncQueryConfig<
-  TData = any,
-  TVariables extends Record<string, any> = Record<string, any>,
+  TData = unknown,
+  TVariables extends Record<string, unknown> = Record<string, unknown>,
 > = {
   field: any;
   onSelectIcon?: ReactNode;
   queryDocument: DocumentNode;
   variables: TVariables;
-  mapResToItems: (data: any) => ISelectOption[];
+  mapResToItems: (data: TData) => ISelectOption[];
   skipQuery?: boolean;
 } & Partial<AutocompleteProps>;
 
 function BaseFormAsyncAutocomplete<
-  TData = any,
-  TVariables extends Record<string, any> = Record<string, any>,
+  TData = unknown,
+  TVariables extends Record<string, unknown> = Record<string, unknown>,
 >({
   queryDocument,
   variables,
@@ -66,7 +66,7 @@ function BaseFormAsyncAutocomplete<
   });
 
   const items: ISelectOption[] = useMemo(
-    () => (mapResToItems ? mapResToItems(res) : []),
+    () => (res ? mapResToItems(res as TData) : []),
     [res, mapResToItems]
   );
 
@@ -151,16 +151,16 @@ function BaseFormAsyncAutocomplete<
 
 type AsyncAutocompleteFormProps<
   TFieldValues extends FieldValues,
-  TData = any,
-  TVariables extends Record<string, any> = Record<string, any>,
+  TData = unknown,
+  TVariables extends Record<string, unknown> = Record<string, unknown>,
 > = Omit<AsyncQueryConfig<TData, TVariables>, 'field'> & {
   controlProps: ControlWithFormProps<TFieldValues>;
 };
 
 export default function FormAsyncAutocomplete<
   TFieldValues extends FieldValues,
-  TData,
-  TVariables extends Record<string, any>,
+  TData = unknown,
+  TVariables extends Record<string, unknown> = Record<string, unknown>,
 >({
   queryDocument,
   variables,
