@@ -25,7 +25,8 @@ import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/ty
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { getItemKey } from '../../domain/purchases.domain';
 import { CardLanguage } from '@/lib/api/schema-types';
-import LanguageSelector from '@/shared/components/language-selector';
+import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
+import { LanguageSelector } from '@/shared/components/language-selector';
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
@@ -47,7 +48,7 @@ interface AddToCartState {
 
 const DEFAULT_ADD_STATE: AddToCartState = {
   condition: CARD_CONDITIONS.NEAR_MINT,
-  language: CardLanguage.English,
+  language: DEFAULT_CARD_LANGUAGE,
   quantity: 1,
   unitBuyPrice: 0,
 };
@@ -65,6 +66,7 @@ function CardResultItem({
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
+    language: card.language || DEFAULT_CARD_LANGUAGE,
     unitBuyPrice: calculateOfferPrice(card.metrics.referencePrice),
   });
   const [isAdding, setIsAdding] = useState(false);
@@ -206,6 +208,7 @@ function CardResultItem({
             <LanguageSelector
               value={addState.language}
               onChange={(language) => setAddState((s) => ({ ...s, language }))}
+              currentLanguage={card.language}
               size="sm"
               label="Idioma"
             />

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
 import { CardCondition } from '../../domain/types';
 import { useUpdateInventoryPrice } from './use-update-inventory-price';
 import { useAdjustInventoryStock } from './use-adjust-inventory-stock';
@@ -35,7 +36,9 @@ export function useCardDetailModal({
   onRefetch,
 }: UseCardDetailModalParams) {
   const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<CardLanguage>(CardLanguage.English);
+  const [selectedLanguage, setSelectedLanguage] = useState<CardLanguage>(
+    card?.language || DEFAULT_CARD_LANGUAGE
+  );
   const [stockAdjustment, setStockAdjustment] = useState<number>(0);
   const [stockNotes, setStockNotes] = useState<string>('');
   const [priceNotes, setPriceNotes] = useState<string>('');
@@ -43,6 +46,13 @@ export function useCardDetailModal({
   const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
   const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
+
+  // Sync selectedLanguage with detail's language when detail loads
+  useEffect(() => {
+    if (detail?.language) {
+      setSelectedLanguage(detail.language);
+    }
+  }, [detail]);
 
   const availableVariants = useMemo(() => {
     if (!detail?.inventoryCards || !card?.guid) return [];
