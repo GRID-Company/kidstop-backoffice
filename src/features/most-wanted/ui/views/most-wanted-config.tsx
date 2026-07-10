@@ -6,6 +6,7 @@ import { Icon } from '@iconify/react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
+import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { useAddCardModal } from '../hooks/use-add-card-modal';
 import { useMostWantedList } from '../hooks/use-most-wanted-list';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
@@ -94,7 +95,7 @@ export default function MostWantedConfig() {
         onAdd={handleAddCard}
         search={addCardModal.search}
         onSearchChange={addCardModal.setSearch}
-        searchResults={addCardModal.searchResults as any}
+        searchResults={addCardModal.searchResults as (IPokemonCard | IMagicCard)[]}
         selectedCard={addCardModal.selectedCard}
         onSelectCard={addCardModal.selectCard}
         form={addCardModal.form}

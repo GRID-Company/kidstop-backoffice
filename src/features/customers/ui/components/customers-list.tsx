@@ -119,7 +119,7 @@ export default function CustomersList({
           <div className="hidden md:block">
             <DataTable
               cols={COLUMNS}
-              data={customers as any}
+              data={customers}
               isLoading={loading}
               sortDescriptor={sortDescriptor}
               onSortChange={onSortChange}

@@ -79,10 +79,12 @@ export default function ItemCard({
     name: `cards.${index}.quantity`,
   });
 
-  const offerPrice = variant === 'purchase' ? useWatch({
+  const offerPriceWatch = useWatch({
     control,
     name: `cards.${index}.offerPrice`,
-  }) : undefined;
+  });
+  
+  const offerPrice = variant === 'purchase' ? offerPriceWatch : undefined;
 
   const subtotal = useMemo(() => {
     if (variant === 'purchase' && isPurchaseItem(item)) {

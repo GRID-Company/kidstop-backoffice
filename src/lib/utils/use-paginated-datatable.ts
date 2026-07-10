@@ -101,7 +101,7 @@ export const usePaginatedDatatable = ({
 
   // ADD DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterDateRange = useCallback(
-    (key: string, value: any | null) => {
+    (key: string, value: { from?: Date; to?: Date } | null) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {
@@ -118,7 +118,7 @@ export const usePaginatedDatatable = ({
 
   // ADD DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterNumericRange = useCallback(
-    (key: string, value: any | null) => {
+    (key: string, value: { from: number; to?: number } | null) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {
@@ -135,7 +135,7 @@ export const usePaginatedDatatable = ({
 
   // ADD RELATIONAL DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterRelationDateRange = useCallback(
-    (key: string, relationKey: string, value: any | null) => {
+    (key: string, relationKey: string, value: { from?: Date; to?: Date } | null) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {

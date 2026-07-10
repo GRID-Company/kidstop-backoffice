@@ -13,7 +13,7 @@ import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 
 type DataTableProps<T extends Record<string, unknown> = Record<string, unknown>> = {
-  cols: ITableColumn[];
+  cols: ITableColumn<T>[];
   data: T[];
   isLoading: boolean;
   selectable?: boolean;
@@ -80,7 +80,7 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
             className={rowClickable ? 'cursor-pointer hover:bg-[#F5F9FF] transition-colors duration-150' : ''}
             onClick={rowClickable && onRowClick ? () => onRowClick(item) : undefined}
           >
-            {cols.map((col: ITableColumn) => (
+            {cols.map((col: ITableColumn<T>) => (
               <TableCell
                 key={col.key}
                 className={`text-center ${col?.className ?? ''}`}

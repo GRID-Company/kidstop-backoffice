@@ -9,7 +9,8 @@ import {
 import { Icon } from '@iconify/react';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
-import { ICustomerOrder, ICustomerOrdersSummary } from '../../domain/types';
+import { ICustomerOrdersSummary } from '../../domain/types';
+import type { ICustomerOrder } from '../../domain/types';
 import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_COLORS,
@@ -164,7 +165,7 @@ export default function CustomerOrdersSummary({
           <div className="hidden md:block">
             <DataTable
               cols={columns}
-              data={summary.orders as any}
+              data={summary.orders as ICustomerOrder[]}
               isLoading={loading}
             />
           </div>

@@ -170,7 +170,7 @@ export function useCardDetailModal({
       setStockAdjustment(0);
       setStockNotes('');
       onRefetch();
-    } catch (_error) {
+    } catch {
       // Error ya manejado en handleAdjustStock
     }
   }, [detail, selectedVariant, stockAdjustment, stockNotes, handleAdjustStock, tcgType, movementType, onRefetch]);

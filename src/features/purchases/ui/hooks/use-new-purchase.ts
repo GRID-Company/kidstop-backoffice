@@ -71,14 +71,14 @@ export function useNewPurchase(): UseNewPurchaseReturn {
   const canSave = seller !== null && items.length > 0 && !saving && form.formState.isValid;
 
   const addItem = useCallback((item: IPurchaseItem) => {
-    fieldArray.append(item as any);
+    fieldArray.append(item);
   }, [fieldArray]);
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<IPurchaseItem>) => {
       const index = items.findIndex((item) => item.guid === itemId);
       if (index !== -1) {
-        fieldArray.update(index, { ...items[index], ...updates } as any);
+        fieldArray.update(index, { ...items[index], ...updates });
       }
     },
     [items, fieldArray]
@@ -119,7 +119,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
       await createPurchase({
         variables: payload,
       });
-    } catch (_error) {
+    } catch {
       // Error already handled by onError callback
     }
   }, [canSave, seller, items, selectedTCG, createPurchase]);

@@ -47,10 +47,10 @@ function BaseFormAsyncAutocomplete<
     () =>
       ({
         ...(variables ?? ({} as TVariables)),
-        ...(searchValue
+        ...(searchValue && variables
           ? {
               [Object.keys(variables)[0]]: {
-                ...variables[Object.keys(variables)[0]],
+                ...(variables[Object.keys(variables)[0] as keyof TVariables] as Record<string, unknown>),
                 search: searchValue,
               },
             }

@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
 
-export interface ITableColumn {
+export interface ITableColumn<T = Record<string, unknown>> {
   key: string;
   label: string;
   allowSorting?: boolean;
   className?: string;
-  customCol?: (row: Record<string, unknown>) => ReactNode;
+  customCol?: (row: T) => ReactNode;
 }
 
 export interface ITableSort {

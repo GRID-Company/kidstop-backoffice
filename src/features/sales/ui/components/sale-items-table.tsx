@@ -17,7 +17,7 @@ interface SaleItemsTableProps {
   loading?: boolean;
 }
 
-const SALE_ITEMS_COLUMNS: ITableColumn[] = [
+const SALE_ITEMS_COLUMNS: ITableColumn<ISaleItem>[] = [
   { key: 'image', label: '', className: 'w-14' },
   { key: 'cardName', label: 'Carta' },
   { key: 'set', label: 'Set' },
@@ -26,7 +26,7 @@ const SALE_ITEMS_COLUMNS: ITableColumn[] = [
   { key: 'subtotal', label: 'Subtotal', className: 'w-24' },
 ];
 
-type ColumnRenderer = (row: any) => React.ReactNode;
+type ColumnRenderer = (row: ISaleItem) => React.ReactNode;
 
 const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   image: (row) => {
@@ -83,9 +83,9 @@ export default function SaleItemsTable({
   }
 
   return (
-    <DataTable
+    <DataTable<ISaleItem>
       cols={COLUMNS_WITH_RENDERERS}
-      data={items as any}
+      data={items}
       isLoading={loading}
     />
   );

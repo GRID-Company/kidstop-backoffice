@@ -88,13 +88,13 @@ export default function PurchaseItemsTable({
     [onUpdateItem]
   );
 
-  const columns: ITableColumn[] = useMemo(() => {
-    const baseCols: ITableColumn[] = [
+  const columns: ITableColumn<IPurchaseItem>[] = useMemo(() => {
+    const baseCols: ITableColumn<IPurchaseItem>[] = [
       {
         key: 'card',
         label: 'Carta',
         className: '!text-left min-w-[220px]',
-        customCol: (item: any) => (
+        customCol: (item: IPurchaseItem) => (
           <div className="flex items-center gap-3">
             <CardImage
               src={item.cardImageUrl}
@@ -118,7 +118,7 @@ export default function PurchaseItemsTable({
         key: 'referencePriceAdded',
         label: 'Precio ref. al agregar',
         className: 'w-[140px]',
-        customCol: (item: any) => (
+        customCol: (item: IPurchaseItem) => (
           <span className="text-sm font-medium">
             {displayCurrency(item.referencePrice ?? 0)}
           </span>
@@ -128,7 +128,7 @@ export default function PurchaseItemsTable({
         key: 'referencePriceCurrent',
         label: 'Precio ref. actual',
         className: 'w-[140px]',
-        customCol: (item: any) => (
+        customCol: (item: IPurchaseItem) => (
           <span className="text-sm font-medium">
             {displayCurrency(item.currentReferencePrice ?? 0)}
           </span>
@@ -138,7 +138,7 @@ export default function PurchaseItemsTable({
         key: 'condition',
         label: 'Condición',
         className: 'min-w-[160px]',
-        customCol: (item: any) =>
+        customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
             <span className="text-sm">
               {CARD_CONDITION_SHORT_LABELS[item.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]}
@@ -167,7 +167,7 @@ export default function PurchaseItemsTable({
         key: 'quantity',
         label: 'Cantidad',
         className: 'w-[100px]',
-        customCol: (item: any) =>
+        customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
             <span className="text-sm">{item.quantity}</span>
           ) : (
@@ -189,7 +189,7 @@ export default function PurchaseItemsTable({
       {
         key: 'unitBuyPrice',
         label: 'Precio oferta',
-        customCol: (item: any) =>
+        customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
             <span className="text-sm font-medium">
               {displayCurrency(item.offerPrice)}
@@ -217,7 +217,7 @@ export default function PurchaseItemsTable({
       {
         key: 'subtotal',
         label: 'Subtotal',
-        customCol: (item: any) => (
+        customCol: (item: IPurchaseItem) => (
           <span className="text-sm font-semibold">
             {formatCurrency(calculateItemSubtotal(item))}
           </span>
@@ -230,7 +230,7 @@ export default function PurchaseItemsTable({
         key: 'actions',
         label: '',
         className: 'w-[60px]',
-        customCol: (item: any) => (
+        customCol: (item: IPurchaseItem) => (
           <Tooltip content="Eliminar item" color="danger">
             <Button
               isIconOnly
@@ -260,7 +260,7 @@ export default function PurchaseItemsTable({
 
   return (
     <div className="flex flex-col gap-3">
-      <DataTable cols={columns} data={itemsWithPrices as any} isLoading={false} />
+      <DataTable<IPurchaseItem> cols={columns} data={itemsWithPrices} isLoading={false} />
 
       {itemsWithPrices.length > 0 && (
         <div className="flex justify-end border-t border-default-200 pt-3">
