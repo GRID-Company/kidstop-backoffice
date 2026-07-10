@@ -16,7 +16,8 @@ type AsyncQueryConfig<
   TData = unknown,
   TVariables extends Record<string, unknown> = Record<string, unknown>,
 > = {
-  field: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  field: any; // React Hook Form field type
   onSelectIcon?: ReactNode;
   queryDocument: DocumentNode;
   variables: TVariables;

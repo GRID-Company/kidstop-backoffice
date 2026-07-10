@@ -19,7 +19,8 @@ function BaseFormAutocomplete({
 }: {
   items: ISelectOption[];
   invalid: boolean;
-  field: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  field: any; // React Hook Form field type
   onSelectIcon?: ReactNode;
 } & Partial<AutocompleteProps>) {
   const [fieldState, setFieldState] = useState({
