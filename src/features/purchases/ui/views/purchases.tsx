@@ -93,7 +93,7 @@ export default function Purchases() {
     });
   }, [handleExport, selectedTCG, filters]);
 
-  const columns: ITableColumn[] = useMemo(
+  const columns: ITableColumn<IPurchase>[] = useMemo(
     () => [
       {
         key: 'reference',
@@ -277,7 +277,7 @@ export default function Purchases() {
         </div>
 
         <div className="mt-4">
-          <DataTable 
+          <DataTable<IPurchase>
             cols={columns} 
             data={purchases} 
             isLoading={false} 

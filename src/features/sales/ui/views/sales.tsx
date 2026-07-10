@@ -113,7 +113,7 @@ export default function Sales() {
     });
   }, [handleExport, selectedTCG, filters]);
 
-  const columns: ITableColumn[] = useMemo(
+  const columns: ITableColumn<ISale>[] = useMemo(
     () => [
       {
         key: 'saleCode',
@@ -149,7 +149,7 @@ export default function Sales() {
         label: 'Items',
         className: 'w-[80px]',
         customCol: (row: ISale) => {
-          const count = row.items.reduce((sum, i) => sum + i.quantity, 0);
+          const count = row.items.reduce((sum: number, i: { quantity: number }) => sum + i.quantity, 0);
           return (
             <Chip size="sm" variant="flat">
               {count} {count === 1 ? 'carta' : 'cartas'}
@@ -294,7 +294,7 @@ export default function Sales() {
         </div>
 
         <div className="mt-4">
-          <DataTable 
+          <DataTable<ISale>
             cols={columns} 
             data={sales} 
             isLoading={loading} 

@@ -47,7 +47,7 @@ export default function PriceAdjustmentModal({
   const [autoCalculatedItems, setAutoCalculatedItems] = useState<Set<string>>(new Set());
 
   const { control, handleSubmit, reset, fieldArray } = usePriceAdjustmentForm();
-  const { fields } = fieldArray;
+  const { fields: _fields } = fieldArray;
 
   const watchedItems = useWatch({
     control,

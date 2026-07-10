@@ -48,7 +48,7 @@ export interface IMagicCardSummary {
   isFoil: boolean;
 }
 
-export interface ISaleItem {
+export interface ISaleItem extends Record<string, unknown> {
   guid: string;
   tcg: TCGType;
   condition: CardCondition;
@@ -66,7 +66,7 @@ export interface ISaleCustomer {
   phone: string | null;
 }
 
-export interface ISale {
+export interface ISale extends Record<string, unknown> {
   guid: string;
   saleCode: SaleCode;
   status: SaleStatus;

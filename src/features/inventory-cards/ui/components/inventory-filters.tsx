@@ -5,14 +5,11 @@ import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import {
   parseDate,
-  today,
-  getLocalTimeZone,
 } from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
 import type { DateValue } from '@internationalized/date';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
-import DateRangePicker from '@/shared/base/heorui-overrides/date-range-picker';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
@@ -52,7 +49,7 @@ export default function InventoryFilters({
     [selectedTCG]
   );
 
-  const dateRangeValue = useMemo(() => {
+  const _dateRangeValue = useMemo(() => {
     if (!dateRange) return null;
     return {
       start: parseDate(dateRange.start),
@@ -60,7 +57,7 @@ export default function InventoryFilters({
     };
   }, [dateRange]);
 
-  const handleDateChange = useCallback(
+  const _handleDateChange = useCallback(
     (value: RangeValue<DateValue> | null) => {
       if (!value) {
         onDateRangeChange(undefined);

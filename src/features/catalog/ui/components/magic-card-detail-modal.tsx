@@ -27,12 +27,11 @@ import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS, CA
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { MagicCardWithMetricsDocument, MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
-import ConditionSelector from '@/shared/blocks/condition-selector';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import InventoryMovementsTable from './inventory-movements-table';
@@ -63,7 +62,7 @@ export default function MagicCardDetailModal({
     }
   }, [isOpen, card]);
 
-  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
+  const { detail, loading: _detailLoading, refetch } = useMagicCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
@@ -89,8 +88,10 @@ export default function MagicCardDetailModal({
     adjustLoading,
     cardName,
   } = useCardDetailModal({
-    detail,
-    card: selectedCard,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    detail: detail as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    card: selectedCard as any,
     tcgType: 'MAGIC',
     onRefetch: refetch,
   });
@@ -145,7 +146,7 @@ export default function MagicCardDetailModal({
   const rarity = detail?.rarity ?? selectedCard?.rarity;
   const isFoil = detail?.isFoil ?? selectedCard?.isFoil;
   const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
-  const variants = detail?.inventoryCards ?? selectedCard?.variants ?? [];
+  const _variants = detail?.inventoryCards ?? selectedCard?.variants ?? [];
 
   const variantMetrics = metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
     (v) => v?.condition === selectedVariant?.condition
@@ -302,7 +303,7 @@ export default function MagicCardDetailModal({
                   <>
                     <span className="text-default-500">Idioma</span>
                     <span className="font-medium">
-                      {LANGUAGE_LABELS[detail?.language ?? selectedCard?.language!]}
+                      {LANGUAGE_LABELS[(detail?.language ?? selectedCard?.language) || CardLanguage.English]}
                     </span>
                   </>
                 )}
@@ -591,7 +592,7 @@ export default function MagicCardDetailModal({
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmAdjustment}
         loading={adjustLoading}
-        cardName={cardName ?? name}
+        cardName={cardName ?? name ?? ''}
         condition={selectedVariant.condition}
         operationType={movementType}
         quantity={stockAdjustment}

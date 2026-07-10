@@ -35,12 +35,20 @@ const COLUMNS: ITableColumn[] = [
   {
     key: 'clientType',
     label: 'Tipo',
-    customCol: (row: ICustomer) => <CustomerTypeBadge role={row.role} clientStatus={row.clientStatus} />,
+    customCol: (row: unknown) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const customer = row as any;
+      return <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />;
+    },
   },
   {
     key: 'clientStatus',
     label: 'Estado',
-    customCol: (row: ICustomer) => <CustomerStatusBadge clientStatus={row.clientStatus} />,
+    customCol: (row: unknown) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const customer = row as any;
+      return <CustomerStatusBadge clientStatus={customer.clientStatus} />;
+    },
   },
   { key: 'totalOrders', label: 'Pedidos' },
 ];

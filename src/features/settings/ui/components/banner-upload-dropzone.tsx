@@ -28,7 +28,8 @@ export const BannerUploadDropzone = ({
   const tcgType = tcg === 'pokemon' ? 'POKEMON' : 'MAGIC';
 
   const { data: bannerData, loading: bannerLoading, refetch: refetchBanner } = useQuery(GetBannerDocument, {
-    variables: { tcg: tcgType as any },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    variables: { tcg: tcgType as any }, // GraphQL enum compatibility
     skip: !currentBannerGuid,
     fetchPolicy: 'cache-and-network',
   });

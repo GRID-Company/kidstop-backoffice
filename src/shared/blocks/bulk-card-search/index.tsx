@@ -10,15 +10,16 @@ import { useBulkCardSearch } from './hooks/use-bulk-card-search';
 import { useBulkSearchForm } from './hooks/use-bulk-search-form';
 import BulkCardSearchInput from './bulk-card-search-input';
 import BulkCardSearchResults from './bulk-card-search-results';
-import { BulkCardSearchProps } from './types';
+import { BulkCardSearchProps, BulkSearchFormDataPurchases, BulkSearchFormDataInventory } from './types';
 
 function BulkCardSearchFooter({ 
   variant, 
   fields, 
   onCancel 
 }: { 
-  variant: 'purchases' | 'inventory'; 
-  fields: any[]; 
+  variant: 'purchases' | 'inventory';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: any[]; // React Hook Form field array
   onCancel: () => void;
 }) {
   const cardsData = useWatch({ name: 'cards' });
@@ -26,6 +27,7 @@ function BulkCardSearchFooter({
   const configuredCount = useMemo(() => {
     if (!cardsData || !Array.isArray(cardsData)) return 0;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return cardsData.filter((card: any) => {
       if (!card) return false;
       
@@ -102,10 +104,10 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   const handleSubmit = form.handleSubmit(
     (data) => {
-      onConfirm(data as any, results);
+      onConfirm(data as BulkSearchFormDataPurchases & BulkSearchFormDataInventory, results);
       handleClear();
     },
-    (errors) => {
+    (_errors) => {
       toast.error('Por favor completa todos los campos requeridos');
     }
   );

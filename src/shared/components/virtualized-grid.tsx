@@ -18,8 +18,8 @@ export function VirtualizedGrid<T>({
   columns = 4,
   gap = '1rem',
   className = '',
-  overscan = 5,
-  itemHeight = 300,
+  overscan: _overscan = 5,
+  itemHeight: _itemHeight = 300,
 }: VirtualizedGridProps<T>) {
   // For now, render all items. In production, implement react-window or @tanstack/react-virtual
   // This component serves as a placeholder for future virtualization implementation

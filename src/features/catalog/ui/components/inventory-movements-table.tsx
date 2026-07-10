@@ -49,59 +49,71 @@ export default function InventoryMovementsTable({
         key: 'movementType',
         label: 'Tipo',
         allowSorting: false,
-        customCol: (item) => (
-          <Chip
-            size="sm"
-            variant="flat"
-            color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
-          >
-            {MOVEMENT_TYPE_LABELS[item.movementType] ?? item.movementType}
-          </Chip>
-        ),
+        customCol: (item: unknown) => {
+          const movement = item as { movementType: string };
+          return (
+            <Chip
+              size="sm"
+              variant="flat"
+              color={MOVEMENT_TYPE_COLORS[movement.movementType as keyof typeof MOVEMENT_TYPE_COLORS] ?? 'default'}
+            >
+              {MOVEMENT_TYPE_LABELS[movement.movementType as keyof typeof MOVEMENT_TYPE_LABELS] ?? movement.movementType}
+            </Chip>
+          );
+        },
       },
       {
         key: 'quantity',
         label: 'Cantidad',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="font-medium">{item.quantity}</span>
-        ),
+        customCol: (item: unknown) => {
+          const movement = item as { quantity: number };
+          return <span className="font-medium">{movement.quantity}</span>;
+        },
       },
       {
         key: 'reference',
         label: 'Referencia',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs text-default-500">{item.reference ?? '—'}</span>
-        ),
+        customCol: (item: unknown) => {
+          const movement = item as { reference?: string };
+          return <span className="text-xs text-default-500">{movement.reference ?? '—'}</span>;
+        },
       },
       {
         key: 'notes',
         label: 'Notas',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs text-default-500 max-w-50 truncate block">
-            {item.notes ?? '—'}
-          </span>
-        ),
+        customCol: (item: unknown) => {
+          const movement = item as { notes?: string };
+          return (
+            <span className="text-xs text-default-500 max-w-50 truncate block">
+              {movement.notes ?? '—'}
+            </span>
+          );
+        },
       },
       {
         key: 'createdDate',
         label: 'Fecha',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs">{formatDate(item.createdDate as string)}</span>
-        ),
+        customCol: (item: unknown) => {
+          const movement = item as { createdDate: string };
+          return <span className="text-xs">{formatDate(movement.createdDate)}</span>;
+        },
       },
       {
         key: 'createdBy',
         label: 'Usuario',
         allowSorting: false,
-        customCol: (item) => (
-          <span className="text-xs text-default-500">
-            {item.createdBy?.name ?? '—'}
-          </span>
-        ),
+        customCol: (item: unknown) => {
+          const movement = item as { createdBy?: { name: string } };
+          return (
+            <span className="text-xs text-default-500">
+              {movement.createdBy?.name ?? '—'}
+            </span>
+          );
+        },
       },
     ],
     []

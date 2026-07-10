@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import { Button, Tab, Tabs, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { Key } from 'react';
-import { TCG_TYPES } from '@/lib/types/tcg.types';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
@@ -126,7 +125,7 @@ export default function Inventory() {
     void refreshIndicators();
   }, [refetch, refreshIndicators]);
 
-  const [bulkLoadInventory, { loading: bulkLoading }] = useMutation(BulkLoadInventoryDocument);
+  const [bulkLoadInventory, { loading: _bulkLoading }] = useMutation(BulkLoadInventoryDocument);
 
   const handleTabChange = useCallback((key: Key) => {
     setActiveTab(key as string);

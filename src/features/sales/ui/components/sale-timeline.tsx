@@ -41,7 +41,7 @@ export default function SaleTimeline({ currentStatus }: SaleTimelineProps) {
         {TIMELINE_STEPS.map((step, idx) => {
           const isPast = idx < currentIndex;
           const isCurrent = idx === currentIndex && !isCancelled;
-          const isFuture = idx > currentIndex || isCancelled;
+          const _isFuture = idx > currentIndex || isCancelled;
 
           return (
             <div key={step.status} className={`flex items-center ${idx < TIMELINE_STEPS.length - 1 ? 'flex-1' : 'shrink-0'}`}>

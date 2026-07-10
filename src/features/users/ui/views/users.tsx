@@ -119,7 +119,7 @@ export default function Users() {
     setResendTarget(null);
   }, [resendTarget, resendEmailInvite]);
 
-  const COLS: ITableColumn[] = useMemo(() => [
+  const COLS: ITableColumn<UserRow>[] = useMemo(() => [
     {
       key: 'name',
       label: 'Nombre',

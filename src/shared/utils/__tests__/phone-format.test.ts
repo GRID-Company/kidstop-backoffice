@@ -73,11 +73,11 @@ describe('formatPhoneNumber', () => {
     });
 
     it('returns empty string for null', () => {
-      expect(formatPhoneNumber(null as any)).toBe('');
+      expect(formatPhoneNumber(null as unknown as string)).toBe('');
     });
 
     it('returns empty string for undefined', () => {
-      expect(formatPhoneNumber(undefined as any)).toBe('');
+      expect(formatPhoneNumber(undefined as unknown as string)).toBe('');
     });
 
     it('handles only non-numeric characters', () => {

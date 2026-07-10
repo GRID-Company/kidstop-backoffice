@@ -33,11 +33,11 @@ describe('validatePhoneNumber', () => {
     });
 
     it('rejects null', () => {
-      expect(validatePhoneNumber(null as any)).toBe(false);
+      expect(validatePhoneNumber(null as unknown as string)).toBe(false);
     });
 
     it('rejects undefined', () => {
-      expect(validatePhoneNumber(undefined as any)).toBe(false);
+      expect(validatePhoneNumber(undefined as unknown as string)).toBe(false);
     });
 
     it('rejects less than 10 digits', () => {

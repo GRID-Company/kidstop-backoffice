@@ -41,8 +41,10 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
 
   const searchResults = useMemo(() => {
     if (selectedTCG === 'POKEMON') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return pokemonCards.filter((card: any) => !existingCardGuids.has(card.guid));
     } else if (selectedTCG === 'MAGIC') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return magicCards.filter((card: any) => !existingCardGuids.has(card.guid));
     }
     return [];

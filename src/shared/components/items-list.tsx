@@ -42,7 +42,7 @@ export default function ItemsList({
     },
   });
 
-  const { fields } = useFieldArray({
+  const { fields: _fields } = useFieldArray({
     control: form.control,
     name: 'cards',
   });

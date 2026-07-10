@@ -4,7 +4,6 @@ import {
   SetStateAction,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 import { InfiniteScrollData } from '../types/datatable.types';
 
@@ -51,10 +50,10 @@ export default function useInfiniteScroll({
   }, [loadMoreData, skipRef, disabled]);
 
   // RECOCILE DATA WHEN A NEW PAGE IS LOADED
-  const reconcileWhenNewPage = (
-    prevData: InfiniteScrollData<any>,
-    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<any>>>,
-    newData: InfiniteScrollData<any>,
+  const reconcileWhenNewPage = <T>(
+    prevData: InfiniteScrollData<T>,
+    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<T>>>,
+    newData: InfiniteScrollData<T>,
     resetList: boolean
   ) => {
     const newState = {
@@ -68,9 +67,9 @@ export default function useInfiniteScroll({
   };
 
   // RECOCILE DATA WHEN A ROW IS CREATED
-  const reconcileWhenCreated = (
-    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<any>>>,
-    created: any
+  const reconcileWhenCreated = <T>(
+    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<T>>>,
+    created: T
   ) => {
     setDataMethod((prev) => ({
       count: prev.count + 1,
@@ -79,9 +78,9 @@ export default function useInfiniteScroll({
   };
 
   // RECOCILE DATA WHEN A ROW IS DELETED
-  const reconcileWhenDeleted = (
-    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<any>>>,
-    deletedGuid: any
+  const reconcileWhenDeleted = <T extends { guid: string }>(
+    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<T>>>,
+    deletedGuid: string
   ) => {
     setDataMethod((prev) => ({
       count:
@@ -93,9 +92,9 @@ export default function useInfiniteScroll({
   };
 
   // RECOCILE DATA WHEN A ROW IS UPDATED
-  const reconcileWhenUpdated = (
-    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<any>>>,
-    updated: any
+  const reconcileWhenUpdated = <T extends { guid?: string }>(
+    setDataMethod: Dispatch<SetStateAction<InfiniteScrollData<T>>>,
+    updated: T
   ) => {
     setDataMethod((prev) => ({
       count: prev.count,

@@ -17,7 +17,7 @@ interface SaleItemsTableProps {
   loading?: boolean;
 }
 
-const SALE_ITEMS_COLUMNS: ITableColumn[] = [
+const SALE_ITEMS_COLUMNS: ITableColumn<ISaleItem>[] = [
   { key: 'image', label: '', className: 'w-14' },
   { key: 'cardName', label: 'Carta' },
   { key: 'set', label: 'Set' },
@@ -51,7 +51,7 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   ),
   condition: (row) => (
     <Chip size="sm" variant="flat">
-      {CARD_CONDITION_SHORT_LABELS[row.condition]}
+      {CARD_CONDITION_SHORT_LABELS[row.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]}
     </Chip>
   ),
   price: (row) => (
@@ -83,7 +83,7 @@ export default function SaleItemsTable({
   }
 
   return (
-    <DataTable
+    <DataTable<ISaleItem>
       cols={COLUMNS_WITH_RENDERERS}
       data={items}
       isLoading={loading}

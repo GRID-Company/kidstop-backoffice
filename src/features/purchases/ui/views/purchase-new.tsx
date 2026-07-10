@@ -72,7 +72,7 @@ export default function PurchaseNew() {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
         validateAndAddItems(newItems);
-      } catch (error) {
+      } catch {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },

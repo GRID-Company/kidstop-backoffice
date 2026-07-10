@@ -34,7 +34,7 @@ export interface ISeller {
   updatedDate?: string;
 }
 
-export interface IPurchaseItem {
+export interface IPurchaseItem extends Record<string, unknown> {
   guid: string;
   cardGuid: string;
   cardName: string;
@@ -62,7 +62,7 @@ export interface IPaymentDetail {
   amount: number;
 }
 
-export interface IPurchase {
+export interface IPurchase extends Record<string, unknown> {
   guid: string;
   reference: string;
   status: PurchaseStatus;

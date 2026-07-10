@@ -72,17 +72,19 @@ export default function ItemCard({
   allItems = [],
 }: ItemCardProps) {
   const { control } = useFormContext();
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyModeStore();
 
   const quantity = useWatch({
     control,
     name: `cards.${index}.quantity`,
   });
 
-  const offerPrice = variant === 'purchase' ? useWatch({
+  const offerPriceWatch = useWatch({
     control,
     name: `cards.${index}.offerPrice`,
-  }) : undefined;
+  });
+  
+  const offerPrice = variant === 'purchase' ? offerPriceWatch : undefined;
 
   const subtotal = useMemo(() => {
     if (variant === 'purchase' && isPurchaseItem(item)) {

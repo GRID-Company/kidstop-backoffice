@@ -14,7 +14,9 @@ export function useMagicCatalog(skip = false) {
     collectionsDocument: MagicCardCollectionsDocument,
     raritiesDocument: MagicCardRaritiesDocument,
     getVarsFunction: getMagicCatalogVars,
-    mapCardFunction: toMagicCard,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mapCardFunction: toMagicCard as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapCollectionFunction: (c: any) => ({ guid: c.guid, name: c.name, editionIconUri: c.editionIconUri ?? null }) as IMagicCollection,
     skip,
   });

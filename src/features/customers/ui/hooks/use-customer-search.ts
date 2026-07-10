@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client/react';
 import { SortDescriptor } from '@heroui/react';
 import { CustomersDocument } from '@/lib/api/generated/customers.generated';
 import { toCustomerDomain } from '../../adapters/mappers/customer.mapper';
-import { CLIENT_STATUSES, CUSTOMER_ROLES, DEFAULT_CUSTOMERS_SORT, DEFAULT_PAGE_SIZE } from '../../domain/constants';
+import { CLIENT_STATUSES, CUSTOMER_ROLES, DEFAULT_PAGE_SIZE } from '../../domain/constants';
 import { ClientStatus, CustomerRole } from '../../domain/types';
 
 export function useCustomerSearch() {

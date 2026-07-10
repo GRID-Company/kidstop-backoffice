@@ -22,8 +22,18 @@ export type CardData = CardSummary | {
   setCode?: string;
   edition?: string;
   collectorNumber?: string;
-  pokemonCardSummary?: any;
-  magicCardSummary?: any;
+  pokemonCardSummary?: {
+    name: string;
+    imageUri?: string | null;
+    setName?: string | null;
+    setCode?: string | null;
+  } | null;
+  magicCardSummary?: {
+    name: string;
+    imageUri?: string | null;
+    edition?: string | null;
+    collectorNumber?: string | null;
+  } | null;
 };
 
 export function getCardName(item: CardData): string {

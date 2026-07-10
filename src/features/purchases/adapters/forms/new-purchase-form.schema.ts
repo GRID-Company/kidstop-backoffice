@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { CardLanguage } from '@/lib/api/schema-types';
-import { CardCondition } from '../../domain/types';
 import { offerPriceSchema, quantitySchema } from './price-schemas';
 
 const newPurchaseItemSchema = z.object({

@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 // import LogoFull from '@/assets/img/logo.webp';
 
 export default function Loading() {

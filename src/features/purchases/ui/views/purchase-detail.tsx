@@ -27,7 +27,6 @@ import {
   PURCHASE_STATUS_LABELS,
   PAYMENT_METHOD_LABELS,
 } from '../../domain/constants';
-import { calculateTotal } from '../../domain/purchases.domain';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
@@ -58,8 +57,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     purchase,
     items,
     payments,
-    itemsForm,
-    paymentsForm,
+    itemsForm: _itemsForm,
+    paymentsForm: _paymentsForm,
     isEditable,
     canSendQuote,
     canQuote,
@@ -71,7 +70,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canReject,
     canReturnToDraft,
     hasItemChanges,
-    total,
+    total: _total,
     mutating,
     currentBuyerSpent,
     assignedBudget,
@@ -140,7 +139,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         await Promise.all(promises);
         updateItems(adjustedItems);
         toast.success('Precios actualizados exitosamente');
-      } catch (error) {
+      } catch {
         // Error already handled by mutation onError callback
       }
     },
@@ -180,7 +179,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
         validateAndAddItems(newItems);
-      } catch (error) {
+      } catch {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },

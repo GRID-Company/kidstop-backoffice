@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST(_req: Request) {
   const response = NextResponse.json(
     {
       removed: true,

@@ -88,8 +88,8 @@ export default function PurchaseItemsTable({
     [onUpdateItem]
   );
 
-  const columns: ITableColumn[] = useMemo(() => {
-    const baseCols: ITableColumn[] = [
+  const columns: ITableColumn<IPurchaseItem>[] = useMemo(() => {
+    const baseCols: ITableColumn<IPurchaseItem>[] = [
       {
         key: 'card',
         label: 'Carta',
@@ -141,7 +141,7 @@ export default function PurchaseItemsTable({
         customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
             <span className="text-sm">
-              {CARD_CONDITION_SHORT_LABELS[item.condition]}
+              {CARD_CONDITION_SHORT_LABELS[item.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]}
             </span>
           ) : (
             <KidstopSelect
@@ -260,7 +260,7 @@ export default function PurchaseItemsTable({
 
   return (
     <div className="flex flex-col gap-3">
-      <DataTable cols={columns} data={itemsWithPrices} isLoading={false} />
+      <DataTable<IPurchaseItem> cols={columns} data={itemsWithPrices} isLoading={false} />
 
       {itemsWithPrices.length > 0 && (
         <div className="flex justify-end border-t border-default-200 pt-3">

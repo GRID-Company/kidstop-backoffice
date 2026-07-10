@@ -3,7 +3,7 @@ import { CLIENT_STATUSES, CUSTOMER_ROLES, ORDER_STATUSES } from './constants';
 export type ClientStatus = (typeof CLIENT_STATUSES)[keyof typeof CLIENT_STATUSES];
 export type CustomerRole = (typeof CUSTOMER_ROLES)[keyof typeof CUSTOMER_ROLES];
 
-export interface ICustomer {
+export interface ICustomer extends Record<string, unknown> {
   guid: string;
   name: string;
   emailAddress: string;
@@ -28,7 +28,7 @@ export interface CustomerFilters {
 
 export type OrderStatus = (typeof ORDER_STATUSES)[keyof typeof ORDER_STATUSES];
 
-export interface ICustomerOrder {
+export interface ICustomerOrder extends Record<string, unknown> {
   id: string;
   code: string;
   status: OrderStatus;

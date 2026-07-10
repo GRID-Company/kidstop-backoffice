@@ -103,7 +103,7 @@ export function fromApiToOperatingHours(
 }
 
 export function fromApiBanners(
-  banners: any
+  banners: Partial<IBannerConfig> | null | undefined
 ): IBannerConfig {
   if (!banners) return DEFAULT_BANNER_CONFIG;
   return {
@@ -120,7 +120,7 @@ export function fromApiToSettings(
     geofence: fromApiToGeofence(api.config.geofence),
     thresholds: fromApiToThresholds(api.config),
     operatingHours: fromApiToOperatingHours(api.config.operationSchedule),
-    bannerGuids: fromApiBanners((api.config as any).bannerGuids),
+    bannerGuids: fromApiBanners(api.config.bannerGuids as Partial<IBannerConfig> | null | undefined),
     createdDate: String(api.createdDate),
     updatedDate: String(api.updatedDate),
   };

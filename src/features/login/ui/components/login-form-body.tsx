@@ -1,4 +1,4 @@
-import { Control, FieldValues } from 'react-hook-form';
+import { Control } from 'react-hook-form';
 import { Button, Link } from '@heroui/react';
 import { LoginForm } from '../../adapters/login-form.schema';
 import InputForm from '@/shared/base/form-controls/input-form';

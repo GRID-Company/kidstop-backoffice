@@ -1,6 +1,5 @@
 'use client';
 
-import NextLink from 'next/link';
 import Image from 'next/image';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
@@ -14,10 +13,7 @@ import {
   TableHeader,
   TableRow,
   CardBody,
-  Tooltip,
-  Button,
 } from '@heroui/react';
-import { Icon } from '@iconify/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';

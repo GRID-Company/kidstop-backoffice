@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { CardLanguage } from '@/lib/api/schema-types';
 
@@ -23,9 +22,8 @@ import {
   CardCondition,
 } from '../../domain/types';
 import { calculateTotal, getItemKey } from '../../domain/purchases.domain';
-import { usePurchaseItemsForm, PurchaseItemsFormData } from '../../adapters/forms/use-purchase-items-form';
-import { usePaymentSplitForm, PaymentSplitFormData } from '../../adapters/forms/use-payment-split-form';
-import { mapFormItemToPurchaseItem } from '../../adapters/mappers/item-mapper';
+import { usePurchaseItemsForm } from '../../adapters/forms/use-purchase-items-form';
+import { usePaymentSplitForm } from '../../adapters/forms/use-payment-split-form';
 
 interface UsePurchaseDetailReturn {
   purchase: IPurchase | null;
@@ -131,7 +129,8 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         sellPrice: item.sellPrice || undefined,
       })),
       payments: (p.payments || []).map((payment) => ({
-        method: payment.method as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        method: payment.method as any, // GraphQL enum compatibility
         amount: payment.amount,
       })),
       notes: p.notes || undefined,
@@ -171,16 +170,19 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     return itemsForm.fieldArray.fields.map((field) => {
       // Find the original item by cardGuid, condition AND language to support multiple languages of same card
       const originalItem = basePurchase.items.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (item) => item.cardGuid === field.cardGuid && item.condition === field.condition && item.language === (field as any).language
       );
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
         // Try to find by cardGuid:condition:language key
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const itemKey = getItemKey({ cardGuid: field.cardGuid, condition: field.condition, language: (field as any).language });
         const newItem = newItems.get(itemKey);
         if (newItem) {
           return {
             ...newItem,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             guid: (field as any).id || newItem.guid, // Use React Hook Form's unique field id
             condition: field.condition,
             language: newItem.language,
@@ -192,6 +194,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         // Fallback for items without metadata - use field.id as guid
         return {
           ...(field as unknown as IPurchaseItem),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition, (field as any).language),
         };
       }
@@ -277,13 +280,15 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       quantity: item.quantity,
       offerPrice: item.offerPrice,
       referencePrice: item.referencePrice,
-    } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any); // Form field type compatibility
   }, [itemsForm.fieldArray]);
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<IPurchaseItem>) => {
       const index = items.findIndex((item) => item.guid === itemId);
       if (index !== -1) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         itemsForm.fieldArray.update(index, { ...items[index], ...updates } as any);
       }
     },
@@ -444,6 +449,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       setStatus(newStatus);
       void refetchBudget();
     } catch {
+      // Error already handled by mutation onError callback
     } finally {
       setMutating(false);
     }

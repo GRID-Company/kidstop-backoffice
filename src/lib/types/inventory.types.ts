@@ -30,8 +30,8 @@ export enum ColorHex {
   ELECTRO = '#99856A',
   EUROPE_GRAY = '#54534D',
   BONE = '#E9E2C5',
-  WOOD = 'transparent',
-  WALNUT = 'transparent',
+  WOOD = 'rgba(0,0,0,0)',
+  WALNUT = 'rgba(0,0,0,0.01)',
 }
 
 export interface ColorItem {

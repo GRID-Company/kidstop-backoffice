@@ -9,7 +9,8 @@ import {
 import { Icon } from '@iconify/react';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
-import { ICustomerOrder, ICustomerOrdersSummary } from '../../domain/types';
+import { ICustomerOrdersSummary } from '../../domain/types';
+import type { ICustomerOrder } from '../../domain/types';
 import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_COLORS,
@@ -43,30 +44,38 @@ function buildColumns(onViewOrder?: (orderId: string) => void): ITableColumn[] {
     {
       key: 'status',
       label: 'Estado',
-      customCol: (row: ICustomerOrder) => (
-        <Chip
-          size="sm"
-          variant="flat"
-          color={ORDER_STATUS_COLORS[row.status]}
-        >
-          {ORDER_STATUS_LABELS[row.status]}
-        </Chip>
-      ),
+      customCol: (row: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const order = row as any;
+        return (
+          <Chip
+            size="sm"
+            variant="flat"
+            color={ORDER_STATUS_COLORS[order.status]}
+          >
+            {ORDER_STATUS_LABELS[order.status]}
+          </Chip>
+        );
+      },
     },
     { key: 'totalItems', label: 'Artículos' },
     {
       key: 'totalAmount',
       label: 'Monto',
-      customCol: (row: ICustomerOrder) => (
-        <span>{formatCurrency(row.totalAmount)}</span>
-      ),
+      customCol: (row: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const order = row as any;
+        return <span>{formatCurrency(order.totalAmount)}</span>;
+      },
     },
     {
       key: 'createdAt',
       label: 'Fecha',
-      customCol: (row: ICustomerOrder) => (
-        <span>{formatDate(row.createdAt)}</span>
-      ),
+      customCol: (row: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const order = row as any;
+        return <span>{formatDate(order.createdAt)}</span>;
+      },
     },
   ];
 
@@ -74,19 +83,23 @@ function buildColumns(onViewOrder?: (orderId: string) => void): ITableColumn[] {
     columns.push({
       key: 'actions',
       label: '',
-      customCol: (row: ICustomerOrder) => (
-        <Tooltip content="Ver pedido">
-          <Button
-            isIconOnly
-            size="sm"
-            variant="light"
-            onPress={() => onViewOrder(row.id)}
-            aria-label={`Ver detalle del pedido ${row.code}`}
-          >
-            <Icon icon="lucide:external-link" className="text-base text-default-500" />
-          </Button>
-        </Tooltip>
-      ),
+      customCol: (row: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const order = row as any;
+        return (
+          <Tooltip content="Ver pedido">
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={() => onViewOrder(order.id)}
+              aria-label={`Ver detalle del pedido ${order.code}`}
+            >
+              <Icon icon="lucide:external-link" className="text-base text-default-500" />
+            </Button>
+          </Tooltip>
+        );
+      },
     });
   }
 
@@ -152,7 +165,7 @@ export default function CustomerOrdersSummary({
           <div className="hidden md:block">
             <DataTable
               cols={columns}
-              data={summary.orders}
+              data={summary.orders as ICustomerOrder[]}
               isLoading={loading}
             />
           </div>
