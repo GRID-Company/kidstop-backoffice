@@ -8,7 +8,7 @@ type ApiInventoryItem = NonNullable<NonNullable<InventoryItemsQuery['inventoryIt
 type ApiInventoryMovement = NonNullable<NonNullable<InventoryMovementsQuery['inventoryMovements']['data']>[number]>;
 
 export function fromApiInventoryItem(item: ApiInventoryItem): IInventoryItem {
-  const isPokemon = !!item.pokemonCardSummary;
+  const _isPokemon = !!item.pokemonCardSummary;
   const card = item.pokemonCardSummary ?? item.magicCardSummary;
 
   return {
@@ -62,7 +62,7 @@ export function toAdjustInventoryPayload(data: InventoryAdjustmentFormData) {
       condition: data.condition,
       language: data.language as CardLanguage,
       quantity: data.quantity,
-      bulkOperationType: data.bulkOperationType as any,
+      bulkOperationType: data.bulkOperationType,
       ...(data.notes && { notes: data.notes }),
     },
   };
@@ -75,6 +75,6 @@ export function toAdjustmentFormDefaults(
     cardGuid: item.cardGuid,
     tcg: item.tcg,
     condition: item.condition,
-    language: item.language as any,
+    language: item.language,
   };
 }

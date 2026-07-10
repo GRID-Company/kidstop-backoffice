@@ -23,7 +23,7 @@ import { useQuery } from '@apollo/client/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import { CARD_CONDITION_SHORT_LABELS, CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
+import { CARD_CONDITION_SHORT_LABELS, CARD_CONDITION_OPTIONS, CardCondition } from '@/lib/types/card.types';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { LanguageSelector } from '@/shared/components/language-selector';
@@ -65,7 +65,7 @@ export default function AdjustmentModal({
   const [resolvedItem, setResolvedItem] = useState<IInventoryItem | null>(item);
   const [itemSearch, setItemSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState<CatalogCard | null>(null);
-  const [selectedCondition, setSelectedCondition] = useState<string>('');
+  const [_selectedCondition, setSelectedCondition] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
@@ -145,7 +145,7 @@ export default function AdjustmentModal({
       rarity: ('rarity' in selectedCard ? selectedCard.rarity : null) ?? '',
       imageUrl: selectedCard.imageUri ?? '',
       tcg: selectedTCG,
-      condition: condition as any,
+      condition: condition as CardCondition,
       language: selectedCard.language as CardLanguage,
       stock,
       stockStatus: stock > 0 ? 'AVAILABLE' : 'UNAVAILABLE',

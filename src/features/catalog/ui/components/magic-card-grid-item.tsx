@@ -12,7 +12,7 @@ interface MagicCardGridItemProps {
 }
 
 export default function MagicCardGridItem({ card, onPress }: MagicCardGridItemProps) {
-  const hasStock = card.totalStock > 0;
+  const _hasStock = card.totalStock > 0;
 
   return (
     <Card
