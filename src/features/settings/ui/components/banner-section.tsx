@@ -26,8 +26,9 @@ export default function BannerSection({
     try {
       bannerSettingsSchema.parse({ pokemonFile: file });
       setPokemonFile(file);
-    } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || 'Error validando archivo');
+    } catch (error: unknown) {
+      const err = error as { errors?: Array<{ message: string }> };
+      toast.error(err.errors?.[0]?.message || 'Error validando archivo');
     }
   }, []);
 
@@ -35,8 +36,9 @@ export default function BannerSection({
     try {
       bannerSettingsSchema.parse({ magicFile: file });
       setMagicFile(file);
-    } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || 'Error validando archivo');
+    } catch (error: unknown) {
+      const err = error as { errors?: Array<{ message: string }> };
+      toast.error(err.errors?.[0]?.message || 'Error validando archivo');
     }
   }, []);
 

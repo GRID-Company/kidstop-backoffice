@@ -9,7 +9,7 @@ export const toBannerMutationInput = (bannerGuids: IBannerConfig) => {
   };
 };
 
-export const fromApiBanners = (apiData: any): IBannerConfig => {
+export const fromApiBanners = (apiData: Partial<IBannerConfig> | null | undefined): IBannerConfig => {
   if (!apiData) {
     return {};
   }
