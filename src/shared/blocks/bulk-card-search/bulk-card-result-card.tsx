@@ -16,7 +16,7 @@ import { formatCurrency } from '@/lib/utils/format-currency';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
-function MetricItem({
+function _MetricItem({
   icon,
   label,
   value,

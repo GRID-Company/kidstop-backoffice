@@ -53,7 +53,7 @@ export const usePaginatedDatatable = ({
         },
       });
     } else if (paginatedArgs.filters !== undefined) {
-      const { filters, ...newArgs } = paginatedArgs;
+      const { filters: _filters, ...newArgs } = paginatedArgs;
       setPaginatedArgs({ ...newArgs, skip: 0 });
     }
     setCurrentPage(1);
@@ -164,7 +164,7 @@ export const usePaginatedDatatable = ({
         return;
       }
       if (paginatedArgs.search !== undefined) {
-        const { search, ...newArgs } = paginatedArgs;
+        const { search: _search, ...newArgs } = paginatedArgs;
         setPaginatedArgs(newArgs);
       }
     }, 250);

@@ -10,7 +10,7 @@ import { useBulkCardSearch } from './hooks/use-bulk-card-search';
 import { useBulkSearchForm } from './hooks/use-bulk-search-form';
 import BulkCardSearchInput from './bulk-card-search-input';
 import BulkCardSearchResults from './bulk-card-search-results';
-import { BulkCardSearchProps } from './types';
+import { BulkCardSearchProps, BulkSearchFormDataPurchases, BulkSearchFormDataInventory } from './types';
 
 function BulkCardSearchFooter({ 
   variant, 
@@ -102,10 +102,10 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   const handleSubmit = form.handleSubmit(
     (data) => {
-      onConfirm(data as any, results);
+      onConfirm(data as BulkSearchFormDataPurchases & BulkSearchFormDataInventory, results);
       handleClear();
     },
-    (errors) => {
+    (_errors) => {
       toast.error('Por favor completa todos los campos requeridos');
     }
   );

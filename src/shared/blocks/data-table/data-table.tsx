@@ -42,7 +42,9 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
       selectedKeys={selectedKeys}
       selectionMode={selectable ? 'multiple' : 'none'}
       onSelectionChange={(e: unknown) => {
-        setSelectedKeys && setSelectedKeys(e as unknown[]);
+        if (setSelectedKeys) {
+          setSelectedKeys(e as unknown[]);
+        }
       }}
       checkboxesProps={{
         color: 'secondary',
