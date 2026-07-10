@@ -51,7 +51,7 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   ),
   condition: (row) => (
     <Chip size="sm" variant="flat">
-      {CARD_CONDITION_SHORT_LABELS[row.condition]}
+      {CARD_CONDITION_SHORT_LABELS[row.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]}
     </Chip>
   ),
   price: (row) => (

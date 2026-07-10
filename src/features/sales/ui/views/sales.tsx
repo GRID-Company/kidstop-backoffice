@@ -119,7 +119,7 @@ export default function Sales() {
         key: 'saleCode',
         label: 'Código',
         className: '!text-left min-w-[140px]',
-        customCol: (row: ISale) => (
+        customCol: (row: any) => (
           <span className="text-sm font-semibold text-accent">{row.saleCode}</span>
         ),
       },
@@ -127,13 +127,13 @@ export default function Sales() {
         key: 'status',
         label: 'Estado',
         className: 'min-w-[140px]',
-        customCol: (row: ISale) => <SaleStatusBadge status={row.status} />,
+        customCol: (row: any) => <SaleStatusBadge status={row.status} />,
       },
       {
         key: 'customer',
         label: 'Cliente',
         className: '!text-left min-w-[160px]',
-        customCol: (row: ISale) => (
+        customCol: (row: any) => (
           <div className="flex flex-col items-start">
             <span className="text-sm font-medium">
               {getCustomerDisplayName(row.customer?.name, row.kioskCustomerName)}
@@ -148,7 +148,7 @@ export default function Sales() {
         key: 'items',
         label: 'Items',
         className: 'w-[80px]',
-        customCol: (row: ISale) => {
+        customCol: (row: any) => {
           const count = row.items.reduce((sum, i) => sum + i.quantity, 0);
           return (
             <Chip size="sm" variant="flat">
@@ -161,7 +161,7 @@ export default function Sales() {
         key: 'total',
         label: 'Total',
         className: 'min-w-[120px]',
-        customCol: (row: ISale) => (
+        customCol: (row: any) => (
           <span className="text-sm font-semibold">
             {formatCurrency(row.total)}
           </span>
@@ -171,7 +171,7 @@ export default function Sales() {
         key: 'createdDate',
         label: 'Fecha',
         className: 'min-w-[120px]',
-        customCol: (row: ISale) => (
+        customCol: (row: any) => (
           <span className="text-sm text-default-500">
             {formatDate(row.createdDate)}
           </span>
@@ -181,7 +181,7 @@ export default function Sales() {
         key: 'actions',
         label: '',
         className: 'w-[60px]',
-        customCol: (row: ISale) => (
+        customCol: (row: any) => (
           <div onClick={(e) => e.stopPropagation()}>
             <Tooltip content="Ver detalle">
               <Button
