@@ -11,6 +11,7 @@ export type MagicCardInternalListQuery = {
     data: Array<{
       guid: string;
       name: string;
+      language: Types.CardLanguage;
       edition: string | null;
       collectorNumber: string | null;
       isFoil: boolean;
@@ -38,6 +39,7 @@ export type MagicCardInternalDetailQuery = {
   magicCardInternalDetail: {
     guid: string;
     name: string;
+    language: Types.CardLanguage;
     edition: string | null;
     collectorNumber: string | null;
     isFoil: boolean;
@@ -192,6 +194,10 @@ export const MagicCardInternalListDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'edition' },
                       },
                       {
@@ -307,6 +313,7 @@ export const MagicCardInternalDetailDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'edition' } },
                 {
                   kind: 'Field',

@@ -34,6 +34,7 @@ export function toPokemonCard(item: PokemonCardInternalItem): IPokemonCard {
   return {
     guid: item.guid,
     name: item.name,
+    language: item.language ?? null,
     cardNumber: item.cardNumber ?? null,
     setName: item.setName ?? null,
     setCode: item.setCode ?? null,
@@ -63,6 +64,7 @@ export function toMagicCard(item: MagicCardInternalItem): IMagicCard {
   return {
     guid: item.guid,
     name: item.name,
+    language: item.language ?? null,
     edition: item.edition ?? null,
     collectorNumber: item.collectorNumber ?? null,
     isFoil: item.isFoil,

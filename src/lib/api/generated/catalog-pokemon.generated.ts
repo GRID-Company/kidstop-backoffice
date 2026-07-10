@@ -11,6 +11,7 @@ export type PokemonCardInternalListQuery = {
     data: Array<{
       guid: string;
       name: string;
+      language: Types.CardLanguage;
       cardNumber: string | null;
       setName: string | null;
       setCode: string | null;
@@ -46,6 +47,7 @@ export type PokemonCardInternalDetailQuery = {
   pokemonCardInternalDetail: {
     guid: string;
     name: string;
+    language: Types.CardLanguage;
     cardNumber: string | null;
     rarity: string | null;
     variant: string | null;
@@ -260,6 +262,10 @@ export const PokemonCardInternalListDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'cardNumber' },
                       },
                       {
@@ -411,6 +417,7 @@ export const PokemonCardInternalDetailDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'cardNumber' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'rarity' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'variant' } },

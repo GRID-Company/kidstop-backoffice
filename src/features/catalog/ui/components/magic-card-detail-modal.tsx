@@ -296,7 +296,7 @@ export default function MagicCardDetailModal({
             <LanguageSelector
               value={selectedLanguage}
               onChange={handleLanguageChange}
-              currentLanguage={selectedVariant?.language}
+              currentLanguage={detail?.language ?? selectedCard?.language ?? undefined}
               size="sm"
             />
           </div>

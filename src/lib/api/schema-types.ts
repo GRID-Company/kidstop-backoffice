@@ -633,6 +633,7 @@ export type MagicCard = {
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
+  language: CardLanguage;
   name: Scalars['String']['output'];
   power?: Maybe<Scalars['String']['output']>;
   priceBuy?: Maybe<Scalars['Float']['output']>;
@@ -706,6 +707,7 @@ export type MagicCardInternalDetail = {
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<MagicCardInventoryItemInternal>>;
   isFoil: Scalars['Boolean']['output'];
+  language: CardLanguage;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
@@ -721,6 +723,7 @@ export type MagicCardInternalItem = {
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<MagicCardInventoryItemInternal>>;
   isFoil: Scalars['Boolean']['output'];
+  language: CardLanguage;
   name: Scalars['String']['output'];
   sellPrice?: Maybe<Scalars['Float']['output']>;
   totalStock: Scalars['Int']['output'];
@@ -750,6 +753,7 @@ export type MagicCardPublicDetail = {
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<MagicCardInventoryItemPublic>>;
   isFoil: Scalars['Boolean']['output'];
+  language: CardLanguage;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
@@ -762,6 +766,7 @@ export type MagicCardPublicItem = {
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
+  language: CardLanguage;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
@@ -798,6 +803,7 @@ export type MagicCardTopSold = {
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
+  language: CardLanguage;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
@@ -1312,6 +1318,7 @@ export type PokemonCardInternalDetail = {
   hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
+  language: CardLanguage;
   moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
@@ -1335,6 +1342,7 @@ export type PokemonCardInternalItem = {
   hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemInternal>>;
+  language: CardLanguage;
   moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   releaseDate?: Maybe<Scalars['String']['output']>;
@@ -1371,6 +1379,7 @@ export type PokemonCardPublicDetail = {
   hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<PokemonCardInventoryItemPublic>>;
+  language: CardLanguage;
   moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
@@ -1392,6 +1401,7 @@ export type PokemonCardPublicItem = {
   guid: Scalars['String']['output'];
   hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
+  language: CardLanguage;
   moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
@@ -1452,6 +1462,7 @@ export type PokemonCardTopSold = {
   guid: Scalars['String']['output'];
   hp?: Maybe<Scalars['String']['output']>;
   imageUri?: Maybe<Scalars['String']['output']>;
+  language: CardLanguage;
   moreImages?: Maybe<Array<ImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;

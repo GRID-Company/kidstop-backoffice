@@ -3,6 +3,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
     data {
       guid
       name
+      language
       edition
       collectorNumber
       isFoil
@@ -27,6 +28,7 @@ query MagicCardInternalDetail($guid: String!) {
   magicCardInternalDetail(guid: $guid) {
     guid
     name
+    language
     edition
     collectorNumber
     isFoil

@@ -6,6 +6,7 @@ import {
 } from '@/lib/types/paginated-datatable.types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type { CardCondition };
 
@@ -62,6 +63,7 @@ export interface IPokemonCardVariant {
 export interface IPokemonCard {
   guid: string;
   name: string;
+  language?: CardLanguage | null;
   cardNumber: string | null;
   setName: string | null;
   setCode: string | null;
@@ -107,6 +109,7 @@ export interface IMagicCardVariant {
 export interface IMagicCard {
   guid: string;
   name: string;
+  language?: CardLanguage | null;
   edition: string | null;
   collectorNumber: string | null;
   isFoil: boolean;

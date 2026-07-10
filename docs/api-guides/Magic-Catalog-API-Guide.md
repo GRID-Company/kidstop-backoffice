@@ -69,6 +69,7 @@ query MagicCardPublicList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) 
       edition
       collectorNumber
       isFoil
+      language
       sellPrice
       availableStock
       imageUri
@@ -104,6 +105,7 @@ query MagicCardPublicList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) 
   - `collectorNumber`: Collector number in set
   - `rarity`: Card rarity (nullable)
   - `isFoil`: Whether the card is foil
+  - `language`: Card language (`CardLanguage` enum)
   - `sellPrice`: Current sell price
   - `availableStock`: Whether stock is available (boolean)
   - `imageUri`: Card image URL
@@ -125,6 +127,7 @@ query MagicCardPublicList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) 
       edition
       collectorNumber
       isFoil
+      language
       sellPrice
       availableStock
       imageUri
@@ -652,6 +655,7 @@ query MagicCardPublicDetail($guid: UUID!) {
     edition
     collectorNumber
     isFoil
+    language
     rarity
     sellPrice
     inventoryCards {
@@ -705,6 +709,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
       edition
       collectorNumber
       isFoil
+      language
       sellPrice
       availableStock
       imageUri
@@ -795,6 +800,7 @@ query MagicCardInternalDetail($guid: UUID!) {
     edition
     collectorNumber
     isFoil
+    language
     rarity
     sellPrice
     inventoryCards {
@@ -835,6 +841,7 @@ query MagicTopSoldCards {
     collectorNumber
     rarity
     isFoil
+    language
     imageUri
     sellPrice
     availableStock
@@ -852,6 +859,7 @@ query MagicTopSoldCards {
 - `collectorNumber`: Collector number in set (nullable)
 - `rarity`: Card rarity (nullable)
 - `isFoil`: Whether the card is foil
+- `language`: Card language (`CardLanguage` enum)
 - `imageUri`: Card image URL (nullable)
 - `sellPrice`: Lowest current sell price across all conditions (nullable)
 - `availableStock`: Whether any stock is currently available (boolean)
@@ -1120,8 +1128,11 @@ const SearchableMagicCardList: React.FC = () => {
 ```graphql
 query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
   magicBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
       originalLine
+      parsedQuantity
       parsedName
       parsedSet
       parsedNumber
@@ -1171,6 +1182,17 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
           purchasePrice
           sellPrice
         }
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          priceRetail
+          priceBuy
+        }
       }
       error
     }
@@ -1208,20 +1230,32 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
 **Input Parameters:**
 
 - `searchText` (required): Multiline text in Moxfield format
-- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for best match
-  - ⚠️ **WARNING:** Significantly increases response time due to external API calls (CardKingdom)
-  - When `true`: `bestMatch.cardMetrics` includes full metrics data
-  - When `false` or omitted: `cardMetrics` field is null (faster response)
+- `withCardsMetrics` (optional, boolean, default: false): Include card metrics for all cards
+  - ⚠️ **Performance Note:** Increases response time due to external API calls for bestMatch only
+  - When `true`: 
+    - `bestMatch.cardMetrics` includes **full metrics + external prices** from CardKingdom
+    - `relatedCards[].cardMetrics` includes **variant metrics only** (stock, wishlist, etc.) but prices are `null`
+  - When `false` or omitted: `cardMetrics` field is null for all cards (fastest response)
 
 **Response Fields:**
 
-- `originalLine`: The original input line
-- `parsedName`: Extracted card name
-- `parsedSet`: Extracted set/edition code
-- `parsedNumber`: Extracted collector number
-- `bestMatch`: The top matching card with full inventory details
-  - `cardMetrics` (nullable): Card metrics data (only when `withCardsMetrics: true`)
-- `relatedCards`: Up to 3 additional related cards (no metrics)
+- `successfulCount`: Number of cards successfully matched (cards with bestMatch and no error)
+- `totalCount`: Total number of cards detected (parsed lines, excluding empty lines)
+- `results`: Array of search results for each parsed line
+  - `originalLine`: The original input line
+  - `parsedName`: Extracted card name
+  - `parsedSet`: Extracted set/edition code
+  - `parsedNumber`: Extracted collector number
+  - `bestMatch`: The top matching card with full inventory details
+  - `cardMetrics` (nullable): Full card metrics including external prices (when `withCardsMetrics: true`)
+    - `variantsMetrics`: Stock, wishlist count, last sell date, avg days in inventory per condition
+    - `priceRetail`: CardKingdom retail price
+    - `priceBuy`: CardKingdom buy price
+- `relatedCards`: Up to 3 additional related cards
+  - `cardMetrics` (nullable): Variant metrics only, prices are `null` (when `withCardsMetrics: true`)
+    - `variantsMetrics`: Stock, wishlist count, last sell date, avg days in inventory per condition
+    - `priceRetail`: `null` (not fetched for performance)
+    - `priceBuy`: `null` (not fetched for performance)
 - `error`: Error message if search failed for this line
 
 **Use Cases:**
@@ -1239,8 +1273,11 @@ import { gql, useLazyQuery } from '@apollo/client';
 const BATCH_SEARCH_MAGIC = gql`
   query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
     magicBatchCardSearch(input: $input) {
+      successfulCount
+      totalCount
       results {
         originalLine
+        parsedQuantity
         parsedName
         bestMatch {
           guid
@@ -1271,6 +1308,8 @@ const BatchSearchComponent = () => {
     });
   };
 
+  const searchResult = data?.magicBatchCardSearch;
+
   return (
     <div>
       <textarea 
@@ -1278,7 +1317,12 @@ const BatchSearchComponent = () => {
         onPaste={(e) => handlePaste(e.clipboardData.getData('text'))}
       />
       {loading && <p>Searching...</p>}
-      {data?.magicBatchCardSearch.results.map((result, idx) => (
+      {searchResult && (
+        <div className="search-summary">
+          <p>Found {searchResult.successfulCount} of {searchResult.totalCount} cards</p>
+        </div>
+      )}
+      {searchResult?.results.map((result, idx) => (
         <div key={idx}>
           <h4>{result.parsedName}</h4>
           {result.bestMatch ? (

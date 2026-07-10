@@ -3,6 +3,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
     data {
       guid
       name
+      language
       cardNumber
       setName
       setCode
@@ -38,6 +39,7 @@ query PokemonCardInternalDetail($guid: String!) {
   pokemonCardInternalDetail(guid: $guid) {
     guid
     name
+    language
     cardNumber
     rarity
     variant
