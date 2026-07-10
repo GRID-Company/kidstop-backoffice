@@ -15,6 +15,7 @@ import { Icon } from '@iconify/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import Search from '@/shared/base/heorui-overrides/search';
+import { ExportButton } from '@/shared/base/export-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { IPurchase, PurchaseStatus } from '../../domain/types';
 import { PURCHASE_STATUS_OPTIONS } from '../../domain/constants';
@@ -22,11 +23,14 @@ import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { calculateTotal } from '../../domain/purchases.domain';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { usePurchases } from '../hooks/use-purchases';
+import { useExportPurchases } from '../hooks/use-export-purchases';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
 
 export default function Purchases() {
   const router = useRouter();
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const {
     purchases,
     totalCount,
@@ -41,6 +45,7 @@ export default function Purchases() {
     resetFilters,
     hasActiveFilters,
   } = usePurchases();
+  const { handleExport, exporting } = useExportPurchases();
 
   const handleStatusChange = useCallback(
     (keys: Set<string> | 'all') => {
@@ -71,6 +76,22 @@ export default function Purchases() {
     },
     [router]
   );
+
+  const handleExportClick = useCallback(() => {
+    handleExport({
+      findPurchasesArgs: {
+        skip: 0,
+        limit: 0,
+        sort: { column: 'createdDate', order: 'DESC' },
+        filters: {
+          tcg: selectedTCG,
+          status: filters.status,
+          buyer: filters.buyerGuid,
+        },
+        search: filters.search?.trim() || undefined,
+      },
+    });
+  }, [handleExport, selectedTCG, filters]);
 
   const columns: ITableColumn[] = useMemo(
     () => [
@@ -158,14 +179,17 @@ export default function Purchases() {
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="Compras">
-        <Button
-          className="bg-accent text-white"
-          startContent={<Icon icon="lucide:plus" width={16} />}
-          size="sm"
-          onPress={() => router.push('/compras/nueva')}
-        >
-          Nueva compra
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            className="bg-accent text-white"
+            startContent={<Icon icon="lucide:plus" width={16} />}
+            size="sm"
+            onPress={() => router.push('/compras/nueva')}
+          >
+            Nueva compra
+          </Button>
+          <ExportButton onPress={handleExportClick} isLoading={exporting} />
+        </div>
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>

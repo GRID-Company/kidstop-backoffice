@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import Search from '@/shared/base/heorui-overrides/search';
+import { ExportButton } from '@/shared/base/export-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
@@ -24,11 +25,14 @@ import { ISale, SaleStatus } from '../../domain/types';
 import { SALE_STATUS_OPTIONS } from '../../domain/constants';
 import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { useSales } from '../hooks/use-sales';
+import { useExportSales } from '../hooks/use-export-sales';
 import SaleStatusBadge from '../components/sale-status-badge';
 
 export default function Sales() {
   const router = useRouter();
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const {
     sales,
     totalCount,
@@ -45,6 +49,7 @@ export default function Sales() {
     loading,
     error,
   } = useSales();
+  const { handleExport, exporting } = useExportSales();
 
   useEffect(() => {
     if (error) {
@@ -80,6 +85,33 @@ export default function Sales() {
     },
     [router]
   );
+
+  const handleExportClick = useCallback(() => {
+    handleExport({
+      findSalesArgs: {
+        skip: 0,
+        limit: 0,
+        sort: { column: 'createdDate', order: 'DESC' },
+        search: filters.search?.trim() || undefined,
+        filters: {
+          tcg: selectedTCG,
+          status: filters.status || undefined,
+          customer: filters.customer || undefined,
+          ...(filters.dateFrom || filters.dateTo
+            ? {
+                createdDate: {
+                  filterType: ':daterange:',
+                  range: {
+                    from: filters.dateFrom,
+                    to: filters.dateTo,
+                  },
+                },
+              }
+            : {}),
+        },
+      },
+    });
+  }, [handleExport, selectedTCG, filters]);
 
   const columns: ITableColumn[] = useMemo(
     () => [
@@ -172,7 +204,7 @@ export default function Sales() {
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label="Pedidos / Ventas">
-        <></>
+        <ExportButton onPress={handleExportClick} isLoading={exporting} />
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>

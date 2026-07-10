@@ -345,6 +345,12 @@ export type DeleteSellerMutationVariables = Types.Exact<{
 
 export type DeleteSellerMutation = { deleteSeller: boolean };
 
+export type ExportPurchasesQueryVariables = Types.Exact<{
+  findPurchasesArgs: Types.FindPurchasesArgs;
+}>;
+
+export type ExportPurchasesQuery = { exportPurchases: { success: boolean } };
+
 export const PurchasesDocument = {
   kind: 'Document',
   definitions: [
@@ -1799,4 +1805,58 @@ export const DeleteSellerDocument = {
 } as unknown as DocumentNode<
   DeleteSellerMutation,
   DeleteSellerMutationVariables
+>;
+export const ExportPurchasesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'ExportPurchases' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findPurchasesArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindPurchasesArgs' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'exportPurchases' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findPurchasesArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findPurchasesArgs' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ExportPurchasesQuery,
+  ExportPurchasesQueryVariables
 >;
