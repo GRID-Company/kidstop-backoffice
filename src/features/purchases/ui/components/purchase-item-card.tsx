@@ -123,7 +123,6 @@ export default function PurchaseItemCard({
             <div className="flex flex-col gap-0.5">
               <h4 className="text-sm font-semibold leading-tight text-default-900">
                 {item.cardName}
-                <pre>{JSON.stringify(item, null, 2)}</pre>
               </h4>
               <div className="flex flex-wrap items-center gap-1.5">
                 {item.language && (
