@@ -1,6 +1,6 @@
 import { extendVariants, Table } from '@heroui/react';
 
-export const KidstopTable: any = extendVariants(Table, {
+export const KidstopTable = extendVariants(Table, {
   variants: {
     color: {
       default: {

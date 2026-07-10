@@ -5,7 +5,7 @@ export interface ITableColumn {
   label: string;
   allowSorting?: boolean;
   className?: string;
-  customCol?: (row: any) => ReactNode;
+  customCol?: (row: Record<string, unknown>) => ReactNode;
 }
 
 export interface ITableSort {
@@ -17,7 +17,7 @@ export interface IPaginatedApiArgs {
   skip: number;
   limit: number;
   sort: ITableSort;
-  filters?: any;
+  filters?: Record<string, unknown>;
   search?: string;
 }
 
