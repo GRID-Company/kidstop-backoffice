@@ -18,6 +18,7 @@ import InputForm from '@/shared/base/form-controls/input-form';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import {
   calculateTotal,
   validatePriceAdjustment,
@@ -250,6 +251,13 @@ export default function PriceAdjustmentModal({
                           }}
                         >
                           {CARD_CONDITION_SHORT_LABELS[item.condition]}
+                        </Chip>
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          className="text-xs"
+                        >
+                          {LANGUAGE_LABELS[item.language]}
                         </Chip>
                       </div>
                       <span className="text-xs text-default-400">

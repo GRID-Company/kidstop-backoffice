@@ -8,14 +8,16 @@ import {
 } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType } from '@/lib/types/tcg.types';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 
 interface UpdatePriceParams {
   cardGuid: string;
   inventoryItemGuid?: string;
   condition: string;
+  language: CardLanguage;
   purchasePrice: number;
   sellPrice: number;
+  notes?: string;
   tcgType: TCGType;
 }
 
@@ -44,7 +46,11 @@ export function useUpdateInventoryPrice() {
                 skip: 0,
                 limit: 200,
                 sort: { column: 'createdDate', order: 'DESC' },
-                filters: { tcg: params.tcgType, condition: params.condition },
+                filters: { 
+                  tcg: params.tcgType, 
+                  condition: params.condition,
+                  language: params.language,
+                },
               },
             },
           });
@@ -66,9 +72,10 @@ export function useUpdateInventoryPrice() {
                     cardGuid: params.cardGuid,
                     condition: params.condition,
                     tcg: params.tcgType,
+                    language: params.language,
                     bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
-                    notes: 'Creación automática para establecer precios',
+                    notes: params.notes || 'Creación automática para establecer precios',
                   },
                 },
               });
@@ -83,7 +90,11 @@ export function useUpdateInventoryPrice() {
                   skip: 0,
                   limit: 200,
                   sort: { column: 'createdDate', order: 'DESC' },
-                  filters: { tcg: params.tcgType, condition: params.condition },
+                  filters: { 
+                    tcg: params.tcgType, 
+                    condition: params.condition,
+                    language: params.language,
+                  },
                 },
               },
             });
@@ -122,6 +133,7 @@ export function useUpdateInventoryPrice() {
               inventoryItemGuid,
               purchasePrice: params.purchasePrice,
               sellPrice: params.sellPrice,
+              notes: params.notes,
             },
           },
         });

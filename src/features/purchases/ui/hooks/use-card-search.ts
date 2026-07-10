@@ -149,6 +149,7 @@ export function useCardSearch() {
         rarity: '',
         imageUrl: card.imageUri || '',
         tcgType: TCG_TYPES.POKEMON,
+        language: card.language,
         metrics: {
           referencePrice: card.sellPrice || 0,
           currentStock: card.availableStock ? 1 : 0,
@@ -171,6 +172,7 @@ export function useCardSearch() {
         rarity: '',
         imageUrl: card.imageUri || '',
         tcgType: TCG_TYPES.MAGIC,
+        language: card.language,
         metrics: {
           referencePrice: card.sellPrice || 0,
           currentStock: card.availableStock ? 1 : 0,

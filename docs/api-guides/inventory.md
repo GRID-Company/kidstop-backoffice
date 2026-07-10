@@ -31,19 +31,29 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
       guid
       tcg
       condition
+      language
       stock
       purchasePrice
       sellPrice
       lastSellDate
       avgDaysInInventory
-      pokemonCard {
-        guid
-        titleName
-        cardNumber
-      }
-      magicCard {
+      pokemonCardSummary {
         guid
         name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
       }
     }
     count
@@ -74,6 +84,7 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
 - `guid`: Unique inventory item identifier
 - `tcg`: Trading card game type (e.g., "POKEMON")
 - `condition`: Card condition (e.g., "NEAR_MINT")
+- `language`: Card language (e.g., "ENGLISH")
 - `stock`: Current stock quantity
 - `purchasePrice`: Cost price
 - `sellPrice`: Selling price
@@ -97,19 +108,29 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
       guid
       tcg
       condition
+      language
       stock
       purchasePrice
       sellPrice
       lastSellDate
       avgDaysInInventory
-      pokemonCard {
-        guid
-        titleName
-        cardNumber
-      }
-      magicCard {
+      pokemonCardSummary {
         guid
         name
+        setName
+        setCode
+        cardNumber
+        rarity
+        imageUri
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        rarity
+        imageUri
+        isFoil
       }
     }
     count
@@ -124,6 +145,8 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
   "findInventoryItemsArgs": {
     "skip": 0,
     "limit": 10,
+    "search": "pikachu",
+    "prioritizeSearch": true,
     "sort": {
       "column": "createdDate",
       "order": "DESC"
@@ -131,6 +154,7 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
     "filters": {
       "tcg": "POKEMON",
       "condition": "NEAR_MINT",
+      "language": "ENGLISH",
       "stockStatus": "AVAILABLE"
     }
   }
@@ -141,9 +165,14 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
 
 - `tcg`: **Required** — Trading card game type (POKEMON, MAGIC)
 - `condition`: Card condition (NEAR_MINT, LIGHTLY_PLAYED, MODERATELY_PLAYED, HEAVILY_PLAYED, DAMAGED)
+- `language`: Optional — Card language (ENGLISH, SPANISH, JAPANESE, KOREAN, CHINESE)
 - `stockStatus`: "AVAILABLE" | "UNAVAILABLE" | "AWAITING_PICKUP"
 - `pokemonFilters.rarity`: Filter by Pokemon card rarity (matches against tcgPlayer or priceCharting rarity)
 - `lastSellDate`: Date range filter with `filterType: ":daterange:"` and `range: { from, to }`
+- `search` (string): Text search in card names (top-level parameter, not inside filters)
+- `prioritizeSearch` (boolean, optional): Defaults to `false`. When `true` and a search term is provided, results are sorted by relevance first instead of the default stock priority ordering
+  - Use `true` when the user is actively searching for a specific card (e.g., "Pikachu V-UNION") and expects the most relevant match at the top
+  - Use `false` (or omit) for browsing/inventory views where stock availability matters more than search precision
 
 ---
 
@@ -159,6 +188,7 @@ query InventoryItem($guid: String!) {
     guid
     tcg
     condition
+    language
     stock
     purchasePrice
     sellPrice
@@ -317,6 +347,7 @@ mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryM
 - `cardGuid`: Required — GUID of the card (Pokemon or Magic based on `tcg`)
 - `tcg`: Required — Trading card game type (POKEMON, MAGIC)
 - `condition`: Required — Card condition (NEAR_MINT, LIGHTLY_PLAYED, MODERATELY_PLAYED, HEAVILY_PLAYED, DAMAGED)
+- `language`: Required — Card language (ENGLISH, SPANISH, JAPANESE, KOREAN, CHINESE). Magic cards accept ENGLISH or SPANISH only. Pokemon cards must match the card's original language.
 - `quantity`: Required — Integer ≥ 1 for MANUAL_ENTRY/MANUAL_EXIT; ≥ 0 for MANUAL_SET
 - `bulkOperationType`: Required — Operation type (see below)
 - `purchasePrice`: Optional — Set/update cost price
@@ -331,7 +362,7 @@ mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryM
 - `MANUAL_SET`: Sets stock to the exact quantity provided, adjusting FIFO batches via delta. Creates inventory item if it doesn't exist.
 
 **Notes:**
-- All movements are recorded internally as `MANUAL_ADJUSTMENT` in the movement history.
+- Each operation type is recorded with its own `movementType` in the movement history: `MANUAL_ENTRY`, `MANUAL_EXIT`, or `MANUAL_SET`.
 - Wishlist restock notifications are triggered when stock transitions from 0 → >0.
 
 ---
@@ -359,10 +390,18 @@ mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInvent
   "updateInventoryItemPricesInput": {
     "inventoryItemGuid": "INVENTORY_ITEM_GUID",
     "purchasePrice": 9.99,
-    "sellPrice": 14.99
+    "sellPrice": 14.99,
+    "notes": "Ajuste de precio por temporada"
   }
 }
 ```
+
+**Input Fields:**
+
+- `inventoryItemGuid`: Required — GUID of the inventory item to update
+- `purchasePrice`: Optional — New cost price
+- `sellPrice`: Optional — New sell price; triggers a `DIRECT_UPDATE` sell price history record
+- `notes`: Optional — Reason or context for the price change; stored in the sell price history record when `sellPrice` is provided
 
 ---
 
@@ -386,6 +425,7 @@ query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs
         guid
         tcg
         condition
+        language
         stock
       }
     }
@@ -415,8 +455,81 @@ query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs
 **Available Filters:**
 
 - `tcg`: **Required** — Trading card game type (POKEMON, MAGIC)
-- `movementType`: Optional — Filter by movement type (PURCHASE_ENTRY, SALE_EXIT, MANUAL_ADJUSTMENT)
+- `movementType`: Optional — Filter by movement type (PURCHASE_ENTRY, SALE_EXIT, MANUAL_ENTRY, MANUAL_EXIT, MANUAL_SET)
 - `createdDate`: Optional — Date range filter
+- `inventoryItemGuid`: Optional — UUID of a specific inventory item; returns only movements for that item
+
+---
+
+### 9. Get Sell Price History
+
+**Query:** `inventoryItemSellPriceHistory`
+**Description:** Retrieve a paginated audit log of every `sellPrice` change on inventory items, including the previous price, the new price, and the origin of the change.
+**Access:** ADMIN, RECEPTION
+
+```graphql
+query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHistoryArgs!) {
+  inventoryItemSellPriceHistory(findSellPriceHistoryArgs: $findSellPriceHistoryArgs) {
+    data {
+      guid
+      previousPrice
+      newPrice
+      reason
+      notes
+      createdDate
+      createdBy {
+        name
+      }
+      inventoryItem {
+        guid
+        tcg
+        condition
+        language
+      }
+    }
+    count
+  }
+}
+```
+
+**Variables:**
+
+```json
+{
+  "findSellPriceHistoryArgs": {
+    "skip": 0,
+    "limit": 20,
+    "filters": {
+      "inventoryItemGuid": "INVENTORY_ITEM_GUID",
+      "reason": null
+    }
+  }
+}
+```
+
+**Available Filters:**
+
+- `inventoryItemGuid`: Optional — UUID of a specific inventory item; returns only history records for that item
+- `reason`: Optional — Filter by change origin (`DIRECT_UPDATE`, `MANUAL_MOVEMENT`, `PURCHASE_FINALIZED`)
+- `createdDate`: Optional — Date range filter
+
+**Response Fields:**
+
+- `previousPrice`: Price before the change (null if the item had no price set yet)
+- `newPrice`: Price after the change
+- `reason`: Origin of the change — see `SellPriceChangeReason` below
+- `notes`: Additional context (e.g., purchase reference)
+- `createdDate`: Timestamp of the change
+- `createdBy`: User who triggered the change
+- `inventoryItem`: The affected inventory item
+
+**`SellPriceChangeReason` values:**
+
+| Value | Triggered by |
+|---|---|
+| `DIRECT_UPDATE` | `updateInventoryItemPrices` mutation (API directa) |
+| `MANUAL_MOVEMENT` | `createInventoryMovement` or `bulkLoadInventory` when `sellPrice` is provided |
+| `PURCHASE_FINALIZED` | `finalizePurchase` — price is taken from the purchase item's `sellPrice` |
 
 ---
 
@@ -430,6 +543,7 @@ interface InventoryItem {
   guid: string;
   tcg: string;
   condition: string;
+  language: string;
   stock: number;
   purchasePrice: number;
   sellPrice: number;
@@ -464,11 +578,24 @@ interface InventoryIndicators {
 
 interface InventoryMovement {
   guid: string;
-  movementType: 'PURCHASE_ENTRY' | 'SALE_EXIT' | 'MANUAL_ADJUSTMENT';
+  movementType: 'PURCHASE_ENTRY' | 'SALE_EXIT' | 'MANUAL_ENTRY' | 'MANUAL_EXIT' | 'MANUAL_SET';
   quantity: number;
   reference: string;
   notes: string;
   createdDate: string;
+}
+
+type SellPriceChangeReason = 'DIRECT_UPDATE' | 'MANUAL_MOVEMENT' | 'PURCHASE_FINALIZED';
+
+interface SellPriceHistory {
+  guid: string;
+  previousPrice: number | null;
+  newPrice: number;
+  reason: SellPriceChangeReason;
+  notes?: string;
+  createdDate: string;
+  createdBy?: { name: string };
+  inventoryItem: { guid: string; tcg: string; condition: string };
 }
 
 // GraphQL Queries
@@ -479,6 +606,7 @@ const GET_INVENTORY_ITEMS = gql`
         guid
         tcg
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -517,6 +645,24 @@ const CREATE_MOVEMENT = gql`
       reference
       notes
       createdDate
+    }
+  }
+`;
+
+const GET_SELL_PRICE_HISTORY = gql`
+  query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHistoryArgs!) {
+    inventoryItemSellPriceHistory(findSellPriceHistoryArgs: $findSellPriceHistoryArgs) {
+      data {
+        guid
+        previousPrice
+        newPrice
+        reason
+        notes
+        createdDate
+        createdBy { name }
+        inventoryItem { guid tcg condition }
+      }
+      count
     }
   }
 `;
@@ -588,6 +734,7 @@ const addManualEntry = async (
   cardGuid: string,
   tcg: 'POKEMON' | 'MAGIC',
   condition: string,
+  language: string,
   quantity: number,
   options?: { purchasePrice?: number; sellPrice?: number; reference?: string; notes?: string }
 ) => {
@@ -599,6 +746,7 @@ const addManualEntry = async (
           cardGuid,
           tcg,
           condition,
+          language,
           quantity,
           bulkOperationType: 'MANUAL_ENTRY',
           ...options
@@ -618,6 +766,7 @@ const addManualExit = async (
   cardGuid: string,
   tcg: 'POKEMON' | 'MAGIC',
   condition: string,
+  language: string,
   quantity: number,
   options?: { reference?: string; notes?: string }
 ) => {
@@ -629,6 +778,7 @@ const addManualExit = async (
           cardGuid,
           tcg,
           condition,
+          language,
           quantity,
           bulkOperationType: 'MANUAL_EXIT',
           ...options
@@ -648,6 +798,7 @@ const setManualStock = async (
   cardGuid: string,
   tcg: 'POKEMON' | 'MAGIC',
   condition: string,
+  language: string,
   quantity: number,
   options?: { purchasePrice?: number; sellPrice?: number; notes?: string }
 ) => {
@@ -659,6 +810,7 @@ const setManualStock = async (
           cardGuid,
           tcg,
           condition,
+          language,
           quantity,
           bulkOperationType: 'MANUAL_SET',
           ...options
@@ -761,6 +913,7 @@ const ManualMovementForm: React.FC<{ onSubmit: Function }> = ({ onSubmit }) => {
     cardGuid: '',
     tcg: 'POKEMON',
     condition: 'NEAR_MINT',
+    language: 'ENGLISH',
     quantity: 1,
     bulkOperationType: 'MANUAL_ENTRY' as BulkOperationType,
     purchasePrice: '',

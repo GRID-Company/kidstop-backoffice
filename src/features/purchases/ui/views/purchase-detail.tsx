@@ -43,6 +43,8 @@ import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import CompletePurchaseModal from '../components/complete-purchase-modal';
+import { DuplicateItemsConfirmationModal } from '../components/duplicate-items-confirmation-modal';
+import { useDuplicateValidation } from '../hooks/use-duplicate-validation';
 
 interface PurchaseDetailProps {
   purchaseId: string;
@@ -88,6 +90,17 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
+
+  const { 
+    duplicateConfirmation, 
+    validateAndAddItems, 
+    handleConfirmDuplicates, 
+    handleCancelDuplicates 
+  } = useDuplicateValidation(
+    existingItemIds, 
+    addItem, 
+    () => setIsAdvancedSearchEnabled(false)
+  );
   const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
 
   const { updateSeller, updating: updatingSeller } = useSellers();
@@ -166,14 +179,12 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
-        newItems.forEach((item) => addItem(item));
-        toast.success(`${newItems.length} cartas agregadas exitosamente`);
-        setIsAdvancedSearchEnabled(false);
+        validateAndAddItems(newItems);
       } catch (error) {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },
-    [purchase?.tcgType, addItem]
+    [purchase?.tcgType, validateAndAddItems]
   );
 
   const handleBulkSearchCancel = useCallback(() => {
@@ -562,6 +573,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         onClose={() => setIsCompleteModalOpen(false)}
         onConfirm={handleCompleteConfirm}
         loading={mutating}
+      />
+
+      <DuplicateItemsConfirmationModal
+        isOpen={duplicateConfirmation !== null}
+        uniqueItems={duplicateConfirmation?.uniqueItems || []}
+        duplicateItems={duplicateConfirmation?.duplicateItems || []}
+        onConfirm={handleConfirmDuplicates}
+        onCancel={handleCancelDuplicates}
       />
     </EntitiesPage>
   );

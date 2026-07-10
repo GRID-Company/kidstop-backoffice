@@ -2,6 +2,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
 import {
   bulkSearchFormSchemaPurchases,
   bulkSearchFormSchemaInventory,
@@ -62,6 +63,7 @@ export function useBulkSearchForm(
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
+          language: selectedCard.language || DEFAULT_CARD_LANGUAGE,
           quantity,
           offerPrice,
         } as BulkCardFormDataPurchases);
@@ -71,6 +73,7 @@ export function useBulkSearchForm(
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
+          language: selectedCard.language || DEFAULT_CARD_LANGUAGE,
           quantity,
           publicPrice: defaultPublicPrice,
         } as BulkCardFormDataInventory);

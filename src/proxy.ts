@@ -53,8 +53,9 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('jwt')?.value ?? null;
   const role = request.cookies.get('role')?.value ?? null;
+  const logoutInProgress = request.cookies.get('logout_in_progress')?.value ?? null;
 
-  if (startsWithAny(pathname, PUBLIC_PAGES) && token) {
+  if (startsWithAny(pathname, PUBLIC_PAGES) && token && !logoutInProgress) {
     const url = request.nextUrl.clone();
     if (role === 'ADMIN' || role === 'SUPERUSER') {
       url.pathname = '/usuarios';
@@ -71,6 +72,7 @@ export function proxy(request: NextRequest) {
     const res = NextResponse.redirect(url);
     res.cookies.delete('jwt');
     res.cookies.delete('role');
+    res.cookies.delete('logout_in_progress');
     return res;
   }
 

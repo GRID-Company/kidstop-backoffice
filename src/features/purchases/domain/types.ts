@@ -1,5 +1,6 @@
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type { CardCondition };
 
@@ -47,6 +48,7 @@ export interface IPurchaseItem {
   hp?: string | null;
   stage?: string | null;
   condition: CardCondition;
+  language: CardLanguage;
   quantity: number;
   offerPrice: number;
   referencePrice?: number;
@@ -93,6 +95,7 @@ export interface ICardSearchResult {
   rarity: string;
   imageUrl: string;
   tcgType: TCGType;
+  language: CardLanguage;
   metrics: ICardSearchMetrics;
 }
 

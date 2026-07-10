@@ -13,6 +13,7 @@ export type InventoryItemsQuery = {
       tcg: string;
       condition: string;
       stock: number;
+      language: Types.CardLanguage;
       purchasePrice: number | null;
       sellPrice: number | null;
       lastSellDate: unknown | null;
@@ -122,6 +123,26 @@ export type BulkLoadInventoryMutation = {
   };
 };
 
+export type InventoryItemSellPriceHistoryQueryVariables = Types.Exact<{
+  findSellPriceHistoryArgs: Types.FindSellPriceHistoryArgs;
+}>;
+
+export type InventoryItemSellPriceHistoryQuery = {
+  inventoryItemSellPriceHistory: {
+    count: number | null;
+    data: Array<{
+      guid: string;
+      previousPrice: number | null;
+      newPrice: number;
+      reason: string;
+      notes: string | null;
+      createdDate: unknown;
+      createdBy: { name: string | null } | null;
+      inventoryItem: { guid: string; tcg: string; condition: string };
+    }> | null;
+  };
+};
+
 export const InventoryItemsDocument = {
   kind: 'Document',
   definitions: [
@@ -177,6 +198,10 @@ export const InventoryItemsDocument = {
                         name: { kind: 'Name', value: 'condition' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'purchasePrice' },
@@ -664,4 +689,119 @@ export const BulkLoadInventoryDocument = {
 } as unknown as DocumentNode<
   BulkLoadInventoryMutation,
   BulkLoadInventoryMutationVariables
+>;
+export const InventoryItemSellPriceHistoryDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'InventoryItemSellPriceHistory' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findSellPriceHistoryArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindSellPriceHistoryArgs' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'inventoryItemSellPriceHistory' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findSellPriceHistoryArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findSellPriceHistoryArgs' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'previousPrice' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'newPrice' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'reason' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdDate' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdBy' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'inventoryItem' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'tcg' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'condition' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'count' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  InventoryItemSellPriceHistoryQuery,
+  InventoryItemSellPriceHistoryQueryVariables
 >;

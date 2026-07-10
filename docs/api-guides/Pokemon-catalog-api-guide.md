@@ -98,6 +98,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
     data {
       guid
       name
+      language
       variant
       setName
       setCode
@@ -145,6 +146,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
 - Card fields:
   - `guid`: Unique card identifier (string)
   - `name`: Card name (string)
+  - `language`: Card language (`CardLanguage` enum)
   - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (string, nullable)
   - `setName`: Collection/set name (string, nullable)
   - `setCode`: Collection/set code (string, nullable)
@@ -178,6 +180,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
     data {
       guid
       name
+      language
       variant
       setName
       setCode
@@ -211,6 +214,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
     "skip": 0,
     "limit": 10,
     "search": "charizard",
+    "prioritizeSearch": true,
     "sort": {
       "column": "name",
       "order": "ASC"
@@ -245,6 +249,9 @@ All filters are optional. Combine them to narrow down results:
 - `condition` (enum): Card condition - "NEAR_MINT" | "LIGHTLY_PLAYED" | "MODERATELY_PLAYED" | "HEAVILY_PLAYED" | "DAMAGED"
 - `stockStatus` (enum): Stock availability - "AVAILABLE" | "UNAVAILABLE"
 - `search` (string): Text search in card names (not in filters object, top-level parameter)
+- `prioritizeSearch` (boolean, optional): Defaults to `false`. When `true` and a search term is provided, results are sorted by relevance first instead of the default stock/collection/genre priority ordering
+  - Use `true` when the user is actively searching for a specific card (e.g., "Pikachu V-UNION") and expects the most relevant match at the top
+  - Use `false` (or omit) for browsing/catalog views where stock availability and collection grouping matter more than search precision
 
 ---
 
@@ -731,6 +738,7 @@ query PokemonCardPublicDetail($guid: String!) {
   pokemonCardPublicDetail(guid: $guid) {
     guid
     name
+    language
     variant
     setGuid
     setName
@@ -769,6 +777,7 @@ query PokemonCardPublicDetail($guid: String!) {
 **Response Fields:**
 
 - All basic card info plus:
+  - `language`: Card language (`CardLanguage` enum)
   - `variant`: Card variant (e.g., "Normal", "Reverse Holo")
   - `setGuid`: UUID of the card's collection/set (nullable)
   - `cardNumber`: Number in set
@@ -803,6 +812,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
     data {
       guid
       name
+      language
       variant
       setName
       setCode
@@ -897,6 +907,7 @@ query PokemonTopSoldCards {
   pokemonTopSoldCards {
     guid
     name
+    language
     variant
     setName
     setCode
@@ -925,6 +936,7 @@ query PokemonTopSoldCards {
 
 - `guid`: Unique card identifier
 - `name`: Card name
+- `language`: Card language (`CardLanguage` enum)
 - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (nullable)
 - `setName`: Collection/set name (nullable)
 - `setCode`: Collection/set code (nullable)
@@ -1259,6 +1271,8 @@ const SearchableCardList: React.FC = () => {
 ```graphql
 query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
       originalLine
       parsedQuantity
@@ -1388,11 +1402,14 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 
 **Response Fields:**
 
-- `originalLine`: The original input line
-- `parsedName`: Extracted card name
-- `parsedSet`: Extracted set code
-- `parsedNumber`: Extracted card number
-- `bestMatch`: The top matching card with full inventory details
+- `successfulCount`: Number of cards successfully matched (cards with bestMatch and no error)
+- `totalCount`: Total number of cards detected (parsed lines, excluding empty lines and headers)
+- `results`: Array of search results for each parsed line
+  - `originalLine`: The original input line
+  - `parsedName`: Extracted card name
+  - `parsedSet`: Extracted set code
+  - `parsedNumber`: Extracted card number
+  - `bestMatch`: The top matching card with full inventory details
   - `cardMetrics` (nullable): Full card metrics including external prices (when `withCardsMetrics: true`)
     - `variantsMetrics`: Stock, wishlist count, last sell date, avg days in inventory per condition
     - `ungradedPrice`: PriceCharting loose price
@@ -1420,6 +1437,8 @@ import { gql, useMutation } from '@apollo/client';
 const BATCH_SEARCH_POKEMON = gql`
   query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
     pokemonBatchCardSearch(input: $input) {
+      successfulCount
+      totalCount
       results {
         originalLine
         parsedQuantity
@@ -1452,6 +1471,8 @@ const BatchSearchComponent = () => {
     });
   };
 
+  const searchResult = data?.pokemonBatchCardSearch;
+
   return (
     <div>
       <textarea 
@@ -1459,7 +1480,12 @@ const BatchSearchComponent = () => {
         onPaste={(e) => handlePaste(e.clipboardData.getData('text'))}
       />
       {loading && <p>Searching...</p>}
-      {data?.pokemonBatchCardSearch.results.map((result, idx) => (
+      {searchResult && (
+        <div className="search-summary">
+          <p>Found {searchResult.successfulCount} of {searchResult.totalCount} cards</p>
+        </div>
+      )}
+      {searchResult?.results.map((result, idx) => (
         <div key={idx}>
           <h4>{result.parsedName}</h4>
           {result.bestMatch ? (

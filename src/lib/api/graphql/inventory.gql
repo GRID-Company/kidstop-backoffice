@@ -5,6 +5,7 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
       tcg
       condition
       stock
+      language
       purchasePrice
       sellPrice
       lastSellDate
@@ -97,5 +98,27 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
     createdCount
     updatedCount
     errors
+  }
+}
+
+query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHistoryArgs!) {
+  inventoryItemSellPriceHistory(findSellPriceHistoryArgs: $findSellPriceHistoryArgs) {
+    data {
+      guid
+      previousPrice
+      newPrice
+      reason
+      notes
+      createdDate
+      createdBy {
+        name
+      }
+      inventoryItem {
+        guid
+        tcg
+        condition
+      }
+    }
+    count
   }
 }

@@ -1,4 +1,4 @@
-import type { CreatePurchaseInput, UpdatePurchaseInput } from '@/lib/api/schema-types';
+import type { CreatePurchaseInput, UpdatePurchaseInput, CardLanguage } from '@/lib/api/schema-types';
 import { IPurchase } from '../../domain/types';
 import { PurchaseFormData } from '../forms/purchase-form.schema';
 
@@ -14,6 +14,7 @@ export function toCreatePurchasePayload(data: PurchaseFormData, tcgType: string)
           : { magicCardGuid: item.cardGuid }
         ),
         condition: item.condition,
+        language: item.language as CardLanguage,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
@@ -57,6 +58,7 @@ export function toPurchaseFormDefaults(purchase: IPurchase): PurchaseFormData {
       hp: item.hp,
       stage: item.stage,
       condition: item.condition,
+      language: item.language,
       quantity: item.quantity,
       offerPrice: item.offerPrice,
       referencePrice: item.referencePrice,

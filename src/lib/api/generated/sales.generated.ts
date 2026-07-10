@@ -32,6 +32,7 @@ export type SalesQuery = {
         guid: string;
         tcg: string;
         condition: string;
+        language: Types.CardLanguage;
         quantity: number;
         price: number;
         pokemonCardSummary: {
@@ -90,6 +91,7 @@ export type SaleQuery = {
       guid: string;
       tcg: string;
       condition: string;
+      language: Types.CardLanguage;
       quantity: number;
       price: number;
       pokemonCardSummary: {
@@ -163,6 +165,7 @@ export type UpdateSaleItemMutation = {
       guid: string;
       tcg: string;
       condition: string;
+      language: Types.CardLanguage;
       quantity: number;
       price: number;
       pokemonCardSummary: {
@@ -206,6 +209,7 @@ export type RemoveSaleItemMutation = {
       guid: string;
       tcg: string;
       condition: string;
+      language: Types.CardLanguage;
       quantity: number;
       price: number;
       pokemonCardSummary: {
@@ -358,6 +362,10 @@ export const SalesDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',
@@ -578,6 +586,10 @@ export const SaleDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       {
                         kind: 'Field',
@@ -885,6 +897,10 @@ export const UpdateSaleItemDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'quantity' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'price' } },
@@ -1050,6 +1066,10 @@ export const RemoveSaleItemDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       {
                         kind: 'Field',

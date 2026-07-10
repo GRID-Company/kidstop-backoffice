@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { UseFormReturn } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 import { useAuthStore } from '@/lib/store/auth';
 import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
@@ -122,6 +123,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         stage: item.pokemonCardSummary?.stage || undefined,
         tcgType: p.tcg === 'POKEMON' ? 'POKEMON' : 'MAGIC',
         condition: item.condition as CardCondition,
+        language: item.language as CardLanguage,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice || undefined,
@@ -150,6 +152,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         items: basePurchase.items.map((item) => ({
           cardGuid: item.cardGuid,
           condition: item.condition,
+          language: item.language,
           quantity: item.quantity,
           offerPrice: item.offerPrice,
           referencePrice: item.referencePrice,
@@ -166,20 +169,21 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     if (!basePurchase) return [];
     
     return itemsForm.fieldArray.fields.map((field) => {
-      // Find the original item by BOTH cardGuid AND condition to support multiple conditions of same card
+      // Find the original item by cardGuid, condition AND language to support multiple languages of same card
       const originalItem = basePurchase.items.find(
-        (item) => item.cardGuid === field.cardGuid && item.condition === field.condition
+        (item) => item.cardGuid === field.cardGuid && item.condition === field.condition && item.language === (field as any).language
       );
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
-        // Try to find by cardGuid:condition key
-        const itemKey = getItemKey({ cardGuid: field.cardGuid, condition: field.condition });
+        // Try to find by cardGuid:condition:language key
+        const itemKey = getItemKey({ cardGuid: field.cardGuid, condition: field.condition, language: (field as any).language });
         const newItem = newItems.get(itemKey);
         if (newItem) {
           return {
             ...newItem,
             guid: (field as any).id || newItem.guid, // Use React Hook Form's unique field id
             condition: field.condition,
+            language: newItem.language,
             quantity: field.quantity,
             offerPrice: field.offerPrice,
             referencePrice: field.referencePrice,
@@ -188,7 +192,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         // Fallback for items without metadata - use field.id as guid
         return {
           ...(field as unknown as IPurchaseItem),
-          guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition),
+          guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition, (field as any).language),
         };
       }
       
@@ -196,6 +200,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       return {
         ...originalItem,
         condition: field.condition,
+        language: originalItem.language,
         quantity: field.quantity,
         offerPrice: field.offerPrice,
         referencePrice: field.referencePrice,
@@ -260,7 +265,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   );
 
   const addItem = useCallback((item: IPurchaseItem) => {
-    // Store the complete item in newItems Map using cardGuid:condition as key
+    // Store the complete item in newItems Map using cardGuid:condition:language as key
     const itemKey = getItemKey(item);
     setNewItems((prev) => new Map(prev).set(itemKey, item));
     
@@ -268,6 +273,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     itemsForm.fieldArray.append({
       cardGuid: item.cardGuid,
       condition: item.condition,
+      language: item.language,
       quantity: item.quantity,
       offerPrice: item.offerPrice,
       referencePrice: item.referencePrice,
@@ -300,6 +306,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       items: newItems.map((item) => ({
         cardGuid: item.cardGuid,
         condition: item.condition,
+        language: item.language,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
@@ -376,6 +383,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
                 ? { pokemonCardGuid: item.cardGuid }
                 : { magicCardGuid: item.cardGuid }),
               condition: item.condition,
+              language: item.language as CardLanguage,
               quantity: item.quantity,
               offerPrice: item.offerPrice,
               referencePrice: item.referencePrice,
@@ -415,6 +423,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
                   ? { pokemonCardGuid: item.cardGuid }
                   : { magicCardGuid: item.cardGuid }),
                 condition: item.condition,
+                language: item.language as CardLanguage,
                 quantity: item.quantity,
                 offerPrice: item.offerPrice,
                 referencePrice: item.referencePrice,

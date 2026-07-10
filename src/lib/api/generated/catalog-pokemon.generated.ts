@@ -11,6 +11,7 @@ export type PokemonCardInternalListQuery = {
     data: Array<{
       guid: string;
       name: string;
+      language: Types.CardLanguage;
       cardNumber: string | null;
       setName: string | null;
       setCode: string | null;
@@ -29,6 +30,7 @@ export type PokemonCardInternalListQuery = {
       inventoryCards: Array<{
         guid: string;
         condition: string;
+        language: string;
         stock: number;
         purchasePrice: number | null;
         sellPrice: number | null;
@@ -45,6 +47,7 @@ export type PokemonCardInternalDetailQuery = {
   pokemonCardInternalDetail: {
     guid: string;
     name: string;
+    language: Types.CardLanguage;
     cardNumber: string | null;
     rarity: string | null;
     variant: string | null;
@@ -63,6 +66,7 @@ export type PokemonCardInternalDetailQuery = {
     inventoryCards: Array<{
       guid: string;
       condition: string;
+      language: string;
       stock: number;
       purchasePrice: number | null;
       sellPrice: number | null;
@@ -147,6 +151,7 @@ export type PokemonBatchCardSearchQuery = {
       bestMatch: {
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         cardNumber: string | null;
         setName: string | null;
         setCode: string | null;
@@ -178,6 +183,7 @@ export type PokemonBatchCardSearchQuery = {
       relatedCards: Array<{
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         cardNumber: string | null;
         setName: string | null;
         setCode: string | null;
@@ -258,6 +264,10 @@ export const PokemonCardInternalListDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'cardNumber' },
                       },
                       {
@@ -336,6 +346,10 @@ export const PokemonCardInternalListDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'stock' },
                             },
                             {
@@ -405,6 +419,7 @@ export const PokemonCardInternalDetailDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'cardNumber' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'rarity' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'variant' } },
@@ -446,6 +461,10 @@ export const PokemonCardInternalDetailDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {
@@ -797,6 +816,10 @@ export const PokemonBatchCardSearchDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'cardNumber' },
                             },
                             {
@@ -961,6 +984,10 @@ export const PokemonBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',

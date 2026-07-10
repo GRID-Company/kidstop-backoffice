@@ -2,6 +2,7 @@ import { useForm, useFieldArray, Resolver, FieldArrayMethodProps } from 'react-h
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMemo } from 'react';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 import { CardCondition, IPurchaseItem } from '../../domain/types';
 import { offerPriceSchema, quantitySchema } from './price-schemas';
@@ -9,6 +10,7 @@ import { offerPriceSchema, quantitySchema } from './price-schemas';
 const purchaseItemFormSchema = z.object({
   cardGuid: z.string().min(1, 'Card GUID is required'),
   condition: z.enum(['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED', 'HEAVILY_PLAYED', 'DAMAGED'] as const),
+  language: z.nativeEnum(CardLanguage),
   quantity: quantitySchema,
   offerPrice: offerPriceSchema,
   referencePrice: z.number().optional(),
@@ -38,6 +40,7 @@ export function usePurchaseItemsForm({ initialItems }: UsePurchaseItemsFormOptio
       items: initialItems.map((item) => ({
         cardGuid: item.cardGuid,
         condition: item.condition as CardCondition,
+        language: item.language,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
@@ -67,6 +70,7 @@ export function usePurchaseItemsForm({ initialItems }: UsePurchaseItemsFormOptio
       return (
         currentItem.cardGuid !== initialItem.cardGuid ||
         currentItem.condition !== initialItem.condition ||
+        currentItem.language !== initialItem.language ||
         currentItem.quantity !== initialItem.quantity ||
         currentItem.offerPrice !== initialItem.offerPrice ||
         currentItem.referencePrice !== initialItem.referencePrice
