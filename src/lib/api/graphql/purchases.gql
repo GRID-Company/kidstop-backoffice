@@ -21,6 +21,7 @@ query Purchases($findPurchasesArgs: FindPurchasesArgs!) {
       items {
         guid
         condition
+        language
         offerPrice
         referencePrice
         sellPrice
@@ -135,6 +136,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       quantity
@@ -201,6 +203,7 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       quantity
@@ -246,6 +249,7 @@ mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseIte
     referencePrice
     sellPrice
     condition
+    language
     quantity
   }
 }
@@ -259,6 +263,7 @@ mutation FinalizePurchase($purchaseGuid: String!) {
     items {
       guid
       condition
+      language
       offerPrice
       sellPrice
       quantity

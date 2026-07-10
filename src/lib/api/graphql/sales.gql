@@ -21,6 +21,7 @@ query Sales($findSalesArgs: FindSalesArgs!) {
         guid
         tcg
         condition
+        language
         quantity
         price
         pokemonCardSummary {

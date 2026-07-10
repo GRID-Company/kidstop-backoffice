@@ -32,6 +32,7 @@ export type SalesQuery = {
         guid: string;
         tcg: string;
         condition: string;
+        language: Types.CardLanguage;
         quantity: number;
         price: number;
         pokemonCardSummary: {
@@ -352,6 +353,10 @@ export const SalesDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',
