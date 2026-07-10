@@ -1,57 +1,8 @@
 import { IPurchaseItem } from '@/features/purchases/domain/types';
 import { ISaleItem } from '@/features/sales/domain/types';
-import { TCGType } from '@/lib/types/tcg.types';
-import { CardCondition } from '@/lib/types/card.types';
+import type { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/types/item.types';
 
-export type ItemVariant = 'purchase' | 'sale';
-
-export interface AdaptedPurchaseItem {
-  guid: string;
-  cardGuid: string;
-  cardName: string;
-  cardImageUrl: string;
-  setName: string;
-  setCode: string;
-  cardNumber?: string | null;
-  variant?: string | null;
-  type?: string | null;
-  hp?: string | null;
-  stage?: string | null;
-  rarity?: string | null;
-  isFoil?: boolean;
-  collectorNumber?: string | null;
-  tcgType: TCGType;
-  condition: CardCondition;
-  quantity: number;
-  offerPrice: number;
-  referencePrice?: number;
-  currentReferencePrice?: number;
-  metrics?: {
-    currentStock?: number;
-  };
-}
-
-export interface AdaptedSaleItem {
-  guid: string;
-  cardGuid: string;
-  cardName: string;
-  cardImageUrl: string;
-  setName: string;
-  setCode: string;
-  cardNumber?: string | null;
-  variant?: string | null;
-  type?: string | null;
-  hp?: string | null;
-  stage?: string | null;
-  rarity?: string | null;
-  isFoil?: boolean;
-  collectorNumber?: string | null;
-  tcgType: TCGType;
-  condition: CardCondition;
-  quantity: number;
-  price: number;
-  foundQuantity?: number;
-}
+export type { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant };
 
 export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
   return {
@@ -67,6 +18,7 @@ export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
     hp: item.hp,
     tcgType: item.tcgType,
     condition: item.condition,
+    language: item.language,
     quantity: item.quantity,
     offerPrice: item.offerPrice,
     referencePrice: item.referencePrice,
@@ -95,6 +47,7 @@ export function adaptSaleItem(item: ISaleItem & { foundQuantity?: number }): Ada
     collectorNumber: item.magicCardSummary?.collectorNumber,
     tcgType: item.tcg,
     condition: item.condition,
+    language: item.language,
     quantity: item.quantity,
     price: item.price,
     foundQuantity: item.foundQuantity,

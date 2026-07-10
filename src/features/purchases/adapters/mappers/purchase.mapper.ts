@@ -14,10 +14,7 @@ export function toCreatePurchasePayload(data: PurchaseFormData, tcgType: string)
           : { magicCardGuid: item.cardGuid }
         ),
         condition: item.condition,
-        // TODO: Agregar selector de idioma (English/Spanish) en UI de compras
-        // - Solo habilitado para cartas que tengan language English
-        // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
-        language: 'ENGLISH' as CardLanguage,
+        language: item.language as CardLanguage,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
@@ -61,6 +58,7 @@ export function toPurchaseFormDefaults(purchase: IPurchase): PurchaseFormData {
       hp: item.hp,
       stage: item.stage,
       condition: item.condition,
+      language: item.language,
       quantity: item.quantity,
       offerPrice: item.offerPrice,
       referencePrice: item.referencePrice,

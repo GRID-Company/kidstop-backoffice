@@ -10,6 +10,7 @@ import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { useAvailableConditions } from '@/shared/hooks/use-available-conditions';
@@ -123,26 +124,33 @@ export default function PurchaseItemCard({
               <h4 className="text-sm font-semibold leading-tight text-default-900">
                 {item.cardName}
               </h4>
-              {item.tcgType === 'POKEMON' && (item.type || item.hp || item.variant) && (
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {item.type && (
-                    <div className="flex items-center gap-0.5">
-                      <PokemonTypeIcon type={item.type} size="sm" />
-                      <span className="text-[10px] text-default-600">{item.type}</span>
-                    </div>
-                  )}
-                  {item.hp && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      {item.hp} HP
-                    </Chip>
-                  )}
-                  {item.variant && !item.variant.toLowerCase().includes('normal') && (
-                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
-                      {item.variant}
-                    </Chip>
-                  )}
-                </div>
-              )}
+              <div className="flex flex-wrap items-center gap-1.5">
+                {item.language && (
+                  <Chip size="sm" variant="flat" color="primary" className="h-4 px-1.5 text-[10px]">
+                    {LANGUAGE_LABELS[item.language]}
+                  </Chip>
+                )}
+                {item.tcgType === 'POKEMON' && (
+                  <>
+                    {item.type && (
+                      <div className="flex items-center gap-0.5">
+                        <PokemonTypeIcon type={item.type} size="sm" />
+                        <span className="text-[10px] text-default-600">{item.type}</span>
+                      </div>
+                    )}
+                    {item.hp && (
+                      <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
+                        {item.hp} HP
+                      </Chip>
+                    )}
+                    {item.variant && !item.variant.toLowerCase().includes('normal') && (
+                      <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
+                        {item.variant}
+                      </Chip>
+                    )}
+                  </>
+                )}
+              </div>
               <p className="text-xs text-default-500">
                 {item.setName} · {item.setCode}
               </p>
@@ -194,7 +202,13 @@ export default function PurchaseItemCard({
 
         <div className="flex flex-col gap-2 border-t border-default-200 pt-3">
           {isReadOnly ? (
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-5 gap-3">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-default-500">Idioma</span>
+                <span className="text-sm font-medium">
+                  {LANGUAGE_LABELS[item.language]}
+                </span>
+              </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-default-500">Condición</span>
                 <span className="text-sm font-medium">

@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
 import { calculateOfferPrice } from '@/features/purchases/domain/price.utils';
 import { BulkCardFormControlsProps } from './types';
+import { CardLanguage } from '@/lib/api/schema-types';
+import { LanguageSelector } from '@/shared/components/language-selector';
 
 export default function BulkCardFormControls({
   variant,
@@ -33,7 +35,7 @@ export default function BulkCardFormControls({
   }, [variant, selectedCard?.guid, selectedCard?.referencePrice, priceName, setValue]);
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-4 gap-2">
       <SelectForm
         controlProps={{
           name: `cards.${index}.condition`,
@@ -48,6 +50,19 @@ export default function BulkCardFormControls({
         }}
         aria-label="Condición de la carta"
         items={CARD_CONDITION_OPTIONS}
+      />
+
+      <Controller
+        name={`cards.${index}.language`}
+        control={control}
+        render={({ field }) => (
+          <LanguageSelector
+            value={field.value as CardLanguage}
+            onChange={field.onChange}
+            currentLanguage={selectedCard?.language as CardLanguage}
+            size="sm"
+          />
+        )}
       />
 
       <InputForm

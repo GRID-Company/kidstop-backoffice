@@ -3,6 +3,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
     data {
       guid
       name
+      language
       cardNumber
       setName
       setCode
@@ -24,6 +25,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       inventoryCards {
         guid
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -37,6 +39,7 @@ query PokemonCardInternalDetail($guid: String!) {
   pokemonCardInternalDetail(guid: $guid) {
     guid
     name
+    language
     cardNumber
     rarity
     variant
@@ -58,6 +61,7 @@ query PokemonCardInternalDetail($guid: String!) {
     inventoryCards {
       guid
       condition
+      language
       stock
       purchasePrice
       sellPrice
@@ -119,6 +123,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
       bestMatch {
         guid
         name
+        language
         cardNumber
         setName
         setCode
@@ -153,6 +158,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
     relatedCards {
       guid
       name
+      language
       cardNumber
       setName
       setCode

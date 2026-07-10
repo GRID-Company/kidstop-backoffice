@@ -37,6 +37,8 @@ import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/
 import { toPokemonCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import ConditionSelector from '@/shared/blocks/condition-selector';
+import { LanguageSelector } from '@/shared/components/language-selector';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import InventoryMovementsTable from './inventory-movements-table';
 import SellPriceHistoryTable from './sell-price-history-table';
 
@@ -70,10 +72,15 @@ export default function PokemonCardDetailModal({
 
   const {
     selectedVariant,
+    selectedLanguage,
+    availableVariants,
+    handleLanguageChange,
     stockAdjustment,
     setStockAdjustment,
     stockNotes,
     setStockNotes,
+    priceNotes,
+    setPriceNotes,
     movementType,
     setMovementType,
     handleVariantSelect,
@@ -159,18 +166,30 @@ export default function PokemonCardDetailModal({
     <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
+        <DrawerHeader className="flex flex-col gap-2">
           <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
-          <span className="text-sm font-normal text-default-500">
-            {selectedCard ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-normal text-default-500">
+              {selectedCard ? (
+                <>
+                  {[setName, setCode].filter(Boolean).join(' · ')}
+                  {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+                </>
+              ) : (
+                'Buscar carta por nombre, set o código'
+              )}
+            </span>
+            {selectedCard && selectedVariant && (
               <>
-                {[setName, setCode].filter(Boolean).join(' · ')}
-                {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+                <Chip size="sm" variant="flat" color="primary">
+                  {LANGUAGE_LABELS[selectedLanguage]}
+                </Chip>
+                <Chip size="sm" variant="flat" color="secondary">
+                  {CARD_CONDITION_LABELS[selectedVariant.condition as CardCondition]}
+                </Chip>
               </>
-            ) : (
-              'Buscar carta por nombre, set o código'
             )}
-          </span>
+          </div>
         </DrawerHeader>
 
         <DrawerBody className="flex flex-col gap-6">
@@ -299,6 +318,14 @@ export default function PokemonCardDetailModal({
                     <span className="font-medium">{detail.rarity}</span>
                   </>
                 ) : null}
+                {!loading && (detail?.language || selectedCard?.language) && (
+                  <>
+                    <span className="text-default-500">Idioma</span>
+                    <span className="font-medium">
+                      {LANGUAGE_LABELS[detail?.language ?? selectedCard?.language!]}
+                    </span>
+                  </>
+                )}
                 {!loading && detail?.variant && (
                   <>
                     <span className="text-default-500">Variante</span>
@@ -361,6 +388,16 @@ export default function PokemonCardDetailModal({
           <Divider />
 
           <div className="flex flex-col gap-3">
+            <h4 className="text-sm font-semibold">Idioma y condición</h4>
+            <LanguageSelector
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+              currentLanguage={detail?.language ?? selectedCard?.language ?? undefined}
+              size="sm"
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
             <h4 className="text-sm font-semibold">Variantes por condición</h4>
             {loading ? (
               <div className="flex gap-2">
@@ -370,11 +407,13 @@ export default function PokemonCardDetailModal({
             ) : (
               <div className="flex flex-wrap gap-2">
                 {Object.values(CARD_CONDITIONS).map((condition) => {
-                  const existing = detail?.inventoryCards?.find((v) => v.condition === condition);
+                  const existing = availableVariants.find((v: InventoryCard) => v.condition === condition);
                   const variant: InventoryCard = existing ?? {
-                    guid: `${card?.guid}-${condition}`,
+                    cardGuid: selectedCard?.guid ?? '',
+                    inventoryItemGuid: undefined,
                     isNew: true,
                     condition,
+                    language: selectedLanguage,
                     stock: 0,
                     purchasePrice: null,
                     sellPrice: null,
@@ -561,6 +600,15 @@ export default function PokemonCardDetailModal({
                   />
                 </div>
 
+                <Textarea
+                  label="Notas (opcional)"
+                  placeholder="Agregar notas sobre el cambio de precio..."
+                  value={priceNotes}
+                  onValueChange={setPriceNotes}
+                  size="sm"
+                  minRows={2}
+                />
+
                 <Button
                   type="submit"
                   size="sm"
@@ -576,16 +624,20 @@ export default function PokemonCardDetailModal({
 
               <Divider />
 
-              <InventoryMovementsTable
-                inventoryItemGuid={selectedVariant.guid}
-                tcg="POKEMON"
-              />
+              {selectedVariant.inventoryItemGuid && (
+                <>
+                  <InventoryMovementsTable
+                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                    tcg="POKEMON"
+                  />
 
-              <Divider />
+                  <Divider />
 
-              <SellPriceHistoryTable
-                inventoryItemGuid={selectedVariant.guid}
-              />
+                  <SellPriceHistoryTable
+                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                  />
+                </>
+              )}
             </>
           )}
           </>

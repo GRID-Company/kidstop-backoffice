@@ -6,7 +6,7 @@ import { FormProvider, useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { Accordion, AccordionItem } from '@heroui/react';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import ItemCard from './item-card';
-import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
+import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/types/item.types';
 
 type AdaptedItem = AdaptedPurchaseItem | AdaptedSaleItem;
 

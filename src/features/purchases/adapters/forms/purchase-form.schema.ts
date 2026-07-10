@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { CARD_CONDITIONS } from '../../domain/constants';
 import { PURCHASE_STATUS, PAYMENT_METHOD } from '../../domain/types';
 
@@ -14,6 +15,7 @@ const purchaseItemSchema = z.object({
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
+  language: z.nativeEnum(CardLanguage),
   quantity: z.coerce
     .number()
     .int()

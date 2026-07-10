@@ -24,6 +24,9 @@ import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
 import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
 import { getItemKey } from '../../domain/purchases.domain';
+import { CardLanguage } from '@/lib/api/schema-types';
+import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
+import { LanguageSelector } from '@/shared/components/language-selector';
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
@@ -38,12 +41,14 @@ interface CardSearchWithMetricsProps {
 
 interface AddToCartState {
   condition: CardCondition;
+  language: CardLanguage;
   quantity: number;
   unitBuyPrice: number;
 }
 
 const DEFAULT_ADD_STATE: AddToCartState = {
   condition: CARD_CONDITIONS.NEAR_MINT,
+  language: DEFAULT_CARD_LANGUAGE,
   quantity: 1,
   unitBuyPrice: 0,
 };
@@ -61,14 +66,15 @@ function CardResultItem({
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
+    language: card.language || DEFAULT_CARD_LANGUAGE,
     unitBuyPrice: calculateOfferPrice(card.metrics.referencePrice),
   });
   const [isAdding, setIsAdding] = useState(false);
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
   const isAlreadyAdded = useMemo(
-    () => existingItemIds.has(getItemKey({ cardGuid: card.guid, condition: addState.condition })),
-    [existingItemIds, card.guid, addState.condition]
+    () => existingItemIds.has(getItemKey({ cardGuid: card.guid, condition: addState.condition, language: addState.language })),
+    [existingItemIds, card.guid, addState.condition, addState.language]
   );
 
   const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
@@ -197,8 +203,16 @@ function CardResultItem({
           )}
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-default-200 pt-2 xl:w-[320px] xl:shrink-0 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
-          <div className="grid grid-cols-3 gap-1.5 xl:gap-2">
+        <div className="flex flex-col gap-2 border-t border-default-200 pt-2 xl:w-[380px] xl:shrink-0 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
+          <div className="grid grid-cols-2 gap-1.5 xl:grid-cols-4 xl:gap-2">
+            <LanguageSelector
+              value={addState.language}
+              onChange={(language) => setAddState((s) => ({ ...s, language }))}
+              currentLanguage={card.language}
+              size="sm"
+              label="Idioma"
+            />
+            
             <Select
               aria-label="Condición"
               size="sm"
@@ -350,7 +364,7 @@ export default function CardSearchWithMetrics({
     (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
-        guid: generateTemporaryItemGuid(card.guid, state.condition),
+        guid: generateTemporaryItemGuid(card.guid, state.condition, state.language),
         cardGuid: card.guid,
         cardName: card.name,
         cardImageUrl: card.imageUrl,
@@ -358,6 +372,7 @@ export default function CardSearchWithMetrics({
         setCode: card.setCode,
         tcgType: card.tcgType,
         condition: state.condition,
+        language: state.language,
         quantity: state.quantity,
         offerPrice: state.unitBuyPrice,
         referencePrice: finalReferencePrice,

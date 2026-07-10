@@ -390,10 +390,18 @@ mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInvent
   "updateInventoryItemPricesInput": {
     "inventoryItemGuid": "INVENTORY_ITEM_GUID",
     "purchasePrice": 9.99,
-    "sellPrice": 14.99
+    "sellPrice": 14.99,
+    "notes": "Ajuste de precio por temporada"
   }
 }
 ```
+
+**Input Fields:**
+
+- `inventoryItemGuid`: Required — GUID of the inventory item to update
+- `purchasePrice`: Optional — New cost price
+- `sellPrice`: Optional — New sell price; triggers a `DIRECT_UPDATE` sell price history record
+- `notes`: Optional — Reason or context for the price change; stored in the sell price history record when `sellPrice` is provided
 
 ---
 
@@ -417,6 +425,7 @@ query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs
         guid
         tcg
         condition
+        language
         stock
       }
     }
@@ -475,6 +484,7 @@ query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHist
         guid
         tcg
         condition
+        language
       }
     }
     count

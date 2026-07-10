@@ -13,6 +13,7 @@ export type InventoryItemsQuery = {
       tcg: string;
       condition: string;
       stock: number;
+      language: Types.CardLanguage;
       purchasePrice: number | null;
       sellPrice: number | null;
       lastSellDate: unknown | null;
@@ -197,6 +198,10 @@ export const InventoryItemsDocument = {
                         name: { kind: 'Name', value: 'condition' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'purchasePrice' },

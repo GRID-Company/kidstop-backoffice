@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { BulkOperationType } from '@/lib/api/schema-types';
 
@@ -10,6 +11,9 @@ export const inventoryAdjustmentFormSchema = z.object({
   tcg: z.string().min(1, 'El TCG es obligatorio'),
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
+  }),
+  language: z.nativeEnum(CardLanguage, {
+    message: 'El idioma es obligatorio',
   }),
   quantity: z.coerce
     .number()

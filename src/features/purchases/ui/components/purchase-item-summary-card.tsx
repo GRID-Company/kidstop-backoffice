@@ -1,6 +1,8 @@
 import { Icon } from '@iconify/react';
+import { Chip } from '@heroui/react';
 import { IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITION_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 
 interface PurchaseItemSummaryCardProps {
   item: IPurchaseItem;
@@ -29,9 +31,14 @@ export function PurchaseItemSummaryCard({
         <p className="text-xs text-default-500 truncate">
           {item.setName} · {item.setCode}
         </p>
-        <p className="text-xs text-default-400">
-          Condición: {CARD_CONDITION_LABELS[item.condition]}
-        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-xs text-default-400">
+            Condición: {CARD_CONDITION_LABELS[item.condition]}
+          </p>
+          <Chip size="sm" variant="flat" className="h-5 text-xs">
+            {LANGUAGE_LABELS[item.language]}
+          </Chip>
+        </div>
         {variant === 'duplicate' && (
           <p className="mt-1 text-xs text-warning font-medium">
             ⚠️ Ya está en la compra

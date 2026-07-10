@@ -10,6 +10,7 @@ import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
@@ -144,8 +145,13 @@ export default function ItemCard({
                 {item.cardName}
               </h4>
               
-              {item.tcgType === 'POKEMON' && (item.cardNumber || item.rarity || item.type || item.hp || item.variant || item.stage) && (
+              {item.tcgType === 'POKEMON' && (isPurchaseItem(item) && item.language || item.cardNumber || item.rarity || item.type || item.hp || item.variant || item.stage) && (
                 <div className="flex flex-wrap items-center gap-1.5">
+                  {isPurchaseItem(item) && item.language && (
+                    <Chip size="sm" variant="flat" color="primary" className="h-4 px-1.5 text-[10px]">
+                      {LANGUAGE_LABELS[item.language]}
+                    </Chip>
+                  )}
                   {item.cardNumber && (
                     <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
                       {item.cardNumber}
@@ -180,8 +186,13 @@ export default function ItemCard({
                 </div>
               )}
               
-              {item.tcgType === 'MAGIC' && (item.collectorNumber || item.rarity || item.isFoil) && (
+              {item.tcgType === 'MAGIC' && (isPurchaseItem(item) && item.language || item.collectorNumber || item.rarity || item.isFoil) && (
                 <div className="flex flex-wrap items-center gap-1.5">
+                  {isPurchaseItem(item) && item.language && (
+                    <Chip size="sm" variant="flat" color="primary" className="h-4 px-1.5 text-[10px]">
+                      {LANGUAGE_LABELS[item.language]}
+                    </Chip>
+                  )}
                   {item.collectorNumber && (
                     <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
                       #{item.collectorNumber}

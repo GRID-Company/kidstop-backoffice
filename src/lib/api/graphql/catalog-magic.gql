@@ -3,6 +3,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
     data {
       guid
       name
+      language
       edition
       collectorNumber
       isFoil
@@ -13,6 +14,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
       inventoryCards {
         guid
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -26,6 +28,7 @@ query MagicCardInternalDetail($guid: String!) {
   magicCardInternalDetail(guid: $guid) {
     guid
     name
+    language
     edition
     collectorNumber
     isFoil
@@ -36,6 +39,7 @@ query MagicCardInternalDetail($guid: String!) {
     inventoryCards {
       guid
       condition
+      language
       stock
       purchasePrice
       sellPrice
@@ -80,6 +84,7 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
     bestMatch {
       guid
       name
+      language
       edition
       collectorNumber
       imageUri
@@ -101,6 +106,7 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
     relatedCards {
       guid
       name
+      language
       edition
       collectorNumber
       imageUri

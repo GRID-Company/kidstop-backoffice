@@ -1,5 +1,6 @@
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type { CardCondition };
 
@@ -51,6 +52,7 @@ export interface ISaleItem {
   guid: string;
   tcg: TCGType;
   condition: CardCondition;
+  language: CardLanguage;
   quantity: number;
   price: number;
   pokemonCardSummary: IPokemonCardSummary | null;

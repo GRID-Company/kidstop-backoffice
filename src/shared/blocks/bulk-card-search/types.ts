@@ -42,6 +42,7 @@ export interface BulkCardData {
   isFoil?: boolean;
   rarity?: string;
   variant?: string | null;
+  language?: string;
   sellPrice: number | null;
   totalStock: number;
   availableStock?: boolean;
@@ -68,6 +69,7 @@ export interface BulkCardResult {
 export interface BulkCardFormDataPurchases {
   selectedCardGuid: string;
   condition: CardCondition;
+  language: import('@/lib/api/schema-types').CardLanguage;
   quantity: number;
   offerPrice: number;
 }
@@ -75,6 +77,7 @@ export interface BulkCardFormDataPurchases {
 export interface BulkCardFormDataInventory {
   selectedCardGuid: string;
   condition: CardCondition;
+  language: import('@/lib/api/schema-types').CardLanguage;
   quantity: number;
   publicPrice: number;
 }

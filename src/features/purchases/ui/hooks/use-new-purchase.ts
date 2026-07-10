@@ -104,6 +104,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
           setName: item.setName,
           setCode: item.setCode,
           condition: item.condition,
+          language: item.language,
           quantity: item.quantity,
           offerPrice: item.offerPrice,
           referencePrice: item.referencePrice,
