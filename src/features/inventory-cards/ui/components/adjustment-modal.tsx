@@ -26,7 +26,7 @@ import TextareaForm from '@/shared/base/form-controls/textarea-form';
 import { CARD_CONDITION_SHORT_LABELS, CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
-import LanguageSelector from '@/shared/components/language-selector';
+import { LanguageSelector } from '@/shared/components/language-selector';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';

@@ -8,7 +8,7 @@ import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
 import { calculateOfferPrice } from '@/features/purchases/domain/price.utils';
 import { BulkCardFormControlsProps } from './types';
 import { CardLanguage } from '@/lib/api/schema-types';
-import LanguageSelector from '@/shared/components/language-selector';
+import { LanguageSelector } from '@/shared/components/language-selector';
 
 export default function BulkCardFormControls({
   variant,
