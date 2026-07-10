@@ -148,7 +148,7 @@ export function useCardDetailModal({
         });
         setPriceNotes('');
         onRefetch();
-      } catch (_error) {
+      } catch {
         // Error ya manejado en handleUpdatePrice
       }
     },

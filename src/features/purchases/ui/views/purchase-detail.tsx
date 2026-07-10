@@ -139,7 +139,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         await Promise.all(promises);
         updateItems(adjustedItems);
         toast.success('Precios actualizados exitosamente');
-      } catch (_error) {
+      } catch {
         // Error already handled by mutation onError callback
       }
     },
@@ -179,7 +179,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
         validateAndAddItems(newItems);
-      } catch (_error) {
+      } catch {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },
