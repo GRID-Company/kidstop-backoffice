@@ -73,7 +73,8 @@ export function useMostWantedList() {
         const input = toAddMostWantedCardInput(formData, selectedTCG);
         await addMutation({ variables: { addMostWantedCardInput: input } });
         toast.success('Carta agregada a Most Wanted');
-      } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         const message = handleMutationError(error, 'Error al agregar carta');
         toast.error(message);
         throw error;
@@ -88,7 +89,8 @@ export function useMostWantedList() {
         const input = toUpdateMostWantedCardInput(guid, updates);
         await updateMutation({ variables: { updateMostWantedCardInput: input } });
         toast.success('Carta actualizada');
-      } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         const message = handleMutationError(error, 'Error al actualizar carta');
         toast.error(message);
         throw error;
@@ -103,7 +105,8 @@ export function useMostWantedList() {
         const input = toUpdateMostWantedCardInput(guid, { active: !currentActive });
         await updateMutation({ variables: { updateMostWantedCardInput: input } });
         toast.success(currentActive ? 'Carta desactivada' : 'Carta activada');
-      } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         const message = handleMutationError(error, 'Error al cambiar estado');
         toast.error(message);
         throw error;
@@ -117,7 +120,8 @@ export function useMostWantedList() {
       try {
         await removeMutation({ variables: { mostWantedCardGuid: guid } });
         toast.success('Carta eliminada de Most Wanted');
-      } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         const message = handleMutationError(error, 'Error al eliminar carta');
         toast.error(message);
         throw error;
@@ -165,7 +169,8 @@ export function useMostWantedList() {
           },
         });
         toast.success('Orden actualizado');
-      } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         const message = handleMutationError(error, 'Error al reordenar');
         toast.error(message);
         throw error;

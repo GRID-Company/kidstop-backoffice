@@ -17,8 +17,9 @@ function BulkCardSearchFooter({
   fields, 
   onCancel 
 }: { 
-  variant: 'purchases' | 'inventory'; 
-  fields: any[]; 
+  variant: 'purchases' | 'inventory';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: any[]; // React Hook Form field array
   onCancel: () => void;
 }) {
   const cardsData = useWatch({ name: 'cards' });
@@ -26,6 +27,7 @@ function BulkCardSearchFooter({
   const configuredCount = useMemo(() => {
     if (!cardsData || !Array.isArray(cardsData)) return 0;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return cardsData.filter((card: any) => {
       if (!card) return false;
       
