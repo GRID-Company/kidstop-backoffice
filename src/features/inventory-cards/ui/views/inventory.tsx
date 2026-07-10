@@ -125,7 +125,7 @@ export default function Inventory() {
     void refreshIndicators();
   }, [refetch, refreshIndicators]);
 
-  const [bulkLoadInventory, { loading: bulkLoading }] = useMutation(BulkLoadInventoryDocument);
+  const [bulkLoadInventory, { loading: _bulkLoading }] = useMutation(BulkLoadInventoryDocument);
 
   const handleTabChange = useCallback((key: Key) => {
     setActiveTab(key as string);

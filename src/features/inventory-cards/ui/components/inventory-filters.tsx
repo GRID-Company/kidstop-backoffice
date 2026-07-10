@@ -49,7 +49,7 @@ export default function InventoryFilters({
     [selectedTCG]
   );
 
-  const dateRangeValue = useMemo(() => {
+  const _dateRangeValue = useMemo(() => {
     if (!dateRange) return null;
     return {
       start: parseDate(dateRange.start),
@@ -57,7 +57,7 @@ export default function InventoryFilters({
     };
   }, [dateRange]);
 
-  const handleDateChange = useCallback(
+  const _handleDateChange = useCallback(
     (value: RangeValue<DateValue> | null) => {
       if (!value) {
         onDateRangeChange(undefined);

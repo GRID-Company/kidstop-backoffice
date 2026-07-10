@@ -16,7 +16,7 @@ import MostWantedPreview from '../components/most-wanted-preview';
 export default function MostWantedConfig() {
   const {
     items,
-    loading,
+    loading: _loading,
     reorder,
     toggleActive,
     updateCard,

@@ -41,7 +41,7 @@ export default function PurchaseTimeline({ currentStatus }: PurchaseTimelineProp
         {TIMELINE_STEPS.map((step, idx) => {
           const isPast = idx < currentIndex;
           const isCurrent = idx === currentIndex && !isRejected;
-          const isFuture = idx > currentIndex || isRejected;
+          const _isFuture = idx > currentIndex || isRejected;
 
           return (
             <div key={step.status} className={`flex items-center ${idx < TIMELINE_STEPS.length - 1 ? 'flex-1' : 'shrink-0'}`}>

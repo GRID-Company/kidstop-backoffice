@@ -27,7 +27,7 @@ export default function SellerSelector<T extends FieldValues>({
   const [search, setSearch] = useState<string | undefined>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { sellers, createSeller, getSellerById, creating } = useSellers(search);
+  const { sellers, createSeller, getSellerById: _getSellerById, creating } = useSellers(search);
 
   const sellerOptions: ISelectOption[] = useMemo(
     () =>
