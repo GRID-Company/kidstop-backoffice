@@ -62,6 +62,7 @@ export function useBulkSearchForm(
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
+          language: selectedCard.language || 'ENGLISH',
           quantity,
           offerPrice,
         } as BulkCardFormDataPurchases);
@@ -71,6 +72,7 @@ export function useBulkSearchForm(
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
+          language: selectedCard.language || 'ENGLISH',
           quantity,
           publicPrice: defaultPublicPrice,
         } as BulkCardFormDataInventory);

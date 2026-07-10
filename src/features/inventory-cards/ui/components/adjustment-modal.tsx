@@ -17,7 +17,7 @@ import {
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, Controller } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
@@ -26,6 +26,8 @@ import TextareaForm from '@/shared/base/form-controls/textarea-form';
 import { CARD_CONDITION_SHORT_LABELS, CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
+import LanguageSelector from '@/shared/components/language-selector';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { toPokemonCard, toMagicCard } from '@/features/catalog/adapters/mappers/card.mapper';
@@ -145,6 +147,7 @@ export default function AdjustmentModal({
       imageUrl: selectedCard.imageUri ?? '',
       tcg: selectedTCG,
       condition: condition as any,
+      language: selectedCard.language as CardLanguage,
       stock,
       stockStatus: stock > 0 ? 'AVAILABLE' : 'UNAVAILABLE',
       purchasePrice: variant?.purchasePrice ?? 0,
@@ -416,6 +419,19 @@ export default function AdjustmentModal({
                   controlProps={{ control, name: 'bulkOperationType' }}
                   isRequired
                   aria-label="Tipo de operación de inventario"
+                />
+
+                <Controller
+                  name="language"
+                  control={control}
+                  render={({ field }) => (
+                    <LanguageSelector
+                      value={field.value as CardLanguage}
+                      onChange={field.onChange}
+                      currentLanguage={resolvedItem.language}
+                      label="Idioma"
+                    />
+                  )}
                 />
 
                 <InputForm

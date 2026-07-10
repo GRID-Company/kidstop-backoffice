@@ -42,6 +42,7 @@ export interface BulkCardData {
   isFoil?: boolean;
   rarity?: string;
   variant?: string | null;
+  language?: string;
   sellPrice: number | null;
   totalStock: number;
   availableStock?: boolean;

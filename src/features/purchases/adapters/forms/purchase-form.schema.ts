@@ -14,6 +14,7 @@ const purchaseItemSchema = z.object({
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
+  language: z.enum(['ENGLISH', 'SPANISH', 'KOREAN', 'CHINESE', 'JAPANESE']),
   quantity: z.coerce
     .number()
     .int()

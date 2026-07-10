@@ -151,6 +151,7 @@ export type PokemonBatchCardSearchQuery = {
       bestMatch: {
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         cardNumber: string | null;
         setName: string | null;
         setCode: string | null;
@@ -182,6 +183,7 @@ export type PokemonBatchCardSearchQuery = {
       relatedCards: Array<{
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         cardNumber: string | null;
         setName: string | null;
         setCode: string | null;
@@ -814,6 +816,10 @@ export const PokemonBatchCardSearchDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'cardNumber' },
                             },
                             {
@@ -978,6 +984,10 @@ export const PokemonBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',

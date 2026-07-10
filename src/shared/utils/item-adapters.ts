@@ -2,6 +2,7 @@ import { IPurchaseItem } from '@/features/purchases/domain/types';
 import { ISaleItem } from '@/features/sales/domain/types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type ItemVariant = 'purchase' | 'sale';
 
@@ -22,6 +23,7 @@ export interface AdaptedPurchaseItem {
   collectorNumber?: string | null;
   tcgType: TCGType;
   condition: CardCondition;
+  language: CardLanguage;
   quantity: number;
   offerPrice: number;
   referencePrice?: number;
@@ -67,6 +69,7 @@ export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
     hp: item.hp,
     tcgType: item.tcgType,
     condition: item.condition,
+    language: item.language,
     quantity: item.quantity,
     offerPrice: item.offerPrice,
     referencePrice: item.referencePrice,

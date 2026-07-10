@@ -29,10 +29,23 @@ export default function LanguageSelector({
 
   const isDisabled = disabled || !isModifiable;
 
+  // Determinar qué idiomas mostrar
+  const availableLanguages = [CardLanguage.English, CardLanguage.Spanish];
+  
+  // Si el idioma no es modificable, agregar el idioma actual a las opciones
+  if (!isModifiable && currentLanguage) {
+    if (!availableLanguages.includes(currentLanguage)) {
+      availableLanguages.push(currentLanguage);
+    }
+  }
+
+  // Cuando el selector está deshabilitado por idioma no modificable, mostrar el idioma de la carta
+  const displayValue = !isModifiable && currentLanguage ? currentLanguage : value;
+
   return (
     <Select
       label={label}
-      selectedKeys={[value]}
+      selectedKeys={[displayValue]}
       onChange={(e) => onChange(e.target.value as CardLanguage)}
       isDisabled={isDisabled}
       size={size}
@@ -43,12 +56,11 @@ export default function LanguageSelector({
           : undefined
       }
     >
-      <SelectItem key={CardLanguage.English}>
-        {LANGUAGE_LABELS[CardLanguage.English]}
-      </SelectItem>
-      <SelectItem key={CardLanguage.Spanish}>
-        {LANGUAGE_LABELS[CardLanguage.Spanish]}
-      </SelectItem>
+      {availableLanguages.map((lang) => (
+        <SelectItem key={lang}>
+          {LANGUAGE_LABELS[lang]}
+        </SelectItem>
+      ))}
     </Select>
   );
 }

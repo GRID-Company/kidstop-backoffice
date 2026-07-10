@@ -11,6 +11,7 @@ const newPurchaseItemSchema = z.object({
   setCode: z.string(),
   tcgType: z.enum(['POKEMON', 'MAGIC']),
   condition: z.enum(['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED', 'HEAVILY_PLAYED', 'DAMAGED'] as const),
+  language: z.enum(['ENGLISH', 'SPANISH', 'KOREAN', 'CHINESE', 'JAPANESE']),
   quantity: quantitySchema,
   offerPrice: offerPriceSchema,
   referencePrice: z.number().optional(),

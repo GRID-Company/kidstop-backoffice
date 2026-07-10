@@ -86,6 +86,7 @@ export type PurchaseQuery = {
     items: Array<{
       guid: string;
       condition: string;
+      language: Types.CardLanguage;
       offerPrice: number;
       referencePrice: number | null;
       sellPrice: number | null;
@@ -695,6 +696,10 @@ export const PurchaseDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       {
                         kind: 'Field',

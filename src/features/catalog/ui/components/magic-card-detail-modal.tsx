@@ -22,7 +22,7 @@ import { useQuery } from '@apollo/client/react';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
-import { IMagicCard } from '../../domain/types';
+import { IMagicCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS, CARD_SEARCH_LIMIT } from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
@@ -75,6 +75,8 @@ export default function MagicCardDetailModal({
     setStockAdjustment,
     stockNotes,
     setStockNotes,
+    priceNotes,
+    setPriceNotes,
     movementType,
     setMovementType,
     handleVariantSelect,
@@ -161,21 +163,33 @@ export default function MagicCardDetailModal({
     <>
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
+        <DrawerHeader className="flex flex-col gap-2">
           <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
-          <div className="flex items-center gap-2 text-sm font-normal text-default-500">
-            {selectedCard ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-normal text-default-500">
+              {selectedCard ? (
+                <>
+                  {edition && <span>{edition}</span>}
+                  {collectorNumber && (
+                    <>
+                      <span>·</span>
+                      <span>#{collectorNumber}</span>
+                    </>
+                  )}
+                </>
+              ) : (
+                <span>Buscar carta por nombre, edición o código</span>
+              )}
+            </span>
+            {selectedCard && selectedVariant && (
               <>
-                {edition && <span>{edition}</span>}
-                {collectorNumber && (
-                  <>
-                    <span>·</span>
-                    <span>#{collectorNumber}</span>
-                  </>
-                )}
+                <Chip size="sm" variant="flat" color="primary">
+                  {LANGUAGE_LABELS[selectedLanguage]}
+                </Chip>
+                <Chip size="sm" variant="flat" color="secondary">
+                  {CARD_CONDITION_LABELS[selectedVariant.condition as CardCondition]}
+                </Chip>
               </>
-            ) : (
-              <span>Buscar carta por nombre, edición o código</span>
             )}
           </div>
         </DrawerHeader>
@@ -518,6 +532,15 @@ export default function MagicCardDetailModal({
                     controlProps={{ control, name: 'sellPrice' }}
                   />
                 </div>
+
+                <Textarea
+                  label="Notas (opcional)"
+                  placeholder="Agregar notas sobre el cambio de precio..."
+                  value={priceNotes}
+                  onValueChange={setPriceNotes}
+                  size="sm"
+                  minRows={2}
+                />
 
                 <Button
                   type="submit"

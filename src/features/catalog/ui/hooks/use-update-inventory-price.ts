@@ -17,6 +17,7 @@ interface UpdatePriceParams {
   language: CardLanguage;
   purchasePrice: number;
   sellPrice: number;
+  notes?: string;
   tcgType: TCGType;
 }
 
@@ -74,7 +75,7 @@ export function useUpdateInventoryPrice() {
                     language: params.language,
                     bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
-                    notes: 'Creación automática para establecer precios',
+                    notes: params.notes || 'Creación automática para establecer precios',
                   },
                 },
               });
@@ -132,6 +133,7 @@ export function useUpdateInventoryPrice() {
               inventoryItemGuid,
               purchasePrice: params.purchasePrice,
               sellPrice: params.sellPrice,
+              notes: params.notes,
             },
           },
         });

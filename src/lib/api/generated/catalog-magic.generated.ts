@@ -110,6 +110,7 @@ export type MagicBatchCardSearchQuery = {
       bestMatch: {
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         edition: string | null;
         collectorNumber: string | null;
         imageUri: string | null;
@@ -131,6 +132,7 @@ export type MagicBatchCardSearchQuery = {
       relatedCards: Array<{
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         edition: string | null;
         collectorNumber: string | null;
         imageUri: string | null;
@@ -576,6 +578,10 @@ export const MagicBatchCardSearchDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'edition' },
                             },
                             {
@@ -681,6 +687,10 @@ export const MagicBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',

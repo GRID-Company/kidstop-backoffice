@@ -82,6 +82,7 @@ query Purchase($guid: String!) {
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       sellPrice

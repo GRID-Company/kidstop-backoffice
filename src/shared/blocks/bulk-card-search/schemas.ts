@@ -9,9 +9,12 @@ const cardConditionEnum = z.enum([
   CARD_CONDITIONS.DAMAGED,
 ]);
 
+const cardLanguageEnum = z.enum(['ENGLISH', 'SPANISH', 'KOREAN', 'CHINESE', 'JAPANESE']);
+
 export const bulkCardFormSchemaPurchases = z.object({
   selectedCardGuid: z.string().min(1, 'Debe seleccionar una carta'),
   condition: cardConditionEnum,
+  language: cardLanguageEnum,
   quantity: z.number().min(1, 'La cantidad debe ser al menos 1').int('La cantidad debe ser un número entero'),
   offerPrice: z.number().min(0.01, 'El precio de oferta debe ser mayor a 0'),
 });
@@ -19,6 +22,7 @@ export const bulkCardFormSchemaPurchases = z.object({
 export const bulkCardFormSchemaInventory = z.object({
   selectedCardGuid: z.string().min(1, 'Debe seleccionar una carta'),
   condition: cardConditionEnum,
+  language: cardLanguageEnum,
   quantity: z.number().min(1, 'La cantidad debe ser al menos 1').int('La cantidad debe ser un número entero'),
   publicPrice: z.number().min(0.01, 'El precio de venta debe ser mayor a 0'),
 });

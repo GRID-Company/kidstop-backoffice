@@ -38,6 +38,7 @@ export function useCardDetailModal({
   const [selectedLanguage, setSelectedLanguage] = useState<CardLanguage>(CardLanguage.English);
   const [stockAdjustment, setStockAdjustment] = useState<number>(0);
   const [stockNotes, setStockNotes] = useState<string>('');
+  const [priceNotes, setPriceNotes] = useState<string>('');
   const [movementType, setMovementType] = useState<BulkOperationType>(BulkOperationType.ManualEntry);
   const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
   const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
@@ -106,34 +107,44 @@ export function useCardDetailModal({
     async (data) => {
       if (!detail || !selectedVariant) return;
 
-      await handleUpdatePrice({
-        cardGuid: selectedVariant.cardGuid,
-        inventoryItemGuid: selectedVariant.inventoryItemGuid,
-        condition: selectedVariant.condition,
-        language: selectedVariant.language,
-        purchasePrice: data.buyPrice,
-        sellPrice: data.sellPrice,
-        tcgType,
-      });
-      onRefetch();
+      try {
+        await handleUpdatePrice({
+          cardGuid: selectedVariant.cardGuid,
+          inventoryItemGuid: selectedVariant.inventoryItemGuid,
+          condition: selectedVariant.condition,
+          language: selectedVariant.language,
+          purchasePrice: data.buyPrice,
+          sellPrice: data.sellPrice,
+          notes: priceNotes.trim() || undefined,
+          tcgType,
+        });
+        setPriceNotes('');
+        onRefetch();
+      } catch (error) {
+        // Error ya manejado en handleUpdatePrice
+      }
     },
-    [detail, selectedVariant, handleUpdatePrice, tcgType, onRefetch]
+    [detail, selectedVariant, handleUpdatePrice, priceNotes, tcgType, onRefetch]
   );
 
   const executeStockAdjust = useCallback(async () => {
     if (!detail || !selectedVariant || stockAdjustment === 0) return;
-    await handleAdjustStock({
-      cardGuid: selectedVariant.cardGuid,
-      condition: selectedVariant.condition,
-      language: selectedVariant.language,
-      quantity: stockAdjustment,
-      notes: stockNotes.trim() || undefined,
-      tcgType,
-      operationType: movementType,
-    });
-    setStockAdjustment(0);
-    setStockNotes('');
-    onRefetch();
+    try {
+      await handleAdjustStock({
+        cardGuid: selectedVariant.cardGuid,
+        condition: selectedVariant.condition,
+        language: selectedVariant.language,
+        quantity: stockAdjustment,
+        notes: stockNotes.trim() || undefined,
+        tcgType,
+        operationType: movementType,
+      });
+      setStockAdjustment(0);
+      setStockNotes('');
+      onRefetch();
+    } catch (error) {
+      // Error ya manejado en handleAdjustStock
+    }
   }, [detail, selectedVariant, stockAdjustment, stockNotes, handleAdjustStock, tcgType, movementType, onRefetch]);
 
   return {
@@ -145,6 +156,8 @@ export function useCardDetailModal({
     setStockAdjustment,
     stockNotes,
     setStockNotes,
+    priceNotes,
+    setPriceNotes,
     movementType,
     setMovementType,
     handleVariantSelect,

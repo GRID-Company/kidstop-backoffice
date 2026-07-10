@@ -22,6 +22,7 @@ export function fromApiInventoryItem(item: ApiInventoryItem): IInventoryItem {
     imageUrl: card?.imageUri ?? '',
     tcg: item.tcg,
     condition: item.condition as IInventoryItem['condition'],
+    language: item.language as CardLanguage,
     stock: item.stock,
     stockStatus: item.stock > 0 ? STOCK_STATUSES.AVAILABLE : STOCK_STATUSES.UNAVAILABLE,
     purchasePrice: item.purchasePrice ?? 0,
@@ -59,10 +60,7 @@ export function toAdjustInventoryPayload(data: InventoryAdjustmentFormData) {
       cardGuid: data.cardGuid,
       tcg: data.tcg,
       condition: data.condition,
-      // TODO: Agregar selector de idioma (English/Spanish) en UI de ajuste de inventario
-      // - Solo habilitado para cartas que tengan language English
-      // - Cartas con otros idiomas (Korean, Chinese, Japanese) mantienen su idioma original y selector deshabilitado
-      language: CardLanguage.English,
+      language: data.language as CardLanguage,
       quantity: data.quantity,
       bulkOperationType: data.bulkOperationType as any,
       ...(data.notes && { notes: data.notes }),
@@ -77,5 +75,6 @@ export function toAdjustmentFormDefaults(
     cardGuid: item.cardGuid,
     tcg: item.tcg,
     condition: item.condition,
+    language: item.language as any,
   };
 }
