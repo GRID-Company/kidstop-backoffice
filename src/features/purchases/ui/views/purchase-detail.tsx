@@ -57,8 +57,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     purchase,
     items,
     payments,
-    itemsForm,
-    paymentsForm,
+    itemsForm: _itemsForm,
+    paymentsForm: _paymentsForm,
     isEditable,
     canSendQuote,
     canQuote,
@@ -70,7 +70,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     canReject,
     canReturnToDraft,
     hasItemChanges,
-    total,
+    total: _total,
     mutating,
     currentBuyerSpent,
     assignedBudget,
@@ -139,7 +139,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         await Promise.all(promises);
         updateItems(adjustedItems);
         toast.success('Precios actualizados exitosamente');
-      } catch (error) {
+      } catch (_error) {
         // Error already handled by mutation onError callback
       }
     },
@@ -179,7 +179,7 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       try {
         const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
         validateAndAddItems(newItems);
-      } catch (error) {
+      } catch (_error) {
         toast.error('Error al agregar cartas desde búsqueda masiva');
       }
     },

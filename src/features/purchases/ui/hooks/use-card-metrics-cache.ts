@@ -18,7 +18,7 @@ export function useCardMetricsCache({
   cardGuids,
   query,
   cacheKey,
-  dataExtractor,
+  dataExtractor: _dataExtractor,
 }: UseCardMetricsCacheOptions): UseCardMetricsCacheReturn {
   const [metricsCache, setMetricsCache] = useState<Record<string, any>>({});
   const fetchedGuidsRef = useRef<Set<string>>(new Set());

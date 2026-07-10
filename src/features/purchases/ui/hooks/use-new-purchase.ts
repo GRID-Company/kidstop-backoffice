@@ -119,7 +119,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
       await createPurchase({
         variables: payload,
       });
-    } catch (error) {
+    } catch (_error) {
       // Error already handled by onError callback
     }
   }, [canSave, seller, items, selectedTCG, createPurchase]);
