@@ -29,7 +29,7 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
       };
     });
 
-    const errorLink = new ErrorLink(({ error, operation }) => {
+    const errorLink = new ErrorLink(({ error, operation: _operation }) => {
       if (CombinedGraphQLErrors.is(error)) {
         const code = error.extensions?.code;
         const message = error.message;

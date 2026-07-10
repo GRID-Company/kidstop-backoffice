@@ -1,5 +1,5 @@
 export default function TimeCol({ date }: { date: string | number }) {
-  const parsedDate = new Date(date);
+  const _parsedDate = new Date(date);
   return (
     <span>
       {date !== null

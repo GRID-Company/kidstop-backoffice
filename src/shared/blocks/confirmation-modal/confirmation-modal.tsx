@@ -22,7 +22,7 @@ export default function ConfirmationModal({
   title,
   message,
   confirmLabel = 'Confirmar',
-  confirmVariant = 'primary',
+  confirmVariant: _confirmVariant = 'primary',
   onConfirm,
   isLoading = false,
 }: ConfirmationModalProps) {
