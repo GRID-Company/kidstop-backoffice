@@ -34,6 +34,7 @@ import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import ConditionSelector from '@/shared/blocks/condition-selector';
 import LanguageSelector from '@/shared/components/language-selector';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import InventoryMovementsTable from './inventory-movements-table';
 import SellPriceHistoryTable from './sell-price-history-table';
 
@@ -280,6 +281,15 @@ export default function MagicCardDetailModal({
                   <>
                     <span className="text-default-500">Número</span>
                     <span className="font-medium">#{collectorNumber}</span>
+                  </>
+                )}
+
+                {(detail?.language || selectedCard?.language) && (
+                  <>
+                    <span className="text-default-500">Idioma</span>
+                    <span className="font-medium">
+                      {LANGUAGE_LABELS[detail?.language ?? selectedCard?.language!]}
+                    </span>
                   </>
                 )}
 
