@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 const cardConditionEnum = z.enum([
   CARD_CONDITIONS.NEAR_MINT,
@@ -9,7 +10,7 @@ const cardConditionEnum = z.enum([
   CARD_CONDITIONS.DAMAGED,
 ]);
 
-const cardLanguageEnum = z.enum(['ENGLISH', 'SPANISH', 'KOREAN', 'CHINESE', 'JAPANESE']);
+const cardLanguageEnum = z.nativeEnum(CardLanguage);
 
 export const bulkCardFormSchemaPurchases = z.object({
   selectedCardGuid: z.string().min(1, 'Debe seleccionar una carta'),

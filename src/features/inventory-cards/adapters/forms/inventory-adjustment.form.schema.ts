@@ -1,10 +1,10 @@
 import { z } from 'zod';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { BulkOperationType } from '@/lib/api/schema-types';
 
 const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string[]];
 const bulkOperationTypeValues = Object.values(BulkOperationType) as [string, ...string[]];
-const cardLanguageValues = ['ENGLISH', 'SPANISH', 'KOREAN', 'CHINESE', 'JAPANESE'] as const;
 
 export const inventoryAdjustmentFormSchema = z.object({
   cardGuid: z.string().min(1, 'La carta es obligatoria'),
@@ -12,7 +12,7 @@ export const inventoryAdjustmentFormSchema = z.object({
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
-  language: z.enum(cardLanguageValues, {
+  language: z.nativeEnum(CardLanguage, {
     message: 'El idioma es obligatorio',
   }),
   quantity: z.coerce
