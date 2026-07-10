@@ -26,7 +26,7 @@ const SALE_ITEMS_COLUMNS: ITableColumn[] = [
   { key: 'subtotal', label: 'Subtotal', className: 'w-24' },
 ];
 
-type ColumnRenderer = (row: ISaleItem) => React.ReactNode;
+type ColumnRenderer = (row: any) => React.ReactNode;
 
 const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
   image: (row) => {
@@ -85,7 +85,7 @@ export default function SaleItemsTable({
   return (
     <DataTable
       cols={COLUMNS_WITH_RENDERERS}
-      data={items}
+      data={items as any}
       isLoading={loading}
     />
   );

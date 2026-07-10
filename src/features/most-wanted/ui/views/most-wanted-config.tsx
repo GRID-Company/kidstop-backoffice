@@ -94,7 +94,7 @@ export default function MostWantedConfig() {
         onAdd={handleAddCard}
         search={addCardModal.search}
         onSearchChange={addCardModal.setSearch}
-        searchResults={addCardModal.searchResults}
+        searchResults={addCardModal.searchResults as any}
         selectedCard={addCardModal.selectedCard}
         onSelectCard={addCardModal.selectCard}
         form={addCardModal.form}

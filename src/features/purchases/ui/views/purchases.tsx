@@ -99,7 +99,7 @@ export default function Purchases() {
         key: 'reference',
         label: 'Código',
         className: '!text-left min-w-[140px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <span className="text-sm font-semibold text-accent">{row.reference}</span>
         ),
       },
@@ -107,7 +107,7 @@ export default function Purchases() {
         key: 'status',
         label: 'Estado',
         className: 'min-w-[140px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <PurchaseStatusBadge status={row.status} />
         ),
       },
@@ -115,7 +115,7 @@ export default function Purchases() {
         key: 'seller',
         label: 'Vendedor',
         className: '!text-left min-w-[160px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <div className="flex flex-col items-start">
             <span className="text-sm font-medium">{row.seller.name}</span>
             <span className="text-xs text-default-400">{row.seller.phone}</span>
@@ -126,7 +126,7 @@ export default function Purchases() {
         key: 'items',
         label: 'Items',
         className: 'w-[80px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <Chip size="sm" variant="flat">
             {row.items.length} {row.items.length === 1 ? 'carta' : 'cartas'}
           </Chip>
@@ -136,7 +136,7 @@ export default function Purchases() {
         key: 'total',
         label: 'Total',
         className: 'min-w-[120px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <span className="text-sm font-semibold">
             {formatCurrency(calculateTotal(row.items))}
           </span>
@@ -146,7 +146,7 @@ export default function Purchases() {
         key: 'createdAt',
         label: 'Fecha',
         className: 'min-w-[120px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <span className="text-sm text-default-500">
             {formatDate(row.createdDate)}
           </span>
@@ -156,7 +156,7 @@ export default function Purchases() {
         key: 'actions',
         label: '',
         className: 'w-[60px]',
-        customCol: (row: IPurchase) => (
+        customCol: (row: any) => (
           <div onClick={(e) => e.stopPropagation()}>
             <Tooltip content="Ver detalle">
               <Button
@@ -279,10 +279,10 @@ export default function Purchases() {
         <div className="mt-4">
           <DataTable 
             cols={columns} 
-            data={purchases} 
+            data={purchases as any} 
             isLoading={false} 
             rowClickable={true}
-            onRowClick={handleRowClick}
+            onRowClick={handleRowClick as any}
           />
         </div>
 
