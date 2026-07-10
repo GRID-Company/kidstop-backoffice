@@ -56,6 +56,7 @@ function BaseFormAutocomplete({
   const handleSelection = (value: Key) => {
     if (value !== null && value !== fieldState.selectedKey) {
       field.onChange(value);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setFieldState((prev: any) => ({
         ...prev,
         selectedKey: value as string,

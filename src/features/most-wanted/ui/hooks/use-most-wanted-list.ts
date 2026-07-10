@@ -16,6 +16,7 @@ import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.sc
 
 const PRIORITY_ORDER = { HIGH: 0, MEDIUM: 1, LOW: 2 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleMutationError = (error: any, defaultMessage: string): string => {
   console.error(defaultMessage, error);
   if (error.graphQLErrors?.length > 0) {
