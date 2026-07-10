@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
         'Access-Control-Allow-Origin': '*',
       },
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: 'Failed to proxy image' },
       { status: 500 }

@@ -31,7 +31,7 @@ import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
 import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
 import { useQuery } from '@apollo/client/react';
 import { PokemonCardWithMetricsDocument, PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toPokemonCard } from '../../adapters/mappers/card.mapper';
@@ -321,7 +321,7 @@ export default function PokemonCardDetailModal({
                   <>
                     <span className="text-default-500">Idioma</span>
                     <span className="font-medium">
-                      {LANGUAGE_LABELS[detail?.language ?? selectedCard?.language!]}
+                      {LANGUAGE_LABELS[(detail?.language ?? selectedCard?.language) || CardLanguage.English]}
                     </span>
                   </>
                 )}
