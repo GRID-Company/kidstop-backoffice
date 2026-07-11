@@ -125,7 +125,7 @@ export default class CardDetailModal {
   shouldSeeSuccessMessage() {
     // Esperar a que aparezca el toast/mensaje de éxito
     cy.contains(
-      /éxito|exitosamente|actualizado|guardado|ajustado|registrada/i,
+      /éxito|exitosamente|actualizado|guardado|ajustado|registrada|creado|desactivado|activado/i,
       { timeout: 30000 }
     ).should('be.visible');
   }
