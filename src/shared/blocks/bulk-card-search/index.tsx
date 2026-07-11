@@ -47,10 +47,10 @@ function BulkCardSearchFooter({
       const hasValidPrice =
         variant === 'purchases'
           ? typeof card.offerPrice === 'number' &&
-            card.offerPrice >= 0 &&
+            card.offerPrice > 0 &&
             !isNaN(card.offerPrice)
           : typeof card.publicPrice === 'number' &&
-            card.publicPrice >= 0 &&
+            card.publicPrice > 0 &&
             !isNaN(card.publicPrice);
 
       return (

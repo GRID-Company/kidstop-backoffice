@@ -45,11 +45,11 @@ const BulkCardSearchResults = forwardRef<
             !isNaN(card.quantity) &&
             ((variant === 'purchases' &&
               typeof card.offerPrice === 'number' &&
-              card.offerPrice >= 0 &&
+              card.offerPrice > 0 &&
               !isNaN(card.offerPrice)) ||
               (variant === 'inventory' &&
                 typeof card.publicPrice === 'number' &&
-                card.publicPrice >= 0 &&
+                card.publicPrice > 0 &&
                 !isNaN(card.publicPrice)));
 
           if (!isConfigured && cardRefs.current[i]) {
