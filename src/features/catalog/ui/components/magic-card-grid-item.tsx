@@ -22,6 +22,7 @@ export default function MagicCardGridItem({
       isPressable
       onPress={() => onPress(card)}
       className='group relative overflow-hidden transition-all hover:scale-[1.02]'
+      data-testid='magic-card-item'
     >
       <CardBody className='p-0'>
         <div className='bg-default-100 relative aspect-[3/4] w-full overflow-hidden'>
@@ -51,11 +52,17 @@ export default function MagicCardGridItem({
 
       <CardFooter className='flex flex-col items-start gap-2 p-3'>
         <div className='flex w-full items-start justify-between gap-2'>
-          <h4 className='text-foreground line-clamp-2 text-sm font-semibold'>
+          <h4
+            className='text-foreground line-clamp-2 text-sm font-semibold'
+            data-testid='magic-card-name'
+          >
             {card.name}
           </h4>
           {card.sellPrice !== null && (
-            <span className='text-accent shrink-0 text-sm font-bold'>
+            <span
+              className='text-accent shrink-0 text-sm font-bold'
+              data-testid='magic-card-price'
+            >
               ${card.sellPrice.toFixed(2)}
             </span>
           )}
@@ -72,7 +79,7 @@ export default function MagicCardGridItem({
         </div>
 
         <div className='flex w-full items-center justify-between text-xs'>
-          <span className='text-default-500'>
+          <span className='text-default-500' data-testid='magic-card-stock'>
             Stock:{' '}
             <span className='text-foreground font-semibold'>
               {card.totalStock}

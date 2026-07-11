@@ -91,6 +91,7 @@ export default function CatalogFilterDrawer({
       onClose={onClose}
       placement='right'
       size='sm'
+      data-testid='catalog-filter-drawer'
     >
       <DrawerContent>
         <DrawerHeader className='flex flex-col gap-1'>
@@ -110,6 +111,7 @@ export default function CatalogFilterDrawer({
             selectedKeys={filters?.condition ? [filters.condition] : []}
             onChange={(e) => onFilterChange('condition', e.target.value)}
             aria-label='Filtrar por condición'
+            data-testid='filter-condition-select'
           />
 
           {rarityOptions.length > 0 &&
@@ -225,6 +227,7 @@ export default function CatalogFilterDrawer({
               onPress={handleReset}
               startContent={<Icon icon='lucide:x' />}
               className='text-accent'
+              data-testid='filter-drawer-reset'
             >
               Limpiar filtros
             </Button>
@@ -235,6 +238,7 @@ export default function CatalogFilterDrawer({
             onPress={onClose}
             className='text-white'
             style={{ backgroundColor: 'var(--color-accent)' }}
+            data-testid='filter-drawer-close'
           >
             Ver resultados
           </Button>

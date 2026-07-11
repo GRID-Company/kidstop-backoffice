@@ -47,7 +47,10 @@ export default function MagicCardGrid({
 
   if (cards.length === 0) {
     return (
-      <div className='flex min-h-[400px] items-center justify-center'>
+      <div
+        className='flex min-h-[400px] items-center justify-center'
+        data-testid='magic-cards-empty'
+      >
         <p className='text-default-500'>No se encontraron cartas</p>
       </div>
     );
@@ -55,7 +58,10 @@ export default function MagicCardGrid({
 
   return (
     <div className='flex flex-col gap-6'>
-      <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
+      <div
+        className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        data-testid='magic-cards-grid'
+      >
         {cards.map((card) => (
           <MagicCardGridItem
             key={card.guid}

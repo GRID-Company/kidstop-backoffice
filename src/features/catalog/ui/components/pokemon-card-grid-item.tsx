@@ -26,6 +26,7 @@ export default function PokemonCardGridItem({
       isPressable={!!onPress}
       onPress={() => onPress?.(card)}
       className='h-full'
+      data-testid='pokemon-card-item'
     >
       <CardBody className='flex flex-col gap-3 !p-0'>
         <div className='bg-default-100 relative aspect-[3/4] w-full overflow-hidden rounded-t-md'>
@@ -57,7 +58,12 @@ export default function PokemonCardGridItem({
         </div>
 
         <div className='flex flex-col gap-1.5 px-4 pb-4'>
-          <p className='truncate text-sm font-semibold'>{card.name}</p>
+          <p
+            className='truncate text-sm font-semibold'
+            data-testid='pokemon-card-name'
+          >
+            {card.name}
+          </p>
 
           <div className='flex flex-wrap items-center gap-1.5'>
             {card.type && (
@@ -94,10 +100,16 @@ export default function PokemonCardGridItem({
           )}
 
           <div className='mt-1 flex items-center justify-between'>
-            <span className='text-success text-sm font-bold'>
+            <span
+              className='text-success text-sm font-bold'
+              data-testid='pokemon-card-price'
+            >
               ${sellPrice.toFixed(2)}
             </span>
-            <span className='text-default-500 text-xs'>
+            <span
+              className='text-default-500 text-xs'
+              data-testid='pokemon-card-stock'
+            >
               Stock: {card.totalStock}
             </span>
           </div>
