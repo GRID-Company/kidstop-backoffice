@@ -96,22 +96,9 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     const result = localItems.some((localItem) => {
       const serverItem = sale.items.find((i) => i.guid === localItem.guid);
       if (!serverItem) return true;
-      const changed = localItem.quantity !== serverItem.quantity;
-      if (changed) {
-        console.log('🟡 Item changed detected:', {
-          guid: localItem.guid,
-          localQuantity: localItem.quantity,
-          localType: typeof localItem.quantity,
-          serverQuantity: serverItem.quantity,
-          serverType: typeof serverItem.quantity,
-        });
-      }
-      return changed;
-    });
-    console.log('🟡 hasChanges:', result, {
-      localItems,
-      saleItems: sale.items,
-      itemsToRemove,
+      // NOTE: Only quantity can be edited. Condition is now read-only (shown as badge).
+      const quantityChanged = localItem.quantity !== serverItem.quantity;
+      return quantityChanged;
     });
     return result;
   }, [sale, localItems, itemsToRemove]);
@@ -158,19 +145,13 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<ISaleItem>) => {
-      console.log('🔵 updateItem called:', { itemId, updates });
       const normalizedUpdates = { ...updates };
 
       if (normalizedUpdates.quantity !== undefined) {
-        const originalQuantity = normalizedUpdates.quantity;
         normalizedUpdates.quantity =
           typeof normalizedUpdates.quantity === 'string'
             ? parseInt(normalizedUpdates.quantity, 10)
             : normalizedUpdates.quantity;
-        console.log('🔵 Quantity normalized:', {
-          originalQuantity,
-          normalized: normalizedUpdates.quantity,
-        });
 
         if (
           isNaN(normalizedUpdates.quantity) ||
@@ -181,13 +162,11 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
         }
       }
 
-      setLocalItems((prev) => {
-        const updated = prev.map((item) =>
+      setLocalItems((prev) =>
+        prev.map((item) =>
           item.guid === itemId ? { ...item, ...normalizedUpdates } : item
-        );
-        console.log('🔵 LocalItems updated:', updated);
-        return updated;
-      });
+        )
+      );
     },
     []
   );
@@ -226,6 +205,9 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
         })
       );
 
+      // NOTE: Only quantity is editable in the UI (condition is read-only, shown as badge).
+      // This simplifies the UX following KISS principle and aligns with backend mutation
+      // which only supports updating quantity via UpdateSaleItemInput.
       const updateMutations = localItems
         .filter((localItem) => {
           const serverItem = sale.items.find((i) => i.guid === localItem.guid);

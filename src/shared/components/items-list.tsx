@@ -16,6 +16,7 @@ import {
   AdaptedSaleItem,
   ItemVariant,
 } from '@/shared/types/item.types';
+import { StockValidation } from '@/shared/types/stock.types';
 
 type AdaptedItem = AdaptedPurchaseItem | AdaptedSaleItem;
 
@@ -28,6 +29,7 @@ interface ItemsListProps {
   variant?: ItemVariant;
   totalLabel?: string;
   emptyMessage?: string;
+  stockValidationMap?: Map<string, StockValidation>;
 }
 
 export default function ItemsList({
@@ -39,6 +41,7 @@ export default function ItemsList({
   variant = 'purchase',
   totalLabel = 'Total',
   emptyMessage = 'No hay items',
+  stockValidationMap,
 }: ItemsListProps) {
   const form = useForm({
     defaultValues: {
@@ -170,6 +173,7 @@ export default function ItemsList({
                   isReadOnly={isReadOnly}
                   variant={variant}
                   allItems={items}
+                  stockValidation={stockValidationMap?.get(item.guid)}
                 />
               ))}
             </div>

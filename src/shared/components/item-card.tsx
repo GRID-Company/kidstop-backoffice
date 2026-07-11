@@ -7,19 +7,18 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
-import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import { useAvailableConditions } from '@/shared/hooks/use-available-conditions';
 import {
   AdaptedPurchaseItem,
   AdaptedSaleItem,
   ItemVariant,
 } from '@/shared/utils/item-adapters';
+import { StockValidation } from '@/shared/types/stock.types';
 
 type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
 
@@ -30,6 +29,7 @@ interface ItemCardProps {
   isReadOnly?: boolean;
   variant?: ItemVariant;
   allItems?: ItemCardData[];
+  stockValidation?: StockValidation;
 }
 
 function PriceMetric({
@@ -75,7 +75,8 @@ export default function ItemCard({
   onRemove,
   isReadOnly = false,
   variant = 'purchase',
-  allItems = [],
+  allItems: _allItems = [],
+  stockValidation,
 }: ItemCardProps) {
   const { control } = useFormContext();
   const { isPrivacyMode: _isPrivacyMode } = usePrivacyModeStore();
@@ -112,11 +113,6 @@ export default function ItemCard({
     }
     return false;
   }, [item, variant]);
-
-  const { usedConditions, availableConditionOptions } = useAvailableConditions(
-    item,
-    allItems
-  );
 
   const displaySubtotal = formatCurrency(subtotal);
 
@@ -158,7 +154,7 @@ export default function ItemCard({
               </h4>
 
               {item.tcgType === 'POKEMON' &&
-                ((isPurchaseItem(item) && item.language) ||
+                (item.language ||
                   item.cardNumber ||
                   item.rarity ||
                   item.type ||
@@ -166,7 +162,7 @@ export default function ItemCard({
                   item.variant ||
                   item.stage) && (
                   <div className='flex flex-wrap items-center gap-1.5'>
-                    {isPurchaseItem(item) && item.language && (
+                    {item.language && (
                       <Chip
                         size='sm'
                         variant='flat'
@@ -174,6 +170,16 @@ export default function ItemCard({
                         className='h-4 px-1.5 text-[10px]'
                       >
                         {LANGUAGE_LABELS[item.language]}
+                      </Chip>
+                    )}
+                    {item.condition && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='default'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {CARD_CONDITION_SHORT_LABELS[item.condition]}
                       </Chip>
                     )}
                     {item.cardNumber && (
@@ -235,12 +241,12 @@ export default function ItemCard({
                 )}
 
               {item.tcgType === 'MAGIC' &&
-                ((isPurchaseItem(item) && item.language) ||
+                (item.language ||
                   item.collectorNumber ||
                   item.rarity ||
                   item.isFoil) && (
                   <div className='flex flex-wrap items-center gap-1.5'>
-                    {isPurchaseItem(item) && item.language && (
+                    {item.language && (
                       <Chip
                         size='sm'
                         variant='flat'
@@ -248,6 +254,16 @@ export default function ItemCard({
                         className='h-4 px-1.5 text-[10px]'
                       >
                         {LANGUAGE_LABELS[item.language]}
+                      </Chip>
+                    )}
+                    {item.condition && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='default'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {CARD_CONDITION_SHORT_LABELS[item.condition]}
                       </Chip>
                     )}
                     {item.collectorNumber && (
@@ -336,6 +352,22 @@ export default function ItemCard({
                 )}
               </div>
             )}
+
+            {variant === 'sale' &&
+              stockValidation &&
+              !stockValidation.hasStock && (
+                <div className='mt-2'>
+                  <Chip size='sm' color='danger' variant='flat'>
+                    <div className='flex items-center gap-1'>
+                      <Icon icon='lucide:alert-triangle' width={12} />
+                      <span className='text-[10px]'>
+                        Stock insuficiente (disponible:{' '}
+                        {stockValidation.available})
+                      </span>
+                    </div>
+                  </Chip>
+                </div>
+              )}
           </div>
         </div>
 
@@ -375,22 +407,12 @@ export default function ItemCard({
             </div>
           ) : (
             <div className='grid grid-cols-1 gap-3 sm:grid-cols-4'>
-              <SelectForm
-                controlProps={{
-                  name: `cards.${index}.condition`,
-                  control,
-                }}
-                label='Condición'
-                size='sm'
-                variant='bordered'
-                classNames={{
-                  trigger: 'border-[1px] bg-white',
-                  label: 'text-xs',
-                }}
-                aria-label='Condición de la carta'
-                items={availableConditionOptions}
-                disabledKeys={Array.from(usedConditions)}
-              />
+              <div className='flex flex-col gap-1'>
+                <span className='text-default-500 text-xs'>Condición</span>
+                <span className='text-sm font-medium'>
+                  {CARD_CONDITION_SHORT_LABELS[item.condition]}
+                </span>
+              </div>
 
               <InputForm
                 controlProps={{

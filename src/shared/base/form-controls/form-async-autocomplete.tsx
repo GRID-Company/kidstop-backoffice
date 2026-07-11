@@ -58,8 +58,6 @@ function BaseFormAsyncAutocomplete<
     [variables, searchValue]
   );
 
-  console.log(memoizedVariables);
-
   const { data: res, loading } = useQuery<TData, TVariables>(queryDocument, {
     variables: memoizedVariables,
     skip: skipQuery,

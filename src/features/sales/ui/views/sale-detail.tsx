@@ -30,6 +30,7 @@ import {
   getCustomerDisplayEmail,
 } from '../../adapters/mappers/sale.mapper';
 import { useSaleDetail } from '../hooks/use-sale-detail';
+// import { useSaleItemsStockValidation } from '../hooks/use-sale-items-stock-validation';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
 import SaleItemsList from '../components/sale-items-list';
@@ -61,6 +62,17 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
     saveChanges,
     discardChanges,
   } = useSaleDetail(saleId);
+
+  // NOTE: Stock validation temporarily disabled until dedicated backend endpoint is implemented.
+  // Current implementation fetches 1000 inventory items which causes performance issues.
+  // Backend already validates stock on save, so validation errors will be shown then.
+  // See docs/BACKEND_PROPOSAL_VALIDATE_STOCK.md for the proposed solution.
+  // const {
+  //   stockValidationMap,
+  //   hasAnyStockIssue,
+  //   loading: validatingStock,
+  // } = useSaleItemsStockValidation(isTerminal ? [] : items);
+  const stockValidationMap = undefined;
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -173,6 +185,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}
               isReadOnly={!isEditable}
+              stockValidationMap={stockValidationMap}
             />
           </div>
         </EntitiesPage.CardContainer>
@@ -220,16 +233,20 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                         >
                           Descartar
                         </Button>
-                        <Button
-                          size='sm'
-                          className='bg-accent text-white'
-                          isLoading={mutating}
-                          onPress={saveChanges}
-                          aria-label='Guardar cambios en items'
-                          startContent={<Icon icon='lucide:save' width={16} />}
-                        >
-                          Guardar cambios
-                        </Button>
+                        <Tooltip content='Guardar cambios en items'>
+                          <Button
+                            size='sm'
+                            className='bg-accent text-white'
+                            isLoading={mutating}
+                            onPress={saveChanges}
+                            aria-label='Guardar cambios en items'
+                            startContent={
+                              <Icon icon='lucide:save' width={16} />
+                            }
+                          >
+                            Guardar cambios
+                          </Button>
+                        </Tooltip>
                       </div>
                     </div>
                   );
@@ -238,7 +255,13 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               <div className='flex items-center justify-between'>
                 <div className='flex flex-wrap gap-3'>
                   {nextStatus && nextStatusLabel && nextStatusIcon && (
-                    <Tooltip content={nextStatusLabel}>
+                    <Tooltip
+                      content={
+                        hasChanges
+                          ? 'Guarda los cambios antes de continuar'
+                          : nextStatusLabel
+                      }
+                    >
                       <Button
                         className='bg-accent text-white'
                         isLoading={mutating}
