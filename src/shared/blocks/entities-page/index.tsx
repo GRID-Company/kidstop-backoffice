@@ -8,7 +8,7 @@ interface Props {
 }
 type ToolbarProps = Props & {
   label: string;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 type EntitiesPageCompound = React.FC<Props> & {
   Title: typeof Title;
@@ -30,10 +30,12 @@ EntitiesPage.Toolbar = function Toolbar({
   label,
   className,
   children,
+  ...props
 }: ToolbarProps) {
   return (
     <div
       className={`mb-6 flex w-full items-center justify-between gap-2 px-4 ${className}`}
+      {...props}
     >
       {label && (
         <EntitiesPage.FlexRow>
