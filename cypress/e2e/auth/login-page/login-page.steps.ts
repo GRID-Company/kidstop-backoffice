@@ -12,6 +12,14 @@ Given('el usuario está en la página de login', () => {
   loginPage.shouldBeOnLoginPage();
 });
 
+Given('el usuario está autenticado', () => {
+  cy.login(
+    config.params.logins.admin.email,
+    config.params.logins.admin.password
+  );
+  cy.url().should('include', '/catalogo');
+});
+
 Given('el usuario está autenticado como administrador', () => {
   cy.login(
     config.params.logins.admin.email,

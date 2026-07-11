@@ -178,9 +178,7 @@ Then('debería ver solo usuarios activados', () => {
 });
 
 // Then steps - Success messages
-Then('debería ver mensaje de éxito', () => {
-  usersPage.shouldSeeSuccessMessage();
-});
+// Step movido a card-detail-modal.steps.ts para evitar duplicados
 
 Then('el nuevo usuario debería aparecer en la lista', () => {
   // Assumes the name was stored in context

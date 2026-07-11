@@ -68,6 +68,7 @@ export default function CardSearch({
             placeholder='Nombre, set o identificador'
             onValueChange={onSearchChange}
             aria-label='Buscar carta por nombre, set o identificador'
+            data-testid='catalog-search-input'
           />
         </div>
         <Select
@@ -77,6 +78,7 @@ export default function CardSearch({
           onChange={(e) => onSortChange(e.target.value)}
           aria-label='Ordenar resultados'
           className='w-48'
+          data-testid='catalog-sort-select'
         />
         <Badge
           content={activeFilterCount > 0 ? activeFilterCount : undefined}
@@ -90,6 +92,7 @@ export default function CardSearch({
             startContent={<Icon icon='lucide:sliders-horizontal' />}
             aria-label='Abrir filtros avanzados'
             className='h-14'
+            data-testid='catalog-filters-button'
           >
             Filtros
           </Button>
@@ -97,7 +100,10 @@ export default function CardSearch({
       </div>
 
       <div className='flex items-center justify-between'>
-        <p className='text-content-tertiary text-sm'>
+        <p
+          className='text-content-tertiary text-sm'
+          data-testid='catalog-result-count'
+        >
           {resultCount}{' '}
           {resultCount === 1 ? 'carta encontrada' : 'cartas encontradas'}
         </p>
@@ -107,6 +113,7 @@ export default function CardSearch({
             size='sm'
             startContent={<Icon icon='lucide:x' />}
             onPress={onReset}
+            data-testid='catalog-clear-filters-button'
           >
             Limpiar filtros
           </Button>

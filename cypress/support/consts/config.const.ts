@@ -28,7 +28,7 @@ export const config = {
       long: 30000,
       uiStabilization: 500,
       dropdownClose: 300,
-      graphqlQuery: 10000,
+      graphqlQuery: 30000,
     },
   },
 };

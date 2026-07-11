@@ -43,6 +43,8 @@ export const POKEMON_SORT_OPTIONS = [
 export const MAGIC_SORT_OPTIONS = [
   { label: 'Nombre A → Z', value: 'name_ASC' },
   { label: 'Nombre Z → A', value: 'name_DESC' },
+  { label: 'Precio menor', value: 'sellPrice_ASC' },
+  { label: 'Precio mayor', value: 'sellPrice_DESC' },
   { label: 'Rareza', value: 'rarity_ASC' },
   { label: 'Set', value: 'setName_ASC' },
 ];

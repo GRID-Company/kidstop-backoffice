@@ -191,7 +191,6 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     return itemsForm.fieldArray.fields.map((field) => {
       // Find the original item by cardGuid, condition AND language to support multiple languages of same card
       const originalItem = basePurchase.items.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (item) =>
           item.cardGuid === field.cardGuid &&
           item.condition === field.condition &&
@@ -200,7 +199,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
         // Try to find by cardGuid:condition:language key
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         const itemKey = getItemKey({
           cardGuid: field.cardGuid,
           condition: field.condition,
@@ -222,7 +221,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         // Fallback for items without metadata - use field.id as guid
         return {
           ...(field as unknown as IPurchaseItem),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
           guid:
             (field as any).id ||
             generateTemporaryItemGuid(
@@ -333,7 +332,6 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     (itemId: string, updates: Partial<IPurchaseItem>) => {
       const index = items.findIndex((item) => item.guid === itemId);
       if (index !== -1) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         itemsForm.fieldArray.update(index, {
           ...items[index],
           ...updates,
