@@ -162,10 +162,10 @@ const mapPokemonRelatedCardToBulkCardData = (
 /**
  * Hook for performing bulk card searches across Pokemon and Magic TCG catalogs.
  * Manages search state, results, and metrics (successful/total counts).
- * 
- * @returns Object containing search function, results, loading state, error state, 
+ *
+ * @returns Object containing search function, results, loading state, error state,
  *          success metrics, and reset function
- * 
+ *
  * @example
  * const { search, results, loading, successfulCount, totalCount } = useBulkCardSearch();
  * await search("4 Charizard\n2 Pikachu", TCG_TYPES.POKEMON);

@@ -18,7 +18,6 @@ export const getValidCardFormIndex = (
   results: BulkCardResult[],
   resultIndex: number
 ): number => {
-  return results
-    .slice(0, resultIndex)
-    .filter((r) => r.bestMatch && !r.error).length;
+  return results.slice(0, resultIndex).filter((r) => r.bestMatch && !r.error)
+    .length;
 };
