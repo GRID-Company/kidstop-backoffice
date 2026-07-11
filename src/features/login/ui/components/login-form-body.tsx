@@ -7,11 +7,13 @@ import PasswordForm from '@/shared/base/form-controls/password-form';
 interface LoginFormProps {
   loading?: boolean;
   control: Control<LoginForm>;
+  isValid?: boolean;
 }
 
 export default function LoginFormBody({
   loading = false,
   control,
+  isValid = false,
 }: LoginFormProps) {
   return (
     <div className='block w-full'>
@@ -42,7 +44,7 @@ export default function LoginFormBody({
         className='mt-24 w-full'
         type='submit'
         isLoading={loading}
-        disabled={loading}
+        disabled={loading || !isValid}
         color='primary'
         data-testid='login-submit-button'
       >
