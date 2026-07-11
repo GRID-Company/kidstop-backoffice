@@ -124,6 +124,7 @@ export default function CatalogFilterDrawer({
                 resetKey={resetKey}
                 selectedValue={filters?.rarity}
                 aria-label='Filtrar por rareza'
+                data-testid='filter-rarity-select'
               />
             ) : (
               <Select
@@ -133,6 +134,7 @@ export default function CatalogFilterDrawer({
                 selectedKeys={filters?.rarity ? [filters.rarity] : []}
                 onChange={(e) => onFilterChange('rarity', e.target.value)}
                 aria-label='Filtrar por rareza'
+                data-testid='filter-rarity-select'
               />
             ))}
 

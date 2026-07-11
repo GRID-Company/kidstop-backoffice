@@ -5,15 +5,10 @@ const cardDetailModal = new CardDetailModal();
 
 // Given - Setup
 Given('el usuario tiene el modal de detalle abierto', () => {
+  // Hacer click en la primera carta para abrir el modal
+  cy.get('[data-testid="pokemon-card-item"]').first().click();
+  cy.wait(500);
   cardDetailModal.shouldSeeModal();
-});
-
-Given('el usuario tiene el modal de detalle de Pokémon abierto', () => {
-  cardDetailModal.shouldSeeModal();
-});
-
-Given('el usuario tiene el modal de detalle de Magic abierto', () => {
-  cardDetailModal.shouldSeeMagicModal();
 });
 
 // When - Actions - Modal
@@ -31,6 +26,10 @@ When('el usuario selecciona una variante de Magic', () => {
 });
 
 When('el usuario selecciona una variante con stock', () => {
+  cardDetailModal.selectVariantWithStock();
+});
+
+When('el usuario selecciona una variante de Magic con stock', () => {
   cardDetailModal.selectVariantWithStock();
 });
 
@@ -60,7 +59,10 @@ When('guarda el ajuste de stock', () => {
 
 // When - Actions - Price Edit
 When('ingresa un nuevo precio {string}', (price: string) => {
-  cardDetailModal.enterPrice('Precio de venta', price);
+  // Si el precio es "random", generar un número aleatorio entre 50 y 200
+  const finalPrice =
+    price === 'random' ? (Math.random() * 150 + 50).toFixed(2) : price;
+  cardDetailModal.enterPrice('Precio de venta', finalPrice);
 });
 
 When('agrega notas de precio {string}', (notes: string) => {
@@ -101,7 +103,7 @@ Then('debería ver la información completa de la carta', () => {
 });
 
 Then('debería ver la información completa de la carta Magic', () => {
-  cardDetailModal.shouldSeeCardInformation();
+  cardDetailModal.shouldSeeMagicCardInformation();
 });
 
 Then('debería ver las variantes por condición', () => {

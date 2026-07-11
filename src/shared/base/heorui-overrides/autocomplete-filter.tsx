@@ -12,6 +12,7 @@ interface AutocompleteFilterProps {
   resetKey?: number;
   selectedValue?: string;
   'aria-label'?: string;
+  'data-testid'?: string;
 }
 
 export default function AutocompleteFilter({
@@ -22,6 +23,7 @@ export default function AutocompleteFilter({
   resetKey,
   selectedValue,
   'aria-label': ariaLabel,
+  'data-testid': dataTestId,
 }: AutocompleteFilterProps) {
   const [selectedKey, setSelectedKey] = useState('');
   const [inputValue, setInputValue] = useState('');
@@ -86,6 +88,7 @@ export default function AutocompleteFilter({
       onSelectionChange={handleSelectionChange}
       onInputChange={handleInputChange}
       aria-label={ariaLabel}
+      data-testid={dataTestId}
     />
   );
 }

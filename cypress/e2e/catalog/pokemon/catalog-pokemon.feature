@@ -1,7 +1,7 @@
-Feature: Gestión de Catálogo
+Feature: Gestión de Catálogo Pokémon
   Como usuario del backoffice de Kidstop
-  Quiero gestionar el catálogo de cartas
-  Para consultar, buscar y actualizar información de cartas
+  Quiero gestionar el catálogo de cartas Pokémon
+  Para consultar, buscar y actualizar información de cartas Pokémon
 
   Background:
     Given el usuario está autenticado
@@ -13,14 +13,7 @@ Feature: Gestión de Catálogo
     And debería ver el grid de cartas
     And debería ver el contador de resultados
 
-  Scenario: Cambiar entre Pokémon y Magic
-    When el usuario selecciona el TCG "Magic"
-    Then debería ver el catálogo de Magic
-    And debería ver el grid de cartas de Magic
-    When el usuario selecciona el TCG "Pokémon"
-    Then debería ver el catálogo de Pokémon
-
-  # Búsqueda - Pokémon
+  # Búsqueda
   Scenario: Buscar carta de Pokémon por nombre
     When el usuario busca "Pikachu"
     Then debería ver solo cartas que coincidan con "Pikachu"
@@ -36,23 +29,16 @@ Feature: Gestión de Catálogo
     And el usuario limpia la búsqueda
     Then debería ver todas las cartas de Pokémon
 
-  # Búsqueda - Magic
-  Scenario: Buscar carta de Magic por nombre
-    Given el usuario selecciona el TCG "Magic"
-    When el usuario busca "Lightning Bolt"
-    Then debería ver solo cartas de Magic que coincidan con "Lightning Bolt"
-    And el contador de resultados debería ser mayor a 0
-
-  # Ordenamiento - Pokémon
+  # Ordenamiento
   Scenario: Ordenar cartas de Pokémon por precio menor a mayor
-    When el usuario ordena por "Precio: Menor a Mayor"
+    When el usuario ordena por "Precio menor"
     Then las cartas deberían estar ordenadas por precio ascendente
 
   Scenario: Ordenar cartas de Pokémon por nombre
-    When el usuario ordena por "Nombre: A-Z"
+    When el usuario ordena por "Nombre A → Z"
     Then las cartas deberían estar ordenadas alfabéticamente
 
-  # Filtros - Pokémon
+  # Filtros
   Scenario: Abrir drawer de filtros
     When el usuario hace clic en el botón de filtros
     Then debería ver el drawer de filtros abierto
@@ -77,7 +63,7 @@ Feature: Gestión de Catálogo
     Then no debería ver el badge de filtros activos
     And debería ver todas las cartas
 
-  # Visualización de Detalles - Pokémon
+  # Visualización de Detalles
   Scenario: Abrir modal de detalle de carta Pokémon
     When el usuario hace clic en una carta de Pokémon
     Then debería ver el modal de detalle abierto
@@ -90,18 +76,11 @@ Feature: Gestión de Catálogo
     When el usuario cierra el modal
     Then no debería ver el modal de detalle
 
-  # Visualización de Detalles - Magic
-  Scenario: Abrir modal de detalle de carta Magic
-    Given el usuario selecciona el TCG "Magic"
-    When el usuario hace clic en una carta de Magic
-    Then debería ver el modal de detalle abierto
-    And debería ver la información completa de la carta Magic
-
-  # Edición de Precios - Pokémon
+  # Edición de Precios
   Scenario: Actualizar precio de venta de carta Pokémon
     Given el usuario tiene el modal de detalle de Pokémon abierto
     When el usuario selecciona una variante
-    And ingresa un nuevo precio "25.99"
+    And ingresa un nuevo precio "random"
     And agrega notas de precio "Ajuste por demanda"
     And guarda el cambio de precio
     Then debería ver mensaje de éxito
@@ -113,16 +92,7 @@ Feature: Gestión de Catálogo
     And intenta ingresar un precio negativo "-10"
     Then el botón de guardar precio debería estar deshabilitado
 
-  # Edición de Precios - Magic
-  Scenario: Actualizar precio de venta de carta Magic
-    Given el usuario selecciona el TCG "Magic"
-    And el usuario tiene el modal de detalle de Magic abierto
-    When el usuario selecciona una variante de Magic
-    And ingresa un nuevo precio "15.50"
-    And guarda el cambio de precio
-    Then debería ver mensaje de éxito
-
-  # Ajuste de Stock - Todos los Roles
+  # Ajuste de Stock
   Scenario: Ajustar stock de carta Pokémon (entrada)
     Given el usuario tiene el modal de detalle de Pokémon abierto
     When el usuario selecciona una variante

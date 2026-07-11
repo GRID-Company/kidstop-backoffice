@@ -70,7 +70,7 @@ export function useCardDetailModal({
     useUpdateInventoryPrice();
   const { handleAdjustStock, loading: adjustLoading } =
     useAdjustInventoryStock();
-  const { control, handleSubmit, formState, reset } = useCardPriceForm();
+  const { control, handleSubmit, formState, reset, watch } = useCardPriceForm();
 
   // Sync selectedLanguage with detail's language when detail loads
   useEffect(() => {
@@ -215,6 +215,7 @@ export function useCardDetailModal({
     control,
     handleSubmit,
     formState,
+    watch,
     updatingPrice,
     adjustLoading,
     cardName: detail?.name,

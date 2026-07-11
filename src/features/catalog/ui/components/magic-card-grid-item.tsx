@@ -58,14 +58,12 @@ export default function MagicCardGridItem({
           >
             {card.name}
           </h4>
-          {card.sellPrice !== null && (
-            <span
-              className='text-accent shrink-0 text-sm font-bold'
-              data-testid='magic-card-price'
-            >
-              ${card.sellPrice.toFixed(2)}
-            </span>
-          )}
+          <span
+            className='text-accent shrink-0 text-sm font-bold'
+            data-testid='magic-card-price'
+          >
+            ${(card.sellPrice ?? 0).toFixed(2)}
+          </span>
         </div>
 
         <div className='text-default-500 flex w-full flex-wrap items-center gap-1 text-xs'>

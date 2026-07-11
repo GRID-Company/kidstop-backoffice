@@ -101,6 +101,7 @@ export default function PokemonCardDetailModal({
     control,
     handleSubmit,
     formState,
+    watch,
     updatingPrice,
     adjustLoading,
     cardName,
@@ -696,6 +697,12 @@ export default function PokemonCardDetailModal({
                           controlProps={{ control, name: 'sellPrice' }}
                         />
                       </div>
+
+                      {watch('sellPrice') < watch('buyPrice') && (
+                        <div className='bg-warning-50 text-warning-700 rounded-md p-3 text-sm'>
+                          ⚠️ El precio de venta es menor al precio de compra
+                        </div>
+                      )}
 
                       <Textarea
                         label='Notas (opcional)'
