@@ -13,16 +13,20 @@
 ## Resumen Ejecutivo
 
 ### Objetivo del Proyecto
-Implementar una plataforma para Kidstop que permita administrar de forma confiable la **compra, venta e inventario** de cartas **singles** de *Pokémon TCG* y *Magic: The Gathering*, habilitando control de stock, operación de compradores con presupuesto y una experiencia digital para que los clientes consulten y realicen compras.
+
+Implementar una plataforma para Kidstop que permita administrar de forma confiable la **compra, venta e inventario** de cartas **singles** de _Pokémon TCG_ y _Magic: The Gathering_, habilitando control de stock, operación de compradores con presupuesto y una experiencia digital para que los clientes consulten y realicen compras.
 
 ### Alcance del MVP
+
 El MVP contempla un sistema responsive compuesto por:
 
 - **Panel administrativo web** para operar compras de singles, administración de inventario y procesos de venta, con roles **Administrador**, **Recepción** y **Comprador**.
 - **Carpeta digital** orientada a clientes para navegar el inventario y realizar compras, con niveles de acceso **Público**, **Cliente** y **Cliente VIP** (compra remota).
 
 ### Resultado Esperado
+
 Al finalizar el MVP, Kidstop contará con:
+
 - Visibilidad y control del **stock actual** de singles
 - Capacidad de registrar y monitorear compras por **comprador** con **presupuesto**
 - Una carpeta digital funcional para consulta y compra según el tipo de usuario
@@ -30,15 +34,18 @@ Al finalizar el MVP, Kidstop contará con:
 ## Diagnóstico y Contexto
 
 ### Situación Actual
+
 Kidstop es una tienda de productos TCG, actualmente enfocada principalmente en **Pokémon**, con la intención de ampliar su operación a otros TCG como **Magic: The Gathering**. Las operaciones actuales se sostienen principalmente en productos TCG y eventos, con procesos ya establecidos para dichas líneas de negocio.
 
 ### Problemas Identificados
+
 - Dificultad para mantener **certeza del inventario** disponible en tiempo real
 - Complejidad para gestionar de forma ordenada la **compra de cartas singles** (registro, trazabilidad y control)
 - Limitación para tomar decisiones de **restock** basadas en datos de venta y rotación del inventario de singles
 - Falta de una experiencia digital estructurada para que los clientes consulten el inventario y realicen compras de acuerdo con su nivel de acceso
 
 ### Oportunidad
+
 Una plataforma enfocada en la operación de singles permitirá estandarizar la compra/venta, mejorar el control de inventario y habilitar reportes que faciliten estrategias de restock. Adicionalmente, la implementación de una **carpeta digital** abre un canal para que clientes consulten y compren inventario de singles, mejorando la experiencia y el alcance comercial, especialmente para usuarios con permisos de compra remota (VIP).
 
 ## Glosario de Términos
@@ -61,11 +68,13 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 ## Roles y Permisos
 
 ### Roles del Panel Administrativo (Backoffice)
+
 - **Administrador:** Usuario con permisos de configuración y control general
 - **Recepción:** Usuario operativo que apoya en procesos definidos (permisos limitados)
 - **Comprador:** Usuario responsable de compras de singles y operación de presupuesto
 
 ### Roles de la Carpeta Digital
+
 - **Público:** Usuario sin autenticación o con acceso limitado
 - **Cliente:** Usuario autenticado con permisos estándar
 - **Cliente VIP:** Usuario con permiso de compra remota
@@ -74,12 +83,14 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 ### Matriz de Permisos Clave
 
 **Backoffice:**
+
 - Todos los roles pueden ver catálogo y crear/editar compras en Draft
 - Solo Admin puede hacer ajustes manuales de inventario
 - Solo Admin puede cambiar tipo de cliente (Cliente ↔ VIP)
 - Recepción puede gestionar ventas/pedidos pero no clientes
 
 **Carpeta Digital:**
+
 - Público: solo navegar catálogo
 - Cliente: crear pedidos solo en tienda (validación ubicación)
 - VIP: crear pedidos remotos sin validación ubicación
@@ -88,6 +99,7 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 ## Modelo de Datos Base
 
 ### Entidades Principales
+
 - **Carta (Card):** Registro base de una carta en el catálogo
 - **Variante (Variant):** Atributos que diferencian una carta
 - **Ítem de inventario:** Stock disponible para venta
@@ -97,6 +109,7 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 - **Usuario (User):** Cuenta interna o externa con rol y permisos
 
 ### Reglas Base del MVP
+
 - **Certeza de stock:** El stock visible debe corresponder al stock operable
 - **Presupuesto por comprador:** El rol Comprador opera con presupuesto asignado
 - **Niveles de acceso:** La carpeta digital limita acciones según rol
@@ -105,27 +118,33 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 ## Módulos del Sistema
 
 ### 1. Autenticación y Seguridad
+
 **Objetivo:** Acceso seguro con autenticación, manejo de sesión y recuperación de contraseña.
 
 **Alcance:**
+
 - Login/logout
 - Recuperación de contraseña vía email
 - Cambio de contraseña
 - Reglas de sesión y vencimiento
 
 ### 2. Usuarios y Roles
+
 **Objetivo:** Administrar usuarios internos del backoffice con permisos por rol.
 
 **Alcance:**
+
 - CRUD de usuarios
 - Asignación de rol (Admin/Recepción/Comprador)
 - Activar/Desactivar usuarios
 - Listado y búsqueda
 
 ### 3. Catálogo de Cartas
+
 **Objetivo:** Búsqueda, consulta y gestión de cartas singles con respaldo interno y precios públicos.
 
 **Alcance:**
+
 - Selector de contexto TCG (Pokémon/Magic)
 - Listado con búsqueda y filtros
 - Detalle de carta y variantes
@@ -134,15 +153,18 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 - Consulta de precio de referencia
 
 **Proveedores:**
+
 - Price Charting (Pokémon)
 - Card Kingdom (Magic)
 
 ### 4. Compras (Buylist/Negociación)
+
 **Objetivo:** Registrar compras de cartas singles con negociación, control de presupuesto y flujo de estados.
 
 **Estados:** Draft → Cotizado → Esperando precio → Finalizado / Rechazado
 
 **Funcionalidades clave:**
+
 - Búsqueda de cartas con métricas operativas (última venta, tiempo en inventario, wishlist)
 - Lista de compra con condición por carta (Jugada/Pristine/Mint)
 - Registro de vendedor
@@ -156,9 +178,11 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 **Regla clave:** En "Esperando precio" las cartas NO se suman al stock. Al pasar a "Finalizado" SÍ se suman.
 
 ### 5. Inventario y Movimientos
+
 **Objetivo:** Control de stock con trazabilidad de movimientos.
 
 **Alcance:**
+
 - Inventario por Carta + Variante + Condición
 - Estados de stock (Disponible, Esperando recolección, No disponible)
 - Registro de movimientos (Entrada por compra, Salida por venta, Ajuste manual)
@@ -167,16 +191,19 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 - Métricas: última venta, tiempo promedio en inventario
 
 **Tipos de movimiento:**
+
 - Entrada por compra (cuando pasa a Finalizado)
 - Salida por venta (cuando se completa)
 - Ajuste manual (solo Admin)
 
 ### 6. Ventas
+
 **Objetivo:** Gestión de pedidos originados en Carpeta Digital para surtido en mostrador.
 
 **Estados:** Nuevo/Recibido → En surtido → Listo para recolección → Completado / Cancelado
 
 **Funcionalidades:**
+
 - Listado de pedidos con filtros
 - Detalle de pedido con items
 - Generación de PDF (picking list)
@@ -188,9 +215,11 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 **Regla clave:** Todas las ventas se originan desde Carpeta Digital (no hay ventas manuales en mostrador en MVP).
 
 ### 7. Clientes
+
 **Objetivo:** Gestión de clientes con clasificación VIP, bloqueos y validación de ubicación.
 
 **Funcionalidades:**
+
 - Registro desde Carpeta Digital (cuenta unificada Pokémon/Magic)
 - Clasificación: Cliente / Cliente VIP
 - Bloqueo por pedidos no concretados (configurable)
@@ -199,16 +228,19 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 - Historial de pedidos por cliente
 
 **Reglas clave:**
+
 - Cliente no VIP: solo puede confirmar pedido si está en tienda (Google Maps geofencing)
 - Cliente VIP: puede confirmar pedido remotamente sin validación de ubicación
 - Bloqueo automático al superar umbral de pedidos no concretados
 
 ### 8. Carpeta Digital
+
 **Objetivo:** Experiencia web para clientes donde puedan consultar inventario y realizar pedidos.
 
 **Superficies:** Dos dominios independientes (Pokémon y Magic) con autenticación compartida.
 
 **Funcionalidades:**
+
 - Navegación del catálogo filtrado por TCG
 - Búsqueda y filtros
 - Carrito y creación de pedido
@@ -219,23 +251,28 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 - Modo Kiosk/iPad con formulario de checkout (captura nombre y correo del cliente real)
 
 **Reglas de compra:**
+
 - No VIP: validación de ubicación obligatoria
 - VIP: compra remota sin validación
 - Kiosk: compra en tienda, sin acceso a perfil/historial
 
 ### 9. Most Wanted (Página Pública)
+
 **Objetivo:** Páginas públicas por TCG para mostrar cartas que Kidstop desea comprar.
 
 **Funcionalidades:**
+
 - Dos páginas independientes (Pokémon y Magic)
 - Configuración desde backoffice (agregar/quitar/ordenar/activar)
 - Vista optimizada para pantalla/TV
 - Contenido: carta, set, variante, prioridad, notas
 
 ### 10. Configuración Global
+
 **Objetivo:** Configuraciones del sistema.
 
 **Funcionalidades:**
+
 - Configuración de geofence (Google Maps)
 - Umbral de bloqueo por pedidos no concretados
 - Presupuestos por comprador
@@ -245,33 +282,40 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 ## Integraciones Externas
 
 ### 1. Proveedores de Catálogo/Precios
+
 - **Price Charting** (Pokémon)
 - **Card Kingdom** (Magic)
 - Propósito: Poblar/actualizar catálogo interno y obtener precios de referencia
 
 ### 2. Google Maps API
+
 - Propósito: Validar ubicación de usuarios no VIP (geofencing)
 - Alcance: Solicitar permisos, validar contra perímetro de tienda, bloquear si está fuera
 
 ### 3. Shopify
+
 - Propósito: Código de venta como custom item (flujo manual)
 - Alcance: El sistema genera código único, staff lo captura manualmente en Shopify
 
 ### 4. Email Transaccional
+
 - Propósito: Notificaciones y recuperación de contraseña
 - Emails: Pedido listo para recolección, Notificación de restock, Recuperación de contraseña
 
 ### 5. WhatsApp
+
 - Propósito: Envío de cotizaciones con hipervínculo
 - Alcance: Generar enlace/mensaje, registrar envío
 
 ### 6. PDF Generation
+
 - Propósito: Picking lists para pedidos
 - Contenido: Código de venta, cliente, TCG, items (carta, variante, condición, cantidad)
 
 ## Requerimientos No Funcionales
 
 ### Seguridad y Acceso
+
 - Autenticación con expiración de sesión
 - Control de acceso por rol
 - Protección de datos sensibles (Modo privacidad)
@@ -279,31 +323,37 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 - API Keys en variables de entorno
 
 ### Disponibilidad y Resiliencia
+
 - Operación degradada si proveedor de catálogo falla (usar catálogo interno)
 - Mensajes claros ante errores
 - Prevención de duplicados (idempotencia)
 
 ### Usabilidad y Compatibilidad
+
 - Responsive (móvil/tablet/desktop)
 - Navegadores modernos (Chrome/Edge/Safari)
 - Accesibilidad básica (contrastes, estados de error)
 
 ### Auditoría y Trazabilidad
+
 - Registrar usuario que realizó acciones relevantes
 - Fecha/hora de acciones
 - Referencia a entidad afectada
 
 ### Datos y Backups
+
 - Backups regulares de base de datos
 - Retención de historial de movimientos y transacciones
 
 ### Ambientes
+
 - Staging y Producción
 - Configuración por variables de entorno
 
 ## Consideraciones de Arquitectura
 
 ### Separación por TCG
+
 - Carpeta digital: dos dominios independientes (Pokémon y Magic)
 - Backoffice: selector de contexto TCG
 - Autenticación compartida entre dominios
@@ -313,6 +363,7 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 ### Flujos Críticos
 
 **Flujo de Compra:**
+
 1. Seleccionar TCG
 2. Buscar cartas (con métricas)
 3. Agregar a lista con condición
@@ -323,6 +374,7 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 8. Finalizar → Sumar a stock
 
 **Flujo de Venta:**
+
 1. Cliente crea pedido en Carpeta Digital
 2. Recepción ve pedido en backoffice
 3. Genera PDF (picking list)
@@ -330,6 +382,7 @@ Una plataforma enfocada en la operación de singles permitirá estandarizar la c
 5. Completa venta → descuenta stock
 
 **Flujo de Inventario:**
+
 - Compra Finalizada → Entrada de inventario
 - Venta Completada → Salida de inventario
 - Ajuste manual → Movimiento con motivo
@@ -373,6 +426,7 @@ STORE_RADIUS_METERS=
 ## Exclusiones del MVP
 
 **Fuera de alcance:**
+
 - Funcionalidades no descritas en requerimientos
 - Single Sign-On (Google/Microsoft/Apple), MFA/2FA
 - Pagos en línea integrados
@@ -386,6 +440,7 @@ STORE_RADIUS_METERS=
 ## Control de Cambios
 
 Cualquier cambio al alcance debe seguir el proceso:
+
 1. Solicitud por escrito (descripción, motivo, urgencia)
 2. Análisis de impacto (alcance, costo, timeline, riesgos)
 3. Propuesta de cambio

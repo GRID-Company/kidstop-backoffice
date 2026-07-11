@@ -23,7 +23,10 @@ const REASON_LABELS: Record<string, string> = {
   PURCHASE_FINALIZED: 'Compra finalizada',
 };
 
-const REASON_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'default'> = {
+const REASON_COLORS: Record<
+  string,
+  'primary' | 'success' | 'warning' | 'default'
+> = {
   DIRECT_UPDATE: 'primary',
   MANUAL_MOVEMENT: 'warning',
   PURCHASE_FINALIZED: 'success',
@@ -32,19 +35,22 @@ const REASON_COLORS: Record<string, 'primary' | 'success' | 'warning' | 'default
 export default function SellPriceHistoryTable({
   inventoryItemGuid,
 }: SellPriceHistoryTableProps) {
-  const { data, loading, error } = useQuery(InventoryItemSellPriceHistoryDocument, {
-    variables: {
-      findSellPriceHistoryArgs: {
-        skip: 0,
-        limit: DEFAULT_HISTORY_LIMIT,
-        sort: { column: 'createdDate', order: 'DESC' },
-        filters: {
-          inventoryItemGuid,
+  const { data, loading, error } = useQuery(
+    InventoryItemSellPriceHistoryDocument,
+    {
+      variables: {
+        findSellPriceHistoryArgs: {
+          skip: 0,
+          limit: DEFAULT_HISTORY_LIMIT,
+          sort: { column: 'createdDate', order: 'DESC' },
+          filters: {
+            inventoryItemGuid,
+          },
         },
       },
-    },
-    skip: !inventoryItemGuid,
-  });
+      skip: !inventoryItemGuid,
+    }
+  );
 
   const priceHistory = useMemo(() => {
     return data?.inventoryItemSellPriceHistory?.data ?? [];
@@ -59,8 +65,11 @@ export default function SellPriceHistoryTable({
         customCol: (item: unknown) => {
           const history = item as { previousPrice?: number | null };
           return (
-            <span className="text-sm">
-              {history.previousPrice !== null && history.previousPrice !== undefined ? `$${history.previousPrice.toFixed(2)}` : '—'}
+            <span className='text-sm'>
+              {history.previousPrice !== null &&
+              history.previousPrice !== undefined
+                ? `$${history.previousPrice.toFixed(2)}`
+                : '—'}
             </span>
           );
         },
@@ -72,7 +81,7 @@ export default function SellPriceHistoryTable({
         customCol: (item: unknown) => {
           const history = item as { newPrice: number };
           return (
-            <span className="text-sm font-medium text-accent">
+            <span className='text-accent text-sm font-medium'>
               ${history.newPrice.toFixed(2)}
             </span>
           );
@@ -86,11 +95,15 @@ export default function SellPriceHistoryTable({
           const history = item as { reason: string };
           return (
             <Chip
-              size="sm"
-              variant="flat"
-              color={REASON_COLORS[history.reason as keyof typeof REASON_COLORS] ?? 'default'}
+              size='sm'
+              variant='flat'
+              color={
+                REASON_COLORS[history.reason as keyof typeof REASON_COLORS] ??
+                'default'
+              }
             >
-              {REASON_LABELS[history.reason as keyof typeof REASON_LABELS] ?? history.reason}
+              {REASON_LABELS[history.reason as keyof typeof REASON_LABELS] ??
+                history.reason}
             </Chip>
           );
         },
@@ -102,7 +115,7 @@ export default function SellPriceHistoryTable({
         customCol: (item: unknown) => {
           const history = item as { notes?: string };
           return (
-            <span className="text-xs text-default-500 max-w-50 truncate block">
+            <span className='text-default-500 block max-w-50 truncate text-xs'>
               {history.notes ?? '—'}
             </span>
           );
@@ -114,7 +127,9 @@ export default function SellPriceHistoryTable({
         allowSorting: false,
         customCol: (item: unknown) => {
           const history = item as { createdDate: string };
-          return <span className="text-xs">{formatDate(history.createdDate)}</span>;
+          return (
+            <span className='text-xs'>{formatDate(history.createdDate)}</span>
+          );
         },
       },
       {
@@ -124,7 +139,7 @@ export default function SellPriceHistoryTable({
         customCol: (item: unknown) => {
           const history = item as { createdBy?: { name: string } };
           return (
-            <span className="text-xs text-default-500">
+            <span className='text-default-500 text-xs'>
               {history.createdBy?.name ?? '—'}
             </span>
           );
@@ -136,9 +151,9 @@ export default function SellPriceHistoryTable({
 
   if (error) {
     return (
-      <div className="flex flex-col gap-3">
-        <h4 className="text-sm font-semibold">Historial de precios de venta</h4>
-        <p className="text-center text-sm text-danger py-4">
+      <div className='flex flex-col gap-3'>
+        <h4 className='text-sm font-semibold'>Historial de precios de venta</h4>
+        <p className='text-danger py-4 text-center text-sm'>
           Error al cargar historial de precios: {error.message}
         </p>
       </div>
@@ -146,16 +161,16 @@ export default function SellPriceHistoryTable({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <h4 className="text-sm font-semibold">Historial de precios de venta</h4>
+    <div className='flex flex-col gap-3'>
+      <h4 className='text-sm font-semibold'>Historial de precios de venta</h4>
       <DataTable
         cols={columns}
         data={priceHistory}
         isLoading={loading}
-        aria-label="Historial de cambios de precio de venta"
+        aria-label='Historial de cambios de precio de venta'
       />
       {!loading && priceHistory.length === 0 && (
-        <p className="text-center text-sm text-default-400 py-4">
+        <p className='text-default-400 py-4 text-center text-sm'>
           No hay cambios de precio registrados
         </p>
       )}

@@ -11,8 +11,8 @@ const coordinateSchema = z.object({
 
 export const geofenceSettingsSchema = z.object({
   center: coordinateSchema,
-  radiusKm: z
-    .coerce.number()
+  radiusKm: z.coerce
+    .number()
     .min(MIN_GEOFENCE_RADIUS_KM, `Mínimo ${MIN_GEOFENCE_RADIUS_KM} km`)
     .max(MAX_GEOFENCE_RADIUS_KM, `Máximo ${MAX_GEOFENCE_RADIUS_KM} km`),
 });

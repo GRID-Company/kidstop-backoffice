@@ -29,7 +29,7 @@ function PurchaseComponent() {
 
   return (
     <BulkCardSearch
-      variant="purchases"
+      variant='purchases'
       onConfirm={handleConfirm}
       onCancel={() => console.log('Cancelled')}
       isOpen={true}
@@ -52,7 +52,7 @@ function InventoryComponent() {
 
   return (
     <BulkCardSearch
-      variant="inventory"
+      variant='inventory'
       onConfirm={handleConfirm}
       onCancel={() => console.log('Cancelled')}
       isOpen={true}

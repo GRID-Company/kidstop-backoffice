@@ -1,4 +1,6 @@
-query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) {
+query MagicCardInternalList(
+  $findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
+) {
   magicCardInternalList(findMagicCardsPublicArgs: $findMagicCardsPublicArgs) {
     data {
       guid
@@ -76,45 +78,45 @@ query MagicCardWithMetrics($guid: String!) {
 query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
   magicBatchCardSearch(input: $input) {
     results {
-    originalLine
-    parsedQuantity
-    parsedName
-    parsedSet
-    parsedNumber
-    bestMatch {
-      guid
-      name
-      language
-      edition
-      collectorNumber
-      imageUri
-      isFoil
-      sellPrice
-      totalStock
-      cardMetrics {
-        variantsMetrics {
-          condition
-          stock
-          lastSellDate
-          avgDaysInInventory
-          wishlistCount
+      originalLine
+      parsedQuantity
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        language
+        edition
+        collectorNumber
+        imageUri
+        isFoil
+        sellPrice
+        totalStock
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          priceRetail
+          priceBuy
         }
-        priceRetail
-        priceBuy
       }
-    }
-    relatedCards {
-      guid
-      name
-      language
-      edition
-      collectorNumber
-      imageUri
-      isFoil
-      sellPrice
-      totalStock
-    }
-    error
+      relatedCards {
+        guid
+        name
+        language
+        edition
+        collectorNumber
+        imageUri
+        isFoil
+        sellPrice
+        totalStock
+      }
+      error
     }
   }
 }

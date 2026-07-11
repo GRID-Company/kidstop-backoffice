@@ -21,9 +21,12 @@ export function useExportQuery<TVariables extends OperationVariables>({
   successMessage = EXPORT_MESSAGES.SUCCESS,
   errorMessage = EXPORT_MESSAGES.ERROR,
 }: UseExportQueryOptions): UseExportQueryReturn<TVariables> {
-  const [exportQuery, { loading: exporting, data, error }] = useLazyQuery(document, {
-    fetchPolicy: 'network-only',
-  });
+  const [exportQuery, { loading: exporting, data, error }] = useLazyQuery(
+    document,
+    {
+      fetchPolicy: 'network-only',
+    }
+  );
 
   useEffect(() => {
     if (data && Object.values(data)[0]?.success) {

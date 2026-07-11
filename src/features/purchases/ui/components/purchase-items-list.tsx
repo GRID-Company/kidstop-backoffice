@@ -29,7 +29,11 @@ export default function PurchaseItemsList({
   tcgType,
   isReadOnly = false,
 }: PurchaseItemsListProps) {
-  const { itemsWithPrices, loading, refetch: refetchPrices } = useItemsReferencePrices(items);
+  const {
+    itemsWithPrices,
+    loading,
+    refetch: refetchPrices,
+  } = useItemsReferencePrices(items);
 
   useEffect(() => {
     if (onRefetchPrices) {
@@ -49,24 +53,28 @@ export default function PurchaseItemsList({
 
   const buttonClassName = useMemo(() => {
     if (!tcgType) return '';
-    return tcgType === 'POKEMON' 
-      ? 'bg-[#e53223] text-white hover:bg-[#991b1b]' 
+    return tcgType === 'POKEMON'
+      ? 'bg-[#e53223] text-white hover:bg-[#991b1b]'
       : 'bg-[#e85d26] text-white hover:bg-[#9a3412]';
   }, [tcgType]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className='flex flex-col gap-3'>
       {showRefreshButton && (
-        <div className="flex justify-end">
+        <div className='flex justify-end'>
           <Button
-            size="sm"
-            variant="flat"
+            size='sm'
+            variant='flat'
             className={buttonClassName}
             startContent={
               loading ? (
-                <Icon icon="lucide:loader-2" width={16} className="animate-spin" />
+                <Icon
+                  icon='lucide:loader-2'
+                  width={16}
+                  className='animate-spin'
+                />
               ) : (
-                <Icon icon="lucide:refresh-cw" width={16} />
+                <Icon icon='lucide:refresh-cw' width={16} />
               )
             }
             onPress={() => refetchPrices(items)}
@@ -82,9 +90,9 @@ export default function PurchaseItemsList({
         onRemoveItem={onRemoveItem}
         calculateTotal={calculateTotalWrapper}
         isReadOnly={isReadOnly}
-        variant="purchase"
-        totalLabel="Total compra"
-        emptyMessage="No hay items en la compra"
+        variant='purchase'
+        totalLabel='Total compra'
+        emptyMessage='No hay items en la compra'
       />
     </div>
   );

@@ -1,8 +1,14 @@
 import { PurchaseStatus, PURCHASE_STATUS } from './types';
 
-export const PURCHASE_STATUS_TRANSITIONS: Record<PurchaseStatus, PurchaseStatus[]> = {
+export const PURCHASE_STATUS_TRANSITIONS: Record<
+  PurchaseStatus,
+  PurchaseStatus[]
+> = {
   [PURCHASE_STATUS.DRAFT]: [PURCHASE_STATUS.QUOTED, PURCHASE_STATUS.REJECTED],
-  [PURCHASE_STATUS.QUOTED]: [PURCHASE_STATUS.WAITING_PRICE, PURCHASE_STATUS.REJECTED],
+  [PURCHASE_STATUS.QUOTED]: [
+    PURCHASE_STATUS.WAITING_PRICE,
+    PURCHASE_STATUS.REJECTED,
+  ],
   [PURCHASE_STATUS.WAITING_PRICE]: [PURCHASE_STATUS.FINALIZED],
   [PURCHASE_STATUS.FINALIZED]: [],
   [PURCHASE_STATUS.REJECTED]: [PURCHASE_STATUS.DRAFT],
@@ -16,7 +22,9 @@ export function canTransitionTo(
   return allowedTransitions.includes(newStatus);
 }
 
-export function getAvailableTransitions(currentStatus: PurchaseStatus): PurchaseStatus[] {
+export function getAvailableTransitions(
+  currentStatus: PurchaseStatus
+): PurchaseStatus[] {
   return PURCHASE_STATUS_TRANSITIONS[currentStatus];
 }
 

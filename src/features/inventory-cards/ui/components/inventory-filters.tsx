@@ -3,9 +3,7 @@
 import { useCallback, useMemo } from 'react';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import {
-  parseDate,
-} from '@internationalized/date';
+import { parseDate } from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
 import type { DateValue } from '@internationalized/date';
 import Search from '@/shared/base/heorui-overrides/search';
@@ -72,30 +70,30 @@ export default function InventoryFilters({
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       <TcgSegmentedSelector />
 
       <Search
-        label="Buscar en inventario"
-        placeholder="Nombre de carta, set o identificador"
+        label='Buscar en inventario'
+        placeholder='Nombre de carta, set o identificador'
         onValueChange={onSearchChange}
-        aria-label="Buscar en inventario por nombre, set o identificador"
+        aria-label='Buscar en inventario por nombre, set o identificador'
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
         <Select
-          placeholder="Todas las condiciones"
-          label="Condición"
+          placeholder='Todas las condiciones'
+          label='Condición'
           items={CARD_CONDITION_OPTIONS}
           onChange={(e) => onFilterChange('condition', e.target.value)}
-          aria-label="Filtrar por condición"
+          aria-label='Filtrar por condición'
         />
         <Select
-          placeholder="Todas las rarezas"
-          label="Rareza"
+          placeholder='Todas las rarezas'
+          label='Rareza'
           items={rarityOptions}
           onChange={(e) => onFilterChange('rarity', e.target.value)}
-          aria-label="Filtrar por rareza"
+          aria-label='Filtrar por rareza'
         />
         {/* TODO: Oculto temporalmente - Backend no soporta filtro lastSellDate como DateRangeFilter */}
         {/* <DateRangePicker
@@ -107,19 +105,19 @@ export default function InventoryFilters({
         /> */}
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm">
-          <span className="font-semibold text-accent">{resultCount}</span>{' '}
-          <span className="text-content-tertiary">
+      <div className='flex items-center justify-between'>
+        <p className='text-sm'>
+          <span className='text-accent font-semibold'>{resultCount}</span>{' '}
+          <span className='text-content-tertiary'>
             {resultCount === 1 ? 'item encontrado' : 'items encontrados'}
           </span>
         </p>
         {hasActiveFilters && (
           <Button
-            variant="light"
-            size="sm"
-            className="text-accent"
-            startContent={<Icon icon="lucide:x" />}
+            variant='light'
+            size='sm'
+            className='text-accent'
+            startContent={<Icon icon='lucide:x' />}
             onPress={onReset}
           >
             Limpiar filtros

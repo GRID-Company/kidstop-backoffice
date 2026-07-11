@@ -21,8 +21,15 @@ import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
 import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
-import { CardCondition, ICardSearchResult, IPurchaseItem } from '../../domain/types';
-import { CARD_CONDITIONS, CARD_CONDITION_OPTIONS } from '../../domain/constants';
+import {
+  CardCondition,
+  ICardSearchResult,
+  IPurchaseItem,
+} from '../../domain/types';
+import {
+  CARD_CONDITIONS,
+  CARD_CONDITION_OPTIONS,
+} from '../../domain/constants';
 import { getItemKey } from '../../domain/purchases.domain';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
@@ -30,7 +37,10 @@ import { LanguageSelector } from '@/shared/components/language-selector';
 import { useCardSearch } from '../hooks/use-card-search';
 import { useCardVariantMetrics } from '../hooks/use-card-variant-metrics';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
-import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
+import {
+  validateOfferPrice,
+  validateQuantity,
+} from '../../adapters/forms/offer-price.form.schema';
 import { calculateOfferPrice } from '../../domain/price.utils';
 import CardConditionBreakdownPopover from './condition-breakdown-popover';
 
@@ -61,7 +71,12 @@ function CardResultItem({
   existingItemIds,
 }: {
   card: ICardSearchResult;
-  onAdd: (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => void;
+  onAdd: (
+    card: ICardSearchResult,
+    state: AddToCartState,
+    variantMetrics: unknown,
+    referencePrice: number | null
+  ) => void;
   existingItemIds: Set<string>;
 }) {
   const [addState, setAddState] = useState<AddToCartState>({
@@ -73,15 +88,23 @@ function CardResultItem({
   const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
 
   const isAlreadyAdded = useMemo(
-    () => existingItemIds.has(getItemKey({ cardGuid: card.guid, condition: addState.condition, language: addState.language })),
+    () =>
+      existingItemIds.has(
+        getItemKey({
+          cardGuid: card.guid,
+          condition: addState.condition,
+          language: addState.language,
+        })
+      ),
     [existingItemIds, card.guid, addState.condition, addState.language]
   );
 
-  const { metrics: variantMetrics, referencePrice, variantsMetrics, loading: metricsLoading } = useCardVariantMetrics(
-    card.guid,
-    addState.condition,
-    card.tcgType
-  );
+  const {
+    metrics: variantMetrics,
+    referencePrice,
+    variantsMetrics,
+    loading: metricsLoading,
+  } = useCardVariantMetrics(card.guid, addState.condition, card.tcgType);
 
   useEffect(() => {
     if (referencePrice !== null) {
@@ -96,9 +119,10 @@ function CardResultItem({
     setIsAdding(true);
     try {
       await onAdd(card, addState, variantMetrics, referencePrice);
-      const resetPrice = referencePrice !== null 
-        ? calculateOfferPrice(referencePrice)
-        : calculateOfferPrice(card.metrics.referencePrice);
+      const resetPrice =
+        referencePrice !== null
+          ? calculateOfferPrice(referencePrice)
+          : calculateOfferPrice(card.metrics.referencePrice);
       setAddState({
         ...DEFAULT_ADD_STATE,
         unitBuyPrice: resetPrice,
@@ -111,57 +135,63 @@ function CardResultItem({
   const displayMetrics = variantMetrics || card.metrics;
 
   return (
-    <KidstopCard className="w-full">
-      <CardBody className="flex flex-col gap-3 !p-3 xl:flex-row xl:gap-4 xl:!p-4">
-        <div className="flex gap-3 xl:w-[200px] xl:shrink-0">
-          <div className="relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md bg-default-100 xl:h-[100px] xl:w-[72px]">
+    <KidstopCard className='w-full'>
+      <CardBody className='flex flex-col gap-3 !p-3 xl:flex-row xl:gap-4 xl:!p-4'>
+        <div className='flex gap-3 xl:w-[200px] xl:shrink-0'>
+          <div className='bg-default-100 relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md xl:h-[100px] xl:w-[72px]'>
             {card.imageUrl ? (
               <img
                 src={card.imageUrl}
                 alt={card.name}
-                className="absolute inset-0 h-full w-full object-contain p-1"
+                className='absolute inset-0 h-full w-full object-contain p-1'
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-default-400">
-                <Icon icon="lucide:image-off" width={24} />
+              <div className='text-default-400 flex h-full items-center justify-center'>
+                <Icon icon='lucide:image-off' width={24} />
               </div>
             )}
           </div>
-          <div className="flex flex-col justify-center gap-1">
-            <p className="text-sm font-semibold leading-tight">{card.name}</p>
-            <p className="text-xs text-default-500">
+          <div className='flex flex-col justify-center gap-1'>
+            <p className='text-sm leading-tight font-semibold'>{card.name}</p>
+            <p className='text-default-500 text-xs'>
               {card.setName} · {card.setCode}
             </p>
-            <p className="text-xs text-default-400">
+            <p className='text-default-400 text-xs'>
               #{card.number} {card.rarity ? `· ${card.rarity}` : ''}
             </p>
           </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-3 gap-x-2 gap-y-1.5 xl:grid-cols-5 xl:gap-x-4 xl:gap-y-2">
+        <div className='grid flex-1 grid-cols-3 gap-x-2 gap-y-1.5 xl:grid-cols-5 xl:gap-x-4 xl:gap-y-2'>
           {metricsLoading ? (
             <>
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
-              <div className="hidden xl:block">
-                <Skeleton className="h-10 rounded-md" />
+              <Skeleton className='h-10 rounded-md' />
+              <Skeleton className='h-10 rounded-md' />
+              <Skeleton className='h-10 rounded-md' />
+              <div className='hidden xl:block'>
+                <Skeleton className='h-10 rounded-md' />
               </div>
-              <div className="hidden xl:block">
-                <Skeleton className="h-10 rounded-md" />
+              <div className='hidden xl:block'>
+                <Skeleton className='h-10 rounded-md' />
               </div>
             </>
           ) : (
             <>
               <MetricItem
-                icon="lucide:tag"
-                label="Precio ref."
-                value={isPrivacyMode ? '***' : formatCurrency(referencePrice ?? card.metrics.referencePrice)}
-                valueClassName="text-accent font-semibold"
+                icon='lucide:tag'
+                label='Precio ref.'
+                value={
+                  isPrivacyMode
+                    ? '***'
+                    : formatCurrency(
+                        referencePrice ?? card.metrics.referencePrice
+                      )
+                }
+                valueClassName='text-accent font-semibold'
               />
               <MetricItem
-                icon="lucide:package"
-                label="Stock"
+                icon='lucide:package'
+                label='Stock'
                 value={String(variantMetrics?.stock ?? 0)}
                 valueClassName={
                   (variantMetrics?.stock ?? 0) === 0
@@ -170,27 +200,31 @@ function CardResultItem({
                 }
               />
               <MetricItem
-                icon="lucide:heart"
-                label="Wishlist"
+                icon='lucide:heart'
+                label='Wishlist'
                 value={String(displayMetrics.wishlistCount)}
                 valueClassName={
                   displayMetrics.wishlistCount >= WISHLIST_HIGHLIGHT_THRESHOLD
                     ? 'text-accent font-semibold'
                     : ''
                 }
-                endContent={<CardConditionBreakdownPopover variantsMetrics={variantsMetrics} />}
+                endContent={
+                  <CardConditionBreakdownPopover
+                    variantsMetrics={variantsMetrics}
+                  />
+                }
               />
-              <div className="hidden xl:block">
+              <div className='hidden xl:block'>
                 <MetricItem
-                  icon="lucide:calendar"
-                  label="Última venta"
+                  icon='lucide:calendar'
+                  label='Última venta'
                   value={formatDate(displayMetrics.lastSaleDate, 'Sin ventas')}
                 />
               </div>
-              <div className="hidden xl:block">
+              <div className='hidden xl:block'>
                 <MetricItem
-                  icon="lucide:clock"
-                  label="En inventario"
+                  icon='lucide:clock'
+                  label='En inventario'
                   value={formatDaysInInventory(displayMetrics.daysInInventory)}
                   valueClassName={
                     displayMetrics.daysInInventory > 30
@@ -203,30 +237,31 @@ function CardResultItem({
           )}
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-default-200 pt-2 xl:w-[380px] xl:shrink-0 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
-          <div className="grid grid-cols-2 gap-1.5 xl:grid-cols-4 xl:gap-2">
+        <div className='border-default-200 flex flex-col gap-2 border-t pt-2 xl:w-[380px] xl:shrink-0 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-4'>
+          <div className='grid grid-cols-2 gap-1.5 xl:grid-cols-4 xl:gap-2'>
             <LanguageSelector
               value={addState.language}
               onChange={(language) => setAddState((s) => ({ ...s, language }))}
               currentLanguage={card.language}
-              size="sm"
-              label="Idioma"
+              size='sm'
+              label='Idioma'
             />
-            
+
             <Select
-              aria-label="Condición"
-              size="sm"
-              variant="bordered"
+              aria-label='Condición'
+              size='sm'
+              variant='bordered'
               selectedKeys={new Set([addState.condition])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as CardCondition;
-                if (selected) setAddState((s) => ({ ...s, condition: selected }));
+                if (selected)
+                  setAddState((s) => ({ ...s, condition: selected }));
               }}
               classNames={{
                 trigger: 'border-[1px] bg-white',
                 label: 'text-xs',
               }}
-              label="Condición"
+              label='Condición'
             >
               {CARD_CONDITION_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value}>{opt.label}</SelectItem>
@@ -234,11 +269,11 @@ function CardResultItem({
             </Select>
 
             <Input
-              aria-label="Cantidad"
-              type="number"
-              size="sm"
-              variant="bordered"
-              label="Cant."
+              aria-label='Cantidad'
+              type='number'
+              size='sm'
+              variant='bordered'
+              label='Cant.'
               min={1}
               value={String(addState.quantity)}
               onValueChange={(val) => {
@@ -255,11 +290,11 @@ function CardResultItem({
             />
 
             <Input
-              aria-label="Precio por carta"
-              type="number"
-              size="sm"
-              variant="bordered"
-              label="Precio por carta"
+              aria-label='Precio por carta'
+              type='number'
+              size='sm'
+              variant='bordered'
+              label='Precio por carta'
               min={0}
               step={0.01}
               value={String(addState.unitBuyPrice)}
@@ -269,9 +304,7 @@ function CardResultItem({
                   setAddState((s) => ({ ...s, unitBuyPrice: price }));
                 }
               }}
-              startContent={
-                <span className="text-xs text-default-400">$</span>
-              }
+              startContent={<span className='text-default-400 text-xs'>$</span>}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white',
                 input: 'text-right',
@@ -286,9 +319,11 @@ function CardResultItem({
           >
             <div>
               <Button
-                size="sm"
-                className="w-full bg-accent text-white"
-                startContent={!isAdding && <Icon icon="lucide:plus" width={16} />}
+                size='sm'
+                className='bg-accent w-full text-white'
+                startContent={
+                  !isAdding && <Icon icon='lucide:plus' width={16} />
+                }
                 onPress={handleAdd}
                 isLoading={isAdding}
                 isDisabled={
@@ -322,12 +357,12 @@ function MetricItem({
   endContent?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <div className="flex items-center gap-1">
-        <Icon icon={icon} width={12} className="text-default-400" />
-        <span className="text-[10px] text-default-400">{label}</span>
+    <div className='flex flex-col gap-0.5'>
+      <div className='flex items-center gap-1'>
+        <Icon icon={icon} width={12} className='text-default-400' />
+        <span className='text-default-400 text-[10px]'>{label}</span>
       </div>
-      <div className="flex items-center gap-1">
+      <div className='flex items-center gap-1'>
         <span className={`text-xs ${valueClassName}`}>{value}</span>
         {endContent}
       </div>
@@ -361,10 +396,19 @@ export default function CardSearchWithMetrics({
   } = useCardSearch();
 
   const handleAddCard = useCallback(
-    (card: ICardSearchResult, state: AddToCartState, variantMetrics: unknown, referencePrice: number | null) => {
+    (
+      card: ICardSearchResult,
+      state: AddToCartState,
+      variantMetrics: unknown,
+      referencePrice: number | null
+    ) => {
       const finalReferencePrice = referencePrice ?? card.metrics.referencePrice;
       const item: IPurchaseItem = {
-        guid: generateTemporaryItemGuid(card.guid, state.condition, state.language),
+        guid: generateTemporaryItemGuid(
+          card.guid,
+          state.condition,
+          state.language
+        ),
         cardGuid: card.guid,
         cardName: card.name,
         cardImageUrl: card.imageUrl,
@@ -385,38 +429,40 @@ export default function CardSearchWithMetrics({
   );
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
+    <div className='flex flex-col gap-4'>
+      <div className='flex items-center gap-3'>
+        <div className='flex-1'>
           <Search
-            label="Buscar carta"
-            placeholder="Nombre, set o identificador..."
+            label='Buscar carta'
+            placeholder='Nombre, set o identificador...'
             value={search}
             onValueChange={setSearch}
-            aria-label="Buscar carta para agregar a compra"
+            aria-label='Buscar carta para agregar a compra'
             isClearable
             onClear={resetSearch}
           />
         </div>
         <Badge
-          content={activeFilterCount > 0 ? String(activeFilterCount) : undefined}
-          color="primary"
-          size="sm"
+          content={
+            activeFilterCount > 0 ? String(activeFilterCount) : undefined
+          }
+          color='primary'
+          size='sm'
           isInvisible={activeFilterCount === 0}
-          className="shrink-0"
+          className='shrink-0'
         >
           <Button
             isIconOnly
-            variant="bordered"
-            aria-label="Filtros avanzados"
+            variant='bordered'
+            aria-label='Filtros avanzados'
             onPress={() => setIsFilterDrawerOpen(true)}
             className={hasActiveFilters ? 'border-primary text-primary' : ''}
           >
-            <Icon icon="lucide:sliders-horizontal" width={18} />
+            <Icon icon='lucide:sliders-horizontal' width={18} />
           </Button>
         </Badge>
         {search && (
-          <Chip size="sm" variant="flat" className="shrink-0">
+          <Chip size='sm' variant='flat' className='shrink-0'>
             {results.length} {results.length === 1 ? 'resultado' : 'resultados'}
           </Chip>
         )}
@@ -438,24 +484,27 @@ export default function CardSearchWithMetrics({
       />
 
       {loading ? (
-        <div className="flex flex-col gap-3">
+        <div className='flex flex-col gap-3'>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex gap-3 rounded-xl border border-default-200 p-3 xl:p-4">
-              <Skeleton className="h-[90px] w-[65px] shrink-0 rounded-md xl:h-[100px] xl:w-[72px]" />
-              <div className="flex flex-1 flex-col justify-center gap-2">
-                <Skeleton className="h-4 w-2/3 rounded-md" />
-                <Skeleton className="h-3 w-1/2 rounded-md" />
-                <div className="flex gap-4 pt-1">
-                  <Skeleton className="h-3 w-16 rounded-md" />
-                  <Skeleton className="h-3 w-16 rounded-md" />
-                  <Skeleton className="h-3 w-16 rounded-md" />
+            <div
+              key={i}
+              className='border-default-200 flex gap-3 rounded-xl border p-3 xl:p-4'
+            >
+              <Skeleton className='h-[90px] w-[65px] shrink-0 rounded-md xl:h-[100px] xl:w-[72px]' />
+              <div className='flex flex-1 flex-col justify-center gap-2'>
+                <Skeleton className='h-4 w-2/3 rounded-md' />
+                <Skeleton className='h-3 w-1/2 rounded-md' />
+                <div className='flex gap-4 pt-1'>
+                  <Skeleton className='h-3 w-16 rounded-md' />
+                  <Skeleton className='h-3 w-16 rounded-md' />
+                  <Skeleton className='h-3 w-16 rounded-md' />
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : results.length > 0 ? (
-        <div className="flex flex-col gap-3">
+        <div className='flex flex-col gap-3'>
           {results.map((card) => (
             <CardResultItem
               key={card.guid}
@@ -466,9 +515,9 @@ export default function CardSearchWithMetrics({
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-12 text-default-400">
-          <Icon icon="lucide:search-x" width={40} className="mb-2" />
-          <span className="text-sm">
+        <div className='text-default-400 flex flex-col items-center justify-center py-12'>
+          <Icon icon='lucide:search-x' width={40} className='mb-2' />
+          <span className='text-sm'>
             {search
               ? 'No se encontraron cartas con ese criterio'
               : 'Busca una carta para ver sus métricas'}

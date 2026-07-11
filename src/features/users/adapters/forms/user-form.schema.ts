@@ -26,7 +26,8 @@ export const userFormSchema = (isEditing = false) =>
         return true;
       },
       {
-        message: 'La contraseña es obligatoria para usuarios kiosk (mínimo 6 caracteres)',
+        message:
+          'La contraseña es obligatoria para usuarios kiosk (mínimo 6 caracteres)',
         path: ['password'],
       }
     );

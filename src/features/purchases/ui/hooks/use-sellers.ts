@@ -4,7 +4,12 @@ import toast from 'react-hot-toast';
 
 import { ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
-import { CreateSellerDocument, SellersDocument, UpdateSellerDocument, DeleteSellerDocument } from '@/lib/api/generated/purchases.generated';
+import {
+  CreateSellerDocument,
+  SellersDocument,
+  UpdateSellerDocument,
+  DeleteSellerDocument,
+} from '@/lib/api/generated/purchases.generated';
 
 export function useSellers(search?: string) {
   const { data, loading, refetch } = useQuery(SellersDocument, {
@@ -117,7 +122,10 @@ export function useSellers(search?: string) {
   );
 
   const updateSeller = useCallback(
-    async (guid: string, data: SellerFormData): Promise<ISeller | undefined> => {
+    async (
+      guid: string,
+      data: SellerFormData
+    ): Promise<ISeller | undefined> => {
       try {
         const result = await updateSellerMutation({
           variables: {

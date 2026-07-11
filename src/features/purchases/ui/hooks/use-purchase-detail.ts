@@ -6,7 +6,7 @@ import { CardLanguage } from '@/lib/api/schema-types';
 import { useAuthStore } from '@/lib/store/auth';
 import { generateTemporaryItemGuid } from '@/shared/utils/guid-utils';
 
-import { 
+import {
   PurchaseDocument,
   UpdatePurchaseStatusDocument,
   UpdatePurchaseItemsDocument,
@@ -65,21 +65,27 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     skip: !purchaseId,
   });
 
-  const [updatePurchaseStatusMutation] = useMutation(UpdatePurchaseStatusDocument, {
-    onCompleted: () => {
-      toast.success('Estado de compra actualizado');
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(`Error al actualizar estado: ${error.message}`);
-    },
-  });
+  const [updatePurchaseStatusMutation] = useMutation(
+    UpdatePurchaseStatusDocument,
+    {
+      onCompleted: () => {
+        toast.success('Estado de compra actualizado');
+        refetch();
+      },
+      onError: (error) => {
+        toast.error(`Error al actualizar estado: ${error.message}`);
+      },
+    }
+  );
 
-  const [updatePurchaseItemsMutation] = useMutation(UpdatePurchaseItemsDocument, {
-    onError: (error) => {
-      toast.error(`Error al guardar items: ${error.message}`);
-    },
-  });
+  const [updatePurchaseItemsMutation] = useMutation(
+    UpdatePurchaseItemsDocument,
+    {
+      onError: (error) => {
+        toast.error(`Error al guardar items: ${error.message}`);
+      },
+    }
+  );
 
   const basePurchase = useMemo<IPurchase | null>(() => {
     if (!data?.purchase) return null;
@@ -109,11 +115,22 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         : undefined,
       items: (p.items || []).map((item) => ({
         guid: item.guid,
-        cardGuid: item.pokemonCardSummary?.guid || item.magicCardSummary?.guid || '',
-        cardName: item.pokemonCardSummary?.name || item.magicCardSummary?.name || '',
-        cardImageUrl: item.pokemonCardSummary?.imageUri || item.magicCardSummary?.imageUri || '',
-        setName: item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '',
-        setCode: item.pokemonCardSummary?.setCode || item.magicCardSummary?.collectorNumber || '',
+        cardGuid:
+          item.pokemonCardSummary?.guid || item.magicCardSummary?.guid || '',
+        cardName:
+          item.pokemonCardSummary?.name || item.magicCardSummary?.name || '',
+        cardImageUrl:
+          item.pokemonCardSummary?.imageUri ||
+          item.magicCardSummary?.imageUri ||
+          '',
+        setName:
+          item.pokemonCardSummary?.setName ||
+          item.magicCardSummary?.edition ||
+          '',
+        setCode:
+          item.pokemonCardSummary?.setCode ||
+          item.magicCardSummary?.collectorNumber ||
+          '',
         cardNumber: item.pokemonCardSummary?.cardNumber || undefined,
         variant: item.pokemonCardSummary?.variant || undefined,
         type: item.pokemonCardSummary?.type || undefined,
@@ -139,10 +156,14 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     };
   }, [data]);
 
-  const itemsForm = usePurchaseItemsForm({ initialItems: basePurchase?.items || [] });
+  const itemsForm = usePurchaseItemsForm({
+    initialItems: basePurchase?.items || [],
+  });
   const paymentsForm = usePaymentSplitForm();
   const [status, setStatus] = useState<PurchaseStatus>(PURCHASE_STATUS.DRAFT);
-  const [newItems, setNewItems] = useState<Map<string, IPurchaseItem>>(new Map());
+  const [newItems, setNewItems] = useState<Map<string, IPurchaseItem>>(
+    new Map()
+  );
   const [mutating, setMutating] = useState(false);
 
   useEffect(() => {
@@ -166,18 +187,25 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const items = useMemo(() => {
     if (!basePurchase) return [];
-    
+
     return itemsForm.fieldArray.fields.map((field) => {
       // Find the original item by cardGuid, condition AND language to support multiple languages of same card
       const originalItem = basePurchase.items.find(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item) => item.cardGuid === field.cardGuid && item.condition === field.condition && item.language === (field as any).language
+        (item) =>
+          item.cardGuid === field.cardGuid &&
+          item.condition === field.condition &&
+          item.language === (field as any).language
       );
       if (!originalItem) {
         // If not found in basePurchase.items, check if it's in newItems
         // Try to find by cardGuid:condition:language key
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const itemKey = getItemKey({ cardGuid: field.cardGuid, condition: field.condition, language: (field as any).language });
+        const itemKey = getItemKey({
+          cardGuid: field.cardGuid,
+          condition: field.condition,
+          language: (field as any).language,
+        });
         const newItem = newItems.get(itemKey);
         if (newItem) {
           return {
@@ -195,10 +223,16 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         return {
           ...(field as unknown as IPurchaseItem),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          guid: (field as any).id || generateTemporaryItemGuid(field.cardGuid, field.condition, (field as any).language),
+          guid:
+            (field as any).id ||
+            generateTemporaryItemGuid(
+              field.cardGuid,
+              field.condition,
+              (field as any).language
+            ),
         };
       }
-      
+
       // Merge form values with original item data
       return {
         ...originalItem,
@@ -224,27 +258,32 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const buyerGuid = currentUser?.guid;
   const tcg = basePurchase?.tcgType;
 
-  const { data: budgetData, refetch: refetchBudget } = useQuery(BuyerBudgetDocument, {
-    variables: {
-      buyerGuid: buyerGuid || '',
-      tcg: tcg || '',
-    },
-    skip: !buyerGuid || !tcg,
-  });
+  const { data: budgetData, refetch: refetchBudget } = useQuery(
+    BuyerBudgetDocument,
+    {
+      variables: {
+        buyerGuid: buyerGuid || '',
+        tcg: tcg || '',
+      },
+      skip: !buyerGuid || !tcg,
+    }
+  );
 
   const currentBuyerSpent = budgetData?.buyerBudget?.usedAmount || 0;
   const assignedBudget = budgetData?.buyerBudget?.assignedAmount || 0;
   const budgetUtilization = budgetData?.buyerBudget?.utilization || 0;
 
-  const isEditable = status === PURCHASE_STATUS.DRAFT || status === PURCHASE_STATUS.QUOTED;
+  const isEditable =
+    status === PURCHASE_STATUS.DRAFT || status === PURCHASE_STATUS.QUOTED;
 
-  const canSendQuote =
-    status === PURCHASE_STATUS.DRAFT && items.length > 0;
+  const canSendQuote = status === PURCHASE_STATUS.DRAFT && items.length > 0;
 
   const canQuote = status === PURCHASE_STATUS.DRAFT && items.length > 0;
 
   const canResendQuote =
-    (status === PURCHASE_STATUS.QUOTED || status === PURCHASE_STATUS.WAITING_PRICE) && items.length > 0;
+    (status === PURCHASE_STATUS.QUOTED ||
+      status === PURCHASE_STATUS.WAITING_PRICE) &&
+    items.length > 0;
 
   const canAcceptQuote = status === PURCHASE_STATUS.QUOTED;
 
@@ -252,10 +291,13 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
   const canAdjustPrices = status === PURCHASE_STATUS.WAITING_PRICE;
 
-  const allPricesAdjusted = items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
+  const allPricesAdjusted =
+    items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
 
   const canFinalize =
-    status === PURCHASE_STATUS.WAITING_PRICE && payments.length > 0 && allPricesAdjusted;
+    status === PURCHASE_STATUS.WAITING_PRICE &&
+    payments.length > 0 &&
+    allPricesAdjusted;
 
   const canReject =
     status === PURCHASE_STATUS.DRAFT || status === PURCHASE_STATUS.QUOTED;
@@ -267,60 +309,75 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
     [items]
   );
 
-  const addItem = useCallback((item: IPurchaseItem) => {
-    // Store the complete item in newItems Map using cardGuid:condition:language as key
-    const itemKey = getItemKey(item);
-    setNewItems((prev) => new Map(prev).set(itemKey, item));
-    
-    // Add to form
-    itemsForm.fieldArray.append({
-      cardGuid: item.cardGuid,
-      condition: item.condition,
-      language: item.language,
-      quantity: item.quantity,
-      offerPrice: item.offerPrice,
-      referencePrice: item.referencePrice,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any); // Form field type compatibility
-  }, [itemsForm.fieldArray]);
+  const addItem = useCallback(
+    (item: IPurchaseItem) => {
+      // Store the complete item in newItems Map using cardGuid:condition:language as key
+      const itemKey = getItemKey(item);
+      setNewItems((prev) => new Map(prev).set(itemKey, item));
 
-  const updateItem = useCallback(
-    (itemId: string, updates: Partial<IPurchaseItem>) => {
-      const index = items.findIndex((item) => item.guid === itemId);
-      if (index !== -1) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        itemsForm.fieldArray.update(index, { ...items[index], ...updates } as any);
-      }
-    },
-    [items, itemsForm.fieldArray]
-  );
-
-  const removeItem = useCallback((itemId: string) => {
-    const index = items.findIndex((item) => item.guid === itemId);
-    if (index !== -1) {
-      itemsForm.fieldArray.remove(index);
-    }
-  }, [items, itemsForm.fieldArray]);
-
-  const updatePayments = useCallback((newPayments: IPaymentDetail[]) => {
-    paymentsForm.reset({ payments: newPayments });
-  }, [paymentsForm]);
-
-  const updateItems = useCallback((newItems: IPurchaseItem[]) => {
-    itemsForm.form.reset({
-      items: newItems.map((item) => ({
+      // Add to form
+      itemsForm.fieldArray.append({
         cardGuid: item.cardGuid,
         condition: item.condition,
         language: item.language,
         quantity: item.quantity,
         offerPrice: item.offerPrice,
         referencePrice: item.referencePrice,
-      })),
-    });
-    if (basePurchase) {
-      void refetch();
-    }
-  }, [itemsForm.form, basePurchase, refetch]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any); // Form field type compatibility
+    },
+    [itemsForm.fieldArray]
+  );
+
+  const updateItem = useCallback(
+    (itemId: string, updates: Partial<IPurchaseItem>) => {
+      const index = items.findIndex((item) => item.guid === itemId);
+      if (index !== -1) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        itemsForm.fieldArray.update(index, {
+          ...items[index],
+          ...updates,
+        } as any);
+      }
+    },
+    [items, itemsForm.fieldArray]
+  );
+
+  const removeItem = useCallback(
+    (itemId: string) => {
+      const index = items.findIndex((item) => item.guid === itemId);
+      if (index !== -1) {
+        itemsForm.fieldArray.remove(index);
+      }
+    },
+    [items, itemsForm.fieldArray]
+  );
+
+  const updatePayments = useCallback(
+    (newPayments: IPaymentDetail[]) => {
+      paymentsForm.reset({ payments: newPayments });
+    },
+    [paymentsForm]
+  );
+
+  const updateItems = useCallback(
+    (newItems: IPurchaseItem[]) => {
+      itemsForm.form.reset({
+        items: newItems.map((item) => ({
+          cardGuid: item.cardGuid,
+          condition: item.condition,
+          language: item.language,
+          quantity: item.quantity,
+          offerPrice: item.offerPrice,
+          referencePrice: item.referencePrice,
+        })),
+      });
+      if (basePurchase) {
+        void refetch();
+      }
+    },
+    [itemsForm.form, basePurchase, refetch]
+  );
 
   const hasItemChanges = useMemo(() => {
     if (!basePurchase) return false;
@@ -348,7 +405,9 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
     // Check if any existing item was modified
     return items.some((currentItem) => {
-      const serverItem = basePurchase.items.find((i) => i.guid === currentItem.guid);
+      const serverItem = basePurchase.items.find(
+        (i) => i.guid === currentItem.guid
+      );
       if (!serverItem) return true;
 
       return (
@@ -363,19 +422,29 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
   const updateItemsOnly = useCallback(async () => {
     try {
       // Validate items before sending
-      const invalidItems = items.filter((item) => item.quantity < 1 || item.offerPrice < 0);
+      const invalidItems = items.filter(
+        (item) => item.quantity < 1 || item.offerPrice < 0
+      );
       if (invalidItems.length > 0) {
-        toast.error('Hay items con valores inválidos (cantidad >= 1, precio >= 0)');
+        toast.error(
+          'Hay items con valores inválidos (cantidad >= 1, precio >= 0)'
+        );
         return;
       }
 
-      const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
+      const serverItemGuids = new Set(
+        (basePurchase?.items ?? []).map((i) => i.guid)
+      );
       const currentItemGuids = new Set(items.map((i) => i.guid));
 
       // Separate added, updated, and removed items
       const addItems = items.filter((i) => !serverItemGuids.has(i.guid));
-      const removeItemGuids = Array.from(serverItemGuids).filter((guid) => !currentItemGuids.has(guid));
-      const updateItems = items.filter((i) => serverItemGuids.has(i.guid) && i.guid);
+      const removeItemGuids = Array.from(serverItemGuids).filter(
+        (guid) => !currentItemGuids.has(guid)
+      );
+      const updateItems = items.filter(
+        (i) => serverItemGuids.has(i.guid) && i.guid
+      );
 
       const tcgType = basePurchase?.tcgType ?? 'POKEMON';
 
@@ -407,53 +476,67 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
       toast.success('Items actualizados correctamente');
       void refetch();
     } catch (error) {
-      toast.error(`Error al actualizar items: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(
+        `Error al actualizar items: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, refetch]);
 
-  const updateStatus = useCallback(async (newStatus: PurchaseStatus) => {
-    setMutating(true);
-    try {
-      const serverItemGuids = new Set((basePurchase?.items ?? []).map((i) => i.guid));
-      const pendingItems = items.filter((i) => !serverItemGuids.has(i.guid));
+  const updateStatus = useCallback(
+    async (newStatus: PurchaseStatus) => {
+      setMutating(true);
+      try {
+        const serverItemGuids = new Set(
+          (basePurchase?.items ?? []).map((i) => i.guid)
+        );
+        const pendingItems = items.filter((i) => !serverItemGuids.has(i.guid));
 
-      if (pendingItems.length > 0) {
-        const tcgType = basePurchase?.tcgType ?? 'POKEMON';
-        await updatePurchaseItemsMutation({
+        if (pendingItems.length > 0) {
+          const tcgType = basePurchase?.tcgType ?? 'POKEMON';
+          await updatePurchaseItemsMutation({
+            variables: {
+              updatePurchaseItemsInput: {
+                purchaseGuid: purchaseId,
+                addItems: pendingItems.map((item) => ({
+                  ...(tcgType === 'POKEMON'
+                    ? { pokemonCardGuid: item.cardGuid }
+                    : { magicCardGuid: item.cardGuid }),
+                  condition: item.condition,
+                  language: item.language as CardLanguage,
+                  quantity: item.quantity,
+                  offerPrice: item.offerPrice,
+                  referencePrice: item.referencePrice,
+                })),
+              },
+            },
+          });
+        }
+
+        await updatePurchaseStatusMutation({
           variables: {
-            updatePurchaseItemsInput: {
+            updatePurchaseStatusInput: {
               purchaseGuid: purchaseId,
-              addItems: pendingItems.map((item) => ({
-                ...(tcgType === 'POKEMON'
-                  ? { pokemonCardGuid: item.cardGuid }
-                  : { magicCardGuid: item.cardGuid }),
-                condition: item.condition,
-                language: item.language as CardLanguage,
-                quantity: item.quantity,
-                offerPrice: item.offerPrice,
-                referencePrice: item.referencePrice,
-              })),
+              newStatus,
             },
           },
         });
+        setStatus(newStatus);
+        void refetchBudget();
+      } catch {
+        // Error already handled by mutation onError callback
+      } finally {
+        setMutating(false);
       }
-
-      await updatePurchaseStatusMutation({
-        variables: {
-          updatePurchaseStatusInput: {
-            purchaseGuid: purchaseId,
-            newStatus,
-          },
-        },
-      });
-      setStatus(newStatus);
-      void refetchBudget();
-    } catch {
-      // Error already handled by mutation onError callback
-    } finally {
-      setMutating(false);
-    }
-  }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, updatePurchaseStatusMutation, refetchBudget]);
+    },
+    [
+      purchaseId,
+      basePurchase,
+      items,
+      updatePurchaseItemsMutation,
+      updatePurchaseStatusMutation,
+      refetchBudget,
+    ]
+  );
 
   return {
     purchase,

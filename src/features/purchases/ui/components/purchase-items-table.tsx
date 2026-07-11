@@ -1,11 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useEffect } from 'react';
-import {
-  Button,
-  Tooltip,
-  SelectItem,
-} from '@heroui/react';
+import { Button, Tooltip, SelectItem } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 import OverrideInput from '@/shared/base/heorui-overrides/input';
@@ -27,8 +23,10 @@ import {
   calculateTotal,
 } from '../../domain/purchases.domain';
 import { useItemsReferencePrices } from '../hooks/use-items-reference-prices';
-import { validateOfferPrice, validateQuantity } from '../../adapters/forms/offer-price.form.schema';
-
+import {
+  validateOfferPrice,
+  validateQuantity,
+} from '../../adapters/forms/offer-price.form.schema';
 
 interface PurchaseItemsTableProps {
   items: IPurchaseItem[];
@@ -47,7 +45,8 @@ export default function PurchaseItemsTable({
 }: PurchaseItemsTableProps) {
   const displayCurrency = usePrivacyCurrency();
   const { isPrivacyMode } = usePrivacyModeStore();
-  const { itemsWithPrices, refetch: refetchPrices } = useItemsReferencePrices(items);
+  const { itemsWithPrices, refetch: refetchPrices } =
+    useItemsReferencePrices(items);
 
   // Expose refetch to parent when requested
   useEffect(() => {
@@ -56,8 +55,10 @@ export default function PurchaseItemsTable({
     }
   }, [refetchPrices, onRefetchPrices]);
 
-
-  const total = useMemo(() => calculateTotal(itemsWithPrices), [itemsWithPrices]);
+  const total = useMemo(
+    () => calculateTotal(itemsWithPrices),
+    [itemsWithPrices]
+  );
 
   const handleQuantityChange = useCallback(
     (itemId: string, value: string) => {
@@ -95,19 +96,19 @@ export default function PurchaseItemsTable({
         label: 'Carta',
         className: '!text-left min-w-[220px]',
         customCol: (item: IPurchaseItem) => (
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             <CardImage
               src={item.cardImageUrl}
               alt={item.cardName}
               tcgType={item.tcgType}
-              containerClassName="relative h-12 w-9 rounded overflow-hidden bg-default-100 flex-shrink-0"
-              className="object-cover"
+              containerClassName='relative h-12 w-9 rounded overflow-hidden bg-default-100 flex-shrink-0'
+              className='object-cover'
               fill
-              sizes="36px"
+              sizes='36px'
             />
-            <div className="flex flex-col items-start">
-              <span className="text-sm font-medium">{item.cardName}</span>
-              <span className="text-xs text-default-400">
+            <div className='flex flex-col items-start'>
+              <span className='text-sm font-medium'>{item.cardName}</span>
+              <span className='text-default-400 text-xs'>
                 {item.setName} · {item.setCode}
               </span>
             </div>
@@ -119,7 +120,7 @@ export default function PurchaseItemsTable({
         label: 'Precio ref. al agregar',
         className: 'w-[140px]',
         customCol: (item: IPurchaseItem) => (
-          <span className="text-sm font-medium">
+          <span className='text-sm font-medium'>
             {displayCurrency(item.referencePrice ?? 0)}
           </span>
         ),
@@ -129,7 +130,7 @@ export default function PurchaseItemsTable({
         label: 'Precio ref. actual',
         className: 'w-[140px]',
         customCol: (item: IPurchaseItem) => (
-          <span className="text-sm font-medium">
+          <span className='text-sm font-medium'>
             {displayCurrency(item.currentReferencePrice ?? 0)}
           </span>
         ),
@@ -140,14 +141,18 @@ export default function PurchaseItemsTable({
         className: 'min-w-[160px]',
         customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
-            <span className="text-sm">
-              {CARD_CONDITION_SHORT_LABELS[item.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]}
+            <span className='text-sm'>
+              {
+                CARD_CONDITION_SHORT_LABELS[
+                  item.condition as keyof typeof CARD_CONDITION_SHORT_LABELS
+                ]
+              }
             </span>
           ) : (
             <KidstopSelect
-              aria-label="Condición"
-              size="sm"
-              variant="bordered"
+              aria-label='Condición'
+              size='sm'
+              variant='bordered'
               selectedKeys={new Set([item.condition])}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -169,13 +174,13 @@ export default function PurchaseItemsTable({
         className: 'w-[100px]',
         customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
-            <span className="text-sm">{item.quantity}</span>
+            <span className='text-sm'>{item.quantity}</span>
           ) : (
             <OverrideInput
-              aria-label="Cantidad"
-              type="number"
-              size="sm"
-              variant="bordered"
+              aria-label='Cantidad'
+              type='number'
+              size='sm'
+              variant='bordered'
               min={1}
               value={String(item.quantity)}
               onValueChange={(val) => handleQuantityChange(item.guid, val)}
@@ -191,22 +196,20 @@ export default function PurchaseItemsTable({
         label: 'Precio oferta',
         customCol: (item: IPurchaseItem) =>
           isReadOnly ? (
-            <span className="text-sm font-medium">
+            <span className='text-sm font-medium'>
               {displayCurrency(item.offerPrice)}
             </span>
           ) : (
             <OverrideInput
-              aria-label="Precio oferta"
-              type="number"
-              size="sm"
-              variant="bordered"
+              aria-label='Precio oferta'
+              type='number'
+              size='sm'
+              variant='bordered'
               min={0}
               step={1}
               value={String(item.offerPrice)}
               onValueChange={(val) => handleOfferPriceChange(item.guid, val)}
-              startContent={
-                <span className="text-xs text-default-400">$</span>
-              }
+              startContent={<span className='text-default-400 text-xs'>$</span>}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white w-[120px] pr-1',
                 input: 'text-right pr-6',
@@ -218,7 +221,7 @@ export default function PurchaseItemsTable({
         key: 'subtotal',
         label: 'Subtotal',
         customCol: (item: IPurchaseItem) => (
-          <span className="text-sm font-semibold">
+          <span className='text-sm font-semibold'>
             {formatCurrency(calculateItemSubtotal(item))}
           </span>
         ),
@@ -231,16 +234,16 @@ export default function PurchaseItemsTable({
         label: '',
         className: 'w-[60px]',
         customCol: (item: IPurchaseItem) => (
-          <Tooltip content="Eliminar item" color="danger">
+          <Tooltip content='Eliminar item' color='danger'>
             <Button
               isIconOnly
-              size="sm"
-              variant="light"
-              color="danger"
+              size='sm'
+              variant='light'
+              color='danger'
               onPress={() => onRemoveItem(item.guid)}
               aria-label={`Eliminar ${item.cardName}`}
             >
-              <Icon icon="lucide:trash-2" width={16} />
+              <Icon icon='lucide:trash-2' width={16} />
             </Button>
           </Tooltip>
         ),
@@ -259,14 +262,18 @@ export default function PurchaseItemsTable({
   ]);
 
   return (
-    <div className="flex flex-col gap-3">
-      <DataTable<IPurchaseItem> cols={columns} data={itemsWithPrices} isLoading={false} />
+    <div className='flex flex-col gap-3'>
+      <DataTable<IPurchaseItem>
+        cols={columns}
+        data={itemsWithPrices}
+        isLoading={false}
+      />
 
       {itemsWithPrices.length > 0 && (
-        <div className="flex justify-end border-t border-default-200 pt-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-default-500">Total compra:</span>
-            <span className="text-lg font-bold text-accent">
+        <div className='border-default-200 flex justify-end border-t pt-3'>
+          <div className='flex items-center gap-2'>
+            <span className='text-default-500 text-sm'>Total compra:</span>
+            <span className='text-accent text-lg font-bold'>
               {formatCurrency(total)}
             </span>
           </div>
@@ -274,9 +281,9 @@ export default function PurchaseItemsTable({
       )}
 
       {itemsWithPrices.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-8 text-default-400">
-          <Icon icon="lucide:package-open" width={40} className="mb-2" />
-          <span className="text-sm">No hay items en la compra</span>
+        <div className='text-default-400 flex flex-col items-center justify-center py-8'>
+          <Icon icon='lucide:package-open' width={40} className='mb-2' />
+          <span className='text-sm'>No hay items en la compra</span>
         </div>
       )}
     </div>

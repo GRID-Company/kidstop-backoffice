@@ -61,7 +61,4 @@ export interface ISettings {
   updatedDate: string;
 }
 
-export type SettingsSection =
-  | 'general'
-  | 'budgets'
-  | 'banners';
+export type SettingsSection = 'general' | 'budgets' | 'banners';

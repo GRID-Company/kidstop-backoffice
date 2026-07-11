@@ -315,15 +315,15 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
         "language": "ENGLISH",
-        "offerPrice": 10.00,
-        "referencePrice": 15.00,
+        "offerPrice": 10.0,
+        "referencePrice": 15.0,
         "quantity": 1
       }
     ],
     "payments": [
       {
         "method": "CASH",
-        "amount": 10.00
+        "amount": 10.0
       }
     ]
   }
@@ -342,7 +342,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
         "language": "ENGLISH",
-        "offerPrice": 10.00,
+        "offerPrice": 10.0,
         "quantity": 1
       }
     ]
@@ -413,11 +413,11 @@ mutation UpdatePurchase($updatePurchaseInput: UpdatePurchaseInput!) {
     "payments": [
       {
         "method": "CASH",
-        "amount": 10.00
+        "amount": 10.0
       },
       {
         "method": "STORE_CREDIT",
-        "amount": 5.00
+        "amount": 5.0
       }
     ]
   }
@@ -439,7 +439,9 @@ mutation UpdatePurchase($updatePurchaseInput: UpdatePurchaseInput!) {
 **Access:** ADMIN, BUYER, RECEPTION
 
 ```graphql
-mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput!) {
+mutation UpdatePurchaseItems(
+  $updatePurchaseItemsInput: UpdatePurchaseItemsInput!
+) {
   updatePurchaseItems(updatePurchaseItemsInput: $updatePurchaseItemsInput) {
     guid
     reference
@@ -476,15 +478,15 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
         "language": "ENGLISH",
-        "offerPrice": 5.00,
-        "referencePrice": 8.00,
+        "offerPrice": 5.0,
+        "referencePrice": 8.0,
         "quantity": 2
       }
     ],
     "updateItems": [
       {
         "itemGuid": "EXISTING_ITEM_GUID",
-        "offerPrice": 12.00,
+        "offerPrice": 12.0,
         "quantity": 3
       }
     ],
@@ -514,7 +516,9 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
 **Access:** ADMIN, BUYER only
 
 ```graphql
-mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusInput!) {
+mutation UpdatePurchaseStatus(
+  $updatePurchaseStatusInput: UpdatePurchaseStatusInput!
+) {
   updatePurchaseStatus(updatePurchaseStatusInput: $updatePurchaseStatusInput) {
     guid
     reference
@@ -552,8 +556,12 @@ mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusIn
 **Access:** ADMIN, BUYER
 
 ```graphql
-mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!) {
-  setPurchaseItemSellPrice(setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput) {
+mutation SetPurchaseItemSellPrice(
+  $setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!
+) {
+  setPurchaseItemSellPrice(
+    setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput
+  ) {
     guid
     offerPrice
     referencePrice
@@ -571,7 +579,7 @@ mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseIte
   "setPurchaseItemSellPriceInput": {
     "purchaseItemGuid": "PURCHASE_ITEM_GUID",
     "sellPrice": 19.99,
-    "referencePrice": 15.00
+    "referencePrice": 15.0
   }
 }
 ```

@@ -17,6 +17,7 @@ DEV GRID (Workspace)
 ```
 
 Cada folder contiene **listas con estados personalizados**:
+
 - ✅ DONE
 - 🔴 BLOCKED / ON HOLD
 - 🔄 IN PROGRESS
@@ -64,6 +65,7 @@ npm run clickup:setup
 ```
 
 El script:
+
 - ✅ Detectará el folder existente
 - ✅ Usará las listas que ya tienes
 - ✅ Agregará custom fields a la primera lista
@@ -88,6 +90,7 @@ npm run clickup:setup
 ```
 
 El script:
+
 - ✅ Creará un folder con el nombre del proyecto
 - ✅ Creará una lista "Tasks" dentro del folder
 - ✅ Agregará custom fields
@@ -124,7 +127,9 @@ npm run clickup:setup
 El setup agrega estos custom fields a tu lista:
 
 ### Feature
+
 Tipo: Dropdown
+
 - auth
 - inventory
 - windows
@@ -132,27 +137,34 @@ Tipo: Dropdown
 - other
 
 ### Layer
+
 Tipo: Dropdown
+
 - adapters
 - domain
 - ui
 - config
 
 ### Priority
+
 Tipo: Dropdown
+
 - high
 - medium
 - low
 
 ### Estimated Time
+
 Tipo: Text
 Ejemplo: "2h", "1d", "3h"
 
 ### Module
+
 Tipo: Text
 Nombre del módulo específico
 
 ### Branch
+
 Tipo: Text
 Nombre del branch de Git
 
@@ -187,6 +199,7 @@ npm run clickup:sync
 ```
 
 Muestra:
+
 - 📊 Resumen de tareas (total, done, in progress, todo)
 - 🎯 Distribución por prioridad
 - 🎨 Distribución por feature

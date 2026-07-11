@@ -12,7 +12,13 @@ import {
   UpdateSaleItemDocument,
   RemoveSaleItemDocument,
 } from '@/lib/api/generated/sales.generated';
-import { CancelReason, ISale, ISaleItem, SALE_STATUS, SaleStatus } from '../../domain/types';
+import {
+  CancelReason,
+  ISale,
+  ISaleItem,
+  SALE_STATUS,
+  SaleStatus,
+} from '../../domain/types';
 import { calculateTotal } from '../../domain/sales.domain';
 
 interface UseSaleDetailReturn {
@@ -75,10 +81,7 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     }
   }, [sale]);
 
-  const total = useMemo(
-    () => calculateTotal(localItems),
-    [localItems]
-  );
+  const total = useMemo(() => calculateTotal(localItems), [localItems]);
 
   const itemCount = useMemo(
     () => localItems.reduce((sum, item) => sum + item.quantity, 0),
@@ -105,7 +108,11 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
       }
       return changed;
     });
-    console.log('🟡 hasChanges:', result, { localItems, saleItems: sale.items, itemsToRemove });
+    console.log('🟡 hasChanges:', result, {
+      localItems,
+      saleItems: sale.items,
+      itemsToRemove,
+    });
     return result;
   }, [sale, localItems, itemsToRemove]);
 
@@ -153,15 +160,22 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     (itemId: string, updates: Partial<ISaleItem>) => {
       console.log('🔵 updateItem called:', { itemId, updates });
       const normalizedUpdates = { ...updates };
-      
+
       if (normalizedUpdates.quantity !== undefined) {
         const originalQuantity = normalizedUpdates.quantity;
-        normalizedUpdates.quantity = typeof normalizedUpdates.quantity === 'string' 
-          ? parseInt(normalizedUpdates.quantity, 10) 
-          : normalizedUpdates.quantity;
-        console.log('🔵 Quantity normalized:', { originalQuantity, normalized: normalizedUpdates.quantity });
-        
-        if (isNaN(normalizedUpdates.quantity) || normalizedUpdates.quantity < 1) {
+        normalizedUpdates.quantity =
+          typeof normalizedUpdates.quantity === 'string'
+            ? parseInt(normalizedUpdates.quantity, 10)
+            : normalizedUpdates.quantity;
+        console.log('🔵 Quantity normalized:', {
+          originalQuantity,
+          normalized: normalizedUpdates.quantity,
+        });
+
+        if (
+          isNaN(normalizedUpdates.quantity) ||
+          normalizedUpdates.quantity < 1
+        ) {
           toast.error('La cantidad debe ser mayor o igual a 1');
           return;
         }
@@ -195,12 +209,14 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     if (!sale || !hasChanges) return;
 
     if (isTerminal) {
-      toast.error('No se pueden editar items en una venta completada o cancelada');
+      toast.error(
+        'No se pueden editar items en una venta completada o cancelada'
+      );
       return;
     }
 
     try {
-      const removeMutations = itemsToRemove.map(itemId =>
+      const removeMutations = itemsToRemove.map((itemId) =>
         removeSaleItemMutation({
           variables: {
             removeSaleItemInput: {
@@ -211,11 +227,11 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
       );
 
       const updateMutations = localItems
-        .filter(localItem => {
+        .filter((localItem) => {
           const serverItem = sale.items.find((i) => i.guid === localItem.guid);
           return serverItem && serverItem.quantity !== localItem.quantity;
         })
-        .map(localItem =>
+        .map((localItem) =>
           updateSaleItemMutation({
             variables: {
               updateSaleItemInput: {
@@ -231,15 +247,29 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
       toast.success('Cambios guardados correctamente');
       setItemsToRemove([]);
     } catch (error: unknown) {
-      const errorMessage = translateGraphQLError(error as { graphQLErrors?: Array<{ message: string }>; message?: string }, 'Error al guardar los cambios');
+      const errorMessage = translateGraphQLError(
+        error as {
+          graphQLErrors?: Array<{ message: string }>;
+          message?: string;
+        },
+        'Error al guardar los cambios'
+      );
       toast.error(errorMessage);
-      
+
       if (sale?.items) {
         setLocalItems(sale.items);
         setItemsToRemove([]);
       }
     }
-  }, [sale, hasChanges, isTerminal, localItems, itemsToRemove, updateSaleItemMutation, removeSaleItemMutation]);
+  }, [
+    sale,
+    hasChanges,
+    isTerminal,
+    localItems,
+    itemsToRemove,
+    updateSaleItemMutation,
+    removeSaleItemMutation,
+  ]);
 
   const discardChanges = useCallback(() => {
     if (sale?.items) {

@@ -16,26 +16,26 @@ Aplicación web orientada al cliente para navegar el inventario de cartas single
 
 ## Módulos
 
-| Módulo | Descripción |
-|--------|-------------|
-| **Auth** | Login, registro, recuperar contraseña (cuenta unificada Pokémon/Magic) |
-| **Catálogo** | Grid de cartas, búsqueda, filtros, detalle con variantes y condiciones |
-| **Carrito** | Agregar/quitar cartas, ajustar cantidad, resumen |
-| **Checkout** | Validación de stock, geofencing, modo Kiosk, confirmación de pedido |
-| **Wishlist** | Lista de deseos con indicador de stock y notificación de restock |
-| **Pedidos** | Historial de pedidos filtrado por TCG del dominio |
-| **Perfil** | Ver/editar datos, cambio de contraseña |
-| **Most Wanted** | Página pública de cartas más buscadas (optimizada para TV) |
+| Módulo          | Descripción                                                            |
+| --------------- | ---------------------------------------------------------------------- |
+| **Auth**        | Login, registro, recuperar contraseña (cuenta unificada Pokémon/Magic) |
+| **Catálogo**    | Grid de cartas, búsqueda, filtros, detalle con variantes y condiciones |
+| **Carrito**     | Agregar/quitar cartas, ajustar cantidad, resumen                       |
+| **Checkout**    | Validación de stock, geofencing, modo Kiosk, confirmación de pedido    |
+| **Wishlist**    | Lista de deseos con indicador de stock y notificación de restock       |
+| **Pedidos**     | Historial de pedidos filtrado por TCG del dominio                      |
+| **Perfil**      | Ver/editar datos, cambio de contraseña                                 |
+| **Most Wanted** | Página pública de cartas más buscadas (optimizada para TV)             |
 
 ## Roles
 
-| Capacidad | Público | Cliente | VIP | Kiosk |
-|-----------|---------|---------|-----|-------|
-| Navegar catálogo | ✅ | ✅ | ✅ | ✅ |
-| Wishlist | ❌ | ✅ | ✅ | ❌ |
-| Crear pedido | ❌ | ✅ (en tienda) | ✅ (remoto) | ✅ (en tienda) |
-| Perfil | ❌ | ✅ | ✅ | ❌ |
-| Historial de pedidos | ❌ | ✅ | ✅ | ❌ |
+| Capacidad            | Público | Cliente        | VIP         | Kiosk          |
+| -------------------- | ------- | -------------- | ----------- | -------------- |
+| Navegar catálogo     | ✅      | ✅             | ✅          | ✅             |
+| Wishlist             | ❌      | ✅             | ✅          | ❌             |
+| Crear pedido         | ❌      | ✅ (en tienda) | ✅ (remoto) | ✅ (en tienda) |
+| Perfil               | ❌      | ✅             | ✅          | ❌             |
+| Historial de pedidos | ❌      | ✅             | ✅          | ❌             |
 
 ## Configuración Inicial
 
@@ -52,6 +52,7 @@ cp .env.example .env
 ```
 
 **Variables mínimas requeridas:**
+
 - `NEXT_PUBLIC_GRAPHQL_ENDPOINT` — URL del API GraphQL
 - `NEXT_PUBLIC_TCG_TYPE` — TCG para desarrollo local (`POKEMON` o `MAGIC`)
 
@@ -144,11 +145,11 @@ Los módulos operan con **datos mock**. La integración con el backend se hará 
 
 ## Documentación
 
-| Documento | Descripción |
-|-----------|-------------|
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura, patrones, capas y convenciones |
-| [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) | Plan de implementación por fases |
-| [CLICKUP_STRUCTURE.md](docs/CLICKUP_STRUCTURE.md) | Estructura de tareas en ClickUp |
+| Documento                                             | Descripción                                  |
+| ----------------------------------------------------- | -------------------------------------------- |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md)               | Arquitectura, patrones, capas y convenciones |
+| [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) | Plan de implementación por fases             |
+| [CLICKUP_STRUCTURE.md](docs/CLICKUP_STRUCTURE.md)     | Estructura de tareas en ClickUp              |
 
 ## Convenciones
 

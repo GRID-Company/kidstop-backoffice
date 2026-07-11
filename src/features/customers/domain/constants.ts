@@ -27,11 +27,12 @@ export const CLIENT_STATUS_TYPE_LABELS: Record<string, string> = {
   [CLIENT_STATUSES.BLOCKED]: 'Cliente',
 };
 
-export const CLIENT_STATUS_TYPE_COLORS: Record<string, 'default' | 'warning'> = {
-  [CLIENT_STATUSES.STANDARD]: 'default',
-  [CLIENT_STATUSES.VIP]: 'warning',
-  [CLIENT_STATUSES.BLOCKED]: 'default',
-};
+export const CLIENT_STATUS_TYPE_COLORS: Record<string, 'default' | 'warning'> =
+  {
+    [CLIENT_STATUSES.STANDARD]: 'default',
+    [CLIENT_STATUSES.VIP]: 'warning',
+    [CLIENT_STATUSES.BLOCKED]: 'default',
+  };
 
 export const CLIENT_STATUS_LABELS: Record<string, string> = {
   [CLIENT_STATUSES.STANDARD]: 'Activo',
@@ -45,19 +46,23 @@ export const CLIENT_STATUS_COLORS: Record<string, 'success' | 'danger'> = {
   [CLIENT_STATUSES.BLOCKED]: 'danger',
 };
 
-export const CLIENT_STATUS_FILTER_OPTIONS = Object.values(CLIENT_STATUSES).map((status) => ({
-  value: status,
-  label: {
-    [CLIENT_STATUSES.STANDARD]: 'Estándar',
-    [CLIENT_STATUSES.VIP]: 'VIP',
-    [CLIENT_STATUSES.BLOCKED]: 'Bloqueado',
-  }[status],
-}));
+export const CLIENT_STATUS_FILTER_OPTIONS = Object.values(CLIENT_STATUSES).map(
+  (status) => ({
+    value: status,
+    label: {
+      [CLIENT_STATUSES.STANDARD]: 'Estándar',
+      [CLIENT_STATUSES.VIP]: 'VIP',
+      [CLIENT_STATUSES.BLOCKED]: 'Bloqueado',
+    }[status],
+  })
+);
 
-export const CUSTOMER_ROLE_FILTER_OPTIONS = Object.values(CUSTOMER_ROLES).map((role) => ({
-  value: role,
-  label: CUSTOMER_ROLE_LABELS[role],
-}));
+export const CUSTOMER_ROLE_FILTER_OPTIONS = Object.values(CUSTOMER_ROLES).map(
+  (role) => ({
+    value: role,
+    label: CUSTOMER_ROLE_LABELS[role],
+  })
+);
 
 export const DEFAULT_CUSTOMERS_SORT: ITableSort = {
   column: 'name',
@@ -84,7 +89,10 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
   [ORDER_STATUSES.CANCELLED]: 'Cancelado',
 };
 
-export const ORDER_STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'success' | 'danger'> = {
+export const ORDER_STATUS_COLORS: Record<
+  string,
+  'default' | 'primary' | 'warning' | 'success' | 'danger'
+> = {
   [ORDER_STATUSES.NEW]: 'default',
   [ORDER_STATUSES.IN_PROGRESS]: 'primary',
   [ORDER_STATUSES.READY]: 'warning',

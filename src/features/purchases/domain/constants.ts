@@ -1,5 +1,10 @@
 import { ITableSort } from '@/lib/types/datatable.types';
-import { PurchaseStatus, PURCHASE_STATUS, PaymentMethod, PAYMENT_METHOD } from './types';
+import {
+  PurchaseStatus,
+  PURCHASE_STATUS,
+  PaymentMethod,
+  PAYMENT_METHOD,
+} from './types';
 
 export {
   CARD_CONDITIONS,

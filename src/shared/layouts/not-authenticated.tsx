@@ -9,13 +9,13 @@ export default function NotAuthenticatedLayout({
   children,
 }: PropsWithChildren) {
   return (
-    <div 
-      className='relative flex h-full min-h-screen w-full min-w-screen justify-center items-center overflow-x-hidden bg-cover bg-center bg-no-repeat'
+    <div
+      className='relative flex h-full min-h-screen w-full min-w-screen items-center justify-center overflow-x-hidden bg-cover bg-center bg-no-repeat'
       style={{ backgroundImage: `url(${BackImg.src})` }}
     >
       <div className='absolute inset-0 bg-black/30' />
       <div className='relative z-10 mx-auto w-full max-w-[420px] p-8 lg:w-5/12 lg:p-12'>
-        <div className='bg-white rounded-lg shadow-2xl border-t-4 border-blue-500 p-8'>
+        <div className='rounded-lg border-t-4 border-blue-500 bg-white p-8 shadow-2xl'>
           <Image
             src={Logo.src}
             alt='Kidstop'

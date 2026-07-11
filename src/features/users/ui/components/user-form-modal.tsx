@@ -35,70 +35,80 @@ export default function UserFormModal({
   submitLabel = 'Guardar',
 }: UserFormModalProps) {
   const isEditing = !!defaults;
-  const { control, handleSubmit, formState, reset } = useUserForm(defaults, isEditing);
+  const { control, handleSubmit, formState, reset } = useUserForm(
+    defaults,
+    isEditing
+  );
   const selectedRole = useWatch({ control, name: 'role' });
   const isKioskRole = selectedRole === USER_ROLES.CLIENT_KIOSK;
 
   useEffect(() => {
     if (!isOpen) return;
-    reset(defaults ?? { name: '', emailAddress: '', role: USER_ROLES.RECEPTION, password: '' });
+    reset(
+      defaults ?? {
+        name: '',
+        emailAddress: '',
+        role: USER_ROLES.RECEPTION,
+        password: '',
+      }
+    );
   }, [isOpen, defaults, reset]);
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
       <form
         onSubmit={(...args) => {
           void handleSubmit(onSubmit)(...args);
         }}
       >
         <DrawerContent>
-          <DrawerHeader className="flex flex-col gap-1">{title}</DrawerHeader>
+          <DrawerHeader className='flex flex-col gap-1'>{title}</DrawerHeader>
 
-          <DrawerBody className="flex flex-col gap-4">
+          <DrawerBody className='flex flex-col gap-4'>
             <InputForm
-              label="Nombre"
-              placeholder="Ingresa el nombre del usuario"
+              label='Nombre'
+              placeholder='Ingresa el nombre del usuario'
               controlProps={{ control, name: 'name' }}
             />
 
             <InputForm
-              label="Correo electrónico"
-              placeholder="Ingresa el correo electrónico"
+              label='Correo electrónico'
+              placeholder='Ingresa el correo electrónico'
               controlProps={{ control, name: 'emailAddress' }}
             />
 
             <SelectForm
-              label="Rol"
-              placeholder="Selecciona un rol"
+              label='Rol'
+              placeholder='Selecciona un rol'
               controlProps={{ control, name: 'role' }}
               items={USER_ROLE_OPTIONS}
             />
 
             {isKioskRole && (
               <InputForm
-                label="Contraseña"
-                placeholder="Ingresa la contraseña (mínimo 6 caracteres)"
+                label='Contraseña'
+                placeholder='Ingresa la contraseña (mínimo 6 caracteres)'
                 controlProps={{ control, name: 'password' }}
-                type="password"
+                type='password'
               />
             )}
           </DrawerBody>
 
           <DrawerFooter>
             <Button
-              variant="light"
+              variant='light'
               onPress={onClose}
-              type="button"
-              className="text-accent"
+              type='button'
+              className='text-accent'
             >
               Cancelar
             </Button>
             <Button
-              size="lg"
+              size='lg'
               isLoading={loading}
-              type="submit"
+              type='submit'
               isDisabled={!formState.isValid}
-              className="text-white"
+              className='text-white'
               style={{ backgroundColor: 'var(--color-accent)' }}
             >
               {submitLabel}

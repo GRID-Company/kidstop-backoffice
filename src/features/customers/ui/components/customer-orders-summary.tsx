@@ -1,11 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import {
-  Chip,
-  Button,
-  Tooltip,
-} from '@heroui/react';
+import { Chip, Button, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
@@ -49,8 +45,8 @@ function buildColumns(onViewOrder?: (orderId: string) => void): ITableColumn[] {
         const order = row as any;
         return (
           <Chip
-            size="sm"
-            variant="flat"
+            size='sm'
+            variant='flat'
             color={ORDER_STATUS_COLORS[order.status]}
           >
             {ORDER_STATUS_LABELS[order.status]}
@@ -87,15 +83,18 @@ function buildColumns(onViewOrder?: (orderId: string) => void): ITableColumn[] {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const order = row as any;
         return (
-          <Tooltip content="Ver pedido">
+          <Tooltip content='Ver pedido'>
             <Button
               isIconOnly
-              size="sm"
-              variant="light"
+              size='sm'
+              variant='light'
               onPress={() => onViewOrder(order.id)}
               aria-label={`Ver detalle del pedido ${order.code}`}
             >
-              <Icon icon="lucide:external-link" className="text-base text-default-500" />
+              <Icon
+                icon='lucide:external-link'
+                className='text-default-500 text-base'
+              />
             </Button>
           </Tooltip>
         );
@@ -135,20 +134,20 @@ export default function CustomerOrdersSummary({
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <h3 className="text-sm font-semibold text-accent">Resumen de pedidos</h3>
+    <div className='flex flex-col gap-4'>
+      <h3 className='text-accent text-sm font-semibold'>Resumen de pedidos</h3>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className='grid grid-cols-3 gap-3'>
         {metrics.map((metric) => (
           <div
             key={metric.label}
-            className="flex flex-col items-center gap-1 rounded-lg bg-default-50 p-3"
+            className='bg-default-50 flex flex-col items-center gap-1 rounded-lg p-3'
           >
             <Icon icon={metric.icon} className={`text-xl ${metric.color}`} />
             <span className={`text-lg font-bold ${metric.color}`}>
               {metric.value}
             </span>
-            <span className="text-[10px] uppercase tracking-wide text-default-400">
+            <span className='text-default-400 text-[10px] tracking-wide uppercase'>
               {metric.label}
             </span>
           </div>
@@ -156,13 +155,13 @@ export default function CustomerOrdersSummary({
       </div>
 
       {summary.orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8 text-default-400">
-          <Icon icon="lucide:package" className="text-4xl" />
-          <p className="mt-2 text-sm">Sin pedidos registrados</p>
+        <div className='text-default-400 flex flex-col items-center justify-center py-8'>
+          <Icon icon='lucide:package' className='text-4xl' />
+          <p className='mt-2 text-sm'>Sin pedidos registrados</p>
         </div>
       ) : (
         <>
-          <div className="hidden md:block">
+          <div className='hidden md:block'>
             <DataTable
               cols={columns}
               data={summary.orders as ICustomerOrder[]}
@@ -170,29 +169,29 @@ export default function CustomerOrdersSummary({
             />
           </div>
 
-          <div className="flex flex-col gap-2 md:hidden">
+          <div className='flex flex-col gap-2 md:hidden'>
             {summary.orders.map((order) => (
               <button
                 key={order.id}
-                type="button"
-                className="flex flex-col gap-2 rounded-lg border border-default-200 bg-white p-3 text-left shadow-sm transition-shadow hover:shadow-md"
+                type='button'
+                className='border-default-200 flex flex-col gap-2 rounded-lg border bg-white p-3 text-left shadow-sm transition-shadow hover:shadow-md'
                 onClick={() => onViewOrder?.(order.id)}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">{order.code}</span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-semibold'>{order.code}</span>
                   <Chip
-                    size="sm"
-                    variant="flat"
+                    size='sm'
+                    variant='flat'
                     color={ORDER_STATUS_COLORS[order.status]}
                   >
                     {ORDER_STATUS_LABELS[order.status]}
                   </Chip>
                 </div>
-                <div className="flex items-center justify-between text-xs text-default-500">
+                <div className='text-default-500 flex items-center justify-between text-xs'>
                   <span>{order.totalItems} artículos</span>
                   <span>{formatCurrency(order.totalAmount)}</span>
                 </div>
-                <span className="text-[10px] text-default-400">
+                <span className='text-default-400 text-[10px]'>
                   {formatDate(order.createdAt)}
                 </span>
               </button>

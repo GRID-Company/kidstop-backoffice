@@ -7,9 +7,13 @@ import {
   inventoryAdjustmentFormSchema,
 } from './inventory-adjustment.form.schema';
 
-export function useAdjustmentForm(defaults?: Partial<InventoryAdjustmentFormData>) {
+export function useAdjustmentForm(
+  defaults?: Partial<InventoryAdjustmentFormData>
+) {
   return useForm<InventoryAdjustmentFormData>({
-    resolver: zodResolver(inventoryAdjustmentFormSchema) as Resolver<InventoryAdjustmentFormData>,
+    resolver: zodResolver(
+      inventoryAdjustmentFormSchema
+    ) as Resolver<InventoryAdjustmentFormData>,
     defaultValues: {
       cardGuid: '',
       condition: CARD_CONDITIONS.NEAR_MINT,

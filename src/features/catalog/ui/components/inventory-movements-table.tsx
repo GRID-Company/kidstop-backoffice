@@ -7,7 +7,10 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { InventoryMovementsDocument } from '@/lib/api/generated/inventory.generated';
 import { formatDate } from '@/lib/utils/format-date';
-import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '@/features/inventory-cards/domain/constants';
+import {
+  MOVEMENT_TYPE_LABELS,
+  MOVEMENT_TYPE_COLORS,
+} from '@/features/inventory-cards/domain/constants';
 import { DEFAULT_HISTORY_LIMIT } from '../../domain/constants';
 
 /**
@@ -53,11 +56,17 @@ export default function InventoryMovementsTable({
           const movement = item as { movementType: string };
           return (
             <Chip
-              size="sm"
-              variant="flat"
-              color={MOVEMENT_TYPE_COLORS[movement.movementType as keyof typeof MOVEMENT_TYPE_COLORS] ?? 'default'}
+              size='sm'
+              variant='flat'
+              color={
+                MOVEMENT_TYPE_COLORS[
+                  movement.movementType as keyof typeof MOVEMENT_TYPE_COLORS
+                ] ?? 'default'
+              }
             >
-              {MOVEMENT_TYPE_LABELS[movement.movementType as keyof typeof MOVEMENT_TYPE_LABELS] ?? movement.movementType}
+              {MOVEMENT_TYPE_LABELS[
+                movement.movementType as keyof typeof MOVEMENT_TYPE_LABELS
+              ] ?? movement.movementType}
             </Chip>
           );
         },
@@ -68,7 +77,7 @@ export default function InventoryMovementsTable({
         allowSorting: false,
         customCol: (item: unknown) => {
           const movement = item as { quantity: number };
-          return <span className="font-medium">{movement.quantity}</span>;
+          return <span className='font-medium'>{movement.quantity}</span>;
         },
       },
       {
@@ -77,7 +86,11 @@ export default function InventoryMovementsTable({
         allowSorting: false,
         customCol: (item: unknown) => {
           const movement = item as { reference?: string };
-          return <span className="text-xs text-default-500">{movement.reference ?? '—'}</span>;
+          return (
+            <span className='text-default-500 text-xs'>
+              {movement.reference ?? '—'}
+            </span>
+          );
         },
       },
       {
@@ -87,7 +100,7 @@ export default function InventoryMovementsTable({
         customCol: (item: unknown) => {
           const movement = item as { notes?: string };
           return (
-            <span className="text-xs text-default-500 max-w-50 truncate block">
+            <span className='text-default-500 block max-w-50 truncate text-xs'>
               {movement.notes ?? '—'}
             </span>
           );
@@ -99,7 +112,9 @@ export default function InventoryMovementsTable({
         allowSorting: false,
         customCol: (item: unknown) => {
           const movement = item as { createdDate: string };
-          return <span className="text-xs">{formatDate(movement.createdDate)}</span>;
+          return (
+            <span className='text-xs'>{formatDate(movement.createdDate)}</span>
+          );
         },
       },
       {
@@ -109,7 +124,7 @@ export default function InventoryMovementsTable({
         customCol: (item: unknown) => {
           const movement = item as { createdBy?: { name: string } };
           return (
-            <span className="text-xs text-default-500">
+            <span className='text-default-500 text-xs'>
               {movement.createdBy?.name ?? '—'}
             </span>
           );
@@ -121,9 +136,9 @@ export default function InventoryMovementsTable({
 
   if (error) {
     return (
-      <div className="flex flex-col gap-3">
-        <h4 className="text-sm font-semibold">Historial de movimientos</h4>
-        <p className="text-center text-sm text-danger py-4">
+      <div className='flex flex-col gap-3'>
+        <h4 className='text-sm font-semibold'>Historial de movimientos</h4>
+        <p className='text-danger py-4 text-center text-sm'>
           Error al cargar movimientos: {error.message}
         </p>
       </div>
@@ -131,16 +146,16 @@ export default function InventoryMovementsTable({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <h4 className="text-sm font-semibold">Historial de movimientos</h4>
+    <div className='flex flex-col gap-3'>
+      <h4 className='text-sm font-semibold'>Historial de movimientos</h4>
       <DataTable
         cols={columns}
         data={movements}
         isLoading={loading}
-        aria-label="Historial de movimientos de inventario"
+        aria-label='Historial de movimientos de inventario'
       />
       {!loading && movements.length === 0 && (
-        <p className="text-center text-sm text-default-400 py-4">
+        <p className='text-default-400 py-4 text-center text-sm'>
           No hay movimientos registrados
         </p>
       )}

@@ -1,9 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
-import { PokemonCardWithMetricsDocument, PokemonCardWithMetricsQuery } from '@/lib/api/generated/catalog-pokemon.generated';
+import {
+  PokemonCardWithMetricsDocument,
+  PokemonCardWithMetricsQuery,
+} from '@/lib/api/generated/catalog-pokemon.generated';
 import { BulkCardDetailMetrics, BulkCardVariantMetrics } from '../types';
 
-type VariantMetric = NonNullable<NonNullable<PokemonCardWithMetricsQuery['pokemonCardWithMetrics']>['variantsMetrics']>[number];
+type VariantMetric = NonNullable<
+  NonNullable<
+    PokemonCardWithMetricsQuery['pokemonCardWithMetrics']
+  >['variantsMetrics']
+>[number];
 
 interface UseCardMetricsReturn {
   metrics: BulkCardDetailMetrics | null;
@@ -48,10 +55,13 @@ export function useCardMetrics(cardGuid: string | null): UseCardMetricsReturn {
   useEffect(() => {
     if (data?.pokemonCardWithMetrics && cardGuid) {
       const metrics: BulkCardDetailMetrics = {
-        variantsMetrics: data.pokemonCardWithMetrics.variantsMetrics?.map(mapVariantMetric) || [],
+        variantsMetrics:
+          data.pokemonCardWithMetrics.variantsMetrics?.map(mapVariantMetric) ||
+          [],
         ungradedPrice: data.pokemonCardWithMetrics.ungradedPrice,
         gradedPriceSeven: data.pokemonCardWithMetrics.gradedPriceSeven,
-        gradedPriceEightOrAbove: data.pokemonCardWithMetrics.gradedPriceEightOrAbove,
+        gradedPriceEightOrAbove:
+          data.pokemonCardWithMetrics.gradedPriceEightOrAbove,
       };
       cacheRef.current.set(cardGuid, metrics);
     }
@@ -68,12 +78,18 @@ export function useCardMetrics(cardGuid: string | null): UseCardMetricsReturn {
   }
 
   return {
-    metrics: data?.pokemonCardWithMetrics ? {
-      variantsMetrics: data.pokemonCardWithMetrics.variantsMetrics?.map(mapVariantMetric) || [],
-      ungradedPrice: data.pokemonCardWithMetrics.ungradedPrice,
-      gradedPriceSeven: data.pokemonCardWithMetrics.gradedPriceSeven,
-      gradedPriceEightOrAbove: data.pokemonCardWithMetrics.gradedPriceEightOrAbove,
-    } : null,
+    metrics: data?.pokemonCardWithMetrics
+      ? {
+          variantsMetrics:
+            data.pokemonCardWithMetrics.variantsMetrics?.map(
+              mapVariantMetric
+            ) || [],
+          ungradedPrice: data.pokemonCardWithMetrics.ungradedPrice,
+          gradedPriceSeven: data.pokemonCardWithMetrics.gradedPriceSeven,
+          gradedPriceEightOrAbove:
+            data.pokemonCardWithMetrics.gradedPriceEightOrAbove,
+        }
+      : null,
     loading,
     error: error?.message || null,
   };

@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
-import { InventoryItemsDocument, CreateInventoryMovementDocument } from '@/lib/api/generated/inventory.generated';
+import {
+  InventoryItemsDocument,
+  CreateInventoryMovementDocument,
+} from '@/lib/api/generated/inventory.generated';
 import {
   UpdateInventoryItemPricesDocument,
   PokemonCardInternalDetailDocument,
@@ -30,9 +33,15 @@ export function useUpdateInventoryPrice() {
     refetchQueries: [InventoryItemsDocument],
   });
 
-  const [updatePrice, { loading }] = useMutation(UpdateInventoryItemPricesDocument, {
-    refetchQueries: [PokemonCardInternalDetailDocument, MagicCardInternalDetailDocument],
-  });
+  const [updatePrice, { loading }] = useMutation(
+    UpdateInventoryItemPricesDocument,
+    {
+      refetchQueries: [
+        PokemonCardInternalDetailDocument,
+        MagicCardInternalDetailDocument,
+      ],
+    }
+  );
 
   const handleUpdatePrice = useCallback(
     async (params: UpdatePriceParams) => {
@@ -46,8 +55,8 @@ export function useUpdateInventoryPrice() {
                 skip: 0,
                 limit: 200,
                 sort: { column: 'createdDate', order: 'DESC' },
-                filters: { 
-                  tcg: params.tcgType, 
+                filters: {
+                  tcg: params.tcgType,
                   condition: params.condition,
                   language: params.language,
                 },
@@ -75,12 +84,16 @@ export function useUpdateInventoryPrice() {
                     language: params.language,
                     bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
-                    notes: params.notes || 'Creación automática para establecer precios',
+                    notes:
+                      params.notes ||
+                      'Creación automática para establecer precios',
                   },
                 },
               });
             } catch (error) {
-              toast.error('Error al crear el item en inventario. Por favor intenta de nuevo.');
+              toast.error(
+                'Error al crear el item en inventario. Por favor intenta de nuevo.'
+              );
               throw error;
             }
 
@@ -90,8 +103,8 @@ export function useUpdateInventoryPrice() {
                   skip: 0,
                   limit: 200,
                   sort: { column: 'createdDate', order: 'DESC' },
-                  filters: { 
-                    tcg: params.tcgType, 
+                  filters: {
+                    tcg: params.tcgType,
                     condition: params.condition,
                     language: params.language,
                   },
@@ -109,7 +122,9 @@ export function useUpdateInventoryPrice() {
             });
 
             if (!newMatch) {
-              toast.error('No se pudo crear el item en inventario. Por favor intenta de nuevo.');
+              toast.error(
+                'No se pudo crear el item en inventario. Por favor intenta de nuevo.'
+              );
               throw new Error('Inventory item creation failed');
             }
 
@@ -118,7 +133,10 @@ export function useUpdateInventoryPrice() {
             inventoryItemGuid = match.guid;
           }
         } catch (error) {
-          if (error instanceof Error && error.message === 'Inventory item creation failed') {
+          if (
+            error instanceof Error &&
+            error.message === 'Inventory item creation failed'
+          ) {
             return;
           }
           toast.error('Error al buscar items en inventario');

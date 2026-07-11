@@ -17,9 +17,14 @@ export const getInventoryVars = (
   };
 };
 
-export const calculateMargin = (purchasePrice: number, sellPrice: number): number => {
+export const calculateMargin = (
+  purchasePrice: number,
+  sellPrice: number
+): number => {
   if (purchasePrice <= 0) return 0;
-  return Math.round(((sellPrice - purchasePrice) / purchasePrice) * 100 * 100) / 100;
+  return (
+    Math.round(((sellPrice - purchasePrice) / purchasePrice) * 100 * 100) / 100
+  );
 };
 
 export const validateStock = (

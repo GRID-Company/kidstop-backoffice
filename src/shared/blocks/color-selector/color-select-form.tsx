@@ -3,8 +3,9 @@ import { SelectProps } from '@heroui/react';
 import { ControlWithFormProps } from '@/lib/types/controller.types';
 import ColorSelect from './color-select';
 
-interface ColorSelectFormProps<T extends FieldValues>
-  extends Partial<SelectProps> {
+interface ColorSelectFormProps<
+  T extends FieldValues,
+> extends Partial<SelectProps> {
   controlProps: ControlWithFormProps<T>;
 }
 

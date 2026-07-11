@@ -1,10 +1,4 @@
-import {
-  Dispatch,
-  RefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-} from 'react';
+import { Dispatch, RefObject, SetStateAction, useEffect, useRef } from 'react';
 import { InfiniteScrollData } from '../types/datatable.types';
 
 interface UseInfiniteScrollProps {

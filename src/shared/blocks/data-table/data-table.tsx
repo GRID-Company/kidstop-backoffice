@@ -12,7 +12,9 @@ import {
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 
-type DataTableProps<T extends Record<string, unknown> = Record<string, unknown>> = {
+type DataTableProps<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> = {
   cols: ITableColumn<T>[];
   data: T[];
   isLoading: boolean;
@@ -23,7 +25,9 @@ type DataTableProps<T extends Record<string, unknown> = Record<string, unknown>>
   onRowClick?: (item: T) => void;
 } & Partial<TableProps>;
 
-export function DataTable<T extends Record<string, unknown> = Record<string, unknown>>({
+export function DataTable<
+  T extends Record<string, unknown> = Record<string, unknown>,
+>({
   cols,
   data,
   isLoading,
@@ -75,10 +79,20 @@ export function DataTable<T extends Record<string, unknown> = Record<string, unk
         }
       >
         {(item) => (
-          <TableRow 
-            key={(item as Record<string, unknown>).guid as string ?? (item as Record<string, unknown>).id as string ?? (item as Record<string, unknown>).key as string}
-            className={rowClickable ? 'cursor-pointer hover:bg-[#F5F9FF] transition-colors duration-150' : ''}
-            onClick={rowClickable && onRowClick ? () => onRowClick(item) : undefined}
+          <TableRow
+            key={
+              ((item as Record<string, unknown>).guid as string) ??
+              ((item as Record<string, unknown>).id as string) ??
+              ((item as Record<string, unknown>).key as string)
+            }
+            className={
+              rowClickable
+                ? 'cursor-pointer transition-colors duration-150 hover:bg-[#F5F9FF]'
+                : ''
+            }
+            onClick={
+              rowClickable && onRowClick ? () => onRowClick(item) : undefined
+            }
           >
             {cols.map((col: ITableColumn<T>) => (
               <TableCell

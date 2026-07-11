@@ -37,12 +37,12 @@ export default function Customers() {
   if (error) {
     return (
       <EntitiesPage>
-        <EntitiesPage.Toolbar label="Clientes">{null}</EntitiesPage.Toolbar>
+        <EntitiesPage.Toolbar label='Clientes'>{null}</EntitiesPage.Toolbar>
         <EntitiesPage.CardContainer>
-          <div className="flex flex-col items-center justify-center py-16 text-default-400">
-            <Icon icon="lucide:wifi-off" className="text-5xl" />
-            <p className="mt-4 text-lg font-medium">Error al cargar clientes</p>
-            <p className="text-sm">Verifica tu conexión e intenta de nuevo</p>
+          <div className='text-default-400 flex flex-col items-center justify-center py-16'>
+            <Icon icon='lucide:wifi-off' className='text-5xl' />
+            <p className='mt-4 text-lg font-medium'>Error al cargar clientes</p>
+            <p className='text-sm'>Verifica tu conexión e intenta de nuevo</p>
           </div>
         </EntitiesPage.CardContainer>
       </EntitiesPage>
@@ -51,7 +51,7 @@ export default function Customers() {
 
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="Clientes">{null}</EntitiesPage.Toolbar>
+      <EntitiesPage.Toolbar label='Clientes'>{null}</EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
         <CustomersList

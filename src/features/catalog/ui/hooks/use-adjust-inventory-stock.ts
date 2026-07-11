@@ -18,9 +18,15 @@ interface AdjustStockParams {
 }
 
 export function useAdjustInventoryStock() {
-  const [createMovement, { loading }] = useMutation(CreateInventoryMovementDocument, {
-    refetchQueries: [PokemonCardInternalDetailDocument, MagicCardInternalDetailDocument],
-  });
+  const [createMovement, { loading }] = useMutation(
+    CreateInventoryMovementDocument,
+    {
+      refetchQueries: [
+        PokemonCardInternalDetailDocument,
+        MagicCardInternalDetailDocument,
+      ],
+    }
+  );
 
   const handleAdjustStock = useCallback(
     async (params: AdjustStockParams) => {

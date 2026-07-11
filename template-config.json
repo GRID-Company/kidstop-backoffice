@@ -34,26 +34,11 @@
     }
   },
   "features": {
-    "available": [
-      "auth",
-      "inventory",
-      "windows"
-    ],
+    "available": ["auth", "inventory", "windows"],
     "structure": {
-      "adapters": [
-        "api",
-        "forms",
-        "mappers"
-      ],
-      "domain": [
-        "types",
-        "constants"
-      ],
-      "ui": [
-        "components",
-        "views",
-        "hooks"
-      ]
+      "adapters": ["api", "forms", "mappers"],
+      "domain": ["types", "constants"],
+      "ui": ["components", "views", "hooks"]
     }
   }
 }

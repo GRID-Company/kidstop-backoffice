@@ -18,22 +18,22 @@ Authorization: Bearer {{auth_token}}
 
 ## Configuration Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `inventoryLimit` | `Number` | Maximum inventory stock limit per item |
-| `purchasePercentage` | `Float` | Default purchase price percentage (0–1 range, e.g. 0.5 = 50%) |
-| `saleCancellationBlockThreshold` | `Number` | Number of cancellations before a client is automatically blocked |
-| `geofence` | `Object` | Geofence location configuration with latitude, longitude, and radius |
-| `geofence.latitude` | `Float` | Geofence center latitude coordinate |
-| `geofence.longitude` | `Float` | Geofence center longitude coordinate |
-| `geofence.radius` | `Float` | Geofence radius in meters |
-| `operationSchedule` | `Object` | Weekly operation schedule with opening/closing times for each day |
-| `operationSchedule.{day}` | `Object` | Schedule for a specific day (monday, tuesday, etc.) |
-| `operationSchedule.{day}.opening` | `Object` | Opening time with hour (1-12), minute (0-59), and period (AM/PM) |
-| `operationSchedule.{day}.closing` | `Object` | Closing time with hour (1-12), minute (0-59), and period (AM/PM) |
-| `bannerGuids` | `Object` | Banner file GUIDs for each TCG (Pokemon and Magic) |
-| `bannerGuids.pokemon` | `String` | File GUID for Pokemon banner image |
-| `bannerGuids.magic` | `String` | File GUID for Magic banner image |
+| Field                             | Type     | Description                                                          |
+| --------------------------------- | -------- | -------------------------------------------------------------------- |
+| `inventoryLimit`                  | `Number` | Maximum inventory stock limit per item                               |
+| `purchasePercentage`              | `Float`  | Default purchase price percentage (0–1 range, e.g. 0.5 = 50%)        |
+| `saleCancellationBlockThreshold`  | `Number` | Number of cancellations before a client is automatically blocked     |
+| `geofence`                        | `Object` | Geofence location configuration with latitude, longitude, and radius |
+| `geofence.latitude`               | `Float`  | Geofence center latitude coordinate                                  |
+| `geofence.longitude`              | `Float`  | Geofence center longitude coordinate                                 |
+| `geofence.radius`                 | `Float`  | Geofence radius in meters                                            |
+| `operationSchedule`               | `Object` | Weekly operation schedule with opening/closing times for each day    |
+| `operationSchedule.{day}`         | `Object` | Schedule for a specific day (monday, tuesday, etc.)                  |
+| `operationSchedule.{day}.opening` | `Object` | Opening time with hour (1-12), minute (0-59), and period (AM/PM)     |
+| `operationSchedule.{day}.closing` | `Object` | Closing time with hour (1-12), minute (0-59), and period (AM/PM)     |
+| `bannerGuids`                     | `Object` | Banner file GUIDs for each TCG (Pokemon and Magic)                   |
+| `bannerGuids.pokemon`             | `String` | File GUID for Pokemon banner image                                   |
+| `bannerGuids.magic`               | `String` | File GUID for Magic banner image                                     |
 
 ## Available Endpoints
 
@@ -58,32 +58,88 @@ query GlobalConfig {
       }
       operationSchedule {
         monday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
         tuesday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
         wednesday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
         thursday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
         friday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
         saturday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
         sunday {
-          opening { hour minute period }
-          closing { hour minute period }
+          opening {
+            hour
+            minute
+            period
+          }
+          closing {
+            hour
+            minute
+            period
+          }
         }
       }
       bannerGuids {
@@ -120,7 +176,9 @@ query GlobalConfig {
 **Roles:** `ADMIN`
 
 ```graphql
-mutation UpdateGlobalConfig($updateGlobalConfigInput: UpdateGlobalConfigInput!) {
+mutation UpdateGlobalConfig(
+  $updateGlobalConfigInput: UpdateGlobalConfigInput!
+) {
   updateGlobalConfig(updateGlobalConfigInput: $updateGlobalConfigInput) {
     message
   }
@@ -253,6 +311,7 @@ query GetBanner($tcg: TCGType!) {
 **Response Examples:**
 
 When banner exists:
+
 ```json
 {
   "data": {
@@ -269,6 +328,7 @@ When banner exists:
 ```
 
 When no banner configured:
+
 ```json
 {
   "data": {
@@ -445,15 +505,13 @@ const GlobalConfigManager: React.FC = () => {
 
 ```typescript
 // Update Global Config
-const updateGlobalConfig = async (
-  updates: Partial<GlobalConfigData>
-) => {
+const updateGlobalConfig = async (updates: Partial<GlobalConfigData>) => {
   try {
     const { data } = await client.mutate({
       mutation: UPDATE_GLOBAL_CONFIG,
       variables: {
-        updateGlobalConfigInput: updates
-      }
+        updateGlobalConfigInput: updates,
+      },
     });
     console.log('Config updated:', data.updateGlobalConfig.message);
     await fetchConfig();
@@ -523,7 +581,7 @@ const ConfigForm: React.FC<{ config: GlobalConfig; onSave: () => void }> = ({ co
           min="0"
         />
       </div>
-      
+
       <h4>Geofence Configuration</h4>
       <div>
         <label>Latitude</label>
@@ -552,11 +610,11 @@ const ConfigForm: React.FC<{ config: GlobalConfig; onSave: () => void }> = ({ co
           min="0"
         />
       </div>
-      
+
       <h4>Operation Schedule</h4>
       <p><em>Configure opening/closing times for each day (12-hour format)</em></p>
       {/* Add time picker components for each day of the week */}
-      
+
       <button type="submit">Save Configuration</button>
     </form>
   );

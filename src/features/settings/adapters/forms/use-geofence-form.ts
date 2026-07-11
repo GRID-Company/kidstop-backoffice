@@ -8,7 +8,9 @@ import {
 
 export function useGeofenceForm(defaults?: Partial<GeofenceSettingsFormData>) {
   return useForm<GeofenceSettingsFormData>({
-    resolver: zodResolver(geofenceSettingsSchema) as Resolver<GeofenceSettingsFormData>,
+    resolver: zodResolver(
+      geofenceSettingsSchema
+    ) as Resolver<GeofenceSettingsFormData>,
     defaultValues: {
       center: DEFAULT_GEOFENCE_CONFIG.center,
       radiusKm: DEFAULT_GEOFENCE_CONFIG.radiusKm,

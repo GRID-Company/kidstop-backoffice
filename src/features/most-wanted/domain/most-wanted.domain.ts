@@ -1,5 +1,9 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
-import { IMostWantedCard, MostWantedFilters, MOST_WANTED_PRIORITIES } from './types';
+import {
+  IMostWantedCard,
+  MostWantedFilters,
+  MOST_WANTED_PRIORITIES,
+} from './types';
 
 export const getMostWantedVars = (
   args: IPaginatedApiArgs,
@@ -26,8 +30,11 @@ const PRIORITY_ORDER: Record<string, number> = {
 
 export const sortByPriority = (cards: IMostWantedCard[]): IMostWantedCard[] => {
   return [...cards].sort((a, b) => {
-    const priorityDiff = (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99);
+    const priorityDiff =
+      (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99);
     if (priorityDiff !== 0) return priorityDiff;
-    return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
+    return (
+      new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
+    );
   });
 };

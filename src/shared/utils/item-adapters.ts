@@ -1,6 +1,10 @@
 import { IPurchaseItem } from '@/features/purchases/domain/types';
 import { ISaleItem } from '@/features/sales/domain/types';
-import type { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/types/item.types';
+import type {
+  AdaptedPurchaseItem,
+  AdaptedSaleItem,
+  ItemVariant,
+} from '@/shared/types/item.types';
 
 export type { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant };
 
@@ -27,17 +31,30 @@ export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
   };
 }
 
-export function adaptSaleItem(item: ISaleItem & { foundQuantity?: number }): AdaptedSaleItem {
+export function adaptSaleItem(
+  item: ISaleItem & { foundQuantity?: number }
+): AdaptedSaleItem {
   const cardSummary = item.pokemonCardSummary || item.magicCardSummary;
-  
+
   return {
     guid: item.guid,
     cardGuid: cardSummary?.guid || '',
     cardName: cardSummary?.name || 'Carta desconocida',
-    cardImageUrl: item.pokemonCardSummary?.imageUri || item.magicCardSummary?.imageUri || '',
-    setName: item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || 'Set desconocido',
-    setCode: item.pokemonCardSummary?.setCode || item.magicCardSummary?.collectorNumber || '',
-    cardNumber: item.pokemonCardSummary?.cardNumber || item.magicCardSummary?.collectorNumber,
+    cardImageUrl:
+      item.pokemonCardSummary?.imageUri ||
+      item.magicCardSummary?.imageUri ||
+      '',
+    setName:
+      item.pokemonCardSummary?.setName ||
+      item.magicCardSummary?.edition ||
+      'Set desconocido',
+    setCode:
+      item.pokemonCardSummary?.setCode ||
+      item.magicCardSummary?.collectorNumber ||
+      '',
+    cardNumber:
+      item.pokemonCardSummary?.cardNumber ||
+      item.magicCardSummary?.collectorNumber,
     rarity: item.pokemonCardSummary?.rarity || item.magicCardSummary?.rarity,
     hp: item.pokemonCardSummary?.hp,
     type: item.pokemonCardSummary?.type,

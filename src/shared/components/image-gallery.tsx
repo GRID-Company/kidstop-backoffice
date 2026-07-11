@@ -30,61 +30,65 @@ export default function ImageGallery({
   if (filteredImages.length === 0) return null;
 
   const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? filteredImages.length - 1 : prev - 1));
+    setCurrentIndex((prev) =>
+      prev === 0 ? filteredImages.length - 1 : prev - 1
+    );
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev === filteredImages.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) =>
+      prev === filteredImages.length - 1 ? 0 : prev + 1
+    );
   };
 
   const currentImage = filteredImages[currentIndex];
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
+    <div className='flex flex-col gap-3'>
+      <div className='bg-default-100 relative aspect-3/4 w-full overflow-hidden rounded-lg'>
         <img
           src={currentImage.imageUrl}
           alt={alt}
-          className="absolute inset-0 h-full w-full object-contain p-2"
-          loading="lazy"
+          className='absolute inset-0 h-full w-full object-contain p-2'
+          loading='lazy'
         />
 
         {filteredImages.length > 1 && (
           <>
             <Button
               isIconOnly
-              size="sm"
-              variant="flat"
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80"
+              size='sm'
+              variant='flat'
+              className='absolute top-1/2 left-2 -translate-y-1/2 bg-white/80'
               onPress={handlePrevious}
-              aria-label="Imagen anterior"
+              aria-label='Imagen anterior'
             >
-              <Icon icon="lucide:chevron-left" width={18} />
+              <Icon icon='lucide:chevron-left' width={18} />
             </Button>
             <Button
               isIconOnly
-              size="sm"
-              variant="flat"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80"
+              size='sm'
+              variant='flat'
+              className='absolute top-1/2 right-2 -translate-y-1/2 bg-white/80'
               onPress={handleNext}
-              aria-label="Siguiente imagen"
+              aria-label='Siguiente imagen'
             >
-              <Icon icon="lucide:chevron-right" width={18} />
+              <Icon icon='lucide:chevron-right' width={18} />
             </Button>
           </>
         )}
       </div>
 
       {filteredImages.length > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className='flex items-center justify-center gap-2'>
           {filteredImages.map((_, index) => (
             <button
               key={index}
-              type="button"
+              type='button'
               onClick={() => setCurrentIndex(index)}
               className={`h-2 w-2 rounded-full transition-all ${
                 index === currentIndex
-                  ? 'w-4 bg-accent'
+                  ? 'bg-accent w-4'
                   : 'bg-default-300 hover:bg-default-400'
               }`}
               aria-label={`Ir a imagen ${index + 1}`}
@@ -94,7 +98,7 @@ export default function ImageGallery({
         </div>
       )}
 
-      <p className="text-center text-xs text-default-400">
+      <p className='text-default-400 text-center text-xs'>
         Resolución: {currentImage.resolution}
       </p>
     </div>

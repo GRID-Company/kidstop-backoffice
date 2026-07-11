@@ -9,6 +9,7 @@ Plan detallado para implementar la Carpeta Digital de Kidstop Singles Platform �
 **Figma:** https://www.figma.com/design/OVJt5MDixgpKHhfO6Bk2bq/ks-UI-MVP?node-id=6403-11874
 
 **Stack:**
+
 - Next.js 16 + React 19 + TypeScript 5
 - Apollo Client + GraphQL Codegen
 - HeroUI + Tailwind CSS 4
@@ -25,9 +26,11 @@ Plan detallado para implementar la Carpeta Digital de Kidstop Singles Platform �
 ## Módulos a Implementar
 
 ### 1. **Layout y Navegación**
+
 **Objetivo:** Estructura visual de la aplicación con header, navegación y footer adaptados al TCG del dominio.
 
 **Funcionalidades:**
+
 - Header con logo, búsqueda, carrito, login/perfil
 - Navegación principal (Catálogo, Most Wanted)
 - Footer con info de tienda
@@ -37,6 +40,7 @@ Plan detallado para implementar la Carpeta Digital de Kidstop Singles Platform �
 - Restricciones por rol (Kiosk no ve perfil/pedidos)
 
 **Implementación:**
+
 ```
 src/shared/layouts/
 ├── public-layout.tsx          # Layout base (header + footer)
@@ -50,9 +54,11 @@ src/shared/layouts/
 ---
 
 ### 2. **TCG por Dominio**
+
 **Objetivo:** Detectar el TCG activo a partir del hostname y aplicar tema visual.
 
 **Implementación:**
+
 ```
 src/lib/utils/
 └── get-tcg-from-domain.ts
@@ -62,6 +68,7 @@ src/lib/store/
 ```
 
 **Lógica:**
+
 - `magic.*` → MAGIC
 - Todo lo demás → POKEMON
 - En desarrollo: `NEXT_PUBLIC_TCG_TYPE` como override
@@ -69,9 +76,11 @@ src/lib/store/
 ---
 
 ### 3. **Autenticación**
+
 **Objetivo:** Login, registro y recuperación de contraseña para clientes.
 
 **Funcionalidades:**
+
 - Login con email + contraseña
 - Registro con nombre, email, teléfono, contraseña
 - Recuperación de contraseña vía email
@@ -79,6 +88,7 @@ src/lib/store/
 - Sesión via cookies (mismo mecanismo que backoffice)
 
 **Implementación:**
+
 ```
 features/auth/
 ├── adapters/
@@ -103,6 +113,7 @@ features/auth/
 ```
 
 **Rutas:**
+
 - `/login`
 - `/registro`
 - `/recuperar-contrasena`
@@ -110,9 +121,11 @@ features/auth/
 ---
 
 ### 4. **Catálogo**
+
 **Objetivo:** Navegación del inventario disponible con búsqueda, filtros y detalle de carta.
 
 **Funcionalidades:**
+
 - Grid de cartas con imagen, nombre, set, precio, stock
 - Búsqueda por nombre
 - Filtros: set/edición, rareza, rango de precio, solo en stock
@@ -123,6 +136,7 @@ features/auth/
 - Loading skeletons
 
 **Implementación:**
+
 ```
 features/catalog/
 ├── adapters/
@@ -152,15 +166,18 @@ features/catalog/
 ```
 
 **Rutas:**
+
 - `/` — Catálogo (landing)
 - `/carta/[id]` — Detalle de carta
 
 ---
 
 ### 5. **Carrito y Checkout**
+
 **Objetivo:** Carrito de compras con validación de stock, geofencing y modo Kiosk.
 
 **Funcionalidades:**
+
 - Agregar/quitar cartas, ajustar cantidad
 - Resumen con total
 - Validación de stock al confirmar
@@ -170,6 +187,7 @@ features/catalog/
 - Confirmación de pedido
 
 **Implementación:**
+
 ```
 src/lib/store/
 └── cart.ts (Zustand: items, addItem, removeItem, updateQuantity, clearCart)
@@ -201,15 +219,18 @@ features/cart/
 ```
 
 **Rutas:**
+
 - `/carrito`
 - `/checkout`
 
 ---
 
 ### 6. **Wishlist**
+
 **Objetivo:** Lista de deseos con indicador de stock y notificación de restock.
 
 **Funcionalidades:**
+
 - Grid de cartas en wishlist
 - Indicador de stock (disponible/agotado)
 - Agregar al carrito si hay stock
@@ -217,6 +238,7 @@ features/cart/
 - No disponible para Kiosk ni Público
 
 **Implementación:**
+
 ```
 features/wishlist/
 ├── adapters/
@@ -235,20 +257,24 @@ features/wishlist/
 ```
 
 **Rutas:**
+
 - `/wishlist`
 
 ---
 
 ### 7. **Historial de Pedidos**
+
 **Objetivo:** Historial de pedidos del cliente filtrado por TCG del dominio.
 
 **Funcionalidades:**
+
 - Lista de pedidos con código, fecha, total, estado
 - Detalle de pedido con items y timeline de estados
 - Filtrado por TCG del dominio
 - No disponible para Kiosk
 
 **Implementación:**
+
 ```
 features/orders/
 ├── adapters/
@@ -272,21 +298,25 @@ features/orders/
 ```
 
 **Rutas:**
+
 - `/pedidos`
 - `/pedidos/[id]`
 
 ---
 
 ### 8. **Perfil de Usuario**
+
 **Objetivo:** Ver y editar datos del usuario autenticado.
 
 **Funcionalidades:**
+
 - Mostrar nombre, email, teléfono, tipo (Cliente/VIP)
 - Edición inline de datos
 - Cambio de contraseña
 - No disponible para Kiosk
 
 **Implementación:**
+
 ```
 features/profile/
 ├── adapters/
@@ -309,14 +339,17 @@ features/profile/
 ```
 
 **Rutas:**
+
 - `/perfil`
 
 ---
 
 ### 9. **Most Wanted (Página Pública)**
+
 **Objetivo:** Página pública sin autenticación que muestra las cartas más buscadas, optimizada para pantalla/TV.
 
 **Funcionalidades:**
+
 - Grid de cartas most wanted
 - Nombre, imagen, notas
 - Modo display (fullscreen, sin header/footer)
@@ -324,6 +357,7 @@ features/profile/
 - Sin autenticación
 
 **Implementación:**
+
 ```
 features/most-wanted/
 ├── adapters/
@@ -342,6 +376,7 @@ features/most-wanted/
 ```
 
 **Rutas:**
+
 - `/most-wanted`
 
 ---
@@ -349,6 +384,7 @@ features/most-wanted/
 ## Componentes Compartidos a Crear
 
 ### `shared/base/`
+
 - `card-image.tsx` — Imagen de carta con Next Image + fallback
 - `price-display.tsx` — Formato de precio MXN
 - `stock-badge.tsx` — Indicador disponible/agotado
@@ -357,6 +393,7 @@ features/most-wanted/
 - `search-input.tsx` — Input de búsqueda con debounce
 
 ### `shared/layouts/`
+
 - `public-layout.tsx` — Header + footer para rutas públicas
 - `authenticated-layout.tsx` — Extiende con menú de usuario
 - `fullscreen-layout.tsx` — Sin header/footer (Most Wanted display)
@@ -377,6 +414,7 @@ src/lib/store/
 ## Orden de Implementación
 
 ### **Fase 1: Fundamentos** (Semanas 1-2)
+
 1. Setup del repo (template desde backoffice)
 2. TCG por dominio (detección + tema visual)
 3. Layout público (header, footer, navegación)
@@ -384,12 +422,14 @@ src/lib/store/
 5. Layout autenticado (menú de usuario)
 
 ### **Fase 2: Catálogo** (Semanas 3-4)
+
 6. Catálogo - Grid de cartas con búsqueda
 7. Catálogo - Filtros
 8. Catálogo - Detalle de carta
 9. Catálogo - Componentes (card-item, variant-selector, etc.)
 
 ### **Fase 3: Carrito y Checkout** (Semanas 5-6)
+
 10. Carrito - Store + Vista
 11. Checkout - Validación de stock
 12. Checkout - Geofencing (Google Maps)
@@ -397,12 +437,14 @@ src/lib/store/
 14. Checkout - Confirmación de pedido
 
 ### **Fase 4: Cuenta de Usuario** (Semanas 7-8)
+
 15. Perfil de usuario
 16. Historial de pedidos (listado + detalle)
 17. Wishlist
 18. Restricciones por rol (Kiosk, Público)
 
 ### **Fase 5: Páginas Públicas y Ajustes** (Semana 9)
+
 19. Most Wanted (página pública)
 20. Responsive completo
 21. Testing integral
@@ -412,17 +454,20 @@ src/lib/store/
 ## Consideraciones Técnicas
 
 ### **TCG por Dominio**
+
 - Detectar hostname en middleware y/o client-side
 - Todas las queries deben incluir `tcgType` como variable
 - Variable de entorno `NEXT_PUBLIC_TCG_TYPE` para desarrollo local
 - Temas visuales en `src/lib/consts/tcg-themes.ts`
 
 ### **Mocked Data**
+
 - Todos los features inician con datos mock en `adapters/api/*.mock.ts`
 - Hooks consumen mocks directamente (mismo patrón que el backoffice)
 - Migración a Apollo seguirá la guía `MOCK_TO_APOLLO_MIGRATION.md` del backoffice
 
 ### **Roles y Permisos**
+
 - Público: solo navegar catálogo y most wanted
 - Cliente: todo excepto compra remota
 - VIP: todo, incluida compra remota (sin geofence)
@@ -430,24 +475,28 @@ src/lib/store/
 - Validar en middleware (`proxy.ts`) y en componentes
 
 ### **Geofencing**
+
 - Google Maps JavaScript API
 - Coordenadas de tienda configurables via env
 - Haversine para cálculo de distancia
 - Solo aplica a Cliente (no VIP, no Kiosk)
 
 ### **Responsive**
+
 - Mobile-first
 - Grid de catálogo: 2 cols (móvil), 3 (tablet), 4-5 (desktop)
 - Filtros: drawer en móvil, sidebar en desktop
 - Navegación: hamburger en móvil
 
 ### **Performance**
+
 - Infinite scroll o paginación en catálogo
 - Next Image con `remotePatterns` para imágenes de cartas
 - Loading skeletons en todas las vistas
 - Cache de Apollo Client (cuando se integre)
 
 ### **Diseño**
+
 - Usar Figma como base/inspiración
 - Link: https://www.figma.com/design/OVJt5MDixgpKHhfO6Bk2bq/ks-UI-MVP?node-id=6403-11874
 - Cada tarea en ClickUp debe referenciar el frame de Figma correspondiente

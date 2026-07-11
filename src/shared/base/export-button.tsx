@@ -16,9 +16,9 @@ export const ExportButton = ({
 }: ExportButtonProps) => (
   <Tooltip content={tooltipContent}>
     <Button
-      className="bg-accent text-white"
-      startContent={<Icon icon="solar:download-minimalistic-bold" width={16} />}
-      size="sm"
+      className='bg-accent text-white'
+      startContent={<Icon icon='solar:download-minimalistic-bold' width={16} />}
+      size='sm'
       onPress={onPress}
       isLoading={isLoading}
       isDisabled={isLoading}

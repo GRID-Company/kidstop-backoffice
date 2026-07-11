@@ -7,7 +7,9 @@ interface UseSellerEditStateReturn {
   setIsEditSellerDrawerOpen: (open: boolean) => void;
 }
 
-export function useSellerEditState(status?: PurchaseStatus): UseSellerEditStateReturn {
+export function useSellerEditState(
+  status?: PurchaseStatus
+): UseSellerEditStateReturn {
   const [isEditSellerDrawerOpen, setIsEditSellerDrawerOpen] = useState(false);
 
   const canEditSeller = useMemo(() => {

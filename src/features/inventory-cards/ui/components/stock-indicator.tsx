@@ -18,9 +18,9 @@ export default function StockIndicator({
 }: StockIndicatorProps) {
   return (
     <Chip
-      size="sm"
+      size='sm'
       color={STOCK_STATUS_COLORS[stockStatus] ?? 'default'}
-      variant="flat"
+      variant='flat'
       className={className}
     >
       {STOCK_STATUS_LABELS[stockStatus] ?? stockStatus} · {stock}

@@ -1,15 +1,20 @@
 import { DateRangePicker, DateRangePickerProps } from '@heroui/react';
 import type { DateValue } from '@internationalized/date';
 
-type OverrideDateRangePickerProps = Omit<DateRangePickerProps<DateValue>, 'classNames'> & {
+type OverrideDateRangePickerProps = Omit<
+  DateRangePickerProps<DateValue>,
+  'classNames'
+> & {
   classNames?: DateRangePickerProps<DateValue>['classNames'];
 };
 
-export default function OverrideDateRangePicker(props: OverrideDateRangePickerProps) {
+export default function OverrideDateRangePicker(
+  props: OverrideDateRangePickerProps
+) {
   return (
     <DateRangePicker
-      variant="bordered"
-      size="md"
+      variant='bordered'
+      size='md'
       {...props}
       classNames={{
         ...props.classNames,

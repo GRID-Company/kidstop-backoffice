@@ -21,7 +21,8 @@ export function toCustomerDomain(raw: ApiCustomerFragment): ICustomer {
     emailAddress: raw.emailAddress,
     phone: raw.phone,
     role: (raw.role as CustomerRole) ?? CUSTOMER_ROLES.CLIENT,
-    clientStatus: (raw.clientStatus as ClientStatus) ?? CLIENT_STATUSES.STANDARD,
+    clientStatus:
+      (raw.clientStatus as ClientStatus) ?? CLIENT_STATUSES.STANDARD,
     active: raw.active,
     createdDate: String(raw.createdDate ?? ''),
     updatedDate: raw.updatedDate ? String(raw.updatedDate) : undefined,

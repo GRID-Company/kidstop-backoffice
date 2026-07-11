@@ -1,4 +1,8 @@
-import { validatePhoneNumber, normalizePhoneNumber, validateAndNormalizePhone } from '../phone-validation';
+import {
+  validatePhoneNumber,
+  normalizePhoneNumber,
+  validateAndNormalizePhone,
+} from '../phone-validation';
 
 describe('validatePhoneNumber', () => {
   describe('Valid phone numbers', () => {

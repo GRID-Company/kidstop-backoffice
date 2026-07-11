@@ -126,18 +126,18 @@ A `success: true` response means the export job has been queued. The XLSX file w
 
 The generated file contains one row per purchase with the following columns:
 
-| Column | Description |
-|---|---|
-| Referencia | Purchase reference code |
-| Vendedor (Nombre) | Seller name |
-| Vendedor (Teléfono) | Seller phone |
-| Vendedor (Email) | Seller email |
-| Comprador | Buyer name |
-| Estado | Purchase status |
-| Total | Purchase total (currency formatted) |
-| Total de Items | Sum of all item quantities |
-| Pago en Efectivo | Total payments made in cash (CASH) |
-| Pago en Transferencia | Total payments made by transfer (TRANSFER) |
+| Column                    | Description                                        |
+| ------------------------- | -------------------------------------------------- |
+| Referencia                | Purchase reference code                            |
+| Vendedor (Nombre)         | Seller name                                        |
+| Vendedor (Teléfono)       | Seller phone                                       |
+| Vendedor (Email)          | Seller email                                       |
+| Comprador                 | Buyer name                                         |
+| Estado                    | Purchase status                                    |
+| Total                     | Purchase total (currency formatted)                |
+| Total de Items            | Sum of all item quantities                         |
+| Pago en Efectivo          | Total payments made in cash (CASH)                 |
+| Pago en Transferencia     | Total payments made by transfer (TRANSFER)         |
 | Pago en Crédito en Tienda | Total payments made in store credit (STORE_CREDIT) |
 
 ---
@@ -228,16 +228,16 @@ A `success: true` response means the export job has been queued. The XLSX file w
 
 The generated file contains one row per sale with the following columns:
 
-| Column | Description |
-|---|---|
-| Fecha de Creación | Sale creation date (DD/MM/YYYY) |
-| Código | Sale code (e.g. KSS-2025-00001) |
-| Cliente | Customer name (or kiosk customer name) |
-| Cliente (Email) | Customer email (or kiosk customer email) |
-| TCG | Trading card game type |
-| Estado | Sale status |
-| Total | Sale total (currency formatted) |
-| Total de Items | Sum of all item quantities |
+| Column            | Description                              |
+| ----------------- | ---------------------------------------- |
+| Fecha de Creación | Sale creation date (DD/MM/YYYY)          |
+| Código            | Sale code (e.g. KSS-2025-00001)          |
+| Cliente           | Customer name (or kiosk customer name)   |
+| Cliente (Email)   | Customer email (or kiosk customer email) |
+| TCG               | Trading card game type                   |
+| Estado            | Sale status                              |
+| Total             | Sale total (currency formatted)          |
+| Total de Items    | Sum of all item quantities               |
 
 ---
 

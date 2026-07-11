@@ -194,7 +194,9 @@ mutation UpdatePurchase($updatePurchaseInput: UpdatePurchaseInput!) {
   }
 }
 
-mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput!) {
+mutation UpdatePurchaseItems(
+  $updatePurchaseItemsInput: UpdatePurchaseItemsInput!
+) {
   updatePurchaseItems(updatePurchaseItemsInput: $updatePurchaseItemsInput) {
     guid
     reference
@@ -233,7 +235,9 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
   }
 }
 
-mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusInput!) {
+mutation UpdatePurchaseStatus(
+  $updatePurchaseStatusInput: UpdatePurchaseStatusInput!
+) {
   updatePurchaseStatus(updatePurchaseStatusInput: $updatePurchaseStatusInput) {
     guid
     reference
@@ -242,8 +246,12 @@ mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusIn
   }
 }
 
-mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!) {
-  setPurchaseItemSellPrice(setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput) {
+mutation SetPurchaseItemSellPrice(
+  $setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!
+) {
+  setPurchaseItemSellPrice(
+    setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput
+  ) {
     guid
     offerPrice
     referencePrice

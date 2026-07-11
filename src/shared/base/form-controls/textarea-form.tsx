@@ -3,8 +3,9 @@ import { TextAreaProps } from '@heroui/react';
 import { ControlWithFormProps } from '@/lib/types/controller.types';
 import OverrideTextarea from '../heorui-overrides/textarea';
 
-interface TextareaFormProps<T extends FieldValues>
-  extends Partial<TextAreaProps> {
+interface TextareaFormProps<
+  T extends FieldValues,
+> extends Partial<TextAreaProps> {
   controlProps: ControlWithFormProps<T>;
 }
 

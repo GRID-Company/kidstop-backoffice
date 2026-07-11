@@ -14,7 +14,9 @@ import {
 import { BulkSearchVariant, BulkCardResult } from '../types';
 import { DEFAULT_OFFER_PERCENTAGE } from '../constants';
 
-type BulkSearchFormData = BulkSearchFormDataPurchases | BulkSearchFormDataInventory;
+type BulkSearchFormData =
+  | BulkSearchFormDataPurchases
+  | BulkSearchFormDataInventory;
 type BulkCardFormData = BulkCardFormDataPurchases | BulkCardFormDataInventory;
 
 interface UseBulkSearchFormReturn {
@@ -31,7 +33,9 @@ export function useBulkSearchForm(
   variant: BulkSearchVariant
 ): UseBulkSearchFormReturn {
   const schema =
-    variant === 'purchases' ? bulkSearchFormSchemaPurchases : bulkSearchFormSchemaInventory;
+    variant === 'purchases'
+      ? bulkSearchFormSchemaPurchases
+      : bulkSearchFormSchemaInventory;
 
   const form = useForm<BulkSearchFormData>({
     resolver: zodResolver(schema),
@@ -55,11 +59,13 @@ export function useBulkSearchForm(
       const quantity = result.parsedQuantity ?? 1;
 
       if (variant === 'purchases') {
-        const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
-        const offerPrice = referencePrice > 0 
-          ? Math.floor(referencePrice * DEFAULT_OFFER_PERCENTAGE) 
-          : 0;
-        
+        const referencePrice =
+          selectedCard.referencePrice || selectedCard.sellPrice || 0;
+        const offerPrice =
+          referencePrice > 0
+            ? Math.floor(referencePrice * DEFAULT_OFFER_PERCENTAGE)
+            : 0;
+
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
@@ -69,7 +75,7 @@ export function useBulkSearchForm(
         } as BulkCardFormDataPurchases);
       } else {
         const defaultPublicPrice = selectedCard.sellPrice || 0;
-        
+
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,

@@ -22,7 +22,12 @@ import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { SetPurchaseItemSellPriceDocument } from '@/lib/api/generated/purchases.generated';
-import { PURCHASE_STATUS, IPaymentDetail, IPurchaseItem, IPurchase } from '../../domain/types';
+import {
+  PURCHASE_STATUS,
+  IPaymentDetail,
+  IPurchaseItem,
+  IPurchase,
+} from '../../domain/types';
 import {
   PURCHASE_STATUS_LABELS,
   PAYMENT_METHOD_LABELS,
@@ -90,26 +95,30 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
 
-  const { 
-    duplicateConfirmation, 
-    validateAndAddItems, 
-    handleConfirmDuplicates, 
-    handleCancelDuplicates 
-  } = useDuplicateValidation(
-    existingItemIds, 
-    addItem, 
-    () => setIsAdvancedSearchEnabled(false)
+  const {
+    duplicateConfirmation,
+    validateAndAddItems,
+    handleConfirmDuplicates,
+    handleCancelDuplicates,
+  } = useDuplicateValidation(existingItemIds, addItem, () =>
+    setIsAdvancedSearchEnabled(false)
   );
-  const tableRefetchPricesRef = useRef<((items?: IPurchaseItem[]) => void) | null>(null);
+  const tableRefetchPricesRef = useRef<
+    ((items?: IPurchaseItem[]) => void) | null
+  >(null);
 
   const { updateSeller, updating: updatingSeller } = useSellers();
-  const { canEditSeller, isEditSellerDrawerOpen, setIsEditSellerDrawerOpen } = useSellerEditState(purchase?.status);
+  const { canEditSeller, isEditSellerDrawerOpen, setIsEditSellerDrawerOpen } =
+    useSellerEditState(purchase?.status);
 
-  const [setPurchaseItemSellPrice] = useMutation(SetPurchaseItemSellPriceDocument, {
-    onError: (error) => {
-      toast.error(`Error al actualizar precio: ${error.message}`);
-    },
-  });
+  const [setPurchaseItemSellPrice] = useMutation(
+    SetPurchaseItemSellPriceDocument,
+    {
+      onError: (error) => {
+        toast.error(`Error al actualizar precio: ${error.message}`);
+      },
+    }
+  );
 
   const handlePaymentsConfirm = useCallback(
     (newPayments: IPaymentDetail[]) => {
@@ -177,7 +186,11 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const handleBulkSearchConfirm = useCallback(
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
-        const newItems = mapBulkSearchToPurchaseItems(data, results, purchase?.tcgType || 'POKEMON');
+        const newItems = mapBulkSearchToPurchaseItems(
+          data,
+          results,
+          purchase?.tcgType || 'POKEMON'
+        );
         validateAndAddItems(newItems);
       } catch {
         toast.error('Error al agregar cartas desde búsqueda masiva');
@@ -196,7 +209,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     }
 
     const missingPayments = payments.length === 0;
-    const allPricesAdjusted = items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
+    const allPricesAdjusted =
+      items.length > 0 && items.every((item) => (item.sellPrice ?? 0) > 0);
     const missingPrices = !allPricesAdjusted;
 
     if (missingPayments && missingPrices) {
@@ -215,9 +229,13 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   if (loading) {
     return (
       <EntitiesPage>
-        <div className="flex flex-col items-center justify-center py-20 text-default-400">
-          <Icon icon="lucide:loader-2" width={48} className="mb-3 animate-spin" />
-          <span className="text-lg font-medium">Cargando compra...</span>
+        <div className='text-default-400 flex flex-col items-center justify-center py-20'>
+          <Icon
+            icon='lucide:loader-2'
+            width={48}
+            className='mb-3 animate-spin'
+          />
+          <span className='text-lg font-medium'>Cargando compra...</span>
         </div>
       </EntitiesPage>
     );
@@ -226,14 +244,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   if (!purchase) {
     return (
       <EntitiesPage>
-        <div className="flex flex-col items-center justify-center py-20 text-default-400">
-          <Icon icon="lucide:search-x" width={48} className="mb-3" />
-          <span className="text-lg font-medium">Compra no encontrada</span>
+        <div className='text-default-400 flex flex-col items-center justify-center py-20'>
+          <Icon icon='lucide:search-x' width={48} className='mb-3' />
+          <span className='text-lg font-medium'>Compra no encontrada</span>
           <Button
-            variant="light"
-            className="mt-4 text-accent"
+            variant='light'
+            className='text-accent mt-4'
             onPress={() => router.push('/compras')}
-            startContent={<Icon icon="lucide:arrow-left" width={16} />}
+            startContent={<Icon icon='lucide:arrow-left' width={16} />}
           >
             Volver a compras
           </Button>
@@ -246,18 +264,18 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="">
-        <div className="flex min-w-full items-center justify-between">
-          <div className="flex items-center gap-5">
+      <EntitiesPage.Toolbar label=''>
+        <div className='flex min-w-full items-center justify-between'>
+          <div className='flex items-center gap-5'>
             <Button
               isIconOnly
-              variant="light"
+              variant='light'
               onPress={() => router.push('/compras')}
-              aria-label="Volver a compras"
+              aria-label='Volver a compras'
             >
-              <Icon icon="lucide:arrow-left" width={20} />
+              <Icon icon='lucide:arrow-left' width={20} />
             </Button>
-            <span className="text-lg font-semibold text-accent">
+            <span className='text-accent text-lg font-semibold'>
               {purchase.reference}
             </span>
             <PurchaseStatusBadge status={purchase.status} />
@@ -266,13 +284,15 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         </div>
       </EntitiesPage.Toolbar>
 
-      <div className="flex flex-col gap-6 px-4">
-        <Card className="p-4">
+      <div className='flex flex-col gap-6 px-4'>
+        <Card className='p-4'>
           <PurchaseTimeline currentStatus={purchase.status} />
         </Card>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className={assignedBudget > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+          <div
+            className={assignedBudget > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}
+          >
             <SellerInfoCard
               seller={purchase.seller}
               createdAt={purchase.createdDate}
@@ -295,23 +315,23 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
         {isEditable && (
           <EntitiesPage.CardContainer>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-accent">
+            <div className='flex flex-col gap-4'>
+              <div className='flex items-center justify-between'>
+                <span className='text-accent text-sm font-semibold'>
                   Agregar cartas
                 </span>
                 <Switch
-                  size="sm"
+                  size='sm'
                   isSelected={isAdvancedSearchEnabled}
                   onValueChange={setIsAdvancedSearchEnabled}
                 >
-                  <span className="text-xs">Búsqueda avanzada</span>
+                  <span className='text-xs'>Búsqueda avanzada</span>
                 </Switch>
               </div>
 
               {isAdvancedSearchEnabled ? (
                 <BulkCardSearch
-                  variant="purchases"
+                  variant='purchases'
                   onConfirm={handleBulkSearchConfirm}
                   onCancel={handleBulkSearchCancel}
                   isOpen={isAdvancedSearchEnabled}
@@ -327,14 +347,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         )}
 
         <EntitiesPage.CardContainer>
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon icon="lucide:list" width={18} className="text-accent" />
-                <span className="text-sm font-semibold">
+          <div className='flex flex-col gap-4'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                <Icon icon='lucide:list' width={18} className='text-accent' />
+                <span className='text-sm font-semibold'>
                   Items de la compra
                 </span>
-                <Chip size="sm" variant="flat">
+                <Chip size='sm' variant='flat'>
                   {items.length} {items.length === 1 ? 'carta' : 'cartas'}
                 </Chip>
               </div>
@@ -355,18 +375,18 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
         {payments.length > 0 && (
           <EntitiesPage.CardContainer>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <Icon icon="lucide:wallet" width={18} className="text-accent" />
-                <span className="text-sm font-semibold">Pagos registrados</span>
+            <div className='flex flex-col gap-4'>
+              <div className='flex items-center gap-2'>
+                <Icon icon='lucide:wallet' width={18} className='text-accent' />
+                <span className='text-sm font-semibold'>Pagos registrados</span>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
                 {payments.map((payment, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between rounded-lg border border-default-200 p-3"
+                    className='border-default-200 flex items-center justify-between rounded-lg border p-3'
                   >
-                    <div className="flex items-center gap-2">
+                    <div className='flex items-center gap-2'>
                       <Icon
                         icon={
                           payment.method === 'CASH'
@@ -376,22 +396,24 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                               : 'lucide:store'
                         }
                         width={16}
-                        className="text-accent"
+                        className='text-accent'
                       />
-                      <span className="text-sm">
+                      <span className='text-sm'>
                         {PAYMENT_METHOD_LABELS[payment.method]}
                       </span>
                     </div>
-                    <span className="text-sm font-semibold">
+                    <span className='text-sm font-semibold'>
                       {displayCurrency(payment.amount)}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-end border-t border-default-200 pt-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-default-500">Total pagado:</span>
-                  <span className="text-lg font-bold text-accent">
+              <div className='border-default-200 flex justify-end border-t pt-3'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-default-500 text-sm'>
+                    Total pagado:
+                  </span>
+                  <span className='text-accent text-lg font-bold'>
                     {displayCurrency(
                       payments.reduce((sum, p) => sum + p.amount, 0)
                     )}
@@ -404,29 +426,31 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
         {!isTerminal && (
           <EntitiesPage.CardContainer>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Icon icon="lucide:zap" width={18} className="text-accent" />
-                  <span className="text-sm font-semibold">Acciones</span>
+            <div className='flex flex-col gap-4'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <Icon icon='lucide:zap' width={18} className='text-accent' />
+                  <span className='text-sm font-semibold'>Acciones</span>
                 </div>
                 {(canSendQuote || canResendQuote) && (
                   <WhatsAppQuoteButton
                     seller={purchase.seller}
                     items={items}
                     tcgType={purchase.tcgType}
-                    label={canResendQuote ? "Reenviar cotización" : undefined}
+                    label={canResendQuote ? 'Reenviar cotización' : undefined}
                   />
                 )}
               </div>
               <Divider />
-              <div className="flex flex-wrap gap-3">
+              <div className='flex flex-wrap gap-3'>
                 {isEditable && (
                   <Button
-                    color="secondary"
-                    variant="bordered"
-                    startContent={<Icon icon="lucide:save" width={18} />}
-                    isDisabled={!hasItemChanges || items.length === 0 || loading}
+                    color='secondary'
+                    variant='bordered'
+                    startContent={<Icon icon='lucide:save' width={18} />}
+                    isDisabled={
+                      !hasItemChanges || items.length === 0 || loading
+                    }
                     onPress={handleUpdateItemsOnly}
                   >
                     Actualizar compra
@@ -435,9 +459,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
                 {canQuote && (
                   <Button
-                    color="primary"
-                    variant="solid"
-                    startContent={<Icon icon="lucide:file-check" width={18} />}
+                    color='primary'
+                    variant='solid'
+                    startContent={<Icon icon='lucide:file-check' width={18} />}
                     onPress={() => updateStatus(PURCHASE_STATUS.QUOTED)}
                   >
                     Cotizar
@@ -446,8 +470,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
                 {canAcceptQuote && (
                   <Button
-                    className="bg-success text-white"
-                    startContent={<Icon icon="lucide:check-check" width={18} />}
+                    className='bg-success text-white'
+                    startContent={<Icon icon='lucide:check-check' width={18} />}
                     onPress={handleAcceptQuote}
                   >
                     Vendedor aceptó cotización
@@ -456,9 +480,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
                 {canRegisterPayment && (
                   <Button
-                    variant="bordered"
-                    className="border-accent text-accent"
-                    startContent={<Icon icon="lucide:wallet" width={18} />}
+                    variant='bordered'
+                    className='border-accent text-accent'
+                    startContent={<Icon icon='lucide:wallet' width={18} />}
                     onPress={() => setIsPaymentModalOpen(true)}
                   >
                     {payments.length > 0 ? 'Editar pago' : 'Registrar pago'}
@@ -467,21 +491,26 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
                 {canAdjustPrices && (
                   <Button
-                    variant="bordered"
-                    className="border-accent text-accent"
-                    startContent={<Icon icon="lucide:tag" width={18} />}
+                    variant='bordered'
+                    className='border-accent text-accent'
+                    startContent={<Icon icon='lucide:tag' width={18} />}
                     onPress={() => setIsPriceModalOpen(true)}
                   >
                     Ajustar precios
                   </Button>
                 )}
 
-                {(canFinalize || purchase.status === PURCHASE_STATUS.WAITING_PRICE) && (
+                {(canFinalize ||
+                  purchase.status === PURCHASE_STATUS.WAITING_PRICE) && (
                   <Tooltip content={finalizeTooltipMessage}>
                     <span>
                       <Button
-                        className="bg-accent text-white"
-                        startContent={!mutating ? <Icon icon="lucide:check-circle" width={18} /> : undefined}
+                        className='bg-accent text-white'
+                        startContent={
+                          !mutating ? (
+                            <Icon icon='lucide:check-circle' width={18} />
+                          ) : undefined
+                        }
                         onPress={handleFinalize}
                         isDisabled={!canFinalize || mutating}
                         isLoading={mutating}
@@ -494,9 +523,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
                 {canReject && (
                   <Button
-                    color="danger"
-                    variant="flat"
-                    startContent={<Icon icon="lucide:x-circle" width={18} />}
+                    color='danger'
+                    variant='flat'
+                    startContent={<Icon icon='lucide:x-circle' width={18} />}
                     onPress={handleReject}
                   >
                     Rechazar
@@ -505,9 +534,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
 
                 {canReturnToDraft && (
                   <Button
-                    color="warning"
-                    variant="bordered"
-                    startContent={<Icon icon="lucide:rotate-ccw" width={18} />}
+                    color='warning'
+                    variant='bordered'
+                    startContent={<Icon icon='lucide:rotate-ccw' width={18} />}
                     onPress={handleReturnToDraft}
                   >
                     Volver a borrador
@@ -519,8 +548,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         )}
 
         {isTerminal && (
-          <div className="flex items-center justify-center rounded-lg border border-default-200 bg-default-50 py-4">
-            <div className="flex items-center gap-2 text-default-500">
+          <div className='border-default-200 bg-default-50 flex items-center justify-center rounded-lg border py-4'>
+            <div className='text-default-500 flex items-center gap-2'>
               <Icon
                 icon={
                   purchase.status === PURCHASE_STATUS.FINALIZED
@@ -529,9 +558,9 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 }
                 width={18}
               />
-              <span className="text-sm font-medium">
-                Compra {PURCHASE_STATUS_LABELS[purchase.status].toLowerCase()} el{' '}
-                {formatDateTime(purchase.updatedDate)}
+              <span className='text-sm font-medium'>
+                Compra {PURCHASE_STATUS_LABELS[purchase.status].toLowerCase()}{' '}
+                el {formatDateTime(purchase.updatedDate)}
               </span>
             </div>
           </div>
@@ -602,56 +631,56 @@ function SellerInfoCard({
 }) {
   return (
     <Card>
-      <CardBody className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon icon="lucide:user" width={18} className="text-accent" />
-            <span className="text-sm font-semibold">Vendedor</span>
+      <CardBody className='flex flex-col gap-4'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Icon icon='lucide:user' width={18} className='text-accent' />
+            <span className='text-sm font-semibold'>Vendedor</span>
           </div>
           {isEditable && onEditClick && (
             <Button
               isIconOnly
-              size="sm"
-              variant="light"
+              size='sm'
+              variant='light'
               onPress={onEditClick}
-              aria-label="Editar vendedor"
+              aria-label='Editar vendedor'
             >
-              <Icon icon="lucide:edit-2" width={16} />
+              <Icon icon='lucide:edit-2' width={16} />
             </Button>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-default-400">Nombre</span>
-            <span className="font-medium">{seller.name}</span>
+        <div className='grid grid-cols-2 gap-x-6 gap-y-2 text-sm'>
+          <div className='flex flex-col gap-0.5'>
+            <span className='text-default-400'>Nombre</span>
+            <span className='font-medium'>{seller.name}</span>
           </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-default-400">Teléfono</span>
-            <span className="font-medium">{seller.phone}</span>
+          <div className='flex flex-col gap-0.5'>
+            <span className='text-default-400'>Teléfono</span>
+            <span className='font-medium'>{seller.phone}</span>
           </div>
           {seller.email && (
-            <div className="flex flex-col gap-0.5">
-              <span className="text-default-400">Email</span>
-              <span className="font-medium">{seller.email}</span>
+            <div className='flex flex-col gap-0.5'>
+              <span className='text-default-400'>Email</span>
+              <span className='font-medium'>{seller.email}</span>
             </div>
           )}
-          <div className="flex flex-col gap-0.5">
-            <span className="text-default-400">Creada</span>
-            <span className="font-medium">{formatDateTime(createdAt)}</span>
+          <div className='flex flex-col gap-0.5'>
+            <span className='text-default-400'>Creada</span>
+            <span className='font-medium'>{formatDateTime(createdAt)}</span>
           </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-default-400">Actualizada</span>
-            <span className="font-medium">{formatDateTime(updatedAt)}</span>
+          <div className='flex flex-col gap-0.5'>
+            <span className='text-default-400'>Actualizada</span>
+            <span className='font-medium'>{formatDateTime(updatedAt)}</span>
           </div>
         </div>
 
         {notes && (
           <>
             <Divider />
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-default-400">Notas</span>
-              <span className="text-sm text-default-600">{notes}</span>
+            <div className='flex flex-col gap-1'>
+              <span className='text-default-400 text-xs'>Notas</span>
+              <span className='text-default-600 text-sm'>{notes}</span>
             </div>
           </>
         )}

@@ -282,8 +282,12 @@ query IndicatorsInventoryItems($tcg: String, $forceRefresh: Boolean) {
 **Access:** ADMIN, RECEPTION, BUYER
 
 ```graphql
-mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryMovementInput!) {
-  createInventoryMovement(createInventoryMovementInput: $createInventoryMovementInput) {
+mutation CreateInventoryMovement(
+  $createInventoryMovementInput: CreateInventoryMovementInput!
+) {
+  createInventoryMovement(
+    createInventoryMovementInput: $createInventoryMovementInput
+  ) {
     guid
     movementType
     quantity
@@ -362,6 +366,7 @@ mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryM
 - `MANUAL_SET`: Sets stock to the exact quantity provided, adjusting FIFO batches via delta. Creates inventory item if it doesn't exist.
 
 **Notes:**
+
 - Each operation type is recorded with its own `movementType` in the movement history: `MANUAL_ENTRY`, `MANUAL_EXIT`, or `MANUAL_SET`.
 - Wishlist restock notifications are triggered when stock transitions from 0 → >0.
 
@@ -374,8 +379,12 @@ mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryM
 **Access:** ADMIN, RECEPTION, BUYER
 
 ```graphql
-mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
-  updateInventoryItemPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+mutation UpdateInventoryItemPrices(
+  $updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!
+) {
+  updateInventoryItemPrices(
+    updateInventoryItemPricesInput: $updateInventoryItemPricesInput
+  ) {
     guid
     purchasePrice
     sellPrice
@@ -412,7 +421,9 @@ mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInvent
 **Access:** ADMIN, RECEPTION, BUYER
 
 ```graphql
-query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs!) {
+query InventoryMovements(
+  $findInventoryMovementsArgs: FindInventoryMovementsArgs!
+) {
   inventoryMovements(findInventoryMovementsArgs: $findInventoryMovementsArgs) {
     data {
       guid
@@ -468,8 +479,12 @@ query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs
 **Access:** ADMIN, RECEPTION
 
 ```graphql
-query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHistoryArgs!) {
-  inventoryItemSellPriceHistory(findSellPriceHistoryArgs: $findSellPriceHistoryArgs) {
+query InventoryItemSellPriceHistory(
+  $findSellPriceHistoryArgs: FindSellPriceHistoryArgs!
+) {
+  inventoryItemSellPriceHistory(
+    findSellPriceHistoryArgs: $findSellPriceHistoryArgs
+  ) {
     data {
       guid
       previousPrice
@@ -525,11 +540,11 @@ query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHist
 
 **`SellPriceChangeReason` values:**
 
-| Value | Triggered by |
-|---|---|
-| `DIRECT_UPDATE` | `updateInventoryItemPrices` mutation (API directa) |
-| `MANUAL_MOVEMENT` | `createInventoryMovement` or `bulkLoadInventory` when `sellPrice` is provided |
-| `PURCHASE_FINALIZED` | `finalizePurchase` — price is taken from the purchase item's `sellPrice` |
+| Value                | Triggered by                                                                  |
+| -------------------- | ----------------------------------------------------------------------------- |
+| `DIRECT_UPDATE`      | `updateInventoryItemPrices` mutation (API directa)                            |
+| `MANUAL_MOVEMENT`    | `createInventoryMovement` or `bulkLoadInventory` when `sellPrice` is provided |
+| `PURCHASE_FINALIZED` | `finalizePurchase` — price is taken from the purchase item's `sellPrice`      |
 
 ---
 
@@ -736,7 +751,12 @@ const addManualEntry = async (
   condition: string,
   language: string,
   quantity: number,
-  options?: { purchasePrice?: number; sellPrice?: number; reference?: string; notes?: string }
+  options?: {
+    purchasePrice?: number;
+    sellPrice?: number;
+    reference?: string;
+    notes?: string;
+  }
 ) => {
   try {
     const { data } = await client.mutate({
@@ -749,9 +769,9 @@ const addManualEntry = async (
           language,
           quantity,
           bulkOperationType: 'MANUAL_ENTRY',
-          ...options
-        }
-      }
+          ...options,
+        },
+      },
     });
 
     console.log('Manual entry created:', data.createInventoryMovement);
@@ -781,9 +801,9 @@ const addManualExit = async (
           language,
           quantity,
           bulkOperationType: 'MANUAL_EXIT',
-          ...options
-        }
-      }
+          ...options,
+        },
+      },
     });
 
     console.log('Manual exit created:', data.createInventoryMovement);
@@ -813,9 +833,9 @@ const setManualStock = async (
           language,
           quantity,
           bulkOperationType: 'MANUAL_SET',
-          ...options
-        }
-      }
+          ...options,
+        },
+      },
     });
 
     console.log('Stock set:', data.createInventoryMovement);
@@ -838,9 +858,9 @@ const updatePrices = async (
         updateInventoryItemPricesInput: {
           inventoryItemGuid,
           purchasePrice,
-          sellPrice
-        }
-      }
+          sellPrice,
+        },
+      },
     });
 
     console.log('Prices updated:', data.updateInventoryItemPrices);
@@ -1021,21 +1041,23 @@ const handleAuthError = (error: any) => {
 ```typescript
 const optimisticSale = async (itemGuid: string, quantity: number) => {
   // Update UI immediately
-  setItems(prev => prev.map(item =>
-    item.guid === itemGuid
-      ? { ...item, stock: item.stock - quantity }
-      : item
-  ));
+  setItems((prev) =>
+    prev.map((item) =>
+      item.guid === itemGuid ? { ...item, stock: item.stock - quantity } : item
+    )
+  );
 
   try {
     await recordSale(itemGuid, quantity);
   } catch (error) {
     // Revert on error
-    setItems(prev => prev.map(item =>
-      item.guid === itemGuid
-        ? { ...item, stock: item.stock + quantity }
-        : item
-    ));
+    setItems((prev) =>
+      prev.map((item) =>
+        item.guid === itemGuid
+          ? { ...item, stock: item.stock + quantity }
+          : item
+      )
+    );
     handleError(error);
   }
 };

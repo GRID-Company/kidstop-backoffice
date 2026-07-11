@@ -9,12 +9,12 @@ export const MOST_WANTED_PRIORITY_LABELS: Record<MostWantedPriority, string> = {
   [MOST_WANTED_PRIORITIES.LOW]: 'Baja',
 };
 
-export const MOST_WANTED_PRIORITY_OPTIONS = Object.values(MOST_WANTED_PRIORITIES).map(
-  (priority) => ({
-    value: priority,
-    label: MOST_WANTED_PRIORITY_LABELS[priority],
-  })
-);
+export const MOST_WANTED_PRIORITY_OPTIONS = Object.values(
+  MOST_WANTED_PRIORITIES
+).map((priority) => ({
+  value: priority,
+  label: MOST_WANTED_PRIORITY_LABELS[priority],
+}));
 
 export const DEFAULT_MOST_WANTED_SORT: ITableSort = {
   column: 'order',

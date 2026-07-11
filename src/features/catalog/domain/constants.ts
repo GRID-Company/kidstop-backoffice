@@ -17,7 +17,9 @@ export const DEFAULT_CARD_CONDITION = CARD_CONDITIONS.NEAR_MINT;
 export function getDefaultVariant<T extends { condition: string }>(
   variants: T[]
 ): T {
-  return variants.find((v) => v.condition === DEFAULT_CARD_CONDITION) ?? variants[0];
+  return (
+    variants.find((v) => v.condition === DEFAULT_CARD_CONDITION) ?? variants[0]
+  );
 }
 
 export const DEFAULT_CARDS_SORT: ITableSort = {

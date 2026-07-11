@@ -27,12 +27,10 @@ export const SALE_STATUS_COLORS: Record<
   [SALE_STATUS.CANCELLED]: 'danger',
 };
 
-export const SALE_STATUS_OPTIONS = Object.values(SALE_STATUS).map(
-  (status) => ({
-    value: status,
-    label: SALE_STATUS_LABELS[status],
-  })
-);
+export const SALE_STATUS_OPTIONS = Object.values(SALE_STATUS).map((status) => ({
+  value: status,
+  label: SALE_STATUS_LABELS[status],
+}));
 
 export const CANCEL_REASON_LABELS: Record<CancelReason, string> = {
   [CANCEL_REASON.CLIENT_UNREACHABLE]: 'Cliente no localizable',

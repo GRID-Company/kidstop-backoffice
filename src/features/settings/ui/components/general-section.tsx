@@ -1,5 +1,9 @@
 import { Divider } from '@heroui/react';
-import { IGeofenceConfig, IThresholdConfig, IOperatingHours } from '../../domain/types';
+import {
+  IGeofenceConfig,
+  IThresholdConfig,
+  IOperatingHours,
+} from '../../domain/types';
 import SettingsSection from './settings-section';
 import { GeofenceContent } from './geofence-section';
 import { ThresholdContent } from './threshold-section';
@@ -25,11 +29,19 @@ export default function GeneralSection({
   onSaveOperatingHours,
 }: GeneralSectionProps) {
   return (
-    <SettingsSection title="General" icon="lucide:settings">
-      <div className="flex flex-col gap-6">
-        <GeofenceContent geofence={geofence} isLoading={isLoading} onSave={onSaveGeofence} />
+    <SettingsSection title='General' icon='lucide:settings'>
+      <div className='flex flex-col gap-6'>
+        <GeofenceContent
+          geofence={geofence}
+          isLoading={isLoading}
+          onSave={onSaveGeofence}
+        />
         <Divider />
-        <ThresholdContent thresholds={thresholds} isLoading={isLoading} onSave={onSaveThresholds} />
+        <ThresholdContent
+          thresholds={thresholds}
+          isLoading={isLoading}
+          onSave={onSaveThresholds}
+        />
         <Divider />
         <OperatingHoursContent
           operatingHours={operatingHours}

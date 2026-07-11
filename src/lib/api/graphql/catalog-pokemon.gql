@@ -1,5 +1,9 @@
-query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
-  pokemonCardInternalList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+query PokemonCardInternalList(
+  $findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!
+) {
+  pokemonCardInternalList(
+    findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs
+  ) {
     data {
       guid
       name
@@ -89,8 +93,12 @@ query PokemonCardGenres {
   pokemonCardGenres
 }
 
-mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
-  updateInventoryItemPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+mutation UpdateInventoryItemPrices(
+  $updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!
+) {
+  updateInventoryItemPrices(
+    updateInventoryItemPricesInput: $updateInventoryItemPricesInput
+  ) {
     guid
     purchasePrice
     sellPrice
@@ -155,33 +163,33 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
           gradedPriceEightOrAbove
         }
       }
-    relatedCards {
-      guid
-      name
-      language
-      cardNumber
-      setName
-      setCode
-      variant
-      imageUri
-      sellPrice
-      totalStock
-      availableStock
-      type
-      hp
-      stage
-      cardMetrics {
-        variantsMetrics {
-          condition
-          stock
-          lastSellDate
-          avgDaysInInventory
-          wishlistCount
+      relatedCards {
+        guid
+        name
+        language
+        cardNumber
+        setName
+        setCode
+        variant
+        imageUri
+        sellPrice
+        totalStock
+        availableStock
+        type
+        hp
+        stage
+        cardMetrics {
+          variantsMetrics {
+            condition
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
         }
-        ungradedPrice
-        gradedPriceSeven
-        gradedPriceEightOrAbove
-      }
       }
       error
     }

@@ -47,28 +47,27 @@ const COLUMNS = [
   { key: 'reference', label: 'Referencia', allowsSorting: true },
 ];
 
-
 function renderCell(item: IInventoryMovement, columnKey: string) {
   switch (columnKey) {
     case 'createdDate':
       return (
-        <span className="text-sm text-default-500">
+        <span className='text-default-500 text-sm'>
           {formatUnixDateTime(item.createdDate)}
         </span>
       );
     case 'cardName':
       return (
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <CardImage
             src={item.cardImageUrl}
             alt={item.cardName}
             tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
-            containerClassName="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100"
-            className="object-contain"
+            containerClassName='relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100'
+            className='object-contain'
           />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{item.cardName}</p>
-            <p className="truncate text-xs text-default-400">
+          <div className='min-w-0'>
+            <p className='truncate text-sm font-medium'>{item.cardName}</p>
+            <p className='text-default-400 truncate text-xs'>
               {item.setName} ({item.setCode}) · {item.cardNumber}
             </p>
           </div>
@@ -77,13 +76,13 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
     case 'movementType':
       return (
         <Chip
-          size="sm"
-          variant="flat"
+          size='sm'
+          variant='flat'
           color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
           startContent={
             <Icon
               icon={MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'}
-              className="ml-1 text-sm"
+              className='ml-1 text-sm'
             />
           }
         >
@@ -92,13 +91,15 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
       );
     case 'quantity': {
       const { text, className } = formatMovementQuantity(item);
-      return <span className={`text-sm font-semibold ${className}`}>{text}</span>;
+      return (
+        <span className={`text-sm font-semibold ${className}`}>{text}</span>
+      );
     }
     case 'userName':
-      return <span className="text-sm">{item.userName}</span>;
+      return <span className='text-sm'>{item.userName}</span>;
     case 'reference':
       return (
-        <span className="text-sm text-default-500">
+        <span className='text-default-500 text-sm'>
           {item.reference ?? '—'}
         </span>
       );
@@ -117,40 +118,39 @@ function MovementMobileCardComponent({
   const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
 
   return (
-    <KidstopCard
-      isPressable={!!onPress}
-      onPress={() => onPress?.(item)}
-    >
-      <CardBody className="flex flex-row gap-3 !p-4">
+    <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
+      <CardBody className='flex flex-row gap-3 !p-4'>
         <CardImage
           src={item.cardImageUrl}
           alt={item.cardName}
           tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
-          containerClassName="relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100"
-          className="object-contain"
+          containerClassName='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100'
+          className='object-contain'
         />
 
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <div className="flex items-start justify-between gap-2">
-            <p className="truncate text-sm font-semibold">{item.cardName}</p>
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+          <div className='flex items-start justify-between gap-2'>
+            <p className='truncate text-sm font-semibold'>{item.cardName}</p>
             <span className={`flex-shrink-0 text-sm font-bold ${qtyClass}`}>
               {qtyText}
             </span>
           </div>
 
-          <p className="truncate text-xs text-default-500">
+          <p className='text-default-500 truncate text-xs'>
             {item.setName} ({item.setCode}) · {item.cardNumber}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className='flex flex-wrap items-center gap-2'>
             <Chip
-              size="sm"
-              variant="flat"
+              size='sm'
+              variant='flat'
               color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
               startContent={
                 <Icon
-                  icon={MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'}
-                  className="ml-1 text-xs"
+                  icon={
+                    MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'
+                  }
+                  className='ml-1 text-xs'
                 />
               }
             >
@@ -158,7 +158,7 @@ function MovementMobileCardComponent({
             </Chip>
           </div>
 
-          <div className="flex items-center gap-3 text-[11px] text-default-400">
+          <div className='text-default-400 flex items-center gap-3 text-[11px]'>
             <span>{formatUnixDateTime(item.createdDate)}</span>
             <span>{item.userName}</span>
             {item.reference && <span>{item.reference}</span>}
@@ -184,9 +184,9 @@ export default function MovementHistoryTable({
 }: MovementHistoryTableProps) {
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-3">
+      <div className='flex flex-col gap-3'>
         {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          <Skeleton key={i} className='h-14 w-full rounded-lg' />
         ))}
       </div>
     );
@@ -194,19 +194,21 @@ export default function MovementHistoryTable({
 
   if (totalItems === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-default-400">
-        <span className="text-5xl">📋</span>
-        <p className="mt-4 text-lg font-medium">No se encontraron movimientos</p>
-        <p className="text-sm">Intenta ajustar los filtros de búsqueda</p>
+      <div className='text-default-400 flex flex-col items-center justify-center py-16'>
+        <span className='text-5xl'>📋</span>
+        <p className='mt-4 text-lg font-medium'>
+          No se encontraron movimientos
+        </p>
+        <p className='text-sm'>Intenta ajustar los filtros de búsqueda</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="hidden lg:block">
+    <div className='flex flex-col gap-6'>
+      <div className='hidden lg:block'>
         <KidstopTable
-          aria-label="Historial de movimientos"
+          aria-label='Historial de movimientos'
           sortDescriptor={sortDescriptor}
           onSortChange={onSortChange}
           onRowAction={
@@ -224,7 +226,7 @@ export default function MovementHistoryTable({
               <TableColumn
                 key={column.key}
                 allowsSorting={column.allowsSorting}
-                className="text-center"
+                className='text-center'
               >
                 {column.label}
               </TableColumn>
@@ -234,7 +236,7 @@ export default function MovementHistoryTable({
             {(item) => (
               <TableRow key={item.guid}>
                 {COLUMNS.map((col) => (
-                  <TableCell key={col.key} className="text-center">
+                  <TableCell key={col.key} className='text-center'>
                     {renderCell(item, col.key)}
                   </TableCell>
                 ))}
@@ -244,15 +246,19 @@ export default function MovementHistoryTable({
         </KidstopTable>
       </div>
 
-      <div className="flex flex-col gap-3 lg:hidden">
+      <div className='flex flex-col gap-3 lg:hidden'>
         {items.map((item) => (
-          <MovementMobileCard key={item.guid} item={item} onPress={onMovementPress} />
+          <MovementMobileCard
+            key={item.guid}
+            item={item}
+            onPress={onMovementPress}
+          />
         ))}
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-default-400">
+        <div className='flex items-center justify-between'>
+          <p className='text-default-400 text-xs'>
             Mostrando {items.length} de {totalItems}
           </p>
           <Pagination
@@ -260,7 +266,7 @@ export default function MovementHistoryTable({
             page={page}
             onChange={onPageChange}
             showControls
-            size="sm"
+            size='sm'
           />
         </div>
       )}

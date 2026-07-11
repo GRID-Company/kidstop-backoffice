@@ -15,17 +15,23 @@ export function mapBulkSearchToPurchaseItems(
     const selectedCard =
       result?.bestMatch?.guid === cardForm.selectedCardGuid
         ? result.bestMatch
-        : result?.relatedCards.find((c) => c.guid === cardForm.selectedCardGuid) ||
-          result?.bestMatch;
+        : result?.relatedCards.find(
+            (c) => c.guid === cardForm.selectedCardGuid
+          ) || result?.bestMatch;
 
     if (!selectedCard) {
       throw new Error(`Card not found for index ${index}`);
     }
 
-    const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
+    const referencePrice =
+      selectedCard.referencePrice || selectedCard.sellPrice || 0;
 
     return {
-      guid: generateTemporaryItemGuid(selectedCard.guid, cardForm.condition, cardForm.language as CardLanguage),
+      guid: generateTemporaryItemGuid(
+        selectedCard.guid,
+        cardForm.condition,
+        cardForm.language as CardLanguage
+      ),
       cardGuid: selectedCard.guid,
       cardName: selectedCard.name,
       cardImageUrl: selectedCard.imageUri || '',

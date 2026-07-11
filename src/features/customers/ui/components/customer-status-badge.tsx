@@ -1,5 +1,8 @@
 import { Chip } from '@heroui/react';
-import { CLIENT_STATUS_LABELS, CLIENT_STATUS_COLORS } from '../../domain/constants';
+import {
+  CLIENT_STATUS_LABELS,
+  CLIENT_STATUS_COLORS,
+} from '../../domain/constants';
 import { ClientStatus } from '../../domain/types';
 
 interface CustomerStatusBadgeProps {
@@ -7,12 +10,15 @@ interface CustomerStatusBadgeProps {
   className?: string;
 }
 
-export default function CustomerStatusBadge({ clientStatus, className }: CustomerStatusBadgeProps) {
+export default function CustomerStatusBadge({
+  clientStatus,
+  className,
+}: CustomerStatusBadgeProps) {
   return (
     <Chip
-      size="sm"
+      size='sm'
       color={CLIENT_STATUS_COLORS[clientStatus] ?? 'default'}
-      variant="flat"
+      variant='flat'
       className={className}
     >
       {CLIENT_STATUS_LABELS[clientStatus] ?? clientStatus}

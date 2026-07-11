@@ -32,11 +32,13 @@ Any non-terminal → CANCELLED (ADMIN/RECEPTION — with cancel reason)
 ### Roles & Permissions
 
 #### Backoffice (ADMIN / RECEPTION)
+
 - View all sales (paginated list and detail)
 - Update sale status
 - Cancel sales with reason
 
 #### Carpeta Digital (CLIENT / CLIENT_KIOSK)
+
 - View own cart and sales
 - Add/update/remove cart items
 - Checkout (create sale from cart)
@@ -45,6 +47,7 @@ Any non-terminal → CANCELLED (ADMIN/RECEPTION — with cancel reason)
 ### Sale Code Format
 
 Format: `KSS-YYYY-XXXXX` (e.g., KSS-2025-00001)
+
 - Incremental per year
 - Auto-generated on sale creation
 
@@ -307,7 +310,7 @@ mutation UpdateSaleStatus($updateSaleStatusInput: UpdateSaleStatusInput!) {
 **Business Rules:**
 
 - **READY transition:** Sends email notification to customer if email is available (registered customer or kiosk email provided)
-- **COMPLETED transition:** 
+- **COMPLETED transition:**
   - Creates SALE_EXIT inventory movements for all items
   - Consumes stock using FIFO batch logic
   - Fails if insufficient stock is available
@@ -737,7 +740,9 @@ mutation ClearCart($tcg: String!) {
 **Access:** CLIENT, CLIENT_KIOSK
 
 ```graphql
-mutation CreateSaleFromCart($createSaleFromCartInput: CreateSaleFromCartInput!) {
+mutation CreateSaleFromCart(
+  $createSaleFromCartInput: CreateSaleFromCartInput!
+) {
   createSaleFromCart(createSaleFromCartInput: $createSaleFromCartInput) {
     guid
     saleCode

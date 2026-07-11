@@ -29,7 +29,8 @@ export default function MostWantedConfig() {
   const existingCards = useMemo(
     () =>
       items.map((item) => ({
-        guid: item.pokemonCardSummary?.guid || item.magicCardSummary?.guid || '',
+        guid:
+          item.pokemonCardSummary?.guid || item.magicCardSummary?.guid || '',
       })),
     [items]
   );
@@ -46,10 +47,10 @@ export default function MostWantedConfig() {
   return (
     <>
       <EntitiesPage>
-        <EntitiesPage.Toolbar label="Most Wanted">
+        <EntitiesPage.Toolbar label='Most Wanted'>
           <Button
-            startContent={<Icon icon="lucide:plus" />}
-            className="text-white"
+            startContent={<Icon icon='lucide:plus' />}
+            className='text-white'
             style={{ backgroundColor: 'var(--color-accent)' }}
             onPress={addCardModal.openModal}
           >
@@ -58,21 +59,20 @@ export default function MostWantedConfig() {
         </EntitiesPage.Toolbar>
 
         <EntitiesPage.CardContainer>
-          <div className="mb-6">
+          <div className='mb-6'>
             <TcgSegmentedSelector />
           </div>
 
-          <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-default-500">
-              {items.length} {items.length === 1 ? 'carta' : 'cartas'} en la lista
+          <div className='mb-4 flex items-center justify-between'>
+            <p className='text-default-500 text-sm'>
+              {items.length} {items.length === 1 ? 'carta' : 'cartas'} en la
+              lista
             </p>
-            <p className="text-xs text-default-400">
-              Arrastra para reordenar
-            </p>
+            <p className='text-default-400 text-xs'>Arrastra para reordenar</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <div className="flex flex-col gap-2">
+          <div className='grid grid-cols-1 gap-6 xl:grid-cols-2'>
+            <div className='flex flex-col gap-2'>
               <MostWantedList
                 items={items}
                 onReorder={reorder}
@@ -82,7 +82,7 @@ export default function MostWantedConfig() {
               />
             </div>
 
-            <div className="xl:sticky xl:top-4 xl:self-start">
+            <div className='xl:sticky xl:top-4 xl:self-start'>
               <MostWantedPreview items={items} selectedTCG={selectedTCG} />
             </div>
           </div>
@@ -95,7 +95,9 @@ export default function MostWantedConfig() {
         onAdd={handleAddCard}
         search={addCardModal.search}
         onSearchChange={addCardModal.setSearch}
-        searchResults={addCardModal.searchResults as (IPokemonCard | IMagicCard)[]}
+        searchResults={
+          addCardModal.searchResults as (IPokemonCard | IMagicCard)[]
+        }
         selectedCard={addCardModal.selectedCard}
         onSelectCard={addCardModal.selectCard}
         form={addCardModal.form}

@@ -22,7 +22,10 @@ interface EditCardModalProps {
   item: IMostWantedCard | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (guid: string, updates: { priority: MostWantedPriority; notes: string }) => void | Promise<void>;
+  onSave: (
+    guid: string,
+    updates: { priority: MostWantedPriority; notes: string }
+  ) => void | Promise<void>;
 }
 
 export default function EditCardModal({
@@ -31,7 +34,9 @@ export default function EditCardModal({
   onClose,
   onSave,
 }: EditCardModalProps) {
-  const form = useMostWantedForm(item ? toMostWantedFormDefaults(item) : undefined);
+  const form = useMostWantedForm(
+    item ? toMostWantedFormDefaults(item) : undefined
+  );
   const { control, formState, handleSubmit, reset } = form;
 
   useEffect(() => {
@@ -49,11 +54,13 @@ export default function EditCardModal({
     onClose();
   });
 
-  const cardName = item?.pokemonCardSummary?.name || item?.magicCardSummary?.name || '';
-  const cardSet = item?.pokemonCardSummary?.setName || item?.magicCardSummary?.edition || '';
+  const cardName =
+    item?.pokemonCardSummary?.name || item?.magicCardSummary?.name || '';
+  const cardSet =
+    item?.pokemonCardSummary?.setName || item?.magicCardSummary?.edition || '';
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
+    <Modal isOpen={isOpen} onClose={onClose} size='md'>
       <ModalContent>
         <form
           onSubmit={(e) => {
@@ -61,38 +68,38 @@ export default function EditCardModal({
             void onSubmit(e);
           }}
         >
-          <ModalHeader className="flex flex-col gap-1">
-            <span className="text-accent">Editar carta</span>
+          <ModalHeader className='flex flex-col gap-1'>
+            <span className='text-accent'>Editar carta</span>
             {item && (
-              <span className="text-sm font-normal text-default-500">
+              <span className='text-default-500 text-sm font-normal'>
                 {cardName} · {cardSet}
               </span>
             )}
           </ModalHeader>
 
-          <ModalBody className="flex flex-col gap-5">
+          <ModalBody className='flex flex-col gap-5'>
             <CardPrioritySelector<MostWantedCardFormData>
               controlProps={{ control, name: 'priority' }}
-              label="Prioridad"
+              label='Prioridad'
             />
 
             <TextareaForm<MostWantedCardFormData>
               controlProps={{ control, name: 'notes' }}
-              label="Notas (opcional)"
-              placeholder="Ej: Clientes preguntan seguido por esta carta"
+              label='Notas (opcional)'
+              placeholder='Ej: Clientes preguntan seguido por esta carta'
               maxRows={3}
             />
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="light" onPress={onClose}>
+            <Button variant='light' onPress={onClose}>
               Cancelar
             </Button>
             <Button
-              type="submit"
+              type='submit'
               isDisabled={!formState.isValid || !formState.isDirty}
-              startContent={<Icon icon="lucide:check" />}
-              className="text-white"
+              startContent={<Icon icon='lucide:check' />}
+              className='text-white'
               style={{ backgroundColor: 'var(--color-accent)' }}
             >
               Guardar cambios

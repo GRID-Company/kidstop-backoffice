@@ -71,7 +71,10 @@ async function loadImageAsBase64(url: string): Promise<string | null> {
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         const ctx = canvas.getContext('2d');
-        if (!ctx) { resolve(null); return; }
+        if (!ctx) {
+          resolve(null);
+          return;
+        }
         ctx.drawImage(img, 0, 0);
         resolve(canvas.toDataURL('image/jpeg', 0.85));
       };
@@ -115,7 +118,11 @@ function drawHeaderBand(doc: jsPDF, data: PickingListData): number {
   return HEADER_BAND_HEIGHT;
 }
 
-function drawInfoSection(doc: jsPDF, data: PickingListData, startY: number): number {
+function drawInfoSection(
+  doc: jsPDF,
+  data: PickingListData,
+  startY: number
+): number {
   let y = startY + 8;
 
   doc.setFontSize(8);
@@ -160,7 +167,11 @@ function drawInfoSection(doc: jsPDF, data: PickingListData, startY: number): num
   return y;
 }
 
-function drawSummaryBar(doc: jsPDF, data: PickingListData, startY: number): number {
+function drawSummaryBar(
+  doc: jsPDF,
+  data: PickingListData,
+  startY: number
+): number {
   const colors = getTcgColors(data.tcgType);
   const y = startY + 3;
   const barH = 8;
@@ -169,7 +180,10 @@ function drawSummaryBar(doc: jsPDF, data: PickingListData, startY: number): numb
   doc.roundedRect(PAGE_MARGIN, y, CONTENT_WIDTH, barH, 1.5, 1.5, 'F');
 
   const totalItems = data.items.reduce((sum, i) => sum + i.quantity, 0);
-  const total = data.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+  const total = data.items.reduce(
+    (sum, i) => sum + i.unitPrice * i.quantity,
+    0
+  );
 
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
@@ -210,7 +224,15 @@ function drawCardCell(
 ): void {
   doc.setDrawColor(220, 220, 220);
   doc.setFillColor(252, 252, 252);
-  doc.roundedRect(x, y, CARD_WIDTH, IMAGE_HEIGHT + CARD_TEXT_HEIGHT, 1.5, 1.5, 'FD');
+  doc.roundedRect(
+    x,
+    y,
+    CARD_WIDTH,
+    IMAGE_HEIGHT + CARD_TEXT_HEIGHT,
+    1.5,
+    1.5,
+    'FD'
+  );
 
   if (imageData) {
     try {
@@ -255,9 +277,14 @@ function drawCardCell(
   doc.setTextColor(...accent);
   doc.text(`×${item.quantity}`, textX + CHECKBOX_SIZE + 1.5, textBottom);
   doc.setTextColor(30, 30, 30);
-  doc.text(formatCurrency(item.unitPrice * item.quantity), x + CARD_WIDTH - 2.5, textBottom, {
-    align: 'right',
-  });
+  doc.text(
+    formatCurrency(item.unitPrice * item.quantity),
+    x + CARD_WIDTH - 2.5,
+    textBottom,
+    {
+      align: 'right',
+    }
+  );
 }
 
 function drawImagePlaceholder(doc: jsPDF, x: number, y: number): void {
@@ -265,7 +292,9 @@ function drawImagePlaceholder(doc: jsPDF, x: number, y: number): void {
   doc.rect(x + 2, y + 2, CARD_WIDTH - 4, IMAGE_HEIGHT - 4, 'F');
   doc.setFontSize(6);
   doc.setTextColor(180, 180, 180);
-  doc.text('Sin imagen', x + CARD_WIDTH / 2, y + IMAGE_HEIGHT / 2, { align: 'center' });
+  doc.text('Sin imagen', x + CARD_WIDTH / 2, y + IMAGE_HEIGHT / 2, {
+    align: 'center',
+  });
 }
 
 function drawFooter(doc: jsPDF, accent: RGB): void {
@@ -300,9 +329,13 @@ function drawFooter(doc: jsPDF, accent: RGB): void {
   }
 }
 
-export async function generatePickingListPdf(data: PickingListData): Promise<void> {
+export async function generatePickingListPdf(
+  data: PickingListData
+): Promise<void> {
   const imagePromises = data.items.map((item) =>
-    item.cardImageUrl ? loadImageAsBase64(item.cardImageUrl) : Promise.resolve(null)
+    item.cardImageUrl
+      ? loadImageAsBase64(item.cardImageUrl)
+      : Promise.resolve(null)
   );
   const images = await Promise.all(imagePromises);
 

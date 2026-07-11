@@ -11,15 +11,14 @@ import {
 } from '@/lib/api/generated/users.generated';
 import { getUsersVars } from '../../domain/users.domain';
 import { UserFilters } from '../../domain/types';
-import { toCreateUserPayload, toUpdateUserPayload } from '../../adapters/mappers/user.mapper';
+import {
+  toCreateUserPayload,
+  toUpdateUserPayload,
+} from '../../adapters/mappers/user.mapper';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
 import { DEFAULT_USERS_SORT, DEFAULT_PAGE_SIZE } from '../../domain/constants';
 
-export function useUsers(
-  page: number,
-  search?: string,
-  filters?: UserFilters
-) {
+export function useUsers(page: number, search?: string, filters?: UserFilters) {
   const vars = getUsersVars(
     {
       skip: (page - 1) * DEFAULT_PAGE_SIZE,
@@ -35,19 +34,30 @@ export function useUsers(
     fetchPolicy: 'cache-and-network',
   });
 
-  const [createMutation, { loading: creating }] = useMutation(CreateUserDocument, {
-    refetchQueries: [UsersDocument],
-  });
+  const [createMutation, { loading: creating }] = useMutation(
+    CreateUserDocument,
+    {
+      refetchQueries: [UsersDocument],
+    }
+  );
 
-  const [updateMutation, { loading: updating }] = useMutation(UpdateUserDocument, {
-    refetchQueries: [UsersDocument],
-  });
+  const [updateMutation, { loading: updating }] = useMutation(
+    UpdateUserDocument,
+    {
+      refetchQueries: [UsersDocument],
+    }
+  );
 
-  const [deleteMutation, { loading: deleting }] = useMutation(DeleteUserDocument, {
-    refetchQueries: [UsersDocument],
-  });
+  const [deleteMutation, { loading: deleting }] = useMutation(
+    DeleteUserDocument,
+    {
+      refetchQueries: [UsersDocument],
+    }
+  );
 
-  const [resendEmailQuery, { loading: resending }] = useLazyQuery(ResendEmailInviteDocument);
+  const [resendEmailQuery, { loading: resending }] = useLazyQuery(
+    ResendEmailInviteDocument
+  );
 
   const createUser = useCallback(
     async (formData: UserFormData) => {
@@ -55,7 +65,9 @@ export function useUsers(
         await createMutation({ variables: toCreateUserPayload(formData) });
         toast.success('Usuario creado');
       } catch (error) {
-        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        const message = CombinedGraphQLErrors.is(error)
+          ? error.errors[0]?.message
+          : undefined;
         toast.error(message ?? 'Error al crear usuario');
       }
     },
@@ -65,10 +77,14 @@ export function useUsers(
   const updateUser = useCallback(
     async (guid: string, formData: UserFormData) => {
       try {
-        await updateMutation({ variables: toUpdateUserPayload(formData, guid) });
+        await updateMutation({
+          variables: toUpdateUserPayload(formData, guid),
+        });
         toast.success('Usuario actualizado');
       } catch (error) {
-        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        const message = CombinedGraphQLErrors.is(error)
+          ? error.errors[0]?.message
+          : undefined;
         toast.error(message ?? 'Error al actualizar usuario');
       }
     },
@@ -81,9 +97,13 @@ export function useUsers(
         await updateMutation({
           variables: { updateUserInput: { guid, active: !currentlyActive } },
         });
-        toast.success(currentlyActive ? 'Usuario desactivado' : 'Usuario activado');
+        toast.success(
+          currentlyActive ? 'Usuario desactivado' : 'Usuario activado'
+        );
       } catch (error) {
-        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        const message = CombinedGraphQLErrors.is(error)
+          ? error.errors[0]?.message
+          : undefined;
         toast.error(message ?? 'Error al cambiar estado del usuario');
       }
     },
@@ -96,7 +116,9 @@ export function useUsers(
         await deleteMutation({ variables: { guid } });
         toast.success('Usuario eliminado');
       } catch (error) {
-        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        const message = CombinedGraphQLErrors.is(error)
+          ? error.errors[0]?.message
+          : undefined;
         toast.error(message ?? 'Error al eliminar usuario');
       }
     },
@@ -109,7 +131,9 @@ export function useUsers(
         await resendEmailQuery({ variables: { guid } });
         toast.success('Invitación reenviada');
       } catch (error) {
-        const message = CombinedGraphQLErrors.is(error) ? error.errors[0]?.message : undefined;
+        const message = CombinedGraphQLErrors.is(error)
+          ? error.errors[0]?.message
+          : undefined;
         toast.error(message ?? 'Error al reenviar invitación');
       }
     },

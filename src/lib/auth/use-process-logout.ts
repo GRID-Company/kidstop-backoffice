@@ -13,15 +13,15 @@ export const useLogout = () => {
   const logout = useCallback(
     async (toastMessage = 'Sesión terminada con éxito.', redirect = true) => {
       setLoading(true);
-      
+
       await removeTokenCookie();
       clearSession();
-      
+
       setLoading(false);
       toast.success(toastMessage);
-      
+
       if (redirect) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         router.push('/login');
       }
     },

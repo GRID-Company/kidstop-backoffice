@@ -133,7 +133,9 @@ mutation AddMostWantedCard($addMostWantedCardInput: AddMostWantedCardInput!) {
   }
 }
 
-mutation UpdateMostWantedCard($updateMostWantedCardInput: UpdateMostWantedCardInput!) {
+mutation UpdateMostWantedCard(
+  $updateMostWantedCardInput: UpdateMostWantedCardInput!
+) {
   updateMostWantedCard(updateMostWantedCardInput: $updateMostWantedCardInput) {
     guid
     tcg
@@ -167,6 +169,10 @@ mutation RemoveMostWantedCard($mostWantedCardGuid: String!) {
   removeMostWantedCard(mostWantedCardGuid: $mostWantedCardGuid)
 }
 
-mutation ReorderMostWantedCards($reorderMostWantedCardsInput: ReorderMostWantedCardsInput!) {
-  reorderMostWantedCards(reorderMostWantedCardsInput: $reorderMostWantedCardsInput)
+mutation ReorderMostWantedCards(
+  $reorderMostWantedCardsInput: ReorderMostWantedCardsInput!
+) {
+  reorderMostWantedCards(
+    reorderMostWantedCardsInput: $reorderMostWantedCardsInput
+  )
 }

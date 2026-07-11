@@ -31,63 +31,70 @@ export default function CustomerCard({
   const isBlocked = customer.clientStatus === CLIENT_STATUSES.BLOCKED;
 
   return (
-    <KidstopCard className="h-full">
-      <CardBody className="flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <p className="truncate text-sm font-semibold">{customer.name}</p>
-            <p className="truncate text-xs text-default-500">{customer.emailAddress}</p>
+    <KidstopCard className='h-full'>
+      <CardBody className='flex flex-col gap-3'>
+        <div className='flex items-start justify-between gap-2'>
+          <div className='flex min-w-0 flex-col gap-0.5'>
+            <p className='truncate text-sm font-semibold'>{customer.name}</p>
+            <p className='text-default-500 truncate text-xs'>
+              {customer.emailAddress}
+            </p>
           </div>
-          <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
+          <CustomerTypeBadge
+            role={customer.role}
+            clientStatus={customer.clientStatus}
+          />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className='flex items-center gap-2'>
           <CustomerStatusBadge clientStatus={customer.clientStatus} />
         </div>
 
-        <div className="flex items-center justify-between border-t border-default-100 pt-2">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] uppercase tracking-wide text-default-400">
+        <div className='border-default-100 flex items-center justify-between border-t pt-2'>
+          <div className='flex flex-col gap-0.5'>
+            <span className='text-default-400 text-[10px] tracking-wide uppercase'>
               Último pedido
             </span>
-            <span className="text-xs font-medium text-default-700">
+            <span className='text-default-700 text-xs font-medium'>
               {formatDate(customer.lastOrderDate ?? null)}
             </span>
           </div>
-          <div className="flex flex-col items-end gap-0.5">
-            <span className="text-[10px] uppercase tracking-wide text-default-400">
+          <div className='flex flex-col items-end gap-0.5'>
+            <span className='text-default-400 text-[10px] tracking-wide uppercase'>
               Pedidos
             </span>
-            <span className="text-xs font-medium text-default-700">
+            <span className='text-default-700 text-xs font-medium'>
               {customer.totalOrders ?? '—'}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-1 border-t border-default-100 pt-2">
-          <Tooltip content="Ver detalle">
+        <div className='border-default-100 flex items-center justify-end gap-1 border-t pt-2'>
+          <Tooltip content='Ver detalle'>
             <Button
               isIconOnly
-              size="sm"
-              variant="light"
+              size='sm'
+              variant='light'
               onPress={() => onViewDetail?.(customer)}
-              aria-label="Ver detalle del cliente"
+              aria-label='Ver detalle del cliente'
             >
-              <Icon icon="lucide:eye" className="text-base text-default-500" />
+              <Icon icon='lucide:eye' className='text-default-500 text-base' />
             </Button>
           </Tooltip>
           <Tooltip content={isBlocked ? 'Desbloquear' : 'Bloquear'}>
             <Button
               isIconOnly
-              size="sm"
-              variant="light"
+              size='sm'
+              variant='light'
               color={isBlocked ? 'success' : 'danger'}
               onPress={() => onToggleBlock?.(customer)}
-              aria-label={isBlocked ? 'Desbloquear cliente' : 'Bloquear cliente'}
+              aria-label={
+                isBlocked ? 'Desbloquear cliente' : 'Bloquear cliente'
+              }
             >
               <Icon
                 icon={isBlocked ? 'lucide:lock-open' : 'lucide:lock'}
-                className="text-base"
+                className='text-base'
               />
             </Button>
           </Tooltip>

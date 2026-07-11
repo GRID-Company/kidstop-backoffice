@@ -1,9 +1,6 @@
 'use client';
 import { type Key, type ReactNode, useEffect, useMemo, useState } from 'react';
-import {
-  Controller,
-  FieldValues,
-} from 'react-hook-form';
+import { Controller, FieldValues } from 'react-hook-form';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { ISelectOption } from '../heorui-overrides/select';
 import { AutocompleteProps } from '@heroui/react';
@@ -50,7 +47,9 @@ function BaseFormAsyncAutocomplete<
         ...(searchValue && variables
           ? {
               [Object.keys(variables)[0]]: {
-                ...(variables[Object.keys(variables)[0] as keyof TVariables] as Record<string, unknown>),
+                ...(variables[
+                  Object.keys(variables)[0] as keyof TVariables
+                ] as Record<string, unknown>),
                 search: searchValue,
               },
             }
