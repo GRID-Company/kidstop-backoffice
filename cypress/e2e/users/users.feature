@@ -26,7 +26,7 @@ Feature: Gestión de Usuarios
   Scenario: Crear nuevo usuario Comprador
     When el administrador hace clic en crear usuario
     And ingresa nombre "Carlos Pérez"
-    And ingresa email "carlos.perez@test.com"
+    And ingresa email dinámico con prefijo "carlos.perez"
     And selecciona rol "BUYER"
     And hace clic en guardar
     Then debería ver mensaje de éxito
@@ -35,7 +35,7 @@ Feature: Gestión de Usuarios
   Scenario: Crear nuevo usuario Recepción
     When el administrador hace clic en crear usuario
     And ingresa nombre "María García"
-    And ingresa email "maria.garcia@test.com"
+    And ingresa email dinámico con prefijo "maria.garcia"
     And selecciona rol "RECEPTION"
     And hace clic en guardar
     Then debería ver mensaje de éxito
@@ -63,8 +63,8 @@ Feature: Gestión de Usuarios
     And el usuario debería aparecer como activo
 
   Scenario: Validación de email duplicado
-    Given existe un usuario con email "existing@test.com"
-    When el administrador intenta crear usuario con email "existing@test.com"
+    Given el administrador crea un usuario temporal
+    When el administrador intenta crear otro usuario con el mismo email
     Then debería ver mensaje de error de email duplicado
 
   Scenario: Validación de campos obligatorios

@@ -33,9 +33,18 @@ Given('existe un usuario inactivo {string}', (userName: string) => {
   usersPage.shouldSeeUserAsInactive(userName);
 });
 
-Given('existe un usuario con email {string}', (email: string) => {
-  // Assumption: user with this email exists
-  cy.log(`User with email ${email} exists`);
+Given('el administrador crea un usuario temporal', () => {
+  const timestamp = Date.now();
+  const tempEmail = `temp.user.${timestamp}@test.com`;
+
+  cy.wrap(tempEmail).as('duplicateEmail');
+
+  usersPage.clickCreateUser();
+  usersPage.enterName('Temp User');
+  usersPage.enterEmail(tempEmail);
+  usersPage.selectRole('BUYER');
+  usersPage.clickSave();
+  usersPage.shouldSeeSuccessMessage();
 });
 
 // When steps - Navigation and viewing
@@ -63,6 +72,13 @@ When('ingresa nombre {string}', (name: string) => {
 
 When('ingresa email {string}', (email: string) => {
   usersPage.enterEmail(email);
+});
+
+When('ingresa email dinámico con prefijo {string}', (prefix: string) => {
+  const timestamp = Date.now();
+  const dynamicEmail = `${prefix}.${timestamp}@test.com`;
+  cy.wrap(dynamicEmail).as('currentUserEmail');
+  usersPage.enterEmail(dynamicEmail);
 });
 
 When('selecciona rol {string}', (role: string) => {
@@ -104,16 +120,15 @@ When('el administrador hace clic en activar usuario', () => {
 });
 
 // When steps - Validation scenarios
-When(
-  'el administrador intenta crear usuario con email {string}',
-  (email: string) => {
+When('el administrador intenta crear otro usuario con el mismo email', () => {
+  cy.get('@duplicateEmail').then((email) => {
     usersPage.clickCreateUser();
-    usersPage.enterName('Test User');
-    usersPage.enterEmail(email);
+    usersPage.enterName('Duplicate User');
+    usersPage.enterEmail(email as string);
     usersPage.selectRole('BUYER');
     usersPage.clickSave();
-  }
-);
+  });
+});
 
 When('intenta guardar sin llenar campos', () => {
   // Just try to click save without filling anything
