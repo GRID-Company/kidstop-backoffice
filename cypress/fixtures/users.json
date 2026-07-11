@@ -16,5 +16,22 @@
     "password": "Buyer123!",
     "role": "BUYER",
     "name": "Buyer Test"
+  },
+  "newUsers": {
+    "buyer1": {
+      "name": "Carlos Pérez",
+      "email": "carlos.perez@test.com",
+      "role": "BUYER"
+    },
+    "reception1": {
+      "name": "María García",
+      "email": "maria.garcia@test.com",
+      "role": "RECEPTION"
+    },
+    "testUser": {
+      "name": "Test User",
+      "email": "test.user@test.com",
+      "role": "BUYER"
+    }
   }
 }
