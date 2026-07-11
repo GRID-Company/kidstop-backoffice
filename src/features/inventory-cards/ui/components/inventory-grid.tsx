@@ -64,7 +64,7 @@ function renderCell(item: IInventoryItem, columnKey: string) {
     case 'name':
       return (
         <div className='flex items-center gap-3'>
-          <div className='bg-default-100 relative h-10 w-8 flex-shrink-0 overflow-hidden rounded'>
+          <div className='bg-default-100 relative h-16 w-12 flex-shrink-0 overflow-hidden rounded'>
             {item.imageUrl ? (
               <img
                 src={item.imageUrl}
@@ -80,7 +80,7 @@ function renderCell(item: IInventoryItem, columnKey: string) {
                 }
                 alt='Card placeholder'
                 fill
-                sizes='32px'
+                sizes='48px'
                 className='object-contain'
               />
             )}
@@ -145,7 +145,7 @@ function InventoryMobileCard({
   return (
     <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
       <CardBody className='flex flex-row gap-3 !p-4'>
-        <div className='bg-default-100 relative h-16 w-12 flex-shrink-0 overflow-hidden rounded'>
+        <div className='bg-default-100 relative h-20 w-16 flex-shrink-0 overflow-hidden rounded'>
           {item.imageUrl ? (
             <img
               src={item.imageUrl}
@@ -161,7 +161,7 @@ function InventoryMobileCard({
               }
               alt='Card placeholder'
               fill
-              sizes='48px'
+              sizes='64px'
               className='object-contain'
             />
           )}
