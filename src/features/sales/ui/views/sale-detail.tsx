@@ -256,11 +256,20 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               <div className='flex items-center justify-between'>
                 <div className='flex flex-wrap gap-3'>
                   {nextStatus && nextStatusLabel && nextStatusIcon && (
-                    <Tooltip content={nextStatusLabel}>
+                    <Tooltip
+                      content={
+                        hasAnyStockIssue
+                          ? 'No se puede avanzar: algunos items exceden el stock disponible'
+                          : hasChanges
+                            ? 'Guarda los cambios antes de continuar'
+                            : nextStatusLabel
+                      }
+                      color={hasAnyStockIssue ? 'danger' : 'default'}
+                    >
                       <Button
                         className='bg-accent text-white'
                         isLoading={mutating}
-                        isDisabled={hasChanges}
+                        isDisabled={hasChanges || hasAnyStockIssue}
                         startContent={<Icon icon={nextStatusIcon} width={18} />}
                         onPress={handleNextStatusPress}
                       >
