@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
 import PokemonCatalogPage from './pokemon-catalog.po';
 import CardDetailModal from '../card-detail-modal/card-detail-modal.po';
+import { TIMEOUTS } from '../../../support/consts/timeouts.const';
 
 const pokemonCatalog = new PokemonCatalogPage();
 const cardDetailModal = new CardDetailModal();
@@ -49,14 +50,12 @@ When('selecciona la condición {string}', (condition: string) => {
 });
 
 When('selecciona una rareza', () => {
-  // Para Autocomplete: hacer click en el componente y luego escribir
   cy.get('[data-testid="filter-rarity-select"]').click();
-  cy.wait(300);
-  // Buscar el input que está visible y escribir
+  cy.wait(TIMEOUTS.ANIMATION);
   cy.get('input[aria-label="Filtrar por rareza"]').type('Common');
-  cy.wait(500);
+  cy.wait(TIMEOUTS.DEBOUNCE);
   cy.contains('li', 'Common').first().click({ force: true });
-  cy.wait(300);
+  cy.wait(TIMEOUTS.ANIMATION);
 });
 
 When('aplica los filtros', () => {

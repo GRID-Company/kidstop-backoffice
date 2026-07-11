@@ -1,13 +1,13 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
 import CardDetailModal from './card-detail-modal.po';
+import { TIMEOUTS } from '../../../support/consts/timeouts.const';
 
 const cardDetailModal = new CardDetailModal();
 
 // Given - Setup
 Given('el usuario tiene el modal de detalle abierto', () => {
-  // Hacer click en la primera carta para abrir el modal
   cy.get('[data-testid="pokemon-card-item"]').first().click();
-  cy.wait(500);
+  cy.wait(TIMEOUTS.DEBOUNCE);
   cardDetailModal.shouldSeeModal();
 });
 
@@ -79,13 +79,11 @@ When('intenta ingresar un precio negativo {string}', (price: string) => {
 
 // When - Actions - Navigation
 When('el usuario navega a la pestaña de historial de movimientos', () => {
-  // El historial está visible por defecto en el modal
-  cy.wait(500);
+  cy.wait(TIMEOUTS.DEBOUNCE);
 });
 
 When('el usuario navega a la pestaña de historial de precios', () => {
-  // El historial está visible por defecto en el modal
-  cy.wait(500);
+  cy.wait(TIMEOUTS.DEBOUNCE);
 });
 
 // Then - Assertions - Modal

@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
 import MagicCatalogPage from './magic-catalog.po';
 import CardDetailModal from '../card-detail-modal/card-detail-modal.po';
+import { TIMEOUTS } from '../../../support/consts/timeouts.const';
 
 const magicCatalog = new MagicCatalogPage();
 const cardDetailModal = new CardDetailModal();
@@ -49,13 +50,12 @@ When('Magic: selecciona la condición {string}', (condition: string) => {
 });
 
 When('Magic: selecciona una edición', () => {
-  // Para Autocomplete de edición - usar aria-label
   cy.get('input[aria-label="Filtrar por edición"]').click();
-  cy.wait(300);
+  cy.wait(TIMEOUTS.ANIMATION);
   cy.get('input[aria-label="Filtrar por edición"]').type('Avatar');
-  cy.wait(500);
+  cy.wait(TIMEOUTS.DEBOUNCE);
   cy.contains('li', 'Avatar').first().click({ force: true });
-  cy.wait(300);
+  cy.wait(TIMEOUTS.ANIMATION);
 });
 
 When('Magic: aplica los filtros', () => {

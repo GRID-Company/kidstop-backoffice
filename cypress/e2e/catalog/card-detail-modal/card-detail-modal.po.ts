@@ -1,17 +1,22 @@
 import { CardDetailModalSelectors } from './card-detail-modal.selectors';
+import { TIMEOUTS } from '../../../support/consts/timeouts.const';
+import {
+  SUCCESS_MESSAGE_REGEX,
+  ERROR_MESSAGE_REGEX,
+} from '../../../support/consts/messages.const';
 
 export default class CardDetailModal {
   // Modal Visibility
   shouldSeeModal() {
-    cy.get(CardDetailModalSelectors.pokemonModal, { timeout: 10000 }).should(
-      'be.visible'
-    );
+    cy.get(CardDetailModalSelectors.pokemonModal, {
+      timeout: TIMEOUTS.MODAL_OPEN,
+    }).should('be.visible');
   }
 
   shouldSeeMagicModal() {
-    cy.get(CardDetailModalSelectors.magicModal, { timeout: 10000 }).should(
-      'be.visible'
-    );
+    cy.get(CardDetailModalSelectors.magicModal, {
+      timeout: TIMEOUTS.MODAL_OPEN,
+    }).should('be.visible');
   }
 
   shouldNotSeeModal() {
@@ -20,7 +25,7 @@ export default class CardDetailModal {
 
   closeModal() {
     cy.get(CardDetailModalSelectors.closeButton).click();
-    cy.wait(500);
+    cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   // Variant Selection
@@ -42,45 +47,41 @@ export default class CardDetailModal {
     };
 
     cy.get(selectorMap[condition]).click();
-    cy.wait(500);
+    cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   selectFirstAvailableVariant() {
-    // Hacer scroll en el modal para asegurar que las variantes sean visibles
     cy.get(
       '[data-testid="magic-card-detail-modal"], [data-testid="pokemon-card-detail-modal"]'
     );
 
-    cy.wait(300);
-    // Hacer scroll al botón específico
+    cy.wait(TIMEOUTS.ANIMATION);
     cy.get('[data-testid^="variant-button-"]').first().scrollIntoView();
-    cy.wait(300);
-    // Click con force por si está parcialmente oculto
+    cy.wait(TIMEOUTS.ANIMATION);
     cy.get('[data-testid^="variant-button-"]').first().click({ force: true });
-    cy.wait(500);
+    cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   selectVariantWithStock() {
-    // Buscar una variante que tenga stock > 0
     cy.get('[data-testid^="variant-button-"]').each(($btn) => {
       const text = $btn.text();
       const match = text.match(/\((\d+)\)/);
       if (match && parseInt(match[1], 10) > 0) {
         cy.wrap($btn).click();
-        return false; // Break the loop
+        return false;
       }
     });
-    cy.wait(500);
+    cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   // Stock Adjustment
   selectMovementType(type: 'Entrada' | 'Salida' | 'Ajuste') {
     cy.get(CardDetailModalSelectors.stockMovementTypeSelect).click();
-    cy.contains('li', type, { timeout: 5000 })
+    cy.contains('li', type, { timeout: TIMEOUTS.DROPDOWN_OPEN })
       .should('be.visible')
       .first()
       .click({ force: true });
-    cy.wait(300);
+    cy.wait(TIMEOUTS.ANIMATION);
   }
 
   enterStockAdjustment(quantity: string) {
@@ -95,7 +96,7 @@ export default class CardDetailModal {
 
   saveStockAdjustment() {
     cy.get(CardDetailModalSelectors.saveStockButton).click();
-    cy.wait(500);
+    cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   shouldSeeStockSaveButtonDisabled() {
@@ -113,7 +114,6 @@ export default class CardDetailModal {
 
   savePrice() {
     cy.get(CardDetailModalSelectors.savePriceButton).click();
-    // Esperar un poco para que la mutación se complete
     cy.wait(1000);
   }
 
@@ -123,22 +123,15 @@ export default class CardDetailModal {
 
   // Messages
   shouldSeeSuccessMessage() {
-    // Esperar a que aparezca el toast/mensaje de éxito
-    cy.contains(
-      /éxito|exitosamente|actualizado|guardado|ajustado|registrada|creado|desactivado|activado/i,
-      { timeout: 30000 }
-    ).should('be.visible');
+    cy.contains(SUCCESS_MESSAGE_REGEX, {
+      timeout: TIMEOUTS.SUCCESS_MESSAGE,
+    }).should('be.visible');
   }
 
   shouldSeeErrorMessage() {
-    cy.get('body', { timeout: 10000 }).should(($body) => {
+    cy.get('body', { timeout: TIMEOUTS.MODAL_OPEN }).should(($body) => {
       const text = $body.text().toLowerCase();
-      const hasError =
-        text.includes('error') ||
-        text.includes('no está disponible') ||
-        text.includes('inválido') ||
-        text.includes('requerido');
-
+      const hasError = ERROR_MESSAGE_REGEX.test(text);
       return expect(hasError, 'Should show an error message').to.be.true;
     });
   }
@@ -172,7 +165,7 @@ export default class CardDetailModal {
   // Tabs/Sections (if applicable)
   navigateToTab(tabName: string) {
     cy.contains('button', tabName).click();
-    cy.wait(500);
+    cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   shouldSeeMovementsTable() {
