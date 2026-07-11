@@ -28,7 +28,6 @@ Feature: Autenticación
     And el usuario debería permanecer en la página de login
 
   Scenario: Validación de campos vacíos
-    When el usuario hace clic en el botón de iniciar sesión
     Then el botón de iniciar sesión debería estar deshabilitado
 
   Scenario: Logout exitoso
