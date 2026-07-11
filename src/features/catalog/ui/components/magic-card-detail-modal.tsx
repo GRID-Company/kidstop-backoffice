@@ -112,9 +112,10 @@ export default function MagicCardDetailModal({
   });
 
   const handleStockAdjustClick = useCallback(() => {
-    if (stockAdjustment === 0) return;
+    if (stockAdjustment === 0 && movementType !== BulkOperationType.ManualSet)
+      return;
     setIsConfirmModalOpen(true);
-  }, [stockAdjustment]);
+  }, [stockAdjustment, movementType]);
 
   const handleConfirmAdjustment = useCallback(async () => {
     await executeStockAdjust();
@@ -585,7 +586,10 @@ export default function MagicCardDetailModal({
                       />
                       <Button
                         size='sm'
-                        isDisabled={stockAdjustment === 0}
+                        isDisabled={
+                          stockAdjustment === 0 &&
+                          movementType !== BulkOperationType.ManualSet
+                        }
                         onPress={handleStockAdjustClick}
                         startContent={<Icon icon='lucide:package-plus' />}
                         className='text-white'

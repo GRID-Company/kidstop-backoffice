@@ -162,7 +162,12 @@ export function useCardDetailModal({
   );
 
   const executeStockAdjust = useCallback(async () => {
-    if (!detail || !selectedVariant || stockAdjustment === 0) return;
+    if (
+      !detail ||
+      !selectedVariant ||
+      (stockAdjustment === 0 && movementType !== BulkOperationType.ManualSet)
+    )
+      return;
     try {
       await handleAdjustStock({
         cardGuid: selectedVariant.cardGuid,
