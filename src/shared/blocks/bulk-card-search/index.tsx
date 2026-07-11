@@ -23,11 +23,13 @@ function BulkCardSearchFooter({
   variant,
   fields,
   onCancel,
+  onScrollToUnconfigured,
 }: {
   variant: 'purchases' | 'inventory';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: any[]; // React Hook Form field array
   onCancel: () => void;
+  onScrollToUnconfigured: () => void;
 }) {
   const cardsData = useWatch({ name: 'cards' });
 
@@ -70,11 +72,15 @@ function BulkCardSearchFooter({
             {fields.length === 1 ? 'carta configurada' : 'cartas configuradas'}
           </p>
           {configuredCount < fields.length && (
-            <p className='text-warning text-xs'>
+            <button
+              type='button'
+              onClick={onScrollToUnconfigured}
+              className='text-warning hover:text-warning-600 cursor-pointer text-left text-xs underline decoration-dotted underline-offset-2 transition-colors'
+            >
               Faltan {fields.length - configuredCount}{' '}
               {fields.length - configuredCount === 1 ? 'carta' : 'cartas'} por
               configurar
-            </p>
+            </button>
           )}
         </div>
         <div className='flex gap-2'>
@@ -183,15 +189,16 @@ function BulkCardSearchRoot({
       handleClear();
     },
     (_errors) => {
-      resultsRef.current?.scrollToFirstUnconfigured();
-      toast.error(
-        'Completa los campos de las cartas pendientes. Se hizo scroll a la primera.'
-      );
+      toast.error('Por favor completa todos los campos requeridos');
     }
   );
 
   const handleCancel = () => {
     onCancel();
+  };
+
+  const handleScrollToUnconfigured = () => {
+    resultsRef.current?.scrollToFirstUnconfigured();
   };
 
   if (!isOpen) return null;
@@ -247,6 +254,7 @@ function BulkCardSearchRoot({
           variant={variant}
           fields={fields}
           onCancel={handleCancel}
+          onScrollToUnconfigured={handleScrollToUnconfigured}
         />
       </form>
     </FormProvider>
