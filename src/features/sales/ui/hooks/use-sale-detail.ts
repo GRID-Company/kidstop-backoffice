@@ -96,7 +96,9 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
     const result = localItems.some((localItem) => {
       const serverItem = sale.items.find((i) => i.guid === localItem.guid);
       if (!serverItem) return true;
-      const changed = localItem.quantity !== serverItem.quantity;
+      const quantityChanged = localItem.quantity !== serverItem.quantity;
+      const conditionChanged = localItem.condition !== serverItem.condition;
+      const changed = quantityChanged || conditionChanged;
       if (changed) {
         console.log('🟡 Item changed detected:', {
           guid: localItem.guid,
@@ -104,6 +106,10 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
           localType: typeof localItem.quantity,
           serverQuantity: serverItem.quantity,
           serverType: typeof serverItem.quantity,
+          localCondition: localItem.condition,
+          serverCondition: serverItem.condition,
+          quantityChanged,
+          conditionChanged,
         });
       }
       return changed;
