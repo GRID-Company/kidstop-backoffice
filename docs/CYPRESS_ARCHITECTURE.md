@@ -564,6 +564,261 @@ cy.url().should('include', '/dashboard');
 
 ---
 
+## Lecciones Aprendidas (Módulo Usuarios)
+
+### 1. Manejo de GraphQL Queries
+
+**Problema:** Tests fallaban porque no esperaban a que las queries GraphQL se completaran.
+
+**Solución:** Configurar intercepts globalmente en el Background:
+
+```typescript
+// En el Given step del Background
+Given('el administrador está en la página de usuarios', () => {
+  // Setup intercept ANTES de navegar
+  cy.intercept('POST', '**/graphql', (req) => {
+    if (req.body.operationName === 'Users') {
+      req.alias = 'usersQuery';
+    }
+  });
+
+  usersPage.visit();
+});
+
+// En los métodos del Page Object
+searchUser(query: string) {
+  cy.get(selector).type(query);
+  cy.wait('@usersQuery', { timeout: 10000 });
+  cy.contains('Cargando').should('not.exist');
+  cy.wait(500); // Estabilizar UI
+}
+```
+
+**Lección:** Los intercepts deben configurarse ANTES de la acción que dispara el request.
+
+### 2. Componentes HeroUI (Dropdowns/Selects)
+
+**Problema:** Los selects de HeroUI no son `<select>` nativos, son componentes custom con `<li>` items.
+
+**Solución:** Usar `cy.contains('li', text)` en lugar de `.select()`:
+
+```typescript
+filterByRole(role: string) {
+  cy.get(selector).click(); // Abrir dropdown
+  cy.contains('li', role, { timeout: 5000 })
+    .should('be.visible')
+    .first() // Por si hay múltiples matches
+    .click({ force: true });
+
+  cy.wait('@usersQuery');
+  cy.contains('Cargando').should('not.exist');
+  cy.wait(500);
+}
+```
+
+**Lección:** Siempre usar `.first()` cuando puede haber múltiples elementos y `{ force: true }` para overlays.
+
+### 3. Valores por Defecto en Formularios
+
+**Problema:** El select de rol tenía "Recepción" por defecto. Al hacer click en "Recepción", se deseleccionaba.
+
+**Solución:** Verificar el valor actual antes de hacer click:
+
+```typescript
+selectRole(role: string) {
+  cy.get(selector).then(($select) => {
+    const currentValue = $select.text();
+
+    if (!currentValue.includes(role)) {
+      cy.get(selector).click();
+      cy.contains('li', role).click({ force: true });
+      cy.wait(300);
+    } else {
+      cy.log(`Role "${role}" is already selected, skipping`);
+    }
+  });
+}
+```
+
+**Lección:** Siempre verificar el estado actual antes de hacer cambios en formularios.
+
+### 4. Emails Dinámicos para Tests
+
+**Problema:** Tests fallaban en ejecuciones repetidas por emails duplicados.
+
+**Solución:** Usar timestamps para generar emails únicos:
+
+```typescript
+When('ingresa email dinámico con prefijo {string}', (prefix: string) => {
+  const timestamp = Date.now();
+  const dynamicEmail = `${prefix}.${timestamp}@test.com`;
+  cy.wrap(dynamicEmail).as('currentUserEmail');
+  usersPage.enterEmail(dynamicEmail);
+});
+```
+
+**Lección:** Siempre usar datos dinámicos para crear entidades en tests E2E.
+
+### 5. Estructura de Tabla vs Cards
+
+**Problema:** Los métodos buscaban `[data-testid="user-card"]` pero la UI usa una tabla con `<tr>`.
+
+**Solución:** Usar `.closest('tr')` para encontrar la fila:
+
+```typescript
+clickEditUser(userName: string) {
+  cy.contains('[data-testid="user-name"]', userName)
+    .closest('tr') // Encuentra la fila
+    .find('[data-testid="user-actions-button"]')
+    .click();
+
+  cy.get('[data-testid="edit-user-button"]').click();
+}
+```
+
+**Lección:** Inspeccionar la estructura HTML real antes de escribir selectores.
+
+### 6. Validación de Mensajes de Error
+
+**Problema:** El selector `[role="alert"]` no encontraba el toast de error.
+
+**Solución:** Buscar en el body por palabras clave comunes:
+
+```typescript
+shouldSeeErrorMessage() {
+  cy.get('body', { timeout: 10000 }).should(($body) => {
+    const text = $body.text().toLowerCase();
+    const hasError =
+      text.includes('error') ||
+      text.includes('no está disponible') ||
+      text.includes('inválido') ||
+      text.includes('requerido') ||
+      text.includes('duplicado');
+
+    expect(hasError, 'Should show an error message').to.be.true;
+  });
+}
+```
+
+**Lección:** Los mensajes de error pueden aparecer en diferentes formatos (toast, modal, inline). Buscar por contenido en lugar de selector específico.
+
+### 7. Creación de Usuarios de Prueba
+
+**Problema:** Tests de editar/desactivar/activar fallaban porque los usuarios no existían.
+
+**Solución:** Crear usuarios de prueba antes de cada escenario:
+
+```gherkin
+Scenario: Editar usuario existente
+  Given el administrador crea un usuario de prueba "Usuario Para Editar"
+  When el administrador hace clic en editar ese usuario
+  And cambia el nombre a "Usuario Editado"
+  Then debería ver mensaje de éxito
+```
+
+```typescript
+Given(
+  'el administrador crea un usuario de prueba {string}',
+  (userName: string) => {
+    const timestamp = Date.now();
+    const email = `test.${timestamp}@test.com`;
+
+    cy.wrap(userName).as('testUserName');
+
+    usersPage.clickCreateUser();
+    usersPage.enterName(userName);
+    usersPage.enterEmail(email);
+    usersPage.selectRole('Comprador');
+    usersPage.clickSave();
+    usersPage.shouldSeeSuccessMessage();
+  }
+);
+```
+
+**Lección:** Los tests deben ser independientes y crear su propia data de prueba.
+
+### 8. Botones de Confirmación Flexibles
+
+**Problema:** El modal de confirmación tenía diferentes textos ("Desactivar", "Activar", "Eliminar").
+
+**Solución:** Buscar por patrón regex:
+
+```typescript
+confirmAction() {
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-testid="confirm-button"]').length > 0) {
+      cy.get('[data-testid="confirm-button"]').click();
+    } else {
+      cy.contains('button', /Desactivar|Activar|Eliminar|Confirmar/i)
+        .filter(':visible')
+        .first()
+        .click();
+    }
+  });
+}
+```
+
+**Lección:** Usar fallbacks flexibles para elementos que pueden variar según el contexto.
+
+### 9. Scope de Búsqueda
+
+**Problema:** `cy.get('[data-testid="user-name"]')` encontraba elementos fuera de la tabla (header, sidebar).
+
+**Solución:** Buscar dentro de un contenedor específico:
+
+```typescript
+shouldSeeOnlyUsersMatching(query: string) {
+  cy.get('[data-testid="users-list"]') // Contenedor
+    .find('[data-testid="user-name"]') // Elementos dentro
+    .should('have.length.at.least', 1);
+
+  cy.get('[data-testid="users-list"]')
+    .find('[data-testid="user-name"]')
+    .each(($el) => {
+      expect($el.text().toLowerCase()).to.include(query.toLowerCase());
+    });
+}
+```
+
+**Lección:** Siempre hacer scope de búsquedas dentro del contenedor relevante.
+
+### 10. Propagación de Props en Componentes Compound
+
+**Problema:** `EntitiesPage.Toolbar` no aceptaba `data-testid` porque no propagaba props adicionales.
+
+**Solución:** Extender el tipo con `React.HTMLAttributes` y usar spread:
+
+```typescript
+type ToolbarProps = Props & {
+  label: string;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+EntitiesPage.Toolbar = function Toolbar({ label, className, children, ...props }: ToolbarProps) {
+  return (
+    <div className={...} {...props}>
+      {/* ... */}
+    </div>
+  );
+};
+```
+
+**Lección:** Los componentes compound deben aceptar y propagar props HTML estándar para testing.
+
+### Checklist para Nuevos Módulos
+
+- [ ] Configurar intercept de GraphQL en el Background
+- [ ] Usar emails/datos dinámicos con timestamps
+- [ ] Verificar estructura HTML (tabla vs cards vs grid)
+- [ ] Agregar `.first()` a selectores que pueden tener múltiples matches
+- [ ] Esperar a que desaparezca "Cargando..." después de queries
+- [ ] Verificar valores por defecto en formularios antes de cambiarlos
+- [ ] Crear usuarios/entidades de prueba en cada escenario
+- [ ] Usar búsquedas con scope dentro de contenedores
+- [ ] Implementar fallbacks flexibles para mensajes y botones
+- [ ] Agregar `data-testid` a todos los elementos interactivos
+
+---
+
 ## Troubleshooting
 
 ### Error: "data-testid not found"

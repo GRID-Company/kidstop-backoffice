@@ -13,24 +13,41 @@ Given('el administrador está autenticado', () => {
 });
 
 Given('el administrador está en la página de usuarios', () => {
+  // Setup intercept for Users GraphQL queries
+  cy.intercept('POST', '**/graphql', (req) => {
+    if (req.body.operationName === 'Users') {
+      req.alias = 'usersQuery';
+    }
+  });
+
   usersPage.visit();
   usersPage.shouldSeePageTitle();
 });
 
-Given('existe un usuario {string}', (userName: string) => {
-  // Assumption: user exists in the system
-  // In a real scenario, we might create it via API
-  usersPage.shouldSeeUserInList(userName);
-});
+Given(
+  'el administrador crea un usuario de prueba {string}',
+  (userName: string) => {
+    const timestamp = Date.now();
+    const email = `test.${timestamp}@test.com`;
 
-Given('existe un usuario activo {string}', (userName: string) => {
-  usersPage.shouldSeeUserInList(userName);
-  usersPage.shouldSeeUserAsActive(userName);
-});
+    cy.wrap(userName).as('testUserName');
+    cy.wrap(email).as('testUserEmail');
 
-Given('existe un usuario inactivo {string}', (userName: string) => {
-  usersPage.shouldSeeUserInList(userName);
-  usersPage.shouldSeeUserAsInactive(userName);
+    usersPage.clickCreateUser();
+    usersPage.enterName(userName);
+    usersPage.enterEmail(email);
+    usersPage.selectRole('Comprador');
+    usersPage.clickSave();
+    usersPage.shouldSeeSuccessMessage();
+  }
+);
+
+Given('el administrador desactiva ese usuario', () => {
+  cy.get('@testUserName').then((userName) => {
+    usersPage.clickToggleUserStatus(userName as string);
+    usersPage.confirmAction();
+    usersPage.shouldSeeSuccessMessage();
+  });
 });
 
 Given('el administrador crea un usuario temporal', () => {
@@ -67,6 +84,7 @@ When('el administrador hace clic en crear usuario', () => {
 });
 
 When('ingresa nombre {string}', (name: string) => {
+  cy.wrap(name).as('currentUserName');
   usersPage.enterName(name);
 });
 
@@ -90,9 +108,8 @@ When('hace clic en guardar', () => {
 });
 
 // When steps - Edit user
-When('el administrador hace clic en editar usuario', () => {
-  // Assumes we're working with the first user or a specific one from context
-  cy.get('@currentUser').then((userName) => {
+When('el administrador hace clic en editar ese usuario', () => {
+  cy.get('@testUserName').then((userName) => {
     usersPage.clickEditUser(userName as string);
   });
 });
@@ -103,8 +120,8 @@ When('cambia el nombre a {string}', (newName: string) => {
 });
 
 // When steps - Toggle status
-When('el administrador hace clic en desactivar usuario', () => {
-  cy.get('@currentUser').then((userName) => {
+When('el administrador hace clic en desactivar ese usuario', () => {
+  cy.get('@testUserName').then((userName) => {
     usersPage.clickToggleUserStatus(userName as string);
   });
 });
@@ -113,8 +130,8 @@ When('confirma la desactivación', () => {
   usersPage.confirmAction();
 });
 
-When('el administrador hace clic en activar usuario', () => {
-  cy.get('@currentUser').then((userName) => {
+When('el administrador hace clic en activar ese usuario', () => {
+  cy.get('@testUserName').then((userName) => {
     usersPage.clickToggleUserStatus(userName as string);
   });
 });

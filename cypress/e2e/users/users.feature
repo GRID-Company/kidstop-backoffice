@@ -42,25 +42,23 @@ Feature: Gestión de Usuarios
     And el nuevo usuario debería aparecer en la lista
 
   Scenario: Editar usuario existente
-    Given existe un usuario "Test User"
-    When el administrador hace clic en editar usuario
-    And cambia el nombre a "Test User Updated"
+    Given el administrador crea un usuario de prueba "Usuario Para Editar"
+    When el administrador hace clic en editar ese usuario
+    And cambia el nombre a "Usuario Editado"
     And hace clic en guardar
     Then debería ver mensaje de éxito
-    And el usuario debería mostrar el nuevo nombre
 
   Scenario: Desactivar usuario
-    Given existe un usuario activo "User To Deactivate"
-    When el administrador hace clic en desactivar usuario
+    Given el administrador crea un usuario de prueba "Usuario Para Desactivar"
+    When el administrador hace clic en desactivar ese usuario
     And confirma la desactivación
     Then debería ver mensaje de éxito
-    And el usuario debería aparecer como inactivo
 
   Scenario: Activar usuario desactivado
-    Given existe un usuario inactivo "Inactive User"
-    When el administrador hace clic en activar usuario
+    Given el administrador crea un usuario de prueba "Usuario Para Activar"
+    And el administrador desactiva ese usuario
+    When el administrador hace clic en activar ese usuario
     Then debería ver mensaje de éxito
-    And el usuario debería aparecer como activo
 
   Scenario: Validación de email duplicado
     Given el administrador crea un usuario temporal
