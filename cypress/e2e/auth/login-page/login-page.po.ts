@@ -53,6 +53,29 @@ export default class LoginPage {
   }
 
   shouldSeeErrorToast() {
-    cy.get(LoginPageSelectors.errorToast).should('be.visible');
+    cy.get(LoginPageSelectors.errorToast, { timeout: 10000 }).should(
+      'be.visible'
+    );
+  }
+
+  shouldSeeErrorMessage(message?: string) {
+    const toast = cy.get(LoginPageSelectors.errorToast, { timeout: 10000 });
+    toast.should('be.visible');
+    if (message) {
+      toast.should('contain', message);
+    }
+  }
+
+  shouldStayOnLoginPage() {
+    cy.url().should('include', '/login');
+    this.shouldSeeEmailInput();
+  }
+
+  shouldSeeSubmitButtonDisabled() {
+    cy.get(LoginPageSelectors.submitButton).should('be.disabled');
+  }
+
+  shouldSeeSubmitButtonEnabled() {
+    cy.get(LoginPageSelectors.submitButton).should('not.be.disabled');
   }
 }
