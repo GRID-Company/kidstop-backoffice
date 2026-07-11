@@ -15,7 +15,7 @@ import { BulkSearchVariant, BulkCardResult } from '../types';
 import {
   calculateOfferPrice,
   calculatePublicPrice,
-} from '@/features/purchases/domain/price.utils';
+} from '@/lib/utils/price.utils';
 
 type BulkSearchFormData =
   | BulkSearchFormDataPurchases
