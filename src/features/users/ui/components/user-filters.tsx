@@ -18,11 +18,13 @@ export default function UserFilters({
         label='Búsqueda'
         placeholder='Nombre o correo electrónico'
         onValueChange={onSearchChange}
+        data-testid='users-search-input'
       />
       <Select
         placeholder='Todos los roles'
         label='Rol'
         items={USER_ROLE_OPTIONS}
+        data-testid='users-filter-role'
         onChange={(e) => {
           onFilterChange('role', e.target.value !== '' ? e.target.value : '');
         }}
@@ -31,6 +33,7 @@ export default function UserFilters({
         placeholder='Todos los estados'
         label='Estado'
         items={USER_STATUS_OPTIONS}
+        data-testid='users-filter-status'
         onChange={(e) => {
           const value = e.target.value;
           if (value === '') {

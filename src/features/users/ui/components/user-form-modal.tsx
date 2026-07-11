@@ -55,7 +55,12 @@ export default function UserFormModal({
   }, [isOpen, defaults, reset]);
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
+    <KidstopDrawer
+      isOpen={isOpen}
+      onClose={onClose}
+      size='xl'
+      data-testid='user-form-modal'
+    >
       <form
         onSubmit={(...args) => {
           void handleSubmit(onSubmit)(...args);
@@ -69,12 +74,14 @@ export default function UserFormModal({
               label='Nombre'
               placeholder='Ingresa el nombre del usuario'
               controlProps={{ control, name: 'name' }}
+              data-testid='user-form-name-input'
             />
 
             <InputForm
               label='Correo electrónico'
               placeholder='Ingresa el correo electrónico'
               controlProps={{ control, name: 'emailAddress' }}
+              data-testid='user-form-email-input'
             />
 
             <SelectForm
@@ -82,6 +89,7 @@ export default function UserFormModal({
               placeholder='Selecciona un rol'
               controlProps={{ control, name: 'role' }}
               items={USER_ROLE_OPTIONS}
+              data-testid='user-form-role-select'
             />
 
             {isKioskRole && (
@@ -100,6 +108,7 @@ export default function UserFormModal({
               onPress={onClose}
               type='button'
               className='text-accent'
+              data-testid='user-form-cancel-button'
             >
               Cancelar
             </Button>
@@ -110,6 +119,7 @@ export default function UserFormModal({
               isDisabled={!formState.isValid}
               className='text-white'
               style={{ backgroundColor: 'var(--color-accent)' }}
+              data-testid='user-form-save-button'
             >
               {submitLabel}
             </Button>

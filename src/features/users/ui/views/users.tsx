@@ -140,12 +140,17 @@ export default function Users() {
         key: 'name',
         label: 'Nombre',
         allowSorting: true,
-        customCol: (row: UserRow) => row.name ?? 'Sin nombre',
+        customCol: (row: UserRow) => (
+          <span data-testid='user-name'>{row.name ?? 'Sin nombre'}</span>
+        ),
       },
       {
         key: 'emailAddress',
         label: 'Correo electrónico',
         allowSorting: true,
+        customCol: (row: UserRow) => (
+          <span data-testid='user-email'>{row.emailAddress}</span>
+        ),
       },
       {
         key: 'role',
@@ -167,13 +172,19 @@ export default function Users() {
           <div onClick={(e) => e.stopPropagation()}>
             <Dropdown>
               <DropdownTrigger>
-                <Button variant='light' size='sm' isIconOnly>
+                <Button
+                  variant='light'
+                  size='sm'
+                  isIconOnly
+                  data-testid='user-actions-button'
+                >
                   <Icon icon='lucide:more-horizontal' />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label='Acciones de usuario'>
                 <DropdownItem
                   key='edit'
+                  data-testid='edit-user-button'
                   startContent={<Icon icon='lucide:pencil' />}
                   onPress={() => handleOpenEdit(row)}
                 >
@@ -181,6 +192,7 @@ export default function Users() {
                 </DropdownItem>
                 <DropdownItem
                   key='toggle-status'
+                  data-testid='toggle-user-status-button'
                   startContent={
                     <Icon
                       icon={row.active ? 'lucide:user-x' : 'lucide:user-check'}
@@ -222,9 +234,13 @@ export default function Users() {
   return (
     <>
       <EntitiesPage>
-        <EntitiesPage.Toolbar label='Usuarios'>
+        <EntitiesPage.Toolbar label='Usuarios' data-testid='users-page-title'>
           <EntitiesPage.FlexRow>
-            <AddNewButton label='Nuevo usuario' onPress={handleOpenCreate} />
+            <AddNewButton
+              label='Nuevo usuario'
+              onPress={handleOpenCreate}
+              data-testid='create-user-button'
+            />
           </EntitiesPage.FlexRow>
         </EntitiesPage.Toolbar>
 
@@ -242,6 +258,7 @@ export default function Users() {
             isLoading={loading}
             rowClickable={true}
             onRowClick={handleRowClick}
+            data-testid='users-list'
           />
 
           {totalPages > 1 && (
