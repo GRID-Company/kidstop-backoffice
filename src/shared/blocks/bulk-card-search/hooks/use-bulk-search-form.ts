@@ -12,7 +12,10 @@ import {
   BulkCardFormDataInventory,
 } from '../schemas';
 import { BulkSearchVariant, BulkCardResult } from '../types';
-import { DEFAULT_OFFER_PERCENTAGE } from '../constants';
+import {
+  calculateOfferPrice,
+  calculatePublicPrice,
+} from '@/features/purchases/domain/price.utils';
 
 type BulkSearchFormData =
   | BulkSearchFormDataPurchases
@@ -62,9 +65,7 @@ export function useBulkSearchForm(
         const referencePrice =
           selectedCard.referencePrice || selectedCard.sellPrice || 0;
         const offerPrice =
-          referencePrice > 0
-            ? Math.floor(referencePrice * DEFAULT_OFFER_PERCENTAGE)
-            : 0;
+          referencePrice > 0 ? calculateOfferPrice(referencePrice) : 0;
 
         append({
           selectedCardGuid: selectedCard.guid,
@@ -74,7 +75,9 @@ export function useBulkSearchForm(
           offerPrice,
         } as BulkCardFormDataPurchases);
       } else {
-        const defaultPublicPrice = selectedCard.sellPrice || 0;
+        const referencePrice = selectedCard.sellPrice || 0;
+        const defaultPublicPrice =
+          referencePrice > 0 ? calculatePublicPrice(referencePrice) : 0;
 
         append({
           selectedCardGuid: selectedCard.guid,
