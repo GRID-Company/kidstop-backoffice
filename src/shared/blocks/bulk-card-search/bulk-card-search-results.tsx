@@ -10,6 +10,7 @@ export default function BulkCardSearchResults({
   variant,
   tcgType,
   isLoading,
+  onRemove,
 }: BulkCardSearchResultsProps) {
   if (isLoading) {
     return (
@@ -55,6 +56,7 @@ export default function BulkCardSearchResults({
           index={index}
           variant={variant}
           tcgType={tcgType}
+          onRemove={onRemove ? () => onRemove(index) : undefined}
         />
       ))}
     </div>

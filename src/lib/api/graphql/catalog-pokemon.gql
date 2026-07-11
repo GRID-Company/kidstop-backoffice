@@ -122,6 +122,8 @@ query PokemonCardWithMetrics($guid: String!) {
 
 query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
       originalLine
       parsedQuantity

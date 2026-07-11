@@ -43,6 +43,7 @@ export default function BulkCardResultCard({
   index,
   variant,
   tcgType,
+  onRemove,
 }: BulkCardResultCardProps) {
   const { setValue, control } = useFormContext();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -148,6 +149,16 @@ export default function BulkCardResultCard({
             <p className='text-default-500 text-xs'>{result.originalLine}</p>
             <p className='text-danger text-xs'>{result.error}</p>
           </div>
+          {onRemove && (
+            <button
+              type='button'
+              onClick={onRemove}
+              className='text-danger hover:bg-danger-50 rounded-md p-1 transition-colors'
+              aria-label='Eliminar carta'
+            >
+              <Icon icon='lucide:x' width={20} />
+            </button>
+          )}
         </CardBody>
       </KidstopCard>
     );
@@ -164,6 +175,16 @@ export default function BulkCardResultCard({
             </p>
             <p className='text-default-500 text-xs'>{result.originalLine}</p>
           </div>
+          {onRemove && (
+            <button
+              type='button'
+              onClick={onRemove}
+              className='text-warning hover:bg-warning-50 rounded-md p-1 transition-colors'
+              aria-label='Eliminar carta'
+            >
+              <Icon icon='lucide:x' width={20} />
+            </button>
+          )}
         </CardBody>
       </KidstopCard>
     );
@@ -332,6 +353,27 @@ export default function BulkCardResultCard({
                   )
                 )}
               </div>
+              {onRemove && (
+                <div
+                  role='button'
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemove();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onRemove();
+                    }
+                  }}
+                  className='text-default-400 hover:text-danger hover:bg-danger-50 cursor-pointer rounded-md p-1 transition-colors'
+                  aria-label='Eliminar carta'
+                >
+                  <Icon icon='lucide:x' width={20} />
+                </div>
+              )}
             </div>
           }
         >

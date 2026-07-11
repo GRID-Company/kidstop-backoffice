@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
@@ -14,6 +14,7 @@ import {
   BulkCardSearchProps,
   BulkSearchFormDataPurchases,
   BulkSearchFormDataInventory,
+  BulkCardResult,
 } from './types';
 
 function BulkCardSearchFooter({
@@ -101,20 +102,24 @@ function BulkCardSearchRoot({
 }: BulkCardSearchProps) {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [searchText, setSearchText] = useState('');
+  const [filteredResults, setFilteredResults] = useState<BulkCardResult[]>([]);
 
   const {
     search,
     results,
     loading,
     error,
+    successfulCount,
+    totalCount,
     reset: resetSearch,
   } = useBulkCardSearch();
 
-  const { form, fields, initializeCards, resetForm } =
+  const { form, fields, initializeCards, resetForm, removeCard } =
     useBulkSearchForm(variant);
 
   useEffect(() => {
     if (results.length > 0) {
+      setFilteredResults(results);
       initializeCards(results);
     }
   }, [results, initializeCards]);
@@ -125,17 +130,36 @@ function BulkCardSearchRoot({
     await search(searchText, selectedTCG);
   };
 
+  const handleRemoveResult = useCallback(
+    (index: number) => {
+      const newFilteredResults = filteredResults.filter((_, i) => i !== index);
+      setFilteredResults(newFilteredResults);
+      removeCard(index);
+    },
+    [filteredResults, removeCard]
+  );
+
   const handleClear = () => {
     setSearchText('');
+    setFilteredResults([]);
     resetSearch();
     resetForm();
   };
 
   const handleSubmit = form.handleSubmit(
     (data) => {
+      const validResults = filteredResults.filter((result) => !result.error);
+      const errorCount = filteredResults.length - validResults.length;
+
+      if (errorCount > 0) {
+        toast.success(
+          `Se omitieron ${errorCount} ${errorCount === 1 ? 'carta' : 'cartas'} con error`
+        );
+      }
+
       onConfirm(
         data as BulkSearchFormDataPurchases & BulkSearchFormDataInventory,
-        results
+        validResults
       );
       handleClear();
     },
@@ -172,11 +196,28 @@ function BulkCardSearchRoot({
           </div>
         )}
 
+        {!loading && filteredResults.length > 0 && totalCount > 0 && (
+          <div className='border-default-200 bg-default-50 flex items-center gap-2 rounded-lg border p-3'>
+            <Icon
+              icon='lucide:search-check'
+              width={20}
+              className='text-success'
+            />
+            <p className='text-default-700 text-sm'>
+              Encontradas{' '}
+              <span className='font-semibold'>{successfulCount}</span> de{' '}
+              <span className='font-semibold'>{totalCount}</span>{' '}
+              {totalCount === 1 ? 'carta' : 'cartas'}
+            </p>
+          </div>
+        )}
+
         <BulkCardSearchResults
-          results={results}
+          results={filteredResults}
           variant={variant}
           tcgType={selectedTCG}
           isLoading={loading}
+          onRemove={handleRemoveResult}
         />
 
         <BulkCardSearchFooter

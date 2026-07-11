@@ -17,6 +17,8 @@ interface UseBulkCardSearchReturn {
   results: BulkCardResult[];
   loading: boolean;
   error: string | null;
+  successfulCount: number;
+  totalCount: number;
   reset: () => void;
 }
 
@@ -160,6 +162,8 @@ const mapPokemonRelatedCardToBulkCardData = (
 export function useBulkCardSearch(): UseBulkCardSearchReturn {
   const [results, setResults] = useState<BulkCardResult[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [successfulCount, setSuccessfulCount] = useState<number>(0);
+  const [totalCount, setTotalCount] = useState<number>(0);
 
   const [
     searchMagic,
@@ -192,6 +196,8 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
           error: result.error,
         }));
       setResults(mappedResults);
+      setSuccessfulCount(magicData.magicBatchCardSearch.successfulCount ?? 0);
+      setTotalCount(magicData.magicBatchCardSearch.totalCount ?? 0);
       setError(null);
     }
   }, [magicData]);
@@ -213,6 +219,10 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
           error: result.error,
         }));
       setResults(mappedResults);
+      setSuccessfulCount(
+        pokemonData.pokemonBatchCardSearch.successfulCount ?? 0
+      );
+      setTotalCount(pokemonData.pokemonBatchCardSearch.totalCount ?? 0);
       setError(null);
     }
   }, [pokemonData]);
@@ -265,6 +275,8 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
   const reset = useCallback(() => {
     setResults([]);
     setError(null);
+    setSuccessfulCount(0);
+    setTotalCount(0);
   }, []);
 
   return {
@@ -272,6 +284,8 @@ export function useBulkCardSearch(): UseBulkCardSearchReturn {
     results,
     loading: magicLoading || pokemonLoading,
     error,
+    successfulCount,
+    totalCount,
     reset,
   };
 }
