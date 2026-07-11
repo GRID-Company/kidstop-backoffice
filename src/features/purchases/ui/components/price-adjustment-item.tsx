@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { Chip } from '@heroui/react';
 import InputForm from '@/shared/base/form-controls/input-form';
+import { CardImage } from '@/shared/components/card-image';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { PriceAdjustmentItemProps } from './price-adjustment-types';
@@ -20,14 +21,14 @@ const PriceAdjustmentItem = forwardRef<
       }`}
     >
       <div className='flex items-center gap-3'>
-        <img
-          src={item.cardImageUrl || 'https://placehold.co/48x64?text=Card'}
+        <CardImage
+          src={item.cardImageUrl}
           alt={item.cardName}
-          className='h-16 w-12 rounded object-cover'
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://placehold.co/48x64?text=Card';
-          }}
+          tcgType={item.tcgType}
+          containerClassName='relative h-16 w-12 rounded overflow-hidden bg-default-100 flex-shrink-0'
+          className='object-cover'
+          fill
+          sizes='48px'
         />
         <div className='flex flex-1 flex-col gap-1'>
           <div className='flex items-center gap-2'>
