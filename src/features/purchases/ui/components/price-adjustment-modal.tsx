@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
 import {
   DrawerContent,
@@ -9,16 +9,12 @@ import {
   DrawerFooter,
   Button,
   Divider,
-  Chip,
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 
-import InputForm from '@/shared/base/form-controls/input-form';
 import { usePrivacyCurrency } from '@/lib/hooks/use-privacy-currency';
 import { IPurchaseItem } from '../../domain/types';
-import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
-import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import {
   calculateTotal,
   validatePriceAdjustment,
@@ -28,6 +24,8 @@ import {
   usePriceAdjustmentForm,
   PriceAdjustmentFormData,
 } from '../../adapters/forms/use-price-adjustment-form';
+import PriceAdjustmentItemsList from './price-adjustment-items-list';
+import { PriceAdjustmentItemsListHandle } from './price-adjustment-types';
 
 interface PriceAdjustmentModalProps {
   items: IPurchaseItem[];
@@ -46,6 +44,7 @@ export default function PriceAdjustmentModal({
   const [autoCalculatedItems, setAutoCalculatedItems] = useState<Set<string>>(
     new Set()
   );
+  const itemsListRef = useRef<PriceAdjustmentItemsListHandle>(null);
 
   const { control, handleSubmit, reset, fieldArray } = usePriceAdjustmentForm();
   const { fields: _fields } = fieldArray;
@@ -157,6 +156,10 @@ export default function PriceAdjustmentModal({
     [onConfirm, onClose, items]
   );
 
+  const handleScrollToInvalid = () => {
+    itemsListRef.current?.scrollToFirstInvalid();
+  };
+
   return (
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
       <DrawerContent>
@@ -219,142 +222,43 @@ export default function PriceAdjustmentModal({
             }}
             className='flex flex-col gap-4'
           >
-            {items.length === 0 && (
-              <div className='text-default-400 flex flex-col items-center justify-center py-6'>
-                <Icon icon='lucide:package-open' width={36} className='mb-2' />
-                <span className='text-sm'>No hay items para ajustar</span>
-              </div>
-            )}
-
-            {items.map((item, index) => {
-              const hasError = validation.itemsWithoutPrice.includes(item.guid);
-
-              return (
-                <div
-                  key={item.guid}
-                  className={`flex flex-col gap-3 rounded-lg border p-4 ${
-                    hasError
-                      ? 'border-danger/50 bg-danger-50/30'
-                      : 'border-default-200'
-                  }`}
-                >
-                  <div className='flex items-center gap-3'>
-                    <img
-                      src={
-                        item.cardImageUrl ||
-                        'https://placehold.co/48x64?text=Card'
-                      }
-                      alt={item.cardName}
-                      className='h-16 w-12 rounded object-cover'
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          'https://placehold.co/48x64?text=Card';
-                      }}
-                    />
-                    <div className='flex flex-1 flex-col gap-1'>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-sm font-semibold'>
-                          {item.cardName}
-                        </span>
-                        <Chip
-                          size='sm'
-                          variant='flat'
-                          classNames={{
-                            base: 'bg-accent/10',
-                            content: 'text-accent text-xs font-medium',
-                          }}
-                        >
-                          {CARD_CONDITION_SHORT_LABELS[item.condition]}
-                        </Chip>
-                        <Chip size='sm' variant='flat' className='text-xs'>
-                          {LANGUAGE_LABELS[item.language]}
-                        </Chip>
-                      </div>
-                      <span className='text-default-400 text-xs'>
-                        {item.setName} · {item.setCode}
-                      </span>
-                      <div className='text-default-500 flex items-center gap-4 text-xs'>
-                        <span>
-                          Cant: <strong>{item.quantity}</strong>
-                        </span>
-                        <span>
-                          Precio compra:{' '}
-                          <strong>{displayCurrency(item.offerPrice)}</strong>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className='flex items-end gap-3'>
-                    <div className='flex flex-col gap-1'>
-                      <span className='text-default-400 text-xs'>
-                        Precio referencia
-                      </span>
-                      <span className='text-default-600 text-sm font-medium'>
-                        {displayCurrency(item.referencePrice || 0)}
-                      </span>
-                    </div>
-
-                    <div className='flex flex-1 flex-col gap-1'>
-                      <InputForm
-                        label='Precio de venta'
-                        type='number'
-                        placeholder='0.00'
-                        controlProps={{
-                          control,
-                          name: `items.${index}.publicPrice`,
-                        }}
-                        isRequired
-                        startContent={
-                          <span className='text-default-400 text-sm'>$</span>
-                        }
-                        size='sm'
-                        aria-label={`Precio de venta de ${item.cardName}`}
-                      />
-                      {autoCalculatedItems.has(item.guid) && (
-                        <p className='text-default-500 text-xs'>
-                          Precio sugerido: Ref. + 20%
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            <PriceAdjustmentItemsList
+              ref={itemsListRef}
+              items={items}
+              control={control}
+              displayCurrency={displayCurrency}
+              itemsWithoutPrice={validation.itemsWithoutPrice}
+              autoCalculatedItems={autoCalculatedItems}
+            />
           </form>
-
-          {validation.errors.length > 0 && items.length > 0 && (
-            <>
-              <Divider />
-              <div className='flex flex-col gap-1'>
-                {validation.errors.map((error, i) => (
-                  <div
-                    key={i}
-                    className='text-danger flex items-center gap-2 text-sm'
-                  >
-                    <Icon icon='lucide:alert-circle' width={14} />
-                    <span>{error}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
         </DrawerBody>
 
-        <DrawerFooter className='flex justify-between'>
+        <DrawerFooter className='flex items-center justify-between'>
           <Button variant='light' onPress={onClose} className='text-accent'>
             Cancelar
           </Button>
-          <Button
-            type='submit'
-            form='price-adjustment-form'
-            isDisabled={!validation.valid}
-            startContent={<Icon icon='lucide:check' />}
-            className='text-white'
-            style={{ backgroundColor: 'var(--color-accent)' }}
-          >
-            Confirmar precios
-          </Button>
+          <div className='flex items-center gap-3'>
+            {validation.itemsWithoutPrice.length > 0 && (
+              <button
+                type='button'
+                onClick={handleScrollToInvalid}
+                className='text-danger hover:text-danger-600 cursor-pointer text-xs underline decoration-dotted underline-offset-2 transition-colors'
+              >
+                {validation.itemsWithoutPrice.length} item(s) sin precio de
+                venta definido
+              </button>
+            )}
+            <Button
+              type='submit'
+              form='price-adjustment-form'
+              isDisabled={!validation.valid}
+              startContent={<Icon icon='lucide:check' />}
+              className='text-white'
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            >
+              Confirmar precios
+            </Button>
+          </div>
         </DrawerFooter>
       </DrawerContent>
     </KidstopDrawer>
