@@ -1,5 +1,6 @@
 import { ITableSort } from '@/lib/types/datatable.types';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { CARD_SEARCH_LIMIT } from '@/lib/consts/card.consts';
 
 export {
   CARD_CONDITIONS,
@@ -11,6 +12,8 @@ export {
   POKEMON_RARITY_OPTIONS,
   MAGIC_RARITY_OPTIONS,
 } from '@/lib/types/card.types';
+
+export { CARD_SEARCH_LIMIT };
 
 export const DEFAULT_CARD_CONDITION = CARD_CONDITIONS.NEAR_MINT;
 
@@ -28,8 +31,6 @@ export const DEFAULT_CARDS_SORT: ITableSort = {
 };
 
 export const DEFAULT_PAGE_SIZE = 20;
-
-export const CARD_SEARCH_LIMIT = 6;
 
 export const POKEMON_SORT_OPTIONS = [
   { label: 'Nombre A → Z', value: 'name_ASC' },

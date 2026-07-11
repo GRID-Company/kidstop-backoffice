@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
+import { CARD_SEARCH_LIMIT } from '@/lib/consts/card.consts';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
@@ -49,7 +50,7 @@ export function useCardSearch() {
       variables: {
         findPokemonCardsPublicArgs: {
           skip: 0,
-          limit: 5,
+          limit: CARD_SEARCH_LIMIT,
           sort: { column: 'releaseDate', order: 'DESC' },
           prioritizeSearch: true,
           search: debouncedSearch.trim() || undefined,
@@ -72,7 +73,7 @@ export function useCardSearch() {
       variables: {
         findMagicCardsPublicArgs: {
           skip: 0,
-          limit: 5,
+          limit: CARD_SEARCH_LIMIT,
           sort: { column: 'releaseDate', order: 'DESC' },
           search: debouncedSearch.trim() || undefined,
           filters: {
