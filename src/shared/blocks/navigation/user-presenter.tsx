@@ -23,11 +23,12 @@ export default function UserPresenter() {
   if (!user) return <UserSkeleton />;
 
   return (
-    <Dropdown placement='bottom-end'>
+    <Dropdown placement='bottom-end' data-testid='user-menu'>
       <DropdownTrigger>
         <Button
           variant='light'
           className='flex items-center gap-2 px-2 py-1'
+          data-testid='user-menu-button'
           startContent={
             <Icon
               icon='solar:user-circle-linear'
@@ -35,12 +36,15 @@ export default function UserPresenter() {
             />
           }
         >
-          <span className='text-content-primary'>{user?.name}</span>
+          <span className='text-content-primary' data-testid='user-name'>
+            {user?.name}
+          </span>
         </Button>
       </DropdownTrigger>
       <DropdownMenu aria-label='Opciones de usuario'>
         <DropdownItem
           key='logout'
+          data-testid='logout-button'
           startContent={<Icon icon='humbleicons:logout' />}
           onPress={() => {
             void logout();

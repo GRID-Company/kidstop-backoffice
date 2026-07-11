@@ -24,6 +24,7 @@ export default function UserRoleBadge({ role, className }: UserRoleBadgeProps) {
       color={ROLE_COLOR_MAP[role] ?? 'default'}
       variant='flat'
       className={className}
+      data-testid='user-role'
     >
       {USER_ROLE_LABELS[role] ?? role}
     </Chip>

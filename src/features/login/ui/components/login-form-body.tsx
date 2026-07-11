@@ -7,11 +7,13 @@ import PasswordForm from '@/shared/base/form-controls/password-form';
 interface LoginFormProps {
   loading?: boolean;
   control: Control<LoginForm>;
+  isValid?: boolean;
 }
 
 export default function LoginFormBody({
   loading = false,
   control,
+  isValid = false,
 }: LoginFormProps) {
   return (
     <div className='block w-full'>
@@ -20,6 +22,7 @@ export default function LoginFormBody({
         placeholder='Ingresa tu correo electrónico'
         isDisabled={loading}
         className='mb-6'
+        data-testid='login-email-input'
         controlProps={{
           control,
           name: 'emailAddress',
@@ -30,6 +33,7 @@ export default function LoginFormBody({
         label='Contraseña *'
         placeholder='Contraseña'
         isDisabled={loading}
+        data-testid='login-password-input'
         controlProps={{
           control,
           name: 'password',
@@ -40,8 +44,9 @@ export default function LoginFormBody({
         className='mt-24 w-full'
         type='submit'
         isLoading={loading}
-        disabled={loading}
+        disabled={loading || !isValid}
         color='primary'
+        data-testid='login-submit-button'
       >
         Iniciar sesión
       </Button>

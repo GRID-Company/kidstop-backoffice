@@ -12,7 +12,7 @@ import { ERROR_MESSAGES } from '@/lib/consts/error-messages';
 
 export default function LoginPage() {
   const { processLogin } = useProcessLogin();
-  const { control, handleSubmit } = useLoginForm();
+  const { control, handleSubmit, formState } = useLoginForm();
   const [mutate, { loading }] = useMutation(LoginDocument);
 
   const onLogin: SubmitHandler<LoginForm> = async (payload): Promise<void> => {
@@ -33,7 +33,11 @@ export default function LoginPage() {
         void handleSubmit(onLogin)(...args);
       }}
     >
-      <LoginFormBody control={control} loading={loading} />
+      <LoginFormBody
+        control={control}
+        loading={loading}
+        isValid={formState.isValid}
+      />
     </form>
   );
 }

@@ -24,6 +24,7 @@ export default function UserStatusBadge({
       color={STATUS_COLOR_MAP[status]}
       variant='flat'
       className={className}
+      data-testid='user-status'
     >
       {USER_STATUS_LABELS[status]}
     </Chip>
