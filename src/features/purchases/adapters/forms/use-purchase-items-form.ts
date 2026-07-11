@@ -9,7 +9,13 @@ import { offerPriceSchema, quantitySchema } from './price-schemas';
 
 const purchaseItemFormSchema = z.object({
   cardGuid: z.string().min(1, 'Card GUID is required'),
-  condition: z.enum(['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED', 'HEAVILY_PLAYED', 'DAMAGED'] as const),
+  condition: z.enum([
+    'NEAR_MINT',
+    'LIGHTLY_PLAYED',
+    'MODERATELY_PLAYED',
+    'HEAVILY_PLAYED',
+    'DAMAGED',
+  ] as const),
   language: z.nativeEnum(CardLanguage),
   quantity: quantitySchema,
   offerPrice: offerPriceSchema,
@@ -17,7 +23,9 @@ const purchaseItemFormSchema = z.object({
 });
 
 const purchaseItemsFormSchema = z.object({
-  items: z.array(purchaseItemFormSchema).min(1, 'Debe agregar al menos una carta'),
+  items: z
+    .array(purchaseItemFormSchema)
+    .min(1, 'Debe agregar al menos una carta'),
 });
 
 export type PurchaseItemFormData = z.infer<typeof purchaseItemFormSchema>;
@@ -33,9 +41,13 @@ interface UsePurchaseItemsFormReturn {
   hasChanges: boolean;
 }
 
-export function usePurchaseItemsForm({ initialItems }: UsePurchaseItemsFormOptions): UsePurchaseItemsFormReturn {
+export function usePurchaseItemsForm({
+  initialItems,
+}: UsePurchaseItemsFormOptions): UsePurchaseItemsFormReturn {
   const form = useForm<PurchaseItemsFormData>({
-    resolver: zodResolver(purchaseItemsFormSchema) as Resolver<PurchaseItemsFormData>,
+    resolver: zodResolver(
+      purchaseItemsFormSchema
+    ) as Resolver<PurchaseItemsFormData>,
     defaultValues: {
       items: initialItems.map((item) => ({
         cardGuid: item.cardGuid,
@@ -56,7 +68,7 @@ export function usePurchaseItemsForm({ initialItems }: UsePurchaseItemsFormOptio
 
   const hasChanges = useMemo(() => {
     const currentItems = form.getValues('items');
-    
+
     // Check if length changed
     if (currentItems.length !== initialItems.length) {
       return true;

@@ -6,7 +6,8 @@ export const CARD_CONDITIONS = {
   DAMAGED: 'DAMAGED',
 } as const;
 
-export type CardCondition = (typeof CARD_CONDITIONS)[keyof typeof CARD_CONDITIONS];
+export type CardCondition =
+  (typeof CARD_CONDITIONS)[keyof typeof CARD_CONDITIONS];
 
 export const CARD_CONDITION_LABELS: Record<CardCondition, string> = {
   [CARD_CONDITIONS.NEAR_MINT]: 'Near Mint',
@@ -24,10 +25,12 @@ export const CARD_CONDITION_SHORT_LABELS: Record<CardCondition, string> = {
   [CARD_CONDITIONS.DAMAGED]: 'DMG',
 };
 
-export const CARD_CONDITION_OPTIONS = Object.values(CARD_CONDITIONS).map((condition) => ({
-  value: condition,
-  label: CARD_CONDITION_LABELS[condition],
-}));
+export const CARD_CONDITION_OPTIONS = Object.values(CARD_CONDITIONS).map(
+  (condition) => ({
+    value: condition,
+    label: CARD_CONDITION_LABELS[condition],
+  })
+);
 
 export const POKEMON_RARITIES = {
   COMMON: 'Common',
@@ -47,10 +50,12 @@ export const MAGIC_RARITIES = {
   MYTHIC_RARE: 'Mythic Rare',
 } as const;
 
-export const POKEMON_RARITY_OPTIONS = Object.values(POKEMON_RARITIES).map((r) => ({
-  value: r,
-  label: r,
-}));
+export const POKEMON_RARITY_OPTIONS = Object.values(POKEMON_RARITIES).map(
+  (r) => ({
+    value: r,
+    label: r,
+  })
+);
 
 export const MAGIC_RARITY_OPTIONS = Object.values(MAGIC_RARITIES).map((r) => ({
   value: r,

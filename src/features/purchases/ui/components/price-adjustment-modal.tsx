@@ -29,7 +29,6 @@ import {
   PriceAdjustmentFormData,
 } from '../../adapters/forms/use-price-adjustment-form';
 
-
 interface PriceAdjustmentModalProps {
   items: IPurchaseItem[];
   isOpen: boolean;
@@ -44,7 +43,9 @@ export default function PriceAdjustmentModal({
   onConfirm,
 }: PriceAdjustmentModalProps) {
   const displayCurrency = usePrivacyCurrency();
-  const [autoCalculatedItems, setAutoCalculatedItems] = useState<Set<string>>(new Set());
+  const [autoCalculatedItems, setAutoCalculatedItems] = useState<Set<string>>(
+    new Set()
+  );
 
   const { control, handleSubmit, reset, fieldArray } = usePriceAdjustmentForm();
   const { fields: _fields } = fieldArray;
@@ -80,7 +81,10 @@ export default function PriceAdjustmentModal({
     [items, adjustedPrices]
   );
 
-  const profitTotal = useMemo(() => sellTotal - buyTotal, [sellTotal, buyTotal]);
+  const profitTotal = useMemo(
+    () => sellTotal - buyTotal,
+    [sellTotal, buyTotal]
+  );
   const profitMargin = useMemo(
     () => (buyTotal > 0 ? (profitTotal / buyTotal) * 100 : 0),
     [profitTotal, buyTotal]
@@ -89,12 +93,13 @@ export default function PriceAdjustmentModal({
   useEffect(() => {
     if (isOpen) {
       const autoCalcSet = new Set<string>();
-      
+
       const formItems = items.map((item) => {
         let publicPrice = item.sellPrice;
-        
+
         if (!publicPrice || publicPrice === 0) {
-          const refPrice = item.currentReferencePrice || item.referencePrice || 0;
+          const refPrice =
+            item.currentReferencePrice || item.referencePrice || 0;
           if (refPrice > 0) {
             publicPrice = calculatePublicPrice(refPrice);
             autoCalcSet.add(item.guid);
@@ -102,13 +107,13 @@ export default function PriceAdjustmentModal({
             publicPrice = 0;
           }
         }
-        
+
         return {
           itemId: item.guid,
           publicPrice,
         };
       });
-      
+
       setAutoCalculatedItems(autoCalcSet);
       reset({ items: formItems });
     }
@@ -118,12 +123,15 @@ export default function PriceAdjustmentModal({
     watchedItems.forEach((watchedItem, index) => {
       const item = items[index];
       if (!item) return;
-      
+
       const currentPrice = Number(watchedItem.publicPrice);
       const refPrice = item.currentReferencePrice || item.referencePrice || 0;
       const calculatedPrice = refPrice > 0 ? calculatePublicPrice(refPrice) : 0;
-      
-      if (autoCalculatedItems.has(item.guid) && currentPrice !== calculatedPrice) {
+
+      if (
+        autoCalculatedItems.has(item.guid) &&
+        currentPrice !== calculatedPrice
+      ) {
         setAutoCalculatedItems((prev) => {
           const newSet = new Set(prev);
           newSet.delete(item.guid);
@@ -150,39 +158,39 @@ export default function PriceAdjustmentModal({
   );
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">
+        <DrawerHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>
             Ajuste de precios públicos
           </span>
-          <span className="text-sm font-normal text-default-500">
+          <span className='text-default-500 text-sm font-normal'>
             Define el precio de venta al público para cada carta antes de
             finalizar
           </span>
         </DrawerHeader>
 
-        <DrawerBody className="flex flex-col gap-6">
-          <div className="flex gap-4">
-            <div className="flex flex-1 flex-col gap-1 rounded-lg bg-default-50 p-4">
-              <span className="text-xs text-default-500">Total compra</span>
-              <span className="text-lg font-bold text-accent">
+        <DrawerBody className='flex flex-col gap-6'>
+          <div className='flex gap-4'>
+            <div className='bg-default-50 flex flex-1 flex-col gap-1 rounded-lg p-4'>
+              <span className='text-default-500 text-xs'>Total compra</span>
+              <span className='text-accent text-lg font-bold'>
                 {displayCurrency(buyTotal)}
               </span>
             </div>
-            <div className="flex flex-1 flex-col gap-1 rounded-lg bg-default-50 p-4">
-              <span className="text-xs text-default-500">
+            <div className='bg-default-50 flex flex-1 flex-col gap-1 rounded-lg p-4'>
+              <span className='text-default-500 text-xs'>
                 Total venta (ajustado)
               </span>
-              <span className="text-lg font-bold text-success">
+              <span className='text-success text-lg font-bold'>
                 {displayCurrency(sellTotal)}
               </span>
             </div>
-            <div className="flex flex-1 flex-col gap-1 rounded-lg bg-default-50 p-4">
-              <span className="text-xs text-default-500">
+            <div className='bg-default-50 flex flex-1 flex-col gap-1 rounded-lg p-4'>
+              <span className='text-default-500 text-xs'>
                 Proyección ganancia
               </span>
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 <span
                   className={`text-lg font-bold ${
                     profitTotal >= 0 ? 'text-success' : 'text-danger'
@@ -205,16 +213,16 @@ export default function PriceAdjustmentModal({
           <Divider />
 
           <form
-            id="price-adjustment-form"
+            id='price-adjustment-form'
             onSubmit={(...args) => {
               void handleSubmit(handleFormSubmit)(...args);
             }}
-            className="flex flex-col gap-4"
+            className='flex flex-col gap-4'
           >
             {items.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-6 text-default-400">
-                <Icon icon="lucide:package-open" width={36} className="mb-2" />
-                <span className="text-sm">No hay items para ajustar</span>
+              <div className='text-default-400 flex flex-col items-center justify-center py-6'>
+                <Icon icon='lucide:package-open' width={36} className='mb-2' />
+                <span className='text-sm'>No hay items para ajustar</span>
               </div>
             )}
 
@@ -230,21 +238,27 @@ export default function PriceAdjustmentModal({
                       : 'border-default-200'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className='flex items-center gap-3'>
                     <img
-                      src={item.cardImageUrl || 'https://placehold.co/48x64?text=Card'}
+                      src={
+                        item.cardImageUrl ||
+                        'https://placehold.co/48x64?text=Card'
+                      }
                       alt={item.cardName}
-                      className="h-16 w-12 rounded object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/48x64?text=Card'; }}
+                      className='h-16 w-12 rounded object-cover'
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          'https://placehold.co/48x64?text=Card';
+                      }}
                     />
-                    <div className="flex flex-1 flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold">
+                    <div className='flex flex-1 flex-col gap-1'>
+                      <div className='flex items-center gap-2'>
+                        <span className='text-sm font-semibold'>
                           {item.cardName}
                         </span>
                         <Chip
-                          size="sm"
-                          variant="flat"
+                          size='sm'
+                          variant='flat'
                           classNames={{
                             base: 'bg-accent/10',
                             content: 'text-accent text-xs font-medium',
@@ -252,18 +266,14 @@ export default function PriceAdjustmentModal({
                         >
                           {CARD_CONDITION_SHORT_LABELS[item.condition]}
                         </Chip>
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          className="text-xs"
-                        >
+                        <Chip size='sm' variant='flat' className='text-xs'>
                           {LANGUAGE_LABELS[item.language]}
                         </Chip>
                       </div>
-                      <span className="text-xs text-default-400">
+                      <span className='text-default-400 text-xs'>
                         {item.setName} · {item.setCode}
                       </span>
-                      <div className="flex items-center gap-4 text-xs text-default-500">
+                      <div className='text-default-500 flex items-center gap-4 text-xs'>
                         <span>
                           Cant: <strong>{item.quantity}</strong>
                         </span>
@@ -275,34 +285,34 @@ export default function PriceAdjustmentModal({
                     </div>
                   </div>
 
-                  <div className="flex items-end gap-3">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs text-default-400">
+                  <div className='flex items-end gap-3'>
+                    <div className='flex flex-col gap-1'>
+                      <span className='text-default-400 text-xs'>
                         Precio referencia
                       </span>
-                      <span className="text-sm font-medium text-default-600">
+                      <span className='text-default-600 text-sm font-medium'>
                         {displayCurrency(item.referencePrice || 0)}
                       </span>
                     </div>
 
-                    <div className="flex flex-1 flex-col gap-1">
+                    <div className='flex flex-1 flex-col gap-1'>
                       <InputForm
-                        label="Precio de venta"
-                        type="number"
-                        placeholder="0.00"
+                        label='Precio de venta'
+                        type='number'
+                        placeholder='0.00'
                         controlProps={{
                           control,
                           name: `items.${index}.publicPrice`,
                         }}
                         isRequired
                         startContent={
-                          <span className="text-sm text-default-400">$</span>
+                          <span className='text-default-400 text-sm'>$</span>
                         }
-                        size="sm"
+                        size='sm'
                         aria-label={`Precio de venta de ${item.cardName}`}
                       />
                       {autoCalculatedItems.has(item.guid) && (
-                        <p className="text-xs text-default-500">
+                        <p className='text-default-500 text-xs'>
                           Precio sugerido: Ref. + 20%
                         </p>
                       )}
@@ -316,13 +326,13 @@ export default function PriceAdjustmentModal({
           {validation.errors.length > 0 && items.length > 0 && (
             <>
               <Divider />
-              <div className="flex flex-col gap-1">
+              <div className='flex flex-col gap-1'>
                 {validation.errors.map((error, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 text-sm text-danger"
+                    className='text-danger flex items-center gap-2 text-sm'
                   >
-                    <Icon icon="lucide:alert-circle" width={14} />
+                    <Icon icon='lucide:alert-circle' width={14} />
                     <span>{error}</span>
                   </div>
                 ))}
@@ -331,16 +341,16 @@ export default function PriceAdjustmentModal({
           )}
         </DrawerBody>
 
-        <DrawerFooter className="flex justify-between">
-          <Button variant="light" onPress={onClose} className="text-accent">
+        <DrawerFooter className='flex justify-between'>
+          <Button variant='light' onPress={onClose} className='text-accent'>
             Cancelar
           </Button>
           <Button
-            type="submit"
-            form="price-adjustment-form"
+            type='submit'
+            form='price-adjustment-form'
             isDisabled={!validation.valid}
-            startContent={<Icon icon="lucide:check" />}
-            className="text-white"
+            startContent={<Icon icon='lucide:check' />}
+            className='text-white'
             style={{ backgroundColor: 'var(--color-accent)' }}
           >
             Confirmar precios

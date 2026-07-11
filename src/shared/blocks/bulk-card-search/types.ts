@@ -82,7 +82,9 @@ export interface BulkCardFormDataInventory {
   publicPrice: number;
 }
 
-export type BulkCardFormData = BulkCardFormDataPurchases | BulkCardFormDataInventory;
+export type BulkCardFormData =
+  | BulkCardFormDataPurchases
+  | BulkCardFormDataInventory;
 
 export interface BulkSearchFormDataPurchases {
   searchText: string;
@@ -94,7 +96,9 @@ export interface BulkSearchFormDataInventory {
   cards: BulkCardFormDataInventory[];
 }
 
-export type BulkSearchFormData = BulkSearchFormDataPurchases | BulkSearchFormDataInventory;
+export type BulkSearchFormData =
+  | BulkSearchFormDataPurchases
+  | BulkSearchFormDataInventory;
 
 export interface BulkCardSearchInputProps {
   value: string;
@@ -134,16 +138,24 @@ export interface BulkCardFormControlsProps {
 
 export interface BulkCardSearchPurchasesProps {
   variant: 'purchases';
-  onConfirm: (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => void;
+  onConfirm: (
+    data: BulkSearchFormDataPurchases,
+    results: BulkCardResult[]
+  ) => void;
   onCancel: () => void;
   isOpen?: boolean;
 }
 
 export interface BulkCardSearchInventoryProps {
   variant: 'inventory';
-  onConfirm: (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => void;
+  onConfirm: (
+    data: BulkSearchFormDataInventory,
+    results: BulkCardResult[]
+  ) => void;
   onCancel: () => void;
   isOpen?: boolean;
 }
 
-export type BulkCardSearchProps = BulkCardSearchPurchasesProps | BulkCardSearchInventoryProps;
+export type BulkCardSearchProps =
+  | BulkCardSearchPurchasesProps
+  | BulkCardSearchInventoryProps;

@@ -9,7 +9,10 @@ import { MOST_WANTED_PRIORITY_LABELS } from '../../domain/constants';
 
 interface MostWantedCardItemProps {
   item: IMostWantedCard;
-  onToggleActive: (guid: string, currentActive: boolean) => void | Promise<void>;
+  onToggleActive: (
+    guid: string,
+    currentActive: boolean
+  ) => void | Promise<void>;
   onEdit: (item: IMostWantedCard) => void;
   onRemove: (guid: string) => void | Promise<void>;
 }
@@ -41,59 +44,63 @@ export default function MostWantedCardItem({
   };
 
   const priorityStyle = PRIORITY_STYLES[item.priority] ?? PRIORITY_STYLES.LOW;
-  
+
   const cardData = item.pokemonCardSummary || item.magicCardSummary;
   const cardName = cardData?.name || 'Unknown';
   const cardImage = cardData?.imageUri || null;
-  const cardSet = item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '';
-  const cardNumber = item.pokemonCardSummary?.cardNumber || item.magicCardSummary?.collectorNumber || '';
+  const cardSet =
+    item.pokemonCardSummary?.setName || item.magicCardSummary?.edition || '';
+  const cardNumber =
+    item.pokemonCardSummary?.cardNumber ||
+    item.magicCardSummary?.collectorNumber ||
+    '';
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 rounded-lg border border-default-200 bg-content1 p-3 ${
-        isDragging ? 'z-50 shadow-lg opacity-90' : ''
+      className={`border-default-200 bg-content1 flex items-center gap-3 rounded-lg border p-3 ${
+        isDragging ? 'z-50 opacity-90 shadow-lg' : ''
       } ${!item.active ? 'opacity-50' : ''}`}
     >
       <button
-        type="button"
-        className="flex cursor-grab items-center text-default-400 hover:text-default-600 active:cursor-grabbing"
+        type='button'
+        className='text-default-400 hover:text-default-600 flex cursor-grab items-center active:cursor-grabbing'
         {...attributes}
         {...listeners}
       >
-        <Icon icon="lucide:grip-vertical" width={20} />
+        <Icon icon='lucide:grip-vertical' width={20} />
       </button>
 
-      <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded bg-default-100">
+      <div className='bg-default-100 relative h-12 w-9 shrink-0 overflow-hidden rounded'>
         {cardImage ? (
           <img
             src={cardImage}
             alt={cardName}
-            className="absolute inset-0 h-full w-full object-contain"
+            className='absolute inset-0 h-full w-full object-contain'
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-default-400">
-            <Icon icon="lucide:image" width={14} />
+          <div className='text-default-400 flex h-full items-center justify-center'>
+            <Icon icon='lucide:image' width={14} />
           </div>
         )}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-sm font-semibold">{cardName}</span>
-        <span className="truncate text-xs text-default-500">
+      <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+        <span className='truncate text-sm font-semibold'>{cardName}</span>
+        <span className='text-default-500 truncate text-xs'>
           {cardSet} {cardNumber ? `· ${cardNumber}` : ''}
         </span>
         {item.notes && (
-          <span className="truncate text-xs italic text-default-400">
+          <span className='text-default-400 truncate text-xs italic'>
             {item.notes}
           </span>
         )}
       </div>
 
       <Chip
-        size="sm"
-        variant="flat"
+        size='sm'
+        variant='flat'
         classNames={{
           base: priorityStyle.bg,
           content: `${priorityStyle.text} font-medium`,
@@ -103,35 +110,35 @@ export default function MostWantedCardItem({
       </Chip>
 
       <Switch
-        size="sm"
+        size='sm'
         isSelected={item.active}
         onValueChange={() => onToggleActive(item.guid, item.active)}
         aria-label={item.active ? 'Desactivar carta' : 'Activar carta'}
       />
 
-      <div className="flex items-center gap-1">
-        <Tooltip content="Editar">
+      <div className='flex items-center gap-1'>
+        <Tooltip content='Editar'>
           <Button
             isIconOnly
-            size="sm"
-            variant="light"
+            size='sm'
+            variant='light'
             onPress={() => onEdit(item)}
-            aria-label="Editar carta"
+            aria-label='Editar carta'
           >
-            <Icon icon="lucide:pencil" width={16} />
+            <Icon icon='lucide:pencil' width={16} />
           </Button>
         </Tooltip>
 
-        <Tooltip content="Eliminar" color="danger">
+        <Tooltip content='Eliminar' color='danger'>
           <Button
             isIconOnly
-            size="sm"
-            variant="light"
-            color="danger"
+            size='sm'
+            variant='light'
+            color='danger'
             onPress={() => onRemove(item.guid)}
-            aria-label="Eliminar carta"
+            aria-label='Eliminar carta'
           >
-            <Icon icon="lucide:trash-2" width={16} />
+            <Icon icon='lucide:trash-2' width={16} />
           </Button>
         </Tooltip>
       </div>

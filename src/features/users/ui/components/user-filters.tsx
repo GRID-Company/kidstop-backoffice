@@ -15,21 +15,21 @@ export default function UserFilters({
   return (
     <>
       <Search
-        label="Búsqueda"
-        placeholder="Nombre o correo electrónico"
+        label='Búsqueda'
+        placeholder='Nombre o correo electrónico'
         onValueChange={onSearchChange}
       />
       <Select
-        placeholder="Todos los roles"
-        label="Rol"
+        placeholder='Todos los roles'
+        label='Rol'
         items={USER_ROLE_OPTIONS}
         onChange={(e) => {
           onFilterChange('role', e.target.value !== '' ? e.target.value : '');
         }}
       />
       <Select
-        placeholder="Todos los estados"
-        label="Estado"
+        placeholder='Todos los estados'
+        label='Estado'
         items={USER_STATUS_OPTIONS}
         onChange={(e) => {
           const value = e.target.value;

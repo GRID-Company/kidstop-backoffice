@@ -34,6 +34,7 @@ Authorization: Bearer {{auth_token}}
 ### Roles & Permissions
 
 All seller operations require one of the following roles:
+
 - **ADMIN**
 - **BUYER**
 - **RECEPTION**
@@ -43,6 +44,7 @@ These roles are homologated with purchase operations for consistency.
 ### Search Functionality
 
 The sellers list endpoint supports searching across:
+
 - Seller name
 - Phone number
 - Email address
@@ -377,11 +379,7 @@ mutation {
 
 ```graphql
 query {
-  sellers(findSellersArgs: {
-    search: "john",
-    limit: 20,
-    skip: 0
-  }) {
+  sellers(findSellersArgs: { search: "john", limit: 20, skip: 0 }) {
     data {
       guid
       name
@@ -397,11 +395,13 @@ query {
 
 ```graphql
 mutation {
-  updateSeller(updateSellerInput: {
-    guid: "abc-123-def",
-    email: "newemail@cardshop.com",
-    notes: "Email updated per seller request"
-  }) {
+  updateSeller(
+    updateSellerInput: {
+      guid: "abc-123-def"
+      email: "newemail@cardshop.com"
+      notes: "Email updated per seller request"
+    }
+  ) {
     guid
     email
     updatedDate
@@ -416,42 +416,54 @@ mutation {
 ### Common Error Responses
 
 **Duplicate Email:**
+
 ```json
 {
-  "errors": [{
-    "message": "Seller with email john@example.com already exists",
-    "extensions": { "code": "BAD_REQUEST" }
-  }]
+  "errors": [
+    {
+      "message": "Seller with email john@example.com already exists",
+      "extensions": { "code": "BAD_REQUEST" }
+    }
+  ]
 }
 ```
 
 **Duplicate Phone:**
+
 ```json
 {
-  "errors": [{
-    "message": "Seller with phone 5551234567 already exists",
-    "extensions": { "code": "BAD_REQUEST" }
-  }]
+  "errors": [
+    {
+      "message": "Seller with phone 5551234567 already exists",
+      "extensions": { "code": "BAD_REQUEST" }
+    }
+  ]
 }
 ```
 
 **Seller Not Found:**
+
 ```json
 {
-  "errors": [{
-    "message": "Seller with guid abc-123-def not found",
-    "extensions": { "code": "NOT_FOUND" }
-  }]
+  "errors": [
+    {
+      "message": "Seller with guid abc-123-def not found",
+      "extensions": { "code": "NOT_FOUND" }
+    }
+  ]
 }
 ```
 
 **Invalid Email Format:**
+
 ```json
 {
-  "errors": [{
-    "message": "email must be a valid email",
-    "extensions": { "code": "BAD_REQUEST" }
-  }]
+  "errors": [
+    {
+      "message": "email must be a valid email",
+      "extensions": { "code": "BAD_REQUEST" }
+    }
+  ]
 }
 ```
 

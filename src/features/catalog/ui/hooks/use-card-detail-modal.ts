@@ -53,16 +53,22 @@ export function useCardDetailModal({
   tcgType,
   onRefetch,
 }: UseCardDetailModalParams) {
-  const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<InventoryCard | null>(
+    null
+  );
   const [selectedLanguage, setSelectedLanguage] = useState<CardLanguage>(
     card?.language || DEFAULT_CARD_LANGUAGE
   );
   const [stockAdjustment, setStockAdjustment] = useState<number>(0);
   const [stockNotes, setStockNotes] = useState<string>('');
   const [priceNotes, setPriceNotes] = useState<string>('');
-  const [movementType, setMovementType] = useState<BulkOperationType>(BulkOperationType.ManualEntry);
-  const { handleUpdatePrice, loading: updatingPrice } = useUpdateInventoryPrice();
-  const { handleAdjustStock, loading: adjustLoading } = useAdjustInventoryStock();
+  const [movementType, setMovementType] = useState<BulkOperationType>(
+    BulkOperationType.ManualEntry
+  );
+  const { handleUpdatePrice, loading: updatingPrice } =
+    useUpdateInventoryPrice();
+  const { handleAdjustStock, loading: adjustLoading } =
+    useAdjustInventoryStock();
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
 
   // Sync selectedLanguage with detail's language when detail loads
@@ -173,7 +179,16 @@ export function useCardDetailModal({
     } catch {
       // Error ya manejado en handleAdjustStock
     }
-  }, [detail, selectedVariant, stockAdjustment, stockNotes, handleAdjustStock, tcgType, movementType, onRefetch]);
+  }, [
+    detail,
+    selectedVariant,
+    stockAdjustment,
+    stockNotes,
+    handleAdjustStock,
+    tcgType,
+    movementType,
+    onRefetch,
+  ]);
 
   return {
     selectedVariant,

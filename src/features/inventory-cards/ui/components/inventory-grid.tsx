@@ -63,27 +63,31 @@ function renderCell(item: IInventoryItem, columnKey: string) {
   switch (columnKey) {
     case 'name':
       return (
-        <div className="flex items-center gap-3">
-          <div className="relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100">
+        <div className='flex items-center gap-3'>
+          <div className='bg-default-100 relative h-10 w-8 flex-shrink-0 overflow-hidden rounded'>
             {item.imageUrl ? (
               <img
                 src={item.imageUrl}
                 alt={item.name}
-                className="absolute inset-0 h-full w-full object-contain"
+                className='absolute inset-0 h-full w-full object-contain'
               />
             ) : (
               <Image
-                src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-                alt="Card placeholder"
+                src={
+                  item.tcg === 'MAGIC'
+                    ? magicCardPlaceholder
+                    : pokemonCardPlaceholder
+                }
+                alt='Card placeholder'
                 fill
-                sizes="32px"
-                className="object-contain"
+                sizes='32px'
+                className='object-contain'
               />
             )}
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{item.name}</p>
-            <p className="truncate text-xs text-default-400">
+          <div className='min-w-0'>
+            <p className='truncate text-sm font-medium'>{item.name}</p>
+            <p className='text-default-400 truncate text-xs'>
               {item.number} · {item.rarity}
             </p>
           </div>
@@ -91,26 +95,41 @@ function renderCell(item: IInventoryItem, columnKey: string) {
       );
     case 'setName':
       return (
-        <span className="text-sm">
-          {item.setName} <span className="text-default-400">({item.setCode})</span>
+        <span className='text-sm'>
+          {item.setName}{' '}
+          <span className='text-default-400'>({item.setCode})</span>
         </span>
       );
     case 'condition':
       return (
-        <span className="rounded-full bg-default-100 px-2 py-0.5 text-xs text-default-600">
+        <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-xs'>
           {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
         </span>
       );
     case 'stock':
-      return <span className="text-sm font-semibold">{item.stock}</span>;
+      return <span className='text-sm font-semibold'>{item.stock}</span>;
     case 'stockStatus':
-      return <StockIndicator stockStatus={item.stockStatus} stock={item.stock} />;
+      return (
+        <StockIndicator stockStatus={item.stockStatus} stock={item.stock} />
+      );
     case 'sellPrice':
-      return <span className="text-sm font-semibold text-success">${item.sellPrice.toFixed(2)}</span>;
+      return (
+        <span className='text-success text-sm font-semibold'>
+          ${item.sellPrice.toFixed(2)}
+        </span>
+      );
     case 'lastSellDate':
-      return <span className="text-sm text-default-500">{formatDate(item.lastSellDate)}</span>;
+      return (
+        <span className='text-default-500 text-sm'>
+          {formatDate(item.lastSellDate)}
+        </span>
+      );
     case 'avgDaysInInventory':
-      return <span className="text-sm text-default-500">{formatDays(item.avgDaysInInventory)}</span>;
+      return (
+        <span className='text-default-500 text-sm'>
+          {formatDays(item.avgDaysInInventory)}
+        </span>
+      );
     default:
       return null;
   }
@@ -124,49 +143,50 @@ function InventoryMobileCard({
   onPress?: (item: IInventoryItem) => void;
 }) {
   return (
-    <KidstopCard
-      isPressable={!!onPress}
-      onPress={() => onPress?.(item)}
-    >
-      <CardBody className="flex flex-row gap-3 !p-4">
-        <div className="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded bg-default-100">
+    <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
+      <CardBody className='flex flex-row gap-3 !p-4'>
+        <div className='bg-default-100 relative h-16 w-12 flex-shrink-0 overflow-hidden rounded'>
           {item.imageUrl ? (
             <img
               src={item.imageUrl}
               alt={item.name}
-              className="absolute inset-0 h-full w-full object-contain"
+              className='absolute inset-0 h-full w-full object-contain'
             />
           ) : (
             <Image
-              src={item.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-              alt="Card placeholder"
+              src={
+                item.tcg === 'MAGIC'
+                  ? magicCardPlaceholder
+                  : pokemonCardPlaceholder
+              }
+              alt='Card placeholder'
               fill
-              sizes="48px"
-              className="object-contain"
+              sizes='48px'
+              className='object-contain'
             />
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <div className="flex items-start justify-between gap-2">
-            <p className="truncate text-sm font-semibold">{item.name}</p>
-            <span className="flex-shrink-0 text-sm font-bold text-success">
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+          <div className='flex items-start justify-between gap-2'>
+            <p className='truncate text-sm font-semibold'>{item.name}</p>
+            <span className='text-success flex-shrink-0 text-sm font-bold'>
               ${item.sellPrice.toFixed(2)}
             </span>
           </div>
 
-          <p className="truncate text-xs text-default-500">
+          <p className='text-default-500 truncate text-xs'>
             {item.setName} ({item.setCode}) · {item.number}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-default-100 px-2 py-0.5 text-[10px] text-default-600">
+          <div className='flex flex-wrap items-center gap-2'>
+            <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-[10px]'>
               {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
             </span>
             <StockIndicator stockStatus={item.stockStatus} stock={item.stock} />
           </div>
 
-          <div className="flex items-center gap-3 text-[11px] text-default-400">
+          <div className='text-default-400 flex items-center gap-3 text-[11px]'>
             <span>Venta: {formatDate(item.lastSellDate)}</span>
             <span>Inv: {formatDays(item.avgDaysInInventory)}</span>
           </div>
@@ -189,9 +209,9 @@ export default function InventoryGrid({
 }: InventoryGridProps) {
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-3">
+      <div className='flex flex-col gap-3'>
         {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          <Skeleton key={i} className='h-14 w-full rounded-lg' />
         ))}
       </div>
     );
@@ -199,19 +219,21 @@ export default function InventoryGrid({
 
   if (totalItems === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-default-400">
-        <span className="text-5xl">📦</span>
-        <p className="mt-4 text-lg font-medium">No se encontraron items en inventario</p>
-        <p className="text-sm">Intenta ajustar los filtros de búsqueda</p>
+      <div className='text-default-400 flex flex-col items-center justify-center py-16'>
+        <span className='text-5xl'>📦</span>
+        <p className='mt-4 text-lg font-medium'>
+          No se encontraron items en inventario
+        </p>
+        <p className='text-sm'>Intenta ajustar los filtros de búsqueda</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="hidden lg:block">
+    <div className='flex flex-col gap-6'>
+      <div className='hidden lg:block'>
         <KidstopTable
-          aria-label="Inventario de cartas"
+          aria-label='Inventario de cartas'
           sortDescriptor={sortDescriptor}
           onSortChange={onSortChange}
         >
@@ -220,7 +242,7 @@ export default function InventoryGrid({
               <TableColumn
                 key={column.key}
                 allowsSorting={column.allowsSorting}
-                className="text-center"
+                className='text-center'
               >
                 {column.label}
               </TableColumn>
@@ -230,11 +252,11 @@ export default function InventoryGrid({
             {(item) => (
               <TableRow
                 key={item.guid}
-                className="cursor-pointer"
+                className='cursor-pointer'
                 onClick={() => onItemPress?.(item)}
               >
                 {COLUMNS.map((col) => (
-                  <TableCell key={col.key} className="text-center">
+                  <TableCell key={col.key} className='text-center'>
                     {renderCell(item, col.key)}
                   </TableCell>
                 ))}
@@ -244,7 +266,7 @@ export default function InventoryGrid({
         </KidstopTable>
       </div>
 
-      <div className="flex flex-col gap-3 lg:hidden">
+      <div className='flex flex-col gap-3 lg:hidden'>
         {items.map((item) => (
           <InventoryMobileCard
             key={item.guid}
@@ -255,8 +277,8 @@ export default function InventoryGrid({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-default-400">
+        <div className='flex items-center justify-between'>
+          <p className='text-default-400 text-xs'>
             Mostrando {items.length} de {totalItems}
           </p>
           <Pagination
@@ -264,7 +286,7 @@ export default function InventoryGrid({
             page={page}
             onChange={onPageChange}
             showControls
-            size="sm"
+            size='sm'
           />
         </div>
       )}

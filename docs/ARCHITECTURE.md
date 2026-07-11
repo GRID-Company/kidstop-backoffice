@@ -120,30 +120,39 @@ src/
 ## Módulos del Sistema
 
 ### login
+
 Autenticación con email/contraseña, manejo de sesión via cookies y recuperación de contraseña.
 
 ### users
+
 CRUD de usuarios internos del backoffice. Roles: Administrador, Recepción, Comprador. Activar/desactivar usuarios.
 
 ### catalog
+
 Búsqueda y consulta de cartas singles con contexto TCG (Pokémon/Magic). Catálogo interno con respaldo de proveedores externos (Price Charting, Card Kingdom). Configuración de precio de venta al público. Incluye buscador avanzado (deck builder) para importar listas de cartas.
 
 ### purchases
+
 Flujo de compra de singles: Draft → Cotizado → Esperando precio → Finalizado / Rechazado. Incluye búsqueda con métricas operativas, control de presupuesto por comprador, envío de cotización por WhatsApp, modo privacidad y registro de pago.
 
 ### inventory-cards
+
 Control de stock por Carta + Variante + Condición. Registro de movimientos (entrada por compra, salida por venta, ajuste manual). Historial con filtros. Métricas: última venta, tiempo promedio en inventario.
 
 ### sales
+
 Gestión de pedidos originados en la Carpeta Digital. Estados: Nuevo → En surtido → Listo para recolección → Completado / Cancelado. Generación de PDF (picking list), notificación por email, código de venta para Shopify.
 
 ### customers
+
 Gestión de clientes con clasificación VIP, bloqueos por pedidos no concretados y validación de ubicación. Historial de pedidos por cliente.
 
 ### most-wanted
+
 Configuración de páginas públicas "Most Wanted" por TCG. Agregar/quitar/ordenar cartas con drag & drop. Preview en tiempo real.
 
 ### settings
+
 Configuración global: geofence, umbrales de bloqueo, presupuestos por comprador, límites de inventario, horarios de operación.
 
 ### Estado Actual de Integración
@@ -242,7 +251,9 @@ export const mapInventoryToForm = (inventory: Inventory): InventoryFormData => {
   };
 };
 
-export const mapFormToInventory = (form: InventoryFormData): CreateInventoryInput => {
+export const mapFormToInventory = (
+  form: InventoryFormData
+): CreateInventoryInput => {
   return {
     name: form.name,
     type: form.type,
@@ -356,7 +367,7 @@ Páginas o vistas principales de la feature.
 // features/inventory/ui/views/inventories.tsx
 export const InventoriesView = () => {
   const { data, loading } = useInventories();
-  
+
   return (
     <EntitiesPage>
       <EntitiesPage.Title>Inventories</EntitiesPage.Title>
@@ -385,7 +396,7 @@ export const useInventories = () => {
   const { data, loading, error } = useQuery(GET_INVENTORIES, {
     variables: getInventoryVars(paginationArgs, filters),
   });
-  
+
   return {
     inventories: data?.inventories.items || [],
     loading,
@@ -425,12 +436,12 @@ EntitiesPage.CardContainer = CardContainer;
 Encapsular lógica reutilizable:
 
 ```typescript
-export const usePaginatedDataTable = <T,>(config: Config) => {
+export const usePaginatedDataTable = <T>(config: Config) => {
   const [page, setPage] = useState(1);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
-  
+
   // Lógica de paginación, ordenamiento, filtros
-  
+
   return {
     data,
     loading,
@@ -526,12 +537,12 @@ const DEFAULT_FILTERS = {};
 export const InventoriesView = ({ filters = DEFAULT_FILTERS }: InventoriesViewProps) => {
   // Hooks
   const { inventories, loading } = useInventories();
-  
+
   // Handlers
   const handleEdit = (id: string) => {
     // ...
   };
-  
+
   // Render
   return (
     // JSX
@@ -555,23 +566,23 @@ export const Component = ({ required, optional = 0, onAction }: ComponentProps) 
   const [state, setState] = useState();
   const query = useQuery();
   const custom = useCustomHook();
-  
+
   // 4. Derived state
   const computed = useMemo(() => {}, []);
-  
+
   // 5. Effects
   useEffect(() => {}, []);
-  
+
   // 6. Handlers
   const handleClick = () => {};
-  
+
   // 7. Render helpers
   const renderItem = () => {};
-  
+
   // 8. Early returns
   if (loading) return <Skeleton />;
   if (error) return <Error />;
-  
+
   // 9. Main render
   return <div>{/* JSX */}</div>;
 };
@@ -648,16 +659,19 @@ const [selectedId, setSelectedId] = useState<string | null>(null);
 Tres stores globales con persistencia:
 
 **auth.ts** — Sesión del usuario (user, token, role):
+
 ```typescript
 const { user, token, setSession, clearSession } = useAuthStore();
 ```
 
 **selected-tcg.ts** — Contexto de juego activo (Pokémon/Magic):
+
 ```typescript
 const { selectedTCG, setTCG } = useSelectedTCGStore();
 ```
 
 **privacy-mode.ts** — Modo privacidad en compras:
+
 ```typescript
 const { isPrivacyMode, togglePrivacyMode } = usePrivacyModeStore();
 ```
@@ -696,6 +710,7 @@ npm run codegen
 ```
 
 Genera:
+
 - `lib/api/schema-types.ts` - Tipos del schema
 - `lib/api/generated/*.generated.ts` - Tipos de operaciones
 
@@ -724,7 +739,7 @@ export const useInventories = () => {
   const { data, loading } = useGetInventoriesQuery({
     variables: { args: getInventoryVars() },
   });
-  
+
   return {
     inventories: data?.inventories.items || [],
     loading,

@@ -1,18 +1,24 @@
-import type { CreatePurchaseInput, UpdatePurchaseInput, CardLanguage } from '@/lib/api/schema-types';
+import type {
+  CreatePurchaseInput,
+  UpdatePurchaseInput,
+  CardLanguage,
+} from '@/lib/api/schema-types';
 import { IPurchase } from '../../domain/types';
 import { PurchaseFormData } from '../forms/purchase-form.schema';
 
-export function toCreatePurchasePayload(data: PurchaseFormData, tcgType: string): { createPurchaseInput: CreatePurchaseInput } {
+export function toCreatePurchasePayload(
+  data: PurchaseFormData,
+  tcgType: string
+): { createPurchaseInput: CreatePurchaseInput } {
   return {
     createPurchaseInput: {
       tcg: tcgType,
       sellerGuid: data.sellerGuid,
       notes: data.notes || undefined,
       items: data.items.map((item) => ({
-        ...(tcgType === 'POKEMON' 
+        ...(tcgType === 'POKEMON'
           ? { pokemonCardGuid: item.cardGuid }
-          : { magicCardGuid: item.cardGuid }
-        ),
+          : { magicCardGuid: item.cardGuid }),
         condition: item.condition,
         language: item.language as CardLanguage,
         quantity: item.quantity,

@@ -135,7 +135,11 @@ export const usePaginatedDatatable = ({
 
   // ADD RELATIONAL DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterRelationDateRange = useCallback(
-    (key: string, relationKey: string, value: { from?: Date; to?: Date } | null) => {
+    (
+      key: string,
+      relationKey: string,
+      value: { from?: Date; to?: Date } | null
+    ) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {

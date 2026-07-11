@@ -134,6 +134,7 @@ nano template-config.json
 ```
 
 Este script verificará:
+
 - ✅ Variables requeridas presentes
 - ✅ Formato correcto de keys
 - ⚠️ Variables opcionales faltantes
@@ -198,6 +199,7 @@ Si deseas integrar con ClickUp:
    - Copiar token
 
 2. **Configurar en .env**
+
    ```bash
    CLICKUP_API_KEY=pk_your_api_key
    CLICKUP_WORKSPACE_ID=your_workspace_id
@@ -220,6 +222,7 @@ Para deploy automático:
    - Permisos: AdministratorAccess-Amplify
 
 2. **Configurar en .env**
+
    ```bash
    AWS_ACCESS_KEY_ID=your_access_key
    AWS_SECRET_ACCESS_KEY=your_secret_key
@@ -243,13 +246,14 @@ Para CI/CD con GitHub Actions:
    - Agregar cada secret
 
 2. **O Usar Script Automático**
+
    ```bash
    # Instalar GitHub CLI
    brew install gh
-   
+
    # Autenticar
    gh auth login
-   
+
    # Configurar secrets
    ./scripts/setup/setup-github-secrets.sh
    ```
@@ -319,6 +323,7 @@ npm run codegen
 ```
 
 Esto generará:
+
 - `src/lib/api/generated/my-feature.generated.ts`
 
 ### 3. Usar en Componentes
@@ -330,7 +335,7 @@ export const MyFeatureView = () => {
   const { data, loading } = useGetMyFeaturesQuery({
     variables: { args: {} },
   });
-  
+
   return (
     <div>
       {loading ? <Loading /> : data?.myFeatures.items.map(...)}
@@ -426,6 +431,7 @@ amplify publish
 ### Deploy Automático
 
 Con GitHub Actions configurado, el deploy es automático:
+
 - Push a `dev` → Deploy a staging
 - Push a `main` → Deploy a producción
 
@@ -523,6 +529,7 @@ git merge --abort
 ## Soporte
 
 Para preguntas o problemas:
+
 1. Revisar documentación en `docs/`
 2. Verificar issues en GitHub
 3. Contactar al equipo de desarrollo

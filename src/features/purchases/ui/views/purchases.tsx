@@ -100,7 +100,9 @@ export default function Purchases() {
         label: 'Código',
         className: '!text-left min-w-[140px]',
         customCol: (row: IPurchase) => (
-          <span className="text-sm font-semibold text-accent">{row.reference}</span>
+          <span className='text-accent text-sm font-semibold'>
+            {row.reference}
+          </span>
         ),
       },
       {
@@ -116,9 +118,9 @@ export default function Purchases() {
         label: 'Vendedor',
         className: '!text-left min-w-[160px]',
         customCol: (row: IPurchase) => (
-          <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">{row.seller.name}</span>
-            <span className="text-xs text-default-400">{row.seller.phone}</span>
+          <div className='flex flex-col items-start'>
+            <span className='text-sm font-medium'>{row.seller.name}</span>
+            <span className='text-default-400 text-xs'>{row.seller.phone}</span>
           </div>
         ),
       },
@@ -127,7 +129,7 @@ export default function Purchases() {
         label: 'Items',
         className: 'w-[80px]',
         customCol: (row: IPurchase) => (
-          <Chip size="sm" variant="flat">
+          <Chip size='sm' variant='flat'>
             {row.items.length} {row.items.length === 1 ? 'carta' : 'cartas'}
           </Chip>
         ),
@@ -137,7 +139,7 @@ export default function Purchases() {
         label: 'Total',
         className: 'min-w-[120px]',
         customCol: (row: IPurchase) => (
-          <span className="text-sm font-semibold">
+          <span className='text-sm font-semibold'>
             {formatCurrency(calculateTotal(row.items))}
           </span>
         ),
@@ -147,7 +149,7 @@ export default function Purchases() {
         label: 'Fecha',
         className: 'min-w-[120px]',
         customCol: (row: IPurchase) => (
-          <span className="text-sm text-default-500">
+          <span className='text-default-500 text-sm'>
             {formatDate(row.createdDate)}
           </span>
         ),
@@ -158,15 +160,15 @@ export default function Purchases() {
         className: 'w-[60px]',
         customCol: (row: IPurchase) => (
           <div onClick={(e) => e.stopPropagation()}>
-            <Tooltip content="Ver detalle">
+            <Tooltip content='Ver detalle'>
               <Button
                 isIconOnly
-                size="sm"
-                variant="light"
+                size='sm'
+                variant='light'
                 aria-label={`Ver compra ${row.reference}`}
                 onPress={() => router.push(`/compras/${row.guid}`)}
               >
-                <Icon icon="lucide:eye" width={16} />
+                <Icon icon='lucide:eye' width={16} />
               </Button>
             </Tooltip>
           </div>
@@ -178,12 +180,12 @@ export default function Purchases() {
 
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="Compras">
-        <div className="flex gap-2">
+      <EntitiesPage.Toolbar label='Compras'>
+        <div className='flex gap-2'>
           <Button
-            className="bg-accent text-white"
-            startContent={<Icon icon="lucide:plus" width={16} />}
-            size="sm"
+            className='bg-accent text-white'
+            startContent={<Icon icon='lucide:plus' width={16} />}
+            size='sm'
             onPress={() => router.push('/compras/nueva')}
           >
             Nueva compra
@@ -193,27 +195,29 @@ export default function Purchases() {
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="min-w-[240px] flex-1">
+        <div className='flex flex-col gap-4'>
+          <div className='flex flex-wrap items-end gap-3'>
+            <div className='min-w-[240px] flex-1'>
               <Search
-                label="Buscar"
-                placeholder="Código, vendedor o carta..."
+                label='Buscar'
+                placeholder='Código, vendedor o carta...'
                 value={filters.search || ''}
                 onValueChange={setSearch}
-                aria-label="Buscar compras"
+                aria-label='Buscar compras'
                 isClearable
                 onClear={() => setSearch('')}
               />
             </div>
 
             <Select
-              aria-label="Filtrar por estado"
-              label="Estado"
-              size="sm"
-              variant="bordered"
-              className="w-[180px]"
-              selectedKeys={filters.status ? new Set([filters.status]) : new Set()}
+              aria-label='Filtrar por estado'
+              label='Estado'
+              size='sm'
+              variant='bordered'
+              className='w-[180px]'
+              selectedKeys={
+                filters.status ? new Set([filters.status]) : new Set()
+              }
               onSelectionChange={(keys) =>
                 handleStatusChange(keys as Set<string>)
               }
@@ -228,12 +232,12 @@ export default function Purchases() {
             </Select>
 
             <Input
-              aria-label="Fecha desde"
-              type="date"
-              label="Desde"
-              size="sm"
-              variant="bordered"
-              className="w-[160px]"
+              aria-label='Fecha desde'
+              type='date'
+              label='Desde'
+              size='sm'
+              variant='bordered'
+              className='w-[160px]'
               onValueChange={handleDateFromChange}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white',
@@ -242,12 +246,12 @@ export default function Purchases() {
             />
 
             <Input
-              aria-label="Fecha hasta"
-              type="date"
-              label="Hasta"
-              size="sm"
-              variant="bordered"
-              className="w-[160px]"
+              aria-label='Fecha hasta'
+              type='date'
+              label='Hasta'
+              size='sm'
+              variant='bordered'
+              className='w-[160px]'
               onValueChange={handleDateToChange}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white',
@@ -257,10 +261,10 @@ export default function Purchases() {
 
             {hasActiveFilters && (
               <Button
-                size="sm"
-                variant="flat"
+                size='sm'
+                variant='flat'
                 onPress={resetFilters}
-                startContent={<Icon icon="lucide:x" width={14} />}
+                startContent={<Icon icon='lucide:x' width={14} />}
               >
                 Limpiar
               </Button>
@@ -268,28 +272,28 @@ export default function Purchases() {
           </div>
 
           {hasActiveFilters && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-default-400">
+            <div className='flex items-center gap-2'>
+              <span className='text-default-400 text-xs'>
                 {totalCount} {totalCount === 1 ? 'resultado' : 'resultados'}
               </span>
             </div>
           )}
         </div>
 
-        <div className="mt-4">
+        <div className='mt-4'>
           <DataTable<IPurchase>
-            cols={columns} 
-            data={purchases} 
-            isLoading={false} 
+            cols={columns}
+            data={purchases}
+            isLoading={false}
             rowClickable={true}
             onRowClick={handleRowClick}
           />
         </div>
 
         {purchases.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-default-400">
-            <Icon icon="lucide:shopping-cart" width={40} className="mb-2" />
-            <span className="text-sm">
+          <div className='text-default-400 flex flex-col items-center justify-center py-12'>
+            <Icon icon='lucide:shopping-cart' width={40} className='mb-2' />
+            <span className='text-sm'>
               {hasActiveFilters
                 ? 'No se encontraron compras con esos filtros'
                 : 'No hay compras registradas'}
@@ -298,7 +302,7 @@ export default function Purchases() {
         )}
 
         {totalPages > 1 && (
-          <div className="mt-4 flex justify-center">
+          <div className='mt-4 flex justify-center'>
             <KidstopPagination
               total={totalPages}
               page={page}

@@ -1,7 +1,13 @@
 import { Tabs, Tab } from '@heroui/react';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { useSettings } from '../hooks/use-settings';
-import { SETTINGS_SECTIONS, DEFAULT_GEOFENCE_CONFIG, DEFAULT_OPERATING_HOURS, DEFAULT_THRESHOLDS, DEFAULT_BANNER_CONFIG } from '../../domain/constants';
+import {
+  SETTINGS_SECTIONS,
+  DEFAULT_GEOFENCE_CONFIG,
+  DEFAULT_OPERATING_HOURS,
+  DEFAULT_THRESHOLDS,
+  DEFAULT_BANNER_CONFIG,
+} from '../../domain/constants';
 import GeneralSection from '../components/general-section';
 import BudgetSection from '../components/budget-section';
 import BannerSection from '../components/banner-section';
@@ -25,32 +31,35 @@ export default function Settings() {
 
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="Configuración">
+      <EntitiesPage.Toolbar label='Configuración'>
         {settings && (
-          <span className="text-sm text-default-400">
-            Última actualización: {new Date(settings.updatedDate).toLocaleString('es-MX')}
+          <span className='text-default-400 text-sm'>
+            Última actualización:{' '}
+            {new Date(settings.updatedDate).toLocaleString('es-MX')}
           </span>
         )}
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
         <Tabs
-          defaultSelectedKey="general"
-          variant="underlined"
+          defaultSelectedKey='general'
+          variant='underlined'
           classNames={{ tabList: 'mb-4' }}
         >
-          <Tab key="general" title={SETTINGS_SECTIONS.general}>
+          <Tab key='general' title={SETTINGS_SECTIONS.general}>
             <GeneralSection
               geofence={settings?.geofence ?? DEFAULT_GEOFENCE_CONFIG}
               thresholds={settings?.thresholds ?? DEFAULT_THRESHOLDS}
-              operatingHours={settings?.operatingHours ?? DEFAULT_OPERATING_HOURS}
+              operatingHours={
+                settings?.operatingHours ?? DEFAULT_OPERATING_HOURS
+              }
               isLoading={updatingConfig}
               onSaveGeofence={updateGeofence}
               onSaveThresholds={updateThresholds}
               onSaveOperatingHours={updateOperatingHours}
             />
           </Tab>
-          <Tab key="budgets" title={SETTINGS_SECTIONS.budgets}>
+          <Tab key='budgets' title={SETTINGS_SECTIONS.budgets}>
             <BudgetSection
               budgets={budgets}
               buyers={buyers}
@@ -58,7 +67,7 @@ export default function Settings() {
               onSave={updateBudget}
             />
           </Tab>
-          <Tab key="banners" title={SETTINGS_SECTIONS.banners}>
+          <Tab key='banners' title={SETTINGS_SECTIONS.banners}>
             <BannerSection
               banners={settings?.bannerGuids ?? DEFAULT_BANNER_CONFIG}
               isLoading={updatingConfig}

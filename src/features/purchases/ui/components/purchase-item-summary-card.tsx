@@ -25,22 +25,22 @@ export function PurchaseItemSummaryCard({
     <div
       className={`flex items-start gap-3 rounded-lg border ${borderColor} ${bgColor} p-3`}
     >
-      <Icon icon={icon} width={20} className={`${iconColor} shrink-0 mt-0.5`} />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate">{item.cardName}</p>
-        <p className="text-xs text-default-500 truncate">
+      <Icon icon={icon} width={20} className={`${iconColor} mt-0.5 shrink-0`} />
+      <div className='min-w-0 flex-1'>
+        <p className='truncate text-sm font-semibold'>{item.cardName}</p>
+        <p className='text-default-500 truncate text-xs'>
           {item.setName} · {item.setCode}
         </p>
-        <div className="flex items-center gap-2 mt-1">
-          <p className="text-xs text-default-400">
+        <div className='mt-1 flex items-center gap-2'>
+          <p className='text-default-400 text-xs'>
             Condición: {CARD_CONDITION_LABELS[item.condition]}
           </p>
-          <Chip size="sm" variant="flat" className="h-5 text-xs">
+          <Chip size='sm' variant='flat' className='h-5 text-xs'>
             {LANGUAGE_LABELS[item.language]}
           </Chip>
         </div>
         {variant === 'duplicate' && (
-          <p className="mt-1 text-xs text-warning font-medium">
+          <p className='text-warning mt-1 text-xs font-medium'>
             ⚠️ Ya está en la compra
           </p>
         )}

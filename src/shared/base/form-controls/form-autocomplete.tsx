@@ -1,9 +1,6 @@
 'use client';
 import { type Key, type ReactNode, useEffect, useState } from 'react';
-import {
-  Controller,
-  FieldValues,
-} from 'react-hook-form';
+import { Controller, FieldValues } from 'react-hook-form';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { ISelectOption } from '../heorui-overrides/select';
 import { AutocompleteProps } from '@heroui/react';
@@ -31,10 +28,13 @@ function BaseFormAutocomplete({
   });
 
   useEffect(() => {
-    const indexed: Record<string, ISelectOption> = items.reduce((acc: Record<string, ISelectOption>, item: ISelectOption) => {
-      acc[item.value] = item;
-      return acc;
-    }, {});
+    const indexed: Record<string, ISelectOption> = items.reduce(
+      (acc: Record<string, ISelectOption>, item: ISelectOption) => {
+        acc[item.value] = item;
+        return acc;
+      },
+      {}
+    );
     setFieldState((prev) => ({
       ...prev,
       items,
@@ -110,8 +110,9 @@ function BaseFormAutocomplete({
   );
 }
 
-interface AutocompleteFormProps<T extends FieldValues>
-  extends Partial<AutocompleteProps> {
+interface AutocompleteFormProps<
+  T extends FieldValues,
+> extends Partial<AutocompleteProps> {
   items: ISelectOption[];
   controlProps: ControlWithFormProps<T>;
   onSelectIcon?: ReactNode;

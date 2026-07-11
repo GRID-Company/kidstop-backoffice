@@ -28,24 +28,27 @@ export default function SaleTimeline({ currentStatus }: SaleTimelineProps) {
   const currentIndex = STATUS_ORDER[currentStatus] ?? -1;
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className='flex w-full flex-col gap-2'>
       {isCancelled && (
-        <div className="flex items-center gap-2 rounded-lg bg-danger-50 px-3 py-2">
-          <Icon icon="lucide:x-circle" width={16} className="text-danger" />
-          <span className="text-sm font-medium text-danger">
+        <div className='bg-danger-50 flex items-center gap-2 rounded-lg px-3 py-2'>
+          <Icon icon='lucide:x-circle' width={16} className='text-danger' />
+          <span className='text-danger text-sm font-medium'>
             {SALE_STATUS_LABELS[SALE_STATUS.CANCELLED]}
           </span>
         </div>
       )}
-      <div className="flex items-center gap-0">
+      <div className='flex items-center gap-0'>
         {TIMELINE_STEPS.map((step, idx) => {
           const isPast = idx < currentIndex;
           const isCurrent = idx === currentIndex && !isCancelled;
           const _isFuture = idx > currentIndex || isCancelled;
 
           return (
-            <div key={step.status} className={`flex items-center ${idx < TIMELINE_STEPS.length - 1 ? 'flex-1' : 'shrink-0'}`}>
-              <div className="flex flex-col items-center gap-1">
+            <div
+              key={step.status}
+              className={`flex items-center ${idx < TIMELINE_STEPS.length - 1 ? 'flex-1' : 'shrink-0'}`}
+            >
+              <div className='flex flex-col items-center gap-1'>
                 <div
                   className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
                     isCurrent
@@ -55,17 +58,14 @@ export default function SaleTimeline({ currentStatus }: SaleTimelineProps) {
                         : 'bg-default-100 text-default-400'
                   }`}
                 >
-                  <Icon
-                    icon={isPast ? 'lucide:check' : step.icon}
-                    width={18}
-                  />
+                  <Icon icon={isPast ? 'lucide:check' : step.icon} width={18} />
                 </div>
                 <span
                   className={`text-center text-[10px] leading-tight ${
                     isCurrent
-                      ? 'font-bold text-accent'
+                      ? 'text-accent font-bold'
                       : isPast
-                        ? 'font-medium text-success'
+                        ? 'text-success font-medium'
                         : 'text-default-400'
                   }`}
                 >

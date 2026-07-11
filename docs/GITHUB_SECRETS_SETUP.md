@@ -16,6 +16,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: API Key para integración con ClickUp
 
 **Cómo obtenerlo**:
+
 1. Ir a [ClickUp Settings](https://app.clickup.com)
 2. Click en tu avatar → **Settings** → **Apps**
 3. Sección **API Token** → **Generate**
@@ -24,6 +25,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `pk_123456_ABCDEFGHIJKLMNOPQRSTUVWXYZ`
 
 **Usado en**:
+
 - `.github/workflows/ticket-to-branch.yml`
 - `.github/workflows/pr-automation.yml`
 - `.github/workflows/release-notes.yml`
@@ -35,6 +37,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: ID del workspace de ClickUp
 
 **Cómo obtenerlo**:
+
 1. Ir a tu workspace en ClickUp
 2. La URL tendrá: `https://app.clickup.com/{WORKSPACE_ID}/...`
 3. Copiar el número
@@ -42,6 +45,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `12345678`
 
 **Usado en**:
+
 - `.github/workflows/ticket-to-branch.yml`
 - `.github/workflows/pr-automation.yml`
 
@@ -52,6 +56,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: API Key para envío de emails
 
 **Cómo obtenerlo**:
+
 1. Ir a [SendGrid](https://app.sendgrid.com)
 2. **Settings** → **API Keys** → **Create API Key**
 3. Nombre: `automation-emails`
@@ -61,6 +66,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `SG.1234567890abcdefghijklmnopqrstuvwxyz`
 
 **Usado en**:
+
 - `.github/workflows/release-notes.yml`
 
 ---
@@ -70,6 +76,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: AWS Access Key ID para Amplify
 
 **Cómo obtenerlo**:
+
 1. Ir a [AWS IAM Console](https://console.aws.amazon.com/iam)
 2. **Users** → **Add users**
 3. Nombre: `amplify-deploy-user`
@@ -80,6 +87,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `AKIAIOSFODNN7EXAMPLE`
 
 **Usado en**:
+
 - `.github/workflows/amplify-deploy.yml`
 
 ---
@@ -89,12 +97,14 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: AWS Secret Access Key para Amplify
 
 **Cómo obtenerlo**:
+
 - Se obtiene junto con el Access Key ID
 - Solo se muestra una vez al crear el usuario
 
 **Formato**: `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
 
 **Usado en**:
+
 - `.github/workflows/amplify-deploy.yml`
 
 ⚠️ **CRÍTICO**: Guardar de forma segura, no se puede recuperar
@@ -108,6 +118,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Valor**: `us-east-2`
 
 **Usado en**:
+
 - `.github/workflows/amplify-deploy.yml`
 
 ---
@@ -117,6 +128,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: ID de la aplicación en AWS Amplify
 
 **Cómo obtenerlo**:
+
 1. Ir a [AWS Amplify Console](https://console.aws.amazon.com/amplify)
 2. Seleccionar tu app
 3. El ID está en la URL: `https://console.aws.amazon.com/amplify/home?region=us-east-2#/{APP_ID}`
@@ -125,6 +137,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `d1234567890abc`
 
 **Usado en**:
+
 - `.github/workflows/amplify-deploy.yml`
 
 ---
@@ -134,12 +147,14 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: Dominio de la aplicación en Amplify
 
 **Cómo obtenerlo**:
+
 1. En Amplify Console, seleccionar tu app
 2. Ver el dominio en la sección **Domain management**
 
 **Formato**: `my-app-dev.amplifyapp.com`
 
 **Usado en**:
+
 - `.github/workflows/release-notes.yml`
 
 ---
@@ -151,6 +166,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `dev1@example.com,dev2@example.com,dev3@example.com`
 
 **Usado en**:
+
 - `.github/workflows/release-notes.yml`
 
 ---
@@ -162,6 +178,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `client1@example.com,client2@example.com`
 
 **Usado en**:
+
 - `.github/workflows/release-notes.yml`
 
 ---
@@ -171,6 +188,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Descripción**: Token para crear branches y comentar en issues
 
 **Cómo obtenerlo**:
+
 1. Ir a [GitHub Settings](https://github.com/settings/tokens)
 2. **Developer settings** → **Personal access tokens** → **Tokens (classic)**
 3. **Generate new token (classic)**
@@ -182,6 +200,7 @@ Guía paso a paso para configurar todos los secrets necesarios en GitHub para lo
 **Formato**: `ghp_1234567890abcdefghijklmnopqrstuvwxyz`
 
 **Usado en**:
+
 - `.github/workflows/ticket-to-branch.yml`
 
 ⚠️ **NOTA**: GitHub Actions ya tiene un `GITHUB_TOKEN` automático, pero este tiene permisos limitados. Este token personalizado permite crear branches automáticamente.
@@ -206,7 +225,7 @@ source .env
 create_secret() {
   local name=$1
   local value=$2
-  
+
   echo "Creating secret: $name"
   gh secret set "$name" --body "$value" --repo "$REPO_OWNER/$REPO_NAME"
 }
@@ -276,6 +295,7 @@ gh secret set SECRET_NAME --body "new_value" --repo GRID-Company/your-repo-name
 ```
 
 O manualmente:
+
 1. Ir a **Settings** → **Secrets and variables** → **Actions**
 2. Click en el secret a actualizar
 3. Click en **Update secret**
@@ -324,6 +344,7 @@ Sin embargo, evita:
 ### Error: "Secret not found"
 
 **Solución**:
+
 1. Verificar que el secret esté creado en GitHub
 2. Verificar el nombre exacto (case-sensitive)
 3. Verificar que estés en el repositorio correcto
@@ -331,6 +352,7 @@ Sin embargo, evita:
 ### Error: "Bad credentials"
 
 **Solución**:
+
 1. Verificar que el valor del secret sea correcto
 2. Regenerar la key/token si es necesario
 3. Actualizar el secret en GitHub
@@ -338,6 +360,7 @@ Sin embargo, evita:
 ### Workflow no Puede Acceder a Secret
 
 **Solución**:
+
 1. Verificar que el workflow esté en la branch correcta
 2. Verificar permisos del workflow
 3. Verificar que el secret esté en el repositorio correcto (no en fork)

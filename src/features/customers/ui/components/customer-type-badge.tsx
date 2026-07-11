@@ -13,10 +13,19 @@ interface CustomerTypeBadgeProps {
   className?: string;
 }
 
-export default function CustomerTypeBadge({ role, clientStatus, className }: CustomerTypeBadgeProps) {
+export default function CustomerTypeBadge({
+  role,
+  clientStatus,
+  className,
+}: CustomerTypeBadgeProps) {
   if (role === CUSTOMER_ROLES.CLIENT_KIOSK) {
     return (
-      <Chip size="sm" color={CUSTOMER_ROLE_COLORS[role]} variant="flat" className={className}>
+      <Chip
+        size='sm'
+        color={CUSTOMER_ROLE_COLORS[role]}
+        variant='flat'
+        className={className}
+      >
         {CUSTOMER_ROLE_LABELS[role]}
       </Chip>
     );
@@ -24,7 +33,7 @@ export default function CustomerTypeBadge({ role, clientStatus, className }: Cus
 
   if (clientStatus === CLIENT_STATUSES.VIP) {
     return (
-      <Chip size="sm" color="warning" variant="flat" className={className}>
+      <Chip size='sm' color='warning' variant='flat' className={className}>
         VIP
       </Chip>
     );

@@ -26,7 +26,8 @@ function CardImageComponent({
   fill = false,
   sizes,
 }: CardImageProps) {
-  const placeholder = tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder;
+  const placeholder =
+    tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder;
 
   if (fill) {
     return (

@@ -5,12 +5,18 @@ import toast from 'react-hot-toast';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { useAuthStore } from '@/lib/store/auth';
-import { CreatePurchaseDocument, PurchasesDocument } from '@/lib/api/generated/purchases.generated';
+import {
+  CreatePurchaseDocument,
+  PurchasesDocument,
+} from '@/lib/api/generated/purchases.generated';
 import { BuyerBudgetDocument } from '@/lib/api/generated/buyer-budgets.generated';
 import { IPurchaseItem, ISeller } from '../../domain/types';
 import { calculateTotal, getItemKey } from '../../domain/purchases.domain';
 import { toCreatePurchasePayload } from '../../adapters/mappers/purchase.mapper';
-import { useNewPurchaseForm, NewPurchaseFormData } from '../../adapters/forms/use-new-purchase-form';
+import {
+  useNewPurchaseForm,
+  NewPurchaseFormData,
+} from '../../adapters/forms/use-new-purchase-form';
 
 interface UseNewPurchaseReturn {
   seller: ISeller | null;
@@ -45,15 +51,18 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     skip: !currentUser?.guid || !selectedTCG,
   });
 
-  const [createPurchase, { loading: saving }] = useMutation(CreatePurchaseDocument, {
-    refetchQueries: [PurchasesDocument],
-    onCompleted: () => {
-      toast.success('Compra creada exitosamente');
-    },
-    onError: (error) => {
-      toast.error(`Error al crear compra: ${error.message}`);
-    },
-  });
+  const [createPurchase, { loading: saving }] = useMutation(
+    CreatePurchaseDocument,
+    {
+      refetchQueries: [PurchasesDocument],
+      onCompleted: () => {
+        toast.success('Compra creada exitosamente');
+      },
+      onError: (error) => {
+        toast.error(`Error al crear compra: ${error.message}`);
+      },
+    }
+  );
 
   const items = fieldArray.fields as unknown as IPurchaseItem[];
 
@@ -68,11 +77,15 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     [items]
   );
 
-  const canSave = seller !== null && items.length > 0 && !saving && form.formState.isValid;
+  const canSave =
+    seller !== null && items.length > 0 && !saving && form.formState.isValid;
 
-  const addItem = useCallback((item: IPurchaseItem) => {
-    fieldArray.append(item);
-  }, [fieldArray]);
+  const addItem = useCallback(
+    (item: IPurchaseItem) => {
+      fieldArray.append(item);
+    },
+    [fieldArray]
+  );
 
   const updateItem = useCallback(
     (itemId: string, updates: Partial<IPurchaseItem>) => {
@@ -84,12 +97,15 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     [items, fieldArray]
   );
 
-  const removeItem = useCallback((itemId: string) => {
-    const index = items.findIndex((item) => item.guid === itemId);
-    if (index !== -1) {
-      fieldArray.remove(index);
-    }
-  }, [items, fieldArray]);
+  const removeItem = useCallback(
+    (itemId: string) => {
+      const index = items.findIndex((item) => item.guid === itemId);
+      if (index !== -1) {
+        fieldArray.remove(index);
+      }
+    },
+    [items, fieldArray]
+  );
 
   const savePurchase = useCallback(async () => {
     if (!canSave || !seller) return;
@@ -97,7 +113,7 @@ export function useNewPurchase(): UseNewPurchaseReturn {
     try {
       const formData = {
         sellerGuid: seller.guid,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           cardGuid: item.cardGuid,
           cardName: item.cardName,
           cardImageUrl: item.cardImageUrl,

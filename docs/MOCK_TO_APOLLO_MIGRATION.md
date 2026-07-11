@@ -26,15 +26,15 @@ El feature `windows` (heredado del template base) es el único que implementa el
 
 ### Archivos de referencia clave
 
-| Archivo | Propósito |
-|---------|-----------|
-| `src/lib/api/graphql/windows.gql` | Query + Mutation GraphQL |
-| `src/lib/api/generated/windows.generated.ts` | Tipos y DocumentNodes generados |
-| `src/features/windows/adapters/forms/window.form.schema.ts` | Zod schema de validación |
-| `src/features/windows/adapters/forms/use-window-form.ts` | Hook de formulario con zodResolver |
-| `src/features/windows/adapters/mappers/window-form.mapper.ts` | Mapper: form → mutation input |
-| `src/features/windows/ui/views/windows.tsx` | Vista con `useQuery` real |
-| `src/features/windows/ui/views/new-window.tsx` | Vista con `useMutation` real |
+| Archivo                                                       | Propósito                          |
+| ------------------------------------------------------------- | ---------------------------------- |
+| `src/lib/api/graphql/windows.gql`                             | Query + Mutation GraphQL           |
+| `src/lib/api/generated/windows.generated.ts`                  | Tipos y DocumentNodes generados    |
+| `src/features/windows/adapters/forms/window.form.schema.ts`   | Zod schema de validación           |
+| `src/features/windows/adapters/forms/use-window-form.ts`      | Hook de formulario con zodResolver |
+| `src/features/windows/adapters/mappers/window-form.mapper.ts` | Mapper: form → mutation input      |
+| `src/features/windows/ui/views/windows.tsx`                   | Vista con `useQuery` real          |
+| `src/features/windows/ui/views/new-window.tsx`                | Vista con `useMutation` real       |
 
 ## Paso a Paso: Migrar un Feature
 
@@ -89,6 +89,7 @@ npm run codegen
 ```
 
 Esto genera automáticamente:
+
 - Tipos de las operaciones en `src/lib/api/generated/{feature}.generated.ts`
 - `DocumentNode` tipados (`UsersDocument`, `CreateUserDocument`, etc.)
 
@@ -97,6 +98,7 @@ Esto genera automáticamente:
 Reemplazar el import de mock por `useQuery` con el `DocumentNode` generado.
 
 **Antes (mock):**
+
 ```typescript
 import { MOCK_USERS } from '../../adapters/api/users.mock';
 
@@ -108,6 +110,7 @@ export function useUsers() {
 ```
 
 **Después (Apollo):**
+
 ```typescript
 import { useQuery } from '@apollo/client/react';
 import { UsersDocument } from '@/lib/api/generated/users.generated';
@@ -137,6 +140,7 @@ export function useUsers(search?: string, filters?: UserFilters) {
 ```
 
 Puntos clave:
+
 - La paginación y filtrado ahora se delegan al backend via `variables`
 - `fetchPolicy: 'cache-and-network'` para UX fluida
 - El `refetch` se expone para refrescar después de mutations
@@ -144,6 +148,7 @@ Puntos clave:
 ### Paso 4 — Adaptar mutations (crear/editar/eliminar)
 
 **Antes (mock):**
+
 ```typescript
 const createUser = useCallback((user) => {
   const newUser = { ...user, guid: crypto.randomUUID() };
@@ -152,6 +157,7 @@ const createUser = useCallback((user) => {
 ```
 
 **Después (Apollo):**
+
 ```typescript
 import { useMutation } from '@apollo/client/react';
 import {
@@ -228,16 +234,16 @@ Usar esta checklist al migrar cada módulo:
 
 Priorizado por complejidad (de menor a mayor) y dependencias entre módulos:
 
-| # | Feature | Complejidad | Dependencias |
-|---|---------|-------------|--------------|
-| 1 | `users` | Baja | Ninguna — CRUD simple |
-| 2 | `settings` | Baja | Ninguna — configuración global |
-| 3 | `customers` | Media | Ninguna directa |
-| 4 | `catalog` | Media | Proveedores externos (Price Charting, Card Kingdom) |
-| 5 | `most-wanted` | Media | Depende de `catalog` |
-| 6 | `inventory-cards` | Media-Alta | Depende de `catalog` |
-| 7 | `purchases` | Alta | Depende de `catalog`, `inventory-cards`, `customers` |
-| 8 | `sales` | Alta | Depende de `inventory-cards`, `customers` |
+| #   | Feature           | Complejidad | Dependencias                                         |
+| --- | ----------------- | ----------- | ---------------------------------------------------- |
+| 1   | `users`           | Baja        | Ninguna — CRUD simple                                |
+| 2   | `settings`        | Baja        | Ninguna — configuración global                       |
+| 3   | `customers`       | Media       | Ninguna directa                                      |
+| 4   | `catalog`         | Media       | Proveedores externos (Price Charting, Card Kingdom)  |
+| 5   | `most-wanted`     | Media       | Depende de `catalog`                                 |
+| 6   | `inventory-cards` | Media-Alta  | Depende de `catalog`                                 |
+| 7   | `purchases`       | Alta        | Depende de `catalog`, `inventory-cards`, `customers` |
+| 8   | `sales`           | Alta        | Depende de `inventory-cards`, `customers`            |
 
 Comenzar por `users` permite validar el flujo completo (query + mutation + codegen) con el feature más simple antes de abordar los módulos con más reglas de negocio.
 

@@ -11,7 +11,13 @@ import { EntitiesPage } from '@/shared/blocks/entities-page';
 import BulkCardSearch from '@/shared/blocks/bulk-card-search';
 import { BulkSearchFormDataInventory } from '@/shared/blocks/bulk-card-search/schemas';
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
-import { DrawerContent, DrawerHeader, DrawerBody, Select, SelectItem } from '@heroui/react';
+import {
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  Select,
+  SelectItem,
+} from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { formatDateTime } from '@/lib/utils/format-date';
 import { IInventoryItem } from '../../domain/types';
@@ -61,62 +67,75 @@ export default function Inventory() {
     refetch,
   } = useInventorySearch();
 
-  const { refresh: refreshIndicators, ...indicators } = useInventoryIndicators(selectedTCG);
+  const { refresh: refreshIndicators, ...indicators } =
+    useInventoryIndicators(selectedTCG);
 
-  const [detailModalItem, setDetailModalItem] = useState<IPokemonCard | IMagicCard | null>(null);
+  const [detailModalItem, setDetailModalItem] = useState<
+    IPokemonCard | IMagicCard | null
+  >(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isBulkAddDrawerOpen, setIsBulkAddDrawerOpen] = useState(false);
   const [bulkOperationType, setBulkOperationType] = useState<BulkOperationType>(
     BulkOperationType.ManualEntry
   );
 
-  const toCatalogCard = useCallback((item: IInventoryItem): IPokemonCard | IMagicCard => {
-    if (item.tcg === 'MAGIC') {
+  const toCatalogCard = useCallback(
+    (item: IInventoryItem): IPokemonCard | IMagicCard => {
+      if (item.tcg === 'MAGIC') {
+        return {
+          guid: item.cardGuid,
+          name: item.name,
+          edition: item.setName,
+          collectorNumber: item.number,
+          isFoil: false,
+          rarity: item.rarity,
+          sellPrice: item.sellPrice,
+          availableStock: item.stock > 0,
+          totalStock: item.stock,
+          imageUri: item.imageUrl,
+          variants: [
+            {
+              guid: item.guid,
+              condition: item.condition,
+              stock: item.stock,
+              purchasePrice: item.purchasePrice,
+              sellPrice: item.sellPrice,
+            },
+          ],
+        };
+      }
       return {
         guid: item.cardGuid,
         name: item.name,
-        edition: item.setName,
-        collectorNumber: item.number,
-        isFoil: false,
-        rarity: item.rarity,
+        cardNumber: item.number,
+        setName: item.setName,
+        setCode: item.setCode,
         sellPrice: item.sellPrice,
         availableStock: item.stock > 0,
         totalStock: item.stock,
         imageUri: item.imageUrl,
-        variants: [{
-          guid: item.guid,
-          condition: item.condition,
-          stock: item.stock,
-          purchasePrice: item.purchasePrice,
-          sellPrice: item.sellPrice,
-        }],
+        variants: [
+          {
+            guid: item.guid,
+            condition: item.condition,
+            stock: item.stock,
+            purchasePrice: item.purchasePrice,
+            sellPrice: item.sellPrice,
+          },
+        ],
       };
-    }
-    return {
-      guid: item.cardGuid,
-      name: item.name,
-      cardNumber: item.number,
-      setName: item.setName,
-      setCode: item.setCode,
-      sellPrice: item.sellPrice,
-      availableStock: item.stock > 0,
-      totalStock: item.stock,
-      imageUri: item.imageUrl,
-      variants: [{
-        guid: item.guid,
-        condition: item.condition,
-        stock: item.stock,
-        purchasePrice: item.purchasePrice,
-        sellPrice: item.sellPrice,
-      }],
-    };
-  }, []);
+    },
+    []
+  );
 
-  const handleItemPress = useCallback((item: IInventoryItem) => {
-    const catalogCard = toCatalogCard(item);
-    setDetailModalItem(catalogCard);
-    setIsDetailModalOpen(true);
-  }, [toCatalogCard]);
+  const handleItemPress = useCallback(
+    (item: IInventoryItem) => {
+      const catalogCard = toCatalogCard(item);
+      setDetailModalItem(catalogCard);
+      setIsDetailModalOpen(true);
+    },
+    [toCatalogCard]
+  );
 
   const handleCloseDetailModal = useCallback(() => {
     setIsDetailModalOpen(false);
@@ -125,7 +144,9 @@ export default function Inventory() {
     void refreshIndicators();
   }, [refetch, refreshIndicators]);
 
-  const [bulkLoadInventory, { loading: _bulkLoading }] = useMutation(BulkLoadInventoryDocument);
+  const [bulkLoadInventory, { loading: _bulkLoading }] = useMutation(
+    BulkLoadInventoryDocument
+  );
 
   const handleTabChange = useCallback((key: Key) => {
     setActiveTab(key as string);
@@ -134,8 +155,13 @@ export default function Inventory() {
   const handleBulkAddConfirm = useCallback(
     async (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => {
       try {
-        const input = mapBulkSearchToInventoryInput(data, results, selectedTCG, bulkOperationType);
-        
+        const input = mapBulkSearchToInventoryInput(
+          data,
+          results,
+          selectedTCG,
+          bulkOperationType
+        );
+
         const response = await bulkLoadInventory({
           variables: { input },
           refetchQueries: [
@@ -146,16 +172,19 @@ export default function Inventory() {
         });
 
         if (response.data?.bulkLoadInventory.success) {
-          const { createdCount, updatedCount, errors } = response.data.bulkLoadInventory;
-          
+          const { createdCount, updatedCount, errors } =
+            response.data.bulkLoadInventory;
+
           if (errors.length > 0) {
-            toast.error(`Algunas cartas no se pudieron agregar: ${errors.join(', ')}`);
+            toast.error(
+              `Algunas cartas no se pudieron agregar: ${errors.join(', ')}`
+            );
           } else {
             toast.success(
               `${createdCount} cartas creadas, ${updatedCount} actualizadas exitosamente`
             );
           }
-          
+
           setIsBulkAddDrawerOpen(false);
           refetch();
           refreshIndicators();
@@ -167,7 +196,13 @@ export default function Inventory() {
         toast.error('Error al agregar cartas al inventario');
       }
     },
-    [selectedTCG, bulkOperationType, bulkLoadInventory, refetch, refreshIndicators]
+    [
+      selectedTCG,
+      bulkOperationType,
+      bulkLoadInventory,
+      refetch,
+      refreshIndicators,
+    ]
   );
 
   const handleBulkAddCancel = useCallback(() => {
@@ -177,20 +212,20 @@ export default function Inventory() {
   return (
     <>
       <EntitiesPage>
-        <EntitiesPage.Toolbar label="Inventario de Cartas">
+        <EntitiesPage.Toolbar label='Inventario de Cartas'>
           {activeTab === INVENTORY_TABS.STOCK && (
-            <div className="flex gap-2">
+            <div className='flex gap-2'>
               <Button
-                variant="bordered"
-                startContent={<Icon icon="lucide:upload" />}
+                variant='bordered'
+                startContent={<Icon icon='lucide:upload' />}
                 onPress={() => setIsBulkAddDrawerOpen(true)}
               >
                 Agregar bulk
               </Button>
               <Button
-                className="text-white"
+                className='text-white'
                 style={{ backgroundColor: 'var(--color-accent)' }}
-                startContent={<Icon icon="lucide:plus" />}
+                startContent={<Icon icon='lucide:plus' />}
                 onPress={() => setIsDetailModalOpen(true)}
               >
                 Ajuste manual
@@ -200,23 +235,24 @@ export default function Inventory() {
         </EntitiesPage.Toolbar>
 
         <EntitiesPage.CardContainer>
-          <div className="mb-6 flex items-center justify-between">
+          <div className='mb-6 flex items-center justify-between'>
             <Tabs
               selectedKey={activeTab}
               onSelectionChange={handleTabChange}
-              variant="underlined"
+              variant='underlined'
               classNames={{
                 tabList: 'gap-6',
                 cursor: 'bg-accent',
                 tab: 'px-0 h-10',
-                tabContent: 'group-data-[selected=true]:text-accent font-medium',
+                tabContent:
+                  'group-data-[selected=true]:text-accent font-medium',
               }}
             >
               <Tab
                 key={INVENTORY_TABS.STOCK}
                 title={
-                  <div className="flex items-center gap-2">
-                    <Icon icon="lucide:package" />
+                  <div className='flex items-center gap-2'>
+                    <Icon icon='lucide:package' />
                     <span>Stock</span>
                   </div>
                 }
@@ -224,29 +260,29 @@ export default function Inventory() {
               <Tab
                 key={INVENTORY_TABS.MOVEMENTS}
                 title={
-                  <div className="flex items-center gap-2">
-                    <Icon icon="lucide:arrow-left-right" />
+                  <div className='flex items-center gap-2'>
+                    <Icon icon='lucide:arrow-left-right' />
                     <span>Movimientos</span>
                   </div>
                 }
               />
             </Tabs>
-            
-            <div className="flex items-center gap-1">
+
+            <div className='flex items-center gap-1'>
               {indicators.lastRefresh && (
-                <span className="text-[11px] text-default-400">
+                <span className='text-default-400 text-[11px]'>
                   Act.: {formatDateTime(indicators.lastRefresh, '—')}
                 </span>
               )}
-              <Tooltip content="Actualizar indicadores">
+              <Tooltip content='Actualizar indicadores'>
                 <Button
-                  variant="light"
+                  variant='light'
                   isIconOnly
-                  size="sm"
+                  size='sm'
                   onPress={refreshIndicators}
                   isLoading={indicators.loading}
                 >
-                  <Icon icon="lucide:refresh-cw" className="text-default-500" />
+                  <Icon icon='lucide:refresh-cw' className='text-default-500' />
                 </Button>
               </Tooltip>
             </div>
@@ -254,7 +290,7 @@ export default function Inventory() {
 
           {activeTab === INVENTORY_TABS.STOCK && (
             <>
-              <div className="mb-6">
+              <div className='mb-6'>
                 <InventoryMetrics
                   totalStock={indicators.totalStock}
                   lastSellDate={indicators.lastSellDate}
@@ -263,7 +299,7 @@ export default function Inventory() {
                 />
               </div>
 
-              <div className="mb-6">
+              <div className='mb-6'>
                 <InventoryFilters
                   onSearchChange={setSearch}
                   onFilterChange={handleFilterChange}
@@ -295,42 +331,58 @@ export default function Inventory() {
       </EntitiesPage>
 
       <PokemonCardDetailModal
-        card={detailModalItem && 'setName' in detailModalItem ? detailModalItem : null}
-        isOpen={isDetailModalOpen && (detailModalItem === null || 'setName' in detailModalItem) && selectedTCG === 'POKEMON'}
+        card={
+          detailModalItem && 'setName' in detailModalItem
+            ? detailModalItem
+            : null
+        }
+        isOpen={
+          isDetailModalOpen &&
+          (detailModalItem === null || 'setName' in detailModalItem) &&
+          selectedTCG === 'POKEMON'
+        }
         onClose={handleCloseDetailModal}
       />
 
       <MagicCardDetailModal
-        card={detailModalItem && 'edition' in detailModalItem ? detailModalItem : null}
-        isOpen={isDetailModalOpen && (detailModalItem === null || 'edition' in detailModalItem) && selectedTCG === 'MAGIC'}
+        card={
+          detailModalItem && 'edition' in detailModalItem
+            ? detailModalItem
+            : null
+        }
+        isOpen={
+          isDetailModalOpen &&
+          (detailModalItem === null || 'edition' in detailModalItem) &&
+          selectedTCG === 'MAGIC'
+        }
         onClose={handleCloseDetailModal}
       />
 
       <KidstopDrawer
         isOpen={isBulkAddDrawerOpen}
         onClose={handleBulkAddCancel}
-        size="xl"
+        size='xl'
       >
         <DrawerContent>
-          <DrawerHeader className="flex flex-col gap-3">
+          <DrawerHeader className='flex flex-col gap-3'>
             <div>
-              <span className="text-lg font-semibold text-accent">Agregar cartas en bulk</span>
-              <p className="text-sm font-normal text-default-500">
+              <span className='text-accent text-lg font-semibold'>
+                Agregar cartas en bulk
+              </span>
+              <p className='text-default-500 text-sm font-normal'>
                 Búsqueda masiva de cartas para agregar al inventario
               </p>
             </div>
             <Select
-              label="Tipo de operación"
-              placeholder="Selecciona el tipo de operación"
+              label='Tipo de operación'
+              placeholder='Selecciona el tipo de operación'
               selectedKeys={[bulkOperationType]}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as BulkOperationType;
                 setBulkOperationType(selected);
               }}
-              size="sm"
-              classNames={{
-                
-              }}
+              size='sm'
+              classNames={{}}
             >
               {BULK_ADJUSTMENT_OPTIONS.map((option) => (
                 <SelectItem key={option.key} description={option.description}>
@@ -339,10 +391,10 @@ export default function Inventory() {
               ))}
             </Select>
           </DrawerHeader>
-          
+
           <DrawerBody>
             <BulkCardSearch
-              variant="inventory"
+              variant='inventory'
               onConfirm={handleBulkAddConfirm}
               onCancel={handleBulkAddCancel}
               isOpen={isBulkAddDrawerOpen}

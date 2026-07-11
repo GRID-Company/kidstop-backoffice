@@ -55,12 +55,12 @@ export default function WhatsAppQuoteButton({
     <Tooltip content={tooltipContent}>
       <div>
         <Button
-          color="success"
-          variant="solid"
-          startContent={<Icon icon="lucide:message-circle" width={18} />}
+          color='success'
+          variant='solid'
+          startContent={<Icon icon='lucide:message-circle' width={18} />}
           onPress={handlePress}
           isDisabled={isDisabled || !validation.valid}
-          className="font-medium"
+          className='font-medium'
         >
           {label}
         </Button>

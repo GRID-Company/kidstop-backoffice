@@ -33,7 +33,9 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
   }
 }
 
-query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs!) {
+query InventoryMovements(
+  $findInventoryMovementsArgs: FindInventoryMovementsArgs!
+) {
   inventoryMovements(findInventoryMovementsArgs: $findInventoryMovementsArgs) {
     data {
       guid
@@ -81,8 +83,12 @@ query IndicatorsInventoryItems($tcg: String, $forceRefresh: Boolean) {
   }
 }
 
-mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryMovementInput!) {
-  createInventoryMovement(createInventoryMovementInput: $createInventoryMovementInput) {
+mutation CreateInventoryMovement(
+  $createInventoryMovementInput: CreateInventoryMovementInput!
+) {
+  createInventoryMovement(
+    createInventoryMovementInput: $createInventoryMovementInput
+  ) {
     guid
     movementType
     quantity
@@ -101,8 +107,12 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
   }
 }
 
-query InventoryItemSellPriceHistory($findSellPriceHistoryArgs: FindSellPriceHistoryArgs!) {
-  inventoryItemSellPriceHistory(findSellPriceHistoryArgs: $findSellPriceHistoryArgs) {
+query InventoryItemSellPriceHistory(
+  $findSellPriceHistoryArgs: FindSellPriceHistoryArgs!
+) {
+  inventoryItemSellPriceHistory(
+    findSellPriceHistoryArgs: $findSellPriceHistoryArgs
+  ) {
     data {
       guid
       previousPrice

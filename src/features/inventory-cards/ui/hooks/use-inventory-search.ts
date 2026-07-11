@@ -5,14 +5,22 @@ import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { InventoryItemsDocument } from '@/lib/api/generated/inventory.generated';
 import { fromApiInventoryItem } from '../../adapters/mappers/inventory.mapper';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
-import { DateRange, IInventoryItem, InventoryFilters } from '../../domain/types';
+import {
+  DateRange,
+  IInventoryItem,
+  InventoryFilters,
+} from '../../domain/types';
 
 export function useInventorySearch() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [search, setSearch] = useState('');
-  const [filters, setFilters] = useState<Omit<InventoryFilters, 'search' | 'dateRange'>>({});
+  const [filters, setFilters] = useState<
+    Omit<InventoryFilters, 'search' | 'dateRange'>
+  >({});
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(undefined);
+  const [sortDescriptor, setSortDescriptor] = useState<
+    SortDescriptor | undefined
+  >(undefined);
   const [page, setPage] = useState(1);
 
   const handleFilterChange = useCallback(

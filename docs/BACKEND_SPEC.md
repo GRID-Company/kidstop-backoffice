@@ -31,7 +31,7 @@ Todas las queries de listado usan esta estructura estándar:
 ```graphql
 input SortType {
   column: String!
-  order: String!  # ASC | DESC
+  order: String! # ASC | DESC
 }
 
 input DateRange {
@@ -195,28 +195,34 @@ type Query {
 ```graphql
 type Mutation {
   login(loginUserInput: LoginUserInput!): LoginOutput!
-  requestPasswordChange(requestPasswordChangeInput: RequestPasswordChangeInput!): RequestPasswordChangeOutput!
-  changePassword(changePasswordInput: ChangePasswordInput!): ChangePasswordOutput!
-  userFinishSignUp(userFinishSignupInput: UserFinishSignupInput!): ChangePasswordOutput!
+  requestPasswordChange(
+    requestPasswordChangeInput: RequestPasswordChangeInput!
+  ): RequestPasswordChangeOutput!
+  changePassword(
+    changePasswordInput: ChangePasswordInput!
+  ): ChangePasswordOutput!
+  userFinishSignUp(
+    userFinishSignupInput: UserFinishSignupInput!
+  ): ChangePasswordOutput!
 }
 ```
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| JWT Expiration | Token expira según configuración del servidor (recomendado: 8h) |
-| OTP Expiration | Token de recuperación expira en 30 minutos |
-| Password Policy | Mínimo 8 caracteres, al menos 1 mayúscula, 1 número |
+| Regla               | Descripción                                                                     |
+| ------------------- | ------------------------------------------------------------------------------- |
+| JWT Expiration      | Token expira según configuración del servidor (recomendado: 8h)                 |
+| OTP Expiration      | Token de recuperación expira en 30 minutos                                      |
+| Password Policy     | Mínimo 8 caracteres, al menos 1 mayúscula, 1 número                             |
 | Credentials Expired | Si `credentials_expired_token` viene en login, redirigir a cambio de contraseña |
-| Finish Signup | Usuarios nuevos creados por Admin reciben email para definir su password |
+| Finish Signup       | Usuarios nuevos creados por Admin reciben email para definir su password        |
 
 ### Integraciones
 
-| Integración | Trigger | Descripción |
-|-------------|---------|-------------|
-| Email | `requestPasswordChange` | Enviar email con link de recuperación de contraseña |
-| Email | `createUser` (Módulo 2) | Enviar email de bienvenida con link de signup |
+| Integración | Trigger                 | Descripción                                         |
+| ----------- | ----------------------- | --------------------------------------------------- |
+| Email       | `requestPasswordChange` | Enviar email con link de recuperación de contraseña |
+| Email       | `createUser` (Módulo 2) | Enviar email de bienvenida con link de signup       |
 
 ---
 
@@ -297,33 +303,35 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): GenericOutput!
   deactiveUser(guid: String!): GenericOutput!
-  updateUserProfile(updateUserProfileInput: UpdateUserProfileInput!): GenericOutput!
+  updateUserProfile(
+    updateUserProfileInput: UpdateUserProfileInput!
+  ): GenericOutput!
   createSuperUser(createUserInput: CreateUserInput!): User!
 }
 ```
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Autenticación / acceso al backoffice | ✅ | ✅ | ✅ |
-| Crear usuarios | ✅ | ❌ | ❌ |
-| Editar usuarios | ✅ | ❌ | ❌ |
-| Activar/desactivar usuarios | ✅ | ❌ | ❌ |
-| Editar perfil propio | ✅ | ✅ | ✅ |
+| Operación                            | Admin | Recepción | Comprador |
+| ------------------------------------ | :---: | :-------: | :-------: |
+| Autenticación / acceso al backoffice |  ✅   |    ✅     |    ✅     |
+| Crear usuarios                       |  ✅   |    ❌     |    ❌     |
+| Editar usuarios                      |  ✅   |    ❌     |    ❌     |
+| Activar/desactivar usuarios          |  ✅   |    ❌     |    ❌     |
+| Editar perfil propio                 |  ✅   |    ✅     |    ✅     |
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Solo ADMIN crea usuarios | Guard: role === ADMIN o SUPERUSER |
-| Solo ADMIN desactiva | Guard: role === ADMIN o SUPERUSER |
-| No auto-desactivar | Un usuario no puede desactivarse a sí mismo |
-| Email único | Validar unicidad de emailAddress |
-| Roles válidos | Solo ADMIN, RECEPTION, BUYER (no SUPERUSER desde UI) |
-| Search | Busca por `name` y `emailAddress` |
-| Filtros | `activated` (boolean), `role` (string) |
-| Sort default | `createdDate DESC` |
+| Regla                    | Descripción                                          |
+| ------------------------ | ---------------------------------------------------- |
+| Solo ADMIN crea usuarios | Guard: role === ADMIN o SUPERUSER                    |
+| Solo ADMIN desactiva     | Guard: role === ADMIN o SUPERUSER                    |
+| No auto-desactivar       | Un usuario no puede desactivarse a sí mismo          |
+| Email único              | Validar unicidad de emailAddress                     |
+| Roles válidos            | Solo ADMIN, RECEPTION, BUYER (no SUPERUSER desde UI) |
+| Search                   | Busca por `name` y `emailAddress`                    |
+| Filtros                  | `activated` (boolean), `role` (string)               |
+| Sort default             | `createdDate DESC`                                   |
 
 ---
 
@@ -409,38 +417,40 @@ type Query {
 ```graphql
 type Mutation {
   updateCardPrice(updateCardPriceInput: UpdateCardPriceInput!): CardVariant!
-  syncFromProvider(syncFromProviderInput: SyncFromProviderInput!): GenericOutput!
+  syncFromProvider(
+    syncFromProviderInput: SyncFromProviderInput!
+  ): GenericOutput!
 }
 ```
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Ver/listar/buscar cartas | ✅ | ✅ | ✅ |
-| Editar carta/variante | ✅ | ✅ | ✅ |
-| Ajustar precio público | ✅ | ✅ | ✅ |
-| Sincronizar proveedor | ✅ | ✅ | ✅ |
+| Operación                | Admin | Recepción | Comprador |
+| ------------------------ | :---: | :-------: | :-------: |
+| Ver/listar/buscar cartas |  ✅   |    ✅     |    ✅     |
+| Editar carta/variante    |  ✅   |    ✅     |    ✅     |
+| Ajustar precio público   |  ✅   |    ✅     |    ✅     |
+| Sincronizar proveedor    |  ✅   |    ✅     |    ✅     |
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Filtro TCG obligatorio | Todas las queries deben filtrar por `tcgType` del contexto seleccionado |
-| No mezclar TCGs | Validar que no se mezclen datos entre Pokémon y Magic |
-| Search | Busca por `name`, `setName`, `setCode`, `number` |
-| Rarities por TCG | Pokémon: Common, Uncommon, Rare Holo, Rare Holo V, Ultra Rare, Double Rare, Special Art Rare, Secret Rare. Magic: Common, Uncommon, Rare, Mythic Rare |
-| Precio mínimo | `sellPrice` >= 0 |
-| Sync provider | POKEMON → Price Charting API. MAGIC → Card Kingdom API |
-| Fallback catálogo | Si proveedor externo falla, usar catálogo interno existente |
-| Stock en variante | El campo `stock` en `CardVariant` es calculado desde inventario (read-only aquí) |
+| Regla                  | Descripción                                                                                                                                           |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Filtro TCG obligatorio | Todas las queries deben filtrar por `tcgType` del contexto seleccionado                                                                               |
+| No mezclar TCGs        | Validar que no se mezclen datos entre Pokémon y Magic                                                                                                 |
+| Search                 | Busca por `name`, `setName`, `setCode`, `number`                                                                                                      |
+| Rarities por TCG       | Pokémon: Common, Uncommon, Rare Holo, Rare Holo V, Ultra Rare, Double Rare, Special Art Rare, Secret Rare. Magic: Common, Uncommon, Rare, Mythic Rare |
+| Precio mínimo          | `sellPrice` >= 0                                                                                                                                      |
+| Sync provider          | POKEMON → Price Charting API. MAGIC → Card Kingdom API                                                                                                |
+| Fallback catálogo      | Si proveedor externo falla, usar catálogo interno existente                                                                                           |
+| Stock en variante      | El campo `stock` en `CardVariant` es calculado desde inventario (read-only aquí)                                                                      |
 
 ### Integraciones
 
-| Proveedor | TCG | Propósito |
-|-----------|-----|-----------|
+| Proveedor      | TCG     | Propósito                                          |
+| -------------- | ------- | -------------------------------------------------- |
 | Price Charting | POKEMON | Poblar/actualizar catálogo + precios de referencia |
-| Card Kingdom | MAGIC | Poblar/actualizar catálogo + precios de referencia |
+| Card Kingdom   | MAGIC   | Poblar/actualizar catálogo + precios de referencia |
 
 ### Relaciones
 
@@ -657,7 +667,9 @@ input AdjustPurchasePricesInput {
 type Query {
   purchases(findPurchasesArgs: FindPurchasesArgs!): PaginatedPurchases!
   purchase(guid: String!): Purchase!
-  searchCardsWithMetrics(args: SearchCardsWithMetricsArgs!): PaginatedCardSearchResults!
+  searchCardsWithMetrics(
+    args: SearchCardsWithMetricsArgs!
+  ): PaginatedCardSearchResults!
   sellers(findSellersArgs: FindSellersArgs!): PaginatedSellers!
   buyerBudget(buyerGuid: String!): BuyerBudget!
 }
@@ -673,20 +685,22 @@ type Mutation {
   sendQuote(sendQuoteInput: SendQuoteInput!): Purchase!
   acceptQuote(purchaseGuid: String!): Purchase!
   rejectQuote(purchaseGuid: String!): Purchase!
-  adjustPurchasePrices(adjustPurchasePricesInput: AdjustPurchasePricesInput!): Purchase!
+  adjustPurchasePrices(
+    adjustPurchasePricesInput: AdjustPurchasePricesInput!
+  ): Purchase!
   finalizePurchase(finalizePurchaseInput: FinalizePurchaseInput!): Purchase!
 }
 ```
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Crear/editar Draft | ✅ | ✅ | ✅ |
-| Enviar cotización WhatsApp | ✅ | ✅ | ✅ |
-| Aceptar/rechazar cotización | ✅ | ✅ | ✅ |
-| Pasar a "Esperando precio" | ✅ | ✅ | ✅ |
-| Finalizar (sumar a stock) | ✅ | ✅ | ✅ |
+| Operación                   | Admin | Recepción | Comprador |
+| --------------------------- | :---: | :-------: | :-------: |
+| Crear/editar Draft          |  ✅   |    ✅     |    ✅     |
+| Enviar cotización WhatsApp  |  ✅   |    ✅     |    ✅     |
+| Aceptar/rechazar cotización |  ✅   |    ✅     |    ✅     |
+| Pasar a "Esperando precio"  |  ✅   |    ✅     |    ✅     |
+| Finalizar (sumar a stock)   |  ✅   |    ✅     |    ✅     |
 
 ### Transiciones de Estado
 
@@ -701,26 +715,26 @@ WAITING_PRICE → FINALIZED (finalizePurchase: suma stock + registra pago)
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Solo editar en DRAFT | `updatePurchase` solo funciona si status === DRAFT |
-| Validar transición | Cada mutation valida que el status actual permita la transición |
-| Código auto-generado | `code` se genera automáticamente: `CMP-{YYYY}-{NNN}` |
-| Presupuesto: advertencia | Al crear/editar, calcular si excede presupuesto del buyer → retornar warning, NO bloquear |
+| Regla                          | Descripción                                                                                   |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| Solo editar en DRAFT           | `updatePurchase` solo funciona si status === DRAFT                                            |
+| Validar transición             | Cada mutation valida que el status actual permita la transición                               |
+| Código auto-generado           | `code` se genera automáticamente: `CMP-{YYYY}-{NNN}`                                          |
+| Presupuesto: advertencia       | Al crear/editar, calcular si excede presupuesto del buyer → retornar warning, NO bloquear     |
 | Límite inventario: advertencia | Al agregar item, validar stock actual vs límite (default: 20) → retornar warning, NO bloquear |
-| Suma a stock al finalizar | `finalizePurchase` → crear `InventoryMovement` tipo `PURCHASE_ENTRY` por cada item |
-| Pagos deben cuadrar | Suma de `payments[].amount` debe ser igual a total de la compra |
-| Total calculado | `total = Σ(item.quantity × item.unitBuyPrice)` |
-| Filtro TCG | Todas las queries filtran por `tcgType` |
-| Search | Busca por `code`, `seller.name` |
+| Suma a stock al finalizar      | `finalizePurchase` → crear `InventoryMovement` tipo `PURCHASE_ENTRY` por cada item            |
+| Pagos deben cuadrar            | Suma de `payments[].amount` debe ser igual a total de la compra                               |
+| Total calculado                | `total = Σ(item.quantity × item.unitBuyPrice)`                                                |
+| Filtro TCG                     | Todas las queries filtran por `tcgType`                                                       |
+| Search                         | Busca por `code`, `seller.name`                                                               |
 
 ### Integraciones
 
-| Integración | Trigger | Descripción |
-|-------------|---------|-------------|
-| WhatsApp | `sendQuote` | Genera mensaje con items + total + link, abre WhatsApp al vendedor |
-| Inventario | `finalizePurchase` | Crea movimientos de entrada por cada item |
-| Catálogo | `adjustPurchasePrices` | Actualiza `sellPrice` en CardVariant del catálogo |
+| Integración | Trigger                | Descripción                                                        |
+| ----------- | ---------------------- | ------------------------------------------------------------------ |
+| WhatsApp    | `sendQuote`            | Genera mensaje con items + total + link, abre WhatsApp al vendedor |
+| Inventario  | `finalizePurchase`     | Crea movimientos de entrada por cada item                          |
+| Catálogo    | `adjustPurchasePrices` | Actualiza `sellPrice` en CardVariant del catálogo                  |
 
 ### Relaciones
 
@@ -856,8 +870,12 @@ input AdjustInventoryInput {
 
 ```graphql
 type Query {
-  inventoryItems(findInventoryItemsArgs: FindInventoryItemsArgs!): PaginatedInventoryItems!
-  inventoryMovements(findInventoryMovementsArgs: FindInventoryMovementsArgs!): PaginatedInventoryMovements!
+  inventoryItems(
+    findInventoryItemsArgs: FindInventoryItemsArgs!
+  ): PaginatedInventoryItems!
+  inventoryMovements(
+    findInventoryMovementsArgs: FindInventoryMovementsArgs!
+  ): PaginatedInventoryMovements!
   inventoryMetrics(tcgType: TCGType!): InventoryMetrics!
 }
 ```
@@ -872,25 +890,25 @@ type Mutation {
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Ver stock y movimientos | ✅ | ✅ | ✅ |
-| Ajustes manuales (+/-) | ✅ | ❌ | ❌ |
+| Operación               | Admin | Recepción | Comprador |
+| ----------------------- | :---: | :-------: | :-------: |
+| Ver stock y movimientos |  ✅   |    ✅     |    ✅     |
+| Ajustes manuales (+/-)  |  ✅   |    ❌     |    ❌     |
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Ajuste solo Admin | Guard: role === ADMIN o SUPERUSER |
-| Movimiento automático: compra | `finalizePurchase` → crea movimiento `PURCHASE_ENTRY` (no se llama directamente) |
-| Movimiento automático: venta | `completeSale` → crea movimiento `SALE_EXIT` (no se llama directamente) |
-| Ajuste manual registra motivo | `reason` es obligatorio en ajustes manuales |
-| Stock nunca negativo | Validar que stock resultante >= 0 |
-| StockStatus calculado | `AVAILABLE` si stock > 0 y no hay pedido pendiente. `AWAITING_PICKUP` si hay pedido en estado READY_FOR_PICKUP. `UNAVAILABLE` si stock === 0 |
-| Métricas calculadas | `lastSoldAt`: fecha del último movimiento SALE_EXIT. `avgDaysInInventory`: promedio de días entre PURCHASE_ENTRY y SALE_EXIT |
-| Filtro TCG | Todas las queries filtran por `tcgType` |
-| Search | Busca por `cardName`, `setName`, `setCode`, `cardNumber` |
-| Trazabilidad | Cada movimiento registra: usuario, fecha, tipo, cantidad, razón, referencia (guid de compra/venta) |
+| Regla                         | Descripción                                                                                                                                  |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ajuste solo Admin             | Guard: role === ADMIN o SUPERUSER                                                                                                            |
+| Movimiento automático: compra | `finalizePurchase` → crea movimiento `PURCHASE_ENTRY` (no se llama directamente)                                                             |
+| Movimiento automático: venta  | `completeSale` → crea movimiento `SALE_EXIT` (no se llama directamente)                                                                      |
+| Ajuste manual registra motivo | `reason` es obligatorio en ajustes manuales                                                                                                  |
+| Stock nunca negativo          | Validar que stock resultante >= 0                                                                                                            |
+| StockStatus calculado         | `AVAILABLE` si stock > 0 y no hay pedido pendiente. `AWAITING_PICKUP` si hay pedido en estado READY_FOR_PICKUP. `UNAVAILABLE` si stock === 0 |
+| Métricas calculadas           | `lastSoldAt`: fecha del último movimiento SALE_EXIT. `avgDaysInInventory`: promedio de días entre PURCHASE_ENTRY y SALE_EXIT                 |
+| Filtro TCG                    | Todas las queries filtran por `tcgType`                                                                                                      |
+| Search                        | Busca por `cardName`, `setName`, `setCode`, `cardNumber`                                                                                     |
+| Trazabilidad                  | Cada movimiento registra: usuario, fecha, tipo, cantidad, razón, referencia (guid de compra/venta)                                           |
 
 ### Relaciones
 
@@ -1020,12 +1038,12 @@ type Mutation {
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Ver pedidos | ✅ | ✅ | ❌ |
-| Cambiar estatus | ✅ | ✅ | ❌ |
-| Generar PDF picking list | ✅ | ✅ | ❌ |
-| Completar venta | ✅ | ✅ | ❌ |
+| Operación                | Admin | Recepción | Comprador |
+| ------------------------ | :---: | :-------: | :-------: |
+| Ver pedidos              |  ✅   |    ✅     |    ❌     |
+| Cambiar estatus          |  ✅   |    ✅     |    ❌     |
+| Generar PDF picking list |  ✅   |    ✅     |    ❌     |
+| Completar venta          |  ✅   |    ✅     |    ❌     |
 
 ### Transiciones de Estado
 
@@ -1040,26 +1058,26 @@ Cualquier estado (excepto COMPLETED) → CANCELLED
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Buyer no ve ventas | Guard: role !== BUYER |
-| Ventas desde Carpeta Digital | Las ventas se crean desde la Carpeta Digital, no desde el backoffice (no hay `createSale` mutation) |
-| Código auto-generado | `code` se genera automáticamente: `VTA-{YYYY}-{NNN}` |
-| Validar transición | Cada mutation valida que el status actual permita la transición |
-| Descuenta stock al completar | `completeSale` → crea movimiento `SALE_EXIT` por cada item con `foundQuantity > 0` |
-| FulfillmentStatus | Se actualiza durante surtido: PENDING → FOUND/PARTIAL/NOT_AVAILABLE |
-| Email al marcar listo | Al pasar a `READY_FOR_PICKUP` → enviar email al cliente |
-| PDF picking list | Endpoint REST o query que genera PDF con: código, cliente, TCG, items (carta, variante, condición, cantidad) |
-| Search | Busca por `code`, `customerName`, `customerEmail` |
-| Filtro TCG | Todas las queries filtran por `tcgType` |
+| Regla                        | Descripción                                                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Buyer no ve ventas           | Guard: role !== BUYER                                                                                        |
+| Ventas desde Carpeta Digital | Las ventas se crean desde la Carpeta Digital, no desde el backoffice (no hay `createSale` mutation)          |
+| Código auto-generado         | `code` se genera automáticamente: `VTA-{YYYY}-{NNN}`                                                         |
+| Validar transición           | Cada mutation valida que el status actual permita la transición                                              |
+| Descuenta stock al completar | `completeSale` → crea movimiento `SALE_EXIT` por cada item con `foundQuantity > 0`                           |
+| FulfillmentStatus            | Se actualiza durante surtido: PENDING → FOUND/PARTIAL/NOT_AVAILABLE                                          |
+| Email al marcar listo        | Al pasar a `READY_FOR_PICKUP` → enviar email al cliente                                                      |
+| PDF picking list             | Endpoint REST o query que genera PDF con: código, cliente, TCG, items (carta, variante, condición, cantidad) |
+| Search                       | Busca por `code`, `customerName`, `customerEmail`                                                            |
+| Filtro TCG                   | Todas las queries filtran por `tcgType`                                                                      |
 
 ### Integraciones
 
-| Integración | Trigger | Descripción |
-|-------------|---------|-------------|
-| Email | `READY_FOR_PICKUP` | Enviar email "tu pedido está listo para recolección" |
-| Inventario | `completeSale` | Crear movimientos `SALE_EXIT` |
-| PDF | Query/endpoint | Generar picking list PDF |
+| Integración | Trigger            | Descripción                                          |
+| ----------- | ------------------ | ---------------------------------------------------- |
+| Email       | `READY_FOR_PICKUP` | Enviar email "tu pedido está listo para recolección" |
+| Inventario  | `completeSale`     | Crear movimientos `SALE_EXIT`                        |
+| PDF         | Query/endpoint     | Generar picking list PDF                             |
 
 ### Relaciones
 
@@ -1188,27 +1206,27 @@ type Mutation {
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Ver/listar/buscar | ✅ | ✅ | ❌ |
-| Bloquear/desbloquear | ✅ | ✅ | ❌ |
-| Cambiar tipo (Cliente ↔ VIP) | ✅ | ❌ | ❌ |
+| Operación                    | Admin | Recepción | Comprador |
+| ---------------------------- | :---: | :-------: | :-------: |
+| Ver/listar/buscar            |  ✅   |    ✅     |    ❌     |
+| Bloquear/desbloquear         |  ✅   |    ✅     |    ❌     |
+| Cambiar tipo (Cliente ↔ VIP) |  ✅   |    ❌     |    ❌     |
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Buyer no ve clientes | Guard: role !== BUYER |
-| Solo Admin cambia VIP | Guard: role === ADMIN o SUPERUSER para `setCustomerVip` |
-| Bloqueo automático | Si `uncompletedOrders >= threshold` (configurable en Settings) → bloquear automáticamente |
-| Bloqueo manual | `blockCustomer` requiere `reason` |
-| Desbloqueo resetea contador | `unblockCustomer` → resetea `uncompletedOrders` a 0 |
-| Registro desde Carpeta Digital | Los clientes se crean desde la Carpeta Digital (no hay `createCustomer` en backoffice) |
-| Cuenta unificada | Un cliente tiene una sola cuenta para Pokémon y Magic |
-| Search | Busca por `name`, `email`, `phone` |
-| Sort default | `name ASC` |
-| `totalOrders` calculado | Conteo de pedidos del cliente |
-| `lastOrderDate` calculado | Fecha del pedido más reciente |
+| Regla                          | Descripción                                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| Buyer no ve clientes           | Guard: role !== BUYER                                                                     |
+| Solo Admin cambia VIP          | Guard: role === ADMIN o SUPERUSER para `setCustomerVip`                                   |
+| Bloqueo automático             | Si `uncompletedOrders >= threshold` (configurable en Settings) → bloquear automáticamente |
+| Bloqueo manual                 | `blockCustomer` requiere `reason`                                                         |
+| Desbloqueo resetea contador    | `unblockCustomer` → resetea `uncompletedOrders` a 0                                       |
+| Registro desde Carpeta Digital | Los clientes se crean desde la Carpeta Digital (no hay `createCustomer` en backoffice)    |
+| Cuenta unificada               | Un cliente tiene una sola cuenta para Pokémon y Magic                                     |
+| Search                         | Busca por `name`, `email`, `phone`                                                        |
+| Sort default                   | `name ASC`                                                                                |
+| `totalOrders` calculado        | Conteo de pedidos del cliente                                                             |
+| `lastOrderDate` calculado      | Fecha del pedido más reciente                                                             |
 
 ### Relaciones
 
@@ -1299,7 +1317,9 @@ input MostWantedOrderItemInput {
 
 ```graphql
 type Query {
-  mostWantedCards(findMostWantedArgs: FindMostWantedArgs!): PaginatedMostWantedCards!
+  mostWantedCards(
+    findMostWantedArgs: FindMostWantedArgs!
+  ): PaginatedMostWantedCards!
   mostWantedPublic(tcgType: TCGType!): [MostWantedCard!]!
 }
 ```
@@ -1308,29 +1328,35 @@ type Query {
 
 ```graphql
 type Mutation {
-  addMostWantedCard(addMostWantedCardInput: AddMostWantedCardInput!): MostWantedCard!
-  updateMostWantedCard(updateMostWantedCardInput: UpdateMostWantedCardInput!): MostWantedCard!
-  reorderMostWanted(reorderMostWantedInput: ReorderMostWantedInput!): GenericOutput!
+  addMostWantedCard(
+    addMostWantedCardInput: AddMostWantedCardInput!
+  ): MostWantedCard!
+  updateMostWantedCard(
+    updateMostWantedCardInput: UpdateMostWantedCardInput!
+  ): MostWantedCard!
+  reorderMostWanted(
+    reorderMostWantedInput: ReorderMostWantedInput!
+  ): GenericOutput!
   removeMostWantedCard(mostWantedGuid: String!): GenericOutput!
 }
 ```
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Configurar (agregar/quitar/ordenar/activar) | ✅ | ✅ | ✅ |
+| Operación                                   | Admin | Recepción | Comprador |
+| ------------------------------------------- | :---: | :-------: | :-------: |
+| Configurar (agregar/quitar/ordenar/activar) |  ✅   |    ✅     |    ✅     |
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Separación por TCG | Cada carta Most Wanted pertenece a un `tcgType` específico |
-| No duplicar | No se puede agregar la misma carta dos veces al mismo TCG |
-| Orden único | El campo `order` define la posición en la lista; `reorderMostWanted` actualiza en batch |
-| Público sin auth | `mostWantedPublic` no requiere autenticación; solo retorna cartas con `isActive === true`, ordenadas por `order` |
-| Search | Busca por nombre de carta, set |
-| Default notes | Si no se envía `notes`, se guarda string vacío |
+| Regla              | Descripción                                                                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Separación por TCG | Cada carta Most Wanted pertenece a un `tcgType` específico                                                       |
+| No duplicar        | No se puede agregar la misma carta dos veces al mismo TCG                                                        |
+| Orden único        | El campo `order` define la posición en la lista; `reorderMostWanted` actualiza en batch                          |
+| Público sin auth   | `mostWantedPublic` no requiere autenticación; solo retorna cartas con `isActive === true`, ordenadas por `order` |
+| Search             | Busca por nombre de carta, set                                                                                   |
+| Default notes      | Si no se envía `notes`, se guarda string vacío                                                                   |
 
 ### Relaciones
 
@@ -1465,30 +1491,30 @@ type Mutation {
 
 ### Permisos
 
-| Operación | Admin | Recepción | Comprador |
-|-----------|:-----:|:---------:|:---------:|
-| Ver/editar configuración | ✅ | ❌ | ❌ |
+| Operación                | Admin | Recepción | Comprador |
+| ------------------------ | :---: | :-------: | :-------: |
+| Ver/editar configuración |  ✅   |    ❌     |    ❌     |
 
 ### Reglas de Negocio
 
-| Regla | Descripción |
-|-------|-------------|
-| Solo Admin | Guard: role === ADMIN o SUPERUSER |
-| Singleton | Solo existe un registro de Settings en la BD |
-| Update parcial | `updateSettings` acepta campos opcionales; solo actualiza lo que se envía |
-| Geofence | `center` + `radiusKm` definen el perímetro. `polygon` es alternativa para formas irregulares |
-| Budgets por buyer | Un `BudgetConfig` por cada usuario con rol BUYER |
-| Threshold de bloqueo | `uncompletedOrdersLimit` se usa en módulo Clientes para bloqueo automático |
-| Límite inventario | `inventoryLimitPerCard` se usa en módulo Compras como advertencia |
-| Horarios | `null` en un día significa cerrado. `open`/`close` en formato `HH:mm` |
-| Validaciones | `radiusKm > 0`, `dailyLimit >= 0`, `weeklyLimit >= dailyLimit`, `monthlyLimit >= weeklyLimit`, `uncompletedOrdersLimit >= 1`, `inventoryLimitPerCard >= 1` |
+| Regla                | Descripción                                                                                                                                                |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Solo Admin           | Guard: role === ADMIN o SUPERUSER                                                                                                                          |
+| Singleton            | Solo existe un registro de Settings en la BD                                                                                                               |
+| Update parcial       | `updateSettings` acepta campos opcionales; solo actualiza lo que se envía                                                                                  |
+| Geofence             | `center` + `radiusKm` definen el perímetro. `polygon` es alternativa para formas irregulares                                                               |
+| Budgets por buyer    | Un `BudgetConfig` por cada usuario con rol BUYER                                                                                                           |
+| Threshold de bloqueo | `uncompletedOrdersLimit` se usa en módulo Clientes para bloqueo automático                                                                                 |
+| Límite inventario    | `inventoryLimitPerCard` se usa en módulo Compras como advertencia                                                                                          |
+| Horarios             | `null` en un día significa cerrado. `open`/`close` en formato `HH:mm`                                                                                      |
+| Validaciones         | `radiusKm > 0`, `dailyLimit >= 0`, `weeklyLimit >= dailyLimit`, `monthlyLimit >= weeklyLimit`, `uncompletedOrdersLimit >= 1`, `inventoryLimitPerCard >= 1` |
 
 ### Dependencias con otros módulos
 
-| Configuración | Módulo que la consume | Uso |
-|---------------|----------------------|-----|
-| `geofence` | Carpeta Digital | Validar ubicación de clientes no-VIP |
-| `budgets` | Compras | Advertencia de presupuesto excedido |
-| `thresholds.uncompletedOrdersLimit` | Clientes | Bloqueo automático |
-| `thresholds.inventoryLimitPerCard` | Compras | Advertencia de límite de inventario |
-| `operatingHours` | Carpeta Digital | Mostrar horarios / validar disponibilidad |
+| Configuración                       | Módulo que la consume | Uso                                       |
+| ----------------------------------- | --------------------- | ----------------------------------------- |
+| `geofence`                          | Carpeta Digital       | Validar ubicación de clientes no-VIP      |
+| `budgets`                           | Compras               | Advertencia de presupuesto excedido       |
+| `thresholds.uncompletedOrdersLimit` | Clientes              | Bloqueo automático                        |
+| `thresholds.inventoryLimitPerCard`  | Compras               | Advertencia de límite de inventario       |
+| `operatingHours`                    | Carpeta Digital       | Mostrar horarios / validar disponibilidad |

@@ -76,66 +76,79 @@ export default function BlockCustomerModal({
   if (!customer) return null;
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="md">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='md'>
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">
+        <DrawerHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>
             {isBlocked ? 'Desbloquear cliente' : 'Bloquear cliente'}
           </span>
-          <span className="text-sm font-normal text-default-500">
+          <span className='text-default-500 text-sm font-normal'>
             {isBlocked
               ? 'Confirma que deseas reactivar a este cliente'
               : 'Confirma el bloqueo e indica la razón'}
           </span>
         </DrawerHeader>
 
-        <DrawerBody className="flex flex-col gap-6">
-          <div className="flex flex-col gap-3 rounded-lg bg-default-50 p-4">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="truncate text-sm font-semibold">{customer.name}</p>
-                <p className="truncate text-xs text-default-500">{customer.emailAddress}</p>
+        <DrawerBody className='flex flex-col gap-6'>
+          <div className='bg-default-50 flex flex-col gap-3 rounded-lg p-4'>
+            <div className='flex items-start justify-between gap-2'>
+              <div className='flex min-w-0 flex-col gap-0.5'>
+                <p className='truncate text-sm font-semibold'>
+                  {customer.name}
+                </p>
+                <p className='text-default-500 truncate text-xs'>
+                  {customer.emailAddress}
+                </p>
                 {customer.phone && (
-                  <p className="truncate text-xs text-default-400">{customer.phone}</p>
+                  <p className='text-default-400 truncate text-xs'>
+                    {customer.phone}
+                  </p>
                 )}
               </div>
-              <CustomerTypeBadge role={customer.role} clientStatus={customer.clientStatus} />
+              <CustomerTypeBadge
+                role={customer.role}
+                clientStatus={customer.clientStatus}
+              />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className='flex items-center gap-2'>
               <CustomerStatusBadge clientStatus={customer.clientStatus} />
             </div>
           </div>
 
           <Divider />
 
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-semibold">Resumen de pedidos</h4>
-            <div className="grid grid-cols-3 gap-4 rounded-lg bg-default-50 p-4 text-sm">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-default-500">Total</span>
-                <span className="text-lg font-bold">{customer.totalOrders ?? '—'}</span>
+          <div className='flex flex-col gap-3'>
+            <h4 className='text-sm font-semibold'>Resumen de pedidos</h4>
+            <div className='bg-default-50 grid grid-cols-3 gap-4 rounded-lg p-4 text-sm'>
+              <div className='flex flex-col items-center gap-1'>
+                <span className='text-default-500'>Total</span>
+                <span className='text-lg font-bold'>
+                  {customer.totalOrders ?? '—'}
+                </span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-default-500">No concretados</span>
+              <div className='flex flex-col items-center gap-1'>
+                <span className='text-default-500'>No concretados</span>
                 <span
                   className={`text-lg font-bold ${exceedsThreshold ? 'text-danger' : ''}`}
                 >
                   {customer.uncompletedOrders ?? '—'}
                 </span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-default-500">Umbral</span>
-                <span className="text-lg font-bold">{threshold}</span>
+              <div className='flex flex-col items-center gap-1'>
+                <span className='text-default-500'>Umbral</span>
+                <span className='text-lg font-bold'>{threshold}</span>
               </div>
             </div>
 
             {!isBlocked && exceedsThreshold && (
               <Chip
-                size="sm"
-                color="danger"
-                variant="flat"
-                startContent={<Icon icon="lucide:alert-triangle" className="text-sm" />}
+                size='sm'
+                color='danger'
+                variant='flat'
+                startContent={
+                  <Icon icon='lucide:alert-triangle' className='text-sm' />
+                }
               >
                 El cliente excede el umbral de pedidos no concretados
               </Chip>
@@ -147,49 +160,48 @@ export default function BlockCustomerModal({
               <Divider />
 
               <form
-                id="block-customer-form"
+                id='block-customer-form'
                 onSubmit={(...args) => {
                   void handleSubmit(handleBlock)(...args);
                 }}
-                className="flex flex-col gap-4"
+                className='flex flex-col gap-4'
               >
                 <TextareaForm
-                  label="Razón de bloqueo"
-                  placeholder="Describe el motivo del bloqueo"
+                  label='Razón de bloqueo'
+                  placeholder='Describe el motivo del bloqueo'
                   controlProps={{ control, name: 'reason' }}
                   minRows={3}
                   maxRows={5}
                   isRequired
-                  aria-label="Razón de bloqueo del cliente"
+                  aria-label='Razón de bloqueo del cliente'
                 />
               </form>
             </>
           )}
-
         </DrawerBody>
 
-        <DrawerFooter className="flex justify-between">
-          <Button variant="light" onPress={onClose} className="text-accent">
+        <DrawerFooter className='flex justify-between'>
+          <Button variant='light' onPress={onClose} className='text-accent'>
             Cancelar
           </Button>
 
           {isBlocked ? (
             <Button
-              color="success"
+              color='success'
               isLoading={loading}
-              startContent={<Icon icon="lucide:lock-open" />}
+              startContent={<Icon icon='lucide:lock-open' />}
               onPress={handleUnblock}
             >
               Desbloquear
             </Button>
           ) : (
             <Button
-              type="submit"
-              form="block-customer-form"
-              color="danger"
+              type='submit'
+              form='block-customer-form'
+              color='danger'
               isLoading={loading}
               isDisabled={!formState.isValid}
-              startContent={<Icon icon="lucide:lock" />}
+              startContent={<Icon icon='lucide:lock' />}
             >
               Bloquear cliente
             </Button>

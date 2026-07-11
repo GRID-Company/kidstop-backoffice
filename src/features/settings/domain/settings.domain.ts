@@ -12,10 +12,7 @@ import {
 
 export const isValidCoordinate = (coord: IGeofenceCoordinate): boolean => {
   return (
-    coord.lat >= -90 &&
-    coord.lat <= 90 &&
-    coord.lng >= -180 &&
-    coord.lng <= 180
+    coord.lat >= -90 && coord.lat <= 90 && coord.lng >= -180 && coord.lng <= 180
   );
 };
 

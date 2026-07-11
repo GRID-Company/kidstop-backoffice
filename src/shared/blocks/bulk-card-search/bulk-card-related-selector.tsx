@@ -19,12 +19,14 @@ export default function BulkCardRelatedSelector({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-xs font-semibold text-default-600">Cartas relacionadas:</p>
+    <div className='flex flex-col gap-2'>
+      <p className='text-default-600 text-xs font-semibold'>
+        Cartas relacionadas:
+      </p>
       <RadioGroup
         value={selectedCardGuid}
         onValueChange={onSelect}
-        orientation="horizontal"
+        orientation='horizontal'
         classNames={{
           wrapper: 'gap-2',
         }}
@@ -38,47 +40,63 @@ export default function BulkCardRelatedSelector({
               wrapper: 'hidden',
             }}
           >
-            <div className="flex items-center gap-2">
-              <div className="relative h-[60px] w-[43px] shrink-0 overflow-hidden rounded-md bg-default-100">
+            <div className='flex items-center gap-2'>
+              <div className='bg-default-100 relative h-[60px] w-[43px] shrink-0 overflow-hidden rounded-md'>
                 {card.imageUri ? (
                   <img
                     src={card.imageUri}
                     alt={card.name}
-                    className="absolute inset-0 h-full w-full object-contain p-0.5"
+                    className='absolute inset-0 h-full w-full object-contain p-0.5'
                   />
                 ) : (
                   <Image
-                    src={tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
+                    src={
+                      tcgType === 'MAGIC'
+                        ? magicCardPlaceholder
+                        : pokemonCardPlaceholder
+                    }
                     alt={`${tcgType} card placeholder`}
                     fill
-                    sizes="43px"
-                    className="object-contain p-0.5"
+                    sizes='43px'
+                    className='object-contain p-0.5'
                   />
                 )}
               </div>
-              <div className="flex flex-col gap-0.5">
-                <p className="text-xs font-semibold leading-tight line-clamp-2">{card.name}</p>
-                <div className="flex flex-wrap items-center gap-1">
+              <div className='flex flex-col gap-0.5'>
+                <p className='line-clamp-2 text-xs leading-tight font-semibold'>
+                  {card.name}
+                </p>
+                <div className='flex flex-wrap items-center gap-1'>
                   {tcgType === 'POKEMON' && card.type && (
-                    <PokemonTypeIcon type={card.type} size="sm" />
+                    <PokemonTypeIcon type={card.type} size='sm' />
                   )}
-                  {card.variant && !card.variant.toLowerCase().includes('normal') && (
-                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1 text-[9px]">
-                      {card.variant}
-                    </Chip>
-                  )}
+                  {card.variant &&
+                    !card.variant.toLowerCase().includes('normal') && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='secondary'
+                        className='h-4 px-1 text-[9px]'
+                      >
+                        {card.variant}
+                      </Chip>
+                    )}
                 </div>
-                <p className="text-[10px] text-default-500">
+                <p className='text-default-500 text-[10px]'>
                   {card.edition} · {card.collectorNumber}
                 </p>
-                <div className="flex items-center gap-1">
+                <div className='flex items-center gap-1'>
                   <Icon
-                    icon="lucide:package"
+                    icon='lucide:package'
                     width={10}
-                    className={card.totalStock > 0 ? 'text-success' : 'text-danger'}
+                    className={
+                      card.totalStock > 0 ? 'text-success' : 'text-danger'
+                    }
                   />
-                  <span className="text-[10px] text-default-400">
-                    {card.totalStock > 0 ? `${card.totalStock} en stock` : 'Sin stock'}
+                  <span className='text-default-400 text-[10px]'>
+                    {card.totalStock > 0
+                      ? `${card.totalStock} en stock`
+                      : 'Sin stock'}
                   </span>
                 </div>
               </div>

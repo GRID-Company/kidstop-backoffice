@@ -5,6 +5,7 @@ Organización atómica de tareas en ClickUp para la Carpeta Digital. Cada tarea 
 ## Estructura Propuesta
 
 ### **Space: Kidstop Carpeta Digital**
+
 ```
 📦 Kidstop Carpeta Digital
 ```
@@ -14,10 +15,12 @@ Organización atómica de tareas en ClickUp para la Carpeta Digital. Cada tarea 
 ### **Folders y Listas**
 
 #### **📁 0. Config**
+
 - Lista: Setup Inicial
 - Lista: Documentación
 
 #### **📁 1. Fundamentos**
+
 - Lista: Layout - Componentes Base
 - Lista: Layout - Layouts y Rutas
 - Lista: TCG por Dominio
@@ -25,12 +28,14 @@ Organización atómica de tareas en ClickUp para la Carpeta Digital. Cada tarea 
 - Lista: Auth - Vistas
 
 #### **📁 2. Catálogo**
+
 - Lista: Catálogo - Domain y Mocks
 - Lista: Catálogo - Componentes
 - Lista: Catálogo - Vistas
 - Lista: Catálogo - Filtros y Búsqueda
 
 #### **📁 3. Carrito y Checkout**
+
 - Lista: Carrito - Store y Domain
 - Lista: Carrito - Vista
 - Lista: Checkout - Flujo Principal
@@ -38,11 +43,13 @@ Organización atómica de tareas en ClickUp para la Carpeta Digital. Cada tarea 
 - Lista: Checkout - Modo Kiosk
 
 #### **📁 4. Cuenta de Usuario**
+
 - Lista: Perfil - Domain y Vista
 - Lista: Pedidos - Domain y Vistas
 - Lista: Wishlist - Domain y Vista
 
 #### **📁 5. Páginas Públicas**
+
 - Lista: Most Wanted
 - Lista: Testing Integral
 
@@ -53,6 +60,7 @@ Organización atómica de tareas en ClickUp para la Carpeta Digital. Cada tarea 
 ### **Lista: Setup Inicial**
 
 #### Tarea: Config - Inicializar Repositorio
+
 ```
 Título: Config - Inicializar Repositorio
 Status: DONE
@@ -79,6 +87,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Config - Variables de Entorno
+
 ```
 Título: Config - Variables de Entorno y .env.example
 Status: DONE
@@ -97,6 +106,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Config - Workflow de Desarrollo
+
 ```
 Título: Config - Copiar Workflow work-on-task
 Status: DONE
@@ -114,6 +124,7 @@ Archivos:
 ### **Lista: Documentación**
 
 #### Tarea: Docs - README del Proyecto
+
 ```
 Título: Docs - README del Proyecto
 Status: DONE
@@ -126,6 +137,7 @@ Archivos:
 ```
 
 #### Tarea: Docs - ARCHITECTURE.md
+
 ```
 Título: Docs - Documentación de Arquitectura
 Status: DONE
@@ -144,6 +156,7 @@ Archivos:
 ### **Lista: Layout - Componentes Base**
 
 #### Tarea: Layout - Componente Header
+
 ```
 Título: Layout - Componente Header
 Status: TO DO
@@ -172,6 +185,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Layout - Componente Footer
+
 ```
 Título: Layout - Componente Footer
 Status: TO DO
@@ -199,6 +213,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Layout - Navegación Móvil (Drawer)
+
 ```
 Título: Layout - Navegación Móvil (Drawer)
 Status: TO DO
@@ -227,6 +242,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Layout - Componente SearchBar
+
 ```
 Título: Layout - Componente SearchBar
 Status: TO DO
@@ -255,6 +271,7 @@ Criterios de Aceptación:
 ### **Lista: Layout - Layouts y Rutas**
 
 #### Tarea: Layout - Public Layout
+
 ```
 Título: Layout - Public Layout (Wrapper)
 Status: TO DO
@@ -281,6 +298,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Layout - Authenticated Layout
+
 ```
 Título: Layout - Authenticated Layout (Wrapper)
 Status: TO DO
@@ -307,6 +325,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Layout - Not Authenticated Layout
+
 ```
 Título: Layout - Not Authenticated Layout
 Status: TO DO
@@ -331,6 +350,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Layout - Página 404 (Not Found)
+
 ```
 Título: Layout - Página 404
 Status: TO DO
@@ -350,6 +370,7 @@ Detalle:
 ### **Lista: TCG por Dominio**
 
 #### Tarea: TCG - Utilidad de Detección por Hostname
+
 ```
 Título: TCG - Utilidad de Detección por Hostname
 Status: DONE
@@ -363,6 +384,7 @@ Archivos:
 ```
 
 #### Tarea: TCG - Constantes de Temas
+
 ```
 Título: TCG - Verificar Constantes de Temas
 Status: TO DO
@@ -387,6 +409,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: TCG - Logo Dinámico por TCG
+
 ```
 Título: TCG - Logo Dinámico por TCG
 Status: TO DO
@@ -410,6 +433,7 @@ Detalle:
 ```
 
 #### Tarea: TCG - Metadata Dinámica
+
 ```
 Título: TCG - Metadata Dinámica (Título y Favicon)
 Status: TO DO
@@ -431,6 +455,7 @@ Detalle:
 ### **Lista: Auth - Domain y Adapters**
 
 #### Tarea: Auth - Domain Types
+
 ```
 Título: Auth - Domain Types y Constants
 Status: TO DO
@@ -451,6 +476,7 @@ Detalle:
 ```
 
 #### Tarea: Auth - Login Form Schema
+
 ```
 Título: Auth - Login Form Schema (Zod)
 Status: TO DO
@@ -470,6 +496,7 @@ Detalle:
 ```
 
 #### Tarea: Auth - Register Form Schema
+
 ```
 Título: Auth - Register Form Schema (Zod)
 Status: TO DO
@@ -492,6 +519,7 @@ Detalle:
 ```
 
 #### Tarea: Auth - Forgot Password Form Schema
+
 ```
 Título: Auth - Forgot Password Form Schema (Zod)
 Status: TO DO
@@ -510,6 +538,7 @@ Detalle:
 ```
 
 #### Tarea: Auth - Mock API
+
 ```
 Título: Auth - Mock API (Login, Register, Forgot Password)
 Status: TO DO
@@ -538,6 +567,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Auth - Mappers
+
 ```
 Título: Auth - Mappers (Form → API Input)
 Status: TO DO
@@ -557,6 +587,7 @@ Detalle:
 ### **Lista: Auth - Vistas**
 
 #### Tarea: Auth - Vista Login
+
 ```
 Título: Auth - Vista Login
 Status: TO DO
@@ -589,6 +620,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Auth - Vista Registro
+
 ```
 Título: Auth - Vista Registro
 Status: TO DO
@@ -617,6 +649,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Auth - Vista Recuperar Contraseña
+
 ```
 Título: Auth - Vista Recuperar Contraseña
 Status: TO DO
@@ -642,6 +675,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Auth - API Routes (Cookies)
+
 ```
 Título: Auth - API Routes para Cookies de Sesión
 Status: TO DO
@@ -674,6 +708,7 @@ Criterios de Aceptación:
 ### **Lista: Catálogo - Domain y Mocks**
 
 #### Tarea: Catálogo - Domain Types
+
 ```
 Título: Catálogo - Domain Types
 Status: TO DO
@@ -694,6 +729,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Mock Data
+
 ```
 Título: Catálogo - Mock Data (Cartas Pokémon y Magic)
 Status: TO DO
@@ -726,6 +762,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Catálogo - Hook useCatalog
+
 ```
 Título: Catálogo - Hook useCatalog
 Status: TO DO
@@ -746,6 +783,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Hook useCardDetail
+
 ```
 Título: Catálogo - Hook useCardDetail
 Status: TO DO
@@ -766,6 +804,7 @@ Detalle:
 ### **Lista: Catálogo - Componentes**
 
 #### Tarea: Catálogo - Componente CardItem
+
 ```
 Título: Catálogo - Componente CardItem
 Status: TO DO
@@ -789,6 +828,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Componente CardGrid
+
 ```
 Título: Catálogo - Componente CardGrid
 Status: TO DO
@@ -809,6 +849,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Componente CardSkeleton
+
 ```
 Título: Catálogo - Componente CardSkeleton
 Status: TO DO
@@ -826,6 +867,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Componente VariantSelector
+
 ```
 Título: Catálogo - Componente VariantSelector
 Status: TO DO
@@ -845,6 +887,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Componente QuantitySelector (Shared)
+
 ```
 Título: Catálogo - Componente QuantitySelector (Shared)
 Status: TO DO
@@ -863,6 +906,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Componente AddToCartButton
+
 ```
 Título: Catálogo - Componente AddToCartButton
 Status: TO DO
@@ -883,6 +927,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Componente AddToWishlistButton
+
 ```
 Título: Catálogo - Componente AddToWishlistButton
 Status: TO DO
@@ -904,6 +949,7 @@ Detalle:
 ### **Lista: Catálogo - Vistas**
 
 #### Tarea: Catálogo - Vista Principal (Grid)
+
 ```
 Título: Catálogo - Vista Principal (Grid de Cartas)
 Status: TO DO
@@ -931,6 +977,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Catálogo - Vista Detalle de Carta
+
 ```
 Título: Catálogo - Vista Detalle de Carta
 Status: TO DO
@@ -964,6 +1011,7 @@ Criterios de Aceptación:
 ### **Lista: Catálogo - Filtros y Búsqueda**
 
 #### Tarea: Catálogo - Panel de Filtros (Desktop)
+
 ```
 Título: Catálogo - Panel de Filtros (Desktop Sidebar)
 Status: TO DO
@@ -986,6 +1034,7 @@ Detalle:
 ```
 
 #### Tarea: Catálogo - Filtro Drawer Móvil
+
 ```
 Título: Catálogo - Filtro Drawer Móvil
 Status: TO DO
@@ -1012,6 +1061,7 @@ Detalle:
 ### **Lista: Carrito - Store y Domain**
 
 #### Tarea: Carrito - Domain Types
+
 ```
 Título: Carrito - Domain Types
 Status: TO DO
@@ -1031,6 +1081,7 @@ Detalle:
 ```
 
 #### Tarea: Carrito - Store Zustand (Ajustar)
+
 ```
 Título: Carrito - Store Zustand (Verificar y Ajustar)
 Status: TO DO
@@ -1060,6 +1111,7 @@ Criterios de Aceptación:
 ### **Lista: Carrito - Vista**
 
 #### Tarea: Carrito - Componente CartItem
+
 ```
 Título: Carrito - Componente CartItem (Fila de Item)
 Status: TO DO
@@ -1083,6 +1135,7 @@ Detalle:
 ```
 
 #### Tarea: Carrito - Componente CartSummary
+
 ```
 Título: Carrito - Componente CartSummary
 Status: TO DO
@@ -1102,6 +1155,7 @@ Detalle:
 ```
 
 #### Tarea: Carrito - Vista de Carrito
+
 ```
 Título: Carrito - Vista de Carrito
 Status: TO DO
@@ -1131,6 +1185,7 @@ Criterios de Aceptación:
 ### **Lista: Checkout - Flujo Principal**
 
 #### Tarea: Checkout - Mock de Validación de Stock
+
 ```
 Título: Checkout - Mock de Validación de Stock
 Status: TO DO
@@ -1149,6 +1204,7 @@ Detalle:
 ```
 
 #### Tarea: Checkout - Modal de Items No Disponibles
+
 ```
 Título: Checkout - Modal de Items No Disponibles
 Status: TO DO
@@ -1171,6 +1227,7 @@ Detalle:
 ```
 
 #### Tarea: Checkout - Vista Resumen y Confirmación
+
 ```
 Título: Checkout - Vista Resumen y Confirmación
 Status: TO DO
@@ -1199,6 +1256,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Checkout - Pantalla de Pedido Confirmado
+
 ```
 Título: Checkout - Pantalla de Pedido Confirmado
 Status: TO DO
@@ -1222,6 +1280,7 @@ Detalle:
 ### **Lista: Checkout - Geofencing**
 
 #### Tarea: Geofencing - Utilidad de Distancia
+
 ```
 Título: Geofencing - Utilidad de Cálculo de Distancia
 Status: TO DO
@@ -1242,6 +1301,7 @@ Criterios de Aceptación:
 ```
 
 #### Tarea: Geofencing - Hook useGeofence
+
 ```
 Título: Geofencing - Hook useGeofence
 Status: TO DO
@@ -1264,6 +1324,7 @@ Detalle:
 ```
 
 #### Tarea: Geofencing - Componente de Validación
+
 ```
 Título: Geofencing - Componente de Validación en Checkout
 Status: TO DO
@@ -1287,6 +1348,7 @@ Detalle:
 ### **Lista: Checkout - Modo Kiosk**
 
 #### Tarea: Kiosk - Form Schema
+
 ```
 Título: Kiosk - Form Schema de Datos del Cliente
 Status: TO DO
@@ -1304,6 +1366,7 @@ Detalle:
 ```
 
 #### Tarea: Kiosk - Componente Formulario
+
 ```
 Título: Kiosk - Componente Formulario de Datos del Cliente
 Status: TO DO
@@ -1333,6 +1396,7 @@ Criterios de Aceptación:
 ### **Lista: Perfil - Domain y Vista**
 
 #### Tarea: Perfil - Domain Types
+
 ```
 Título: Perfil - Domain Types
 Status: TO DO
@@ -1350,6 +1414,7 @@ Detalle:
 ```
 
 #### Tarea: Perfil - Form Schemas
+
 ```
 Título: Perfil - Form Schemas (Editar y Cambiar Contraseña)
 Status: TO DO
@@ -1370,6 +1435,7 @@ Detalle:
 ```
 
 #### Tarea: Perfil - Mock API
+
 ```
 Título: Perfil - Mock API
 Status: TO DO
@@ -1389,6 +1455,7 @@ Detalle:
 ```
 
 #### Tarea: Perfil - Vista
+
 ```
 Título: Perfil - Vista de Perfil
 Status: TO DO
@@ -1417,6 +1484,7 @@ Criterios de Aceptación:
 ### **Lista: Pedidos - Domain y Vistas**
 
 #### Tarea: Pedidos - Domain Types
+
 ```
 Título: Pedidos - Domain Types
 Status: TO DO
@@ -1438,6 +1506,7 @@ Detalle:
 ```
 
 #### Tarea: Pedidos - Mock Data
+
 ```
 Título: Pedidos - Mock Data
 Status: TO DO
@@ -1458,6 +1527,7 @@ Detalle:
 ```
 
 #### Tarea: Pedidos - Componente OrderCard
+
 ```
 Título: Pedidos - Componente OrderCard
 Status: TO DO
@@ -1475,6 +1545,7 @@ Detalle:
 ```
 
 #### Tarea: Pedidos - Componente OrderTimeline
+
 ```
 Título: Pedidos - Componente OrderTimeline
 Status: TO DO
@@ -1492,6 +1563,7 @@ Detalle:
 ```
 
 #### Tarea: Pedidos - Vista Listado
+
 ```
 Título: Pedidos - Vista Listado
 Status: TO DO
@@ -1514,6 +1586,7 @@ Detalle:
 ```
 
 #### Tarea: Pedidos - Vista Detalle
+
 ```
 Título: Pedidos - Vista Detalle de Pedido
 Status: TO DO
@@ -1541,6 +1614,7 @@ Criterios de Aceptación:
 ### **Lista: Wishlist - Domain y Vista**
 
 #### Tarea: Wishlist - Domain Types
+
 ```
 Título: Wishlist - Domain Types
 Status: TO DO
@@ -1556,6 +1630,7 @@ Detalle:
 ```
 
 #### Tarea: Wishlist - Mock Data
+
 ```
 Título: Wishlist - Mock Data
 Status: TO DO
@@ -1575,6 +1650,7 @@ Detalle:
 ```
 
 #### Tarea: Wishlist - Componente WishlistItem
+
 ```
 Título: Wishlist - Componente WishlistItem
 Status: TO DO
@@ -1596,6 +1672,7 @@ Detalle:
 ```
 
 #### Tarea: Wishlist - Vista
+
 ```
 Título: Wishlist - Vista de Lista de Deseos
 Status: TO DO
@@ -1627,6 +1704,7 @@ Criterios de Aceptación:
 ### **Lista: Most Wanted**
 
 #### Tarea: Most Wanted - Domain Types
+
 ```
 Título: Most Wanted - Domain Types
 Status: TO DO
@@ -1642,6 +1720,7 @@ Detalle:
 ```
 
 #### Tarea: Most Wanted - Mock Data
+
 ```
 Título: Most Wanted - Mock Data
 Status: TO DO
@@ -1659,6 +1738,7 @@ Detalle:
 ```
 
 #### Tarea: Most Wanted - Componente MostWantedCard
+
 ```
 Título: Most Wanted - Componente MostWantedCard
 Status: TO DO
@@ -1677,6 +1757,7 @@ Detalle:
 ```
 
 #### Tarea: Most Wanted - Vista Página Pública
+
 ```
 Título: Most Wanted - Vista Página Pública
 Status: TO DO
@@ -1706,6 +1787,7 @@ Criterios de Aceptación:
 ### **Lista: Testing Integral**
 
 #### Tarea: Testing - Flujo Completo Público
+
 ```
 Título: Testing - Flujo Completo Público (Sin Auth)
 Status: TO DO
@@ -1726,6 +1808,7 @@ Detalle:
 ```
 
 #### Tarea: Testing - Flujo Completo Cliente
+
 ```
 Título: Testing - Flujo Completo Cliente (Auth)
 Status: TO DO
@@ -1748,6 +1831,7 @@ Detalle:
 ```
 
 #### Tarea: Testing - Flujo Kiosk
+
 ```
 Título: Testing - Flujo Kiosk
 Status: TO DO
@@ -1769,17 +1853,20 @@ Detalle:
 ## Sistema de Tags
 
 ### Por Capa de Arquitectura
+
 - `#atomo` — Componentes base, tipos, utilidades, schemas (1-2 SP)
 - `#molecula` — Componentes compuestos, hooks complejos (2-3 SP)
 - `#organismo` — Vistas completas, flujos (3-5 SP)
 
 ### Por Tipo de Trabajo
+
 - `#frontend` — Trabajo de frontend
 - `#integration` — Integraciones externas (Google Maps)
 - `#docs` — Documentación
 - `#testing` — Testing y QA
 
 ### Por Módulo
+
 - `#layout` — Layout y navegación
 - `#tcg` — Contexto TCG
 - `#auth` — Autenticación
@@ -1794,6 +1881,7 @@ Detalle:
 - `#google-maps` — Geofencing
 
 ### Por Capa Feature-First
+
 - `#domain` — Tipos y constantes
 - `#adapters` — Mocks, forms, mappers
 - `#ui` — Componentes y vistas
@@ -1827,11 +1915,13 @@ Detalle:
 ## Convención de Nombres
 
 ### Formato:
+
 ```
 [Módulo] - Descripción Breve
 ```
 
 ### Ejemplos:
+
 - `Layout - Componente Header`
 - `Auth - Login Form Schema`
 - `Catálogo - Mock Data`
@@ -1843,15 +1933,15 @@ Detalle:
 
 ## Resumen de Tareas
 
-| Folder | Tareas | SP Total |
-|--------|--------|----------|
-| 0. Config | 5 | 5 |
-| 1. Fundamentos | 20 | 35 |
-| 2. Catálogo | 14 | 25 |
-| 3. Carrito y Checkout | 13 | 25 |
-| 4. Cuenta de Usuario | 12 | 20 |
-| 5. Páginas Públicas | 7 | 13 |
-| **Total** | **71** | **123** |
+| Folder                | Tareas | SP Total |
+| --------------------- | ------ | -------- |
+| 0. Config             | 5      | 5        |
+| 1. Fundamentos        | 20     | 35       |
+| 2. Catálogo           | 14     | 25       |
+| 3. Carrito y Checkout | 13     | 25       |
+| 4. Cuenta de Usuario  | 12     | 20       |
+| 5. Páginas Públicas   | 7      | 13       |
+| **Total**             | **71** | **123**  |
 
 ---
 
@@ -1860,204 +1950,217 @@ Detalle:
 Secuencia recomendada respetando dependencias. Las tareas dentro de un mismo paso pueden ejecutarse en paralelo.
 
 ### Fase 0 — Config (DONE)
+
 > 5 tareas · 5 SP · Ya completadas
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 1 | Config - Inicializar Repositorio | 1 | — |
-| 2 | Config - Variables de Entorno y .env.example | 1 | — |
-| 3 | Config - Copiar Workflow work-on-task | 1 | — |
-| 4 | Docs - README del Proyecto | 1 | — |
-| 5 | Docs - Documentación de Arquitectura | 1 | — |
+| #   | Tarea                                        | SP  | Depende de |
+| --- | -------------------------------------------- | --- | ---------- |
+| 1   | Config - Inicializar Repositorio             | 1   | —          |
+| 2   | Config - Variables de Entorno y .env.example | 1   | —          |
+| 3   | Config - Copiar Workflow work-on-task        | 1   | —          |
+| 4   | Docs - README del Proyecto                   | 1   | —          |
+| 5   | Docs - Documentación de Arquitectura         | 1   | —          |
 
 ---
 
 ### Fase 1A — TCG y Layout Base (paralelo)
+
 > 8 tareas · 10 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 6 | TCG - Utilidad de Detección por Hostname | 1 | — (DONE) |
-| 7 | TCG - Verificar Constantes de Temas | 1 | — |
-| 8 | TCG - Logo Dinámico por TCG | 1 | #7 |
-| 9 | TCG - Metadata Dinámica (Título y Favicon) | 2 | #7 |
-| 10 | Layout - Componente Footer | 2 | — |
-| 11 | Layout - Componente SearchBar | 2 | — |
-| 12 | Layout - Componente Header | 3 | #8, #11 |
-| 13 | Layout - Navegación Móvil (Drawer) | 3 | #12 |
+| #   | Tarea                                      | SP  | Depende de |
+| --- | ------------------------------------------ | --- | ---------- |
+| 6   | TCG - Utilidad de Detección por Hostname   | 1   | — (DONE)   |
+| 7   | TCG - Verificar Constantes de Temas        | 1   | —          |
+| 8   | TCG - Logo Dinámico por TCG                | 1   | #7         |
+| 9   | TCG - Metadata Dinámica (Título y Favicon) | 2   | #7         |
+| 10  | Layout - Componente Footer                 | 2   | —          |
+| 11  | Layout - Componente SearchBar              | 2   | —          |
+| 12  | Layout - Componente Header                 | 3   | #8, #11    |
+| 13  | Layout - Navegación Móvil (Drawer)         | 3   | #12        |
 
 ---
 
 ### Fase 1B — Layouts y Auth Domain (paralelo)
+
 > 10 tareas · 12 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 14 | Layout - Public Layout (Wrapper) | 2 | #10, #12 |
-| 15 | Layout - Authenticated Layout (Wrapper) | 2 | #14 |
-| 16 | Layout - Not Authenticated Layout | 1 | #8 |
-| 17 | Layout - Página 404 | 1 | — |
-| 18 | Auth - Domain Types y Constants | 1 | — |
-| 19 | Auth - Login Form Schema (Zod) | 1 | #18 |
-| 20 | Auth - Register Form Schema (Zod) | 2 | #18 |
-| 21 | Auth - Forgot Password Form Schema (Zod) | 1 | #18 |
-| 22 | Auth - Mock API (Login, Register, Forgot Password) | 2 | #18 |
-| 23 | Auth - Mappers (Form → API Input) | 1 | #18 |
+| #   | Tarea                                              | SP  | Depende de |
+| --- | -------------------------------------------------- | --- | ---------- |
+| 14  | Layout - Public Layout (Wrapper)                   | 2   | #10, #12   |
+| 15  | Layout - Authenticated Layout (Wrapper)            | 2   | #14        |
+| 16  | Layout - Not Authenticated Layout                  | 1   | #8         |
+| 17  | Layout - Página 404                                | 1   | —          |
+| 18  | Auth - Domain Types y Constants                    | 1   | —          |
+| 19  | Auth - Login Form Schema (Zod)                     | 1   | #18        |
+| 20  | Auth - Register Form Schema (Zod)                  | 2   | #18        |
+| 21  | Auth - Forgot Password Form Schema (Zod)           | 1   | #18        |
+| 22  | Auth - Mock API (Login, Register, Forgot Password) | 2   | #18        |
+| 23  | Auth - Mappers (Form → API Input)                  | 1   | #18        |
 
 ---
 
 ### Fase 1C — Auth Vistas
+
 > 4 tareas · 10 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 24 | Auth - Vista Login | 3 | #16, #19, #22 |
-| 25 | Auth - Vista Registro | 3 | #16, #20, #22 |
-| 26 | Auth - Vista Recuperar Contraseña | 2 | #16, #21, #22 |
-| 27 | Auth - API Routes para Cookies de Sesión | 2 | — |
+| #   | Tarea                                    | SP  | Depende de    |
+| --- | ---------------------------------------- | --- | ------------- |
+| 24  | Auth - Vista Login                       | 3   | #16, #19, #22 |
+| 25  | Auth - Vista Registro                    | 3   | #16, #20, #22 |
+| 26  | Auth - Vista Recuperar Contraseña        | 2   | #16, #21, #22 |
+| 27  | Auth - API Routes para Cookies de Sesión | 2   | —             |
 
 ---
 
 ### Fase 2A — Catálogo Domain y Componentes Base
+
 > 8 tareas · 10 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 28 | Catálogo - Domain Types | 1 | — |
-| 29 | Catálogo - Mock Data (Cartas Pokémon y Magic) | 2 | #28 |
-| 30 | Catálogo - Hook useCatalog | 2 | #29 |
-| 31 | Catálogo - Hook useCardDetail | 1 | #29 |
-| 32 | Catálogo - Componente CardItem | 2 | #28 |
-| 33 | Catálogo - Componente CardSkeleton | 1 | — |
-| 34 | Catálogo - Componente QuantitySelector (Shared) | 1 | — |
-| 35 | Catálogo - Componente CardGrid | 2 | #32 |
+| #   | Tarea                                           | SP  | Depende de |
+| --- | ----------------------------------------------- | --- | ---------- |
+| 28  | Catálogo - Domain Types                         | 1   | —          |
+| 29  | Catálogo - Mock Data (Cartas Pokémon y Magic)   | 2   | #28        |
+| 30  | Catálogo - Hook useCatalog                      | 2   | #29        |
+| 31  | Catálogo - Hook useCardDetail                   | 1   | #29        |
+| 32  | Catálogo - Componente CardItem                  | 2   | #28        |
+| 33  | Catálogo - Componente CardSkeleton              | 1   | —          |
+| 34  | Catálogo - Componente QuantitySelector (Shared) | 1   | —          |
+| 35  | Catálogo - Componente CardGrid                  | 2   | #32        |
 
 ---
 
 ### Fase 2B — Catálogo Componentes Avanzados y Carrito Domain
+
 > 6 tareas · 8 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 36 | Catálogo - Componente VariantSelector | 2 | #28 |
-| 37 | Carrito - Domain Types | 1 | — |
-| 38 | Carrito - Store Zustand (Verificar y Ajustar) | 2 | #37 |
-| 39 | Catálogo - Componente AddToCartButton | 1 | #38 |
-| 40 | Catálogo - Componente AddToWishlistButton | 1 | — |
-| 41 | Catálogo - Panel de Filtros (Desktop Sidebar) | 3 | #28 |
+| #   | Tarea                                         | SP  | Depende de |
+| --- | --------------------------------------------- | --- | ---------- |
+| 36  | Catálogo - Componente VariantSelector         | 2   | #28        |
+| 37  | Carrito - Domain Types                        | 1   | —          |
+| 38  | Carrito - Store Zustand (Verificar y Ajustar) | 2   | #37        |
+| 39  | Catálogo - Componente AddToCartButton         | 1   | #38        |
+| 40  | Catálogo - Componente AddToWishlistButton     | 1   | —          |
+| 41  | Catálogo - Panel de Filtros (Desktop Sidebar) | 3   | #28        |
 
 ---
 
 ### Fase 2C — Catálogo Vistas
+
 > 4 tareas · 10 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 42 | Catálogo - Filtro Drawer Móvil | 2 | #41 |
-| 43 | Catálogo - Vista Principal (Grid de Cartas) | 3 | #30, #35, #41 |
-| 44 | Catálogo - Vista Detalle de Carta | 3 | #31, #34, #36, #39, #40 |
+| #   | Tarea                                       | SP  | Depende de              |
+| --- | ------------------------------------------- | --- | ----------------------- |
+| 42  | Catálogo - Filtro Drawer Móvil              | 2   | #41                     |
+| 43  | Catálogo - Vista Principal (Grid de Cartas) | 3   | #30, #35, #41           |
+| 44  | Catálogo - Vista Detalle de Carta           | 3   | #31, #34, #36, #39, #40 |
 
 ---
 
 ### Fase 3A — Carrito Vista
+
 > 3 tareas · 6 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 45 | Carrito - Componente CartItem (Fila de Item) | 2 | #34, #37 |
-| 46 | Carrito - Componente CartSummary | 1 | — |
-| 47 | Carrito - Vista de Carrito | 3 | #45, #46 |
+| #   | Tarea                                        | SP  | Depende de |
+| --- | -------------------------------------------- | --- | ---------- |
+| 45  | Carrito - Componente CartItem (Fila de Item) | 2   | #34, #37   |
+| 46  | Carrito - Componente CartSummary             | 1   | —          |
+| 47  | Carrito - Vista de Carrito                   | 3   | #45, #46   |
 
 ---
 
 ### Fase 3B — Checkout y Geofencing (paralelo)
+
 > 7 tareas · 14 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 48 | Checkout - Mock de Validación de Stock | 1 | #37 |
-| 49 | Checkout - Modal de Items No Disponibles | 3 | #48 |
-| 50 | Geofencing - Utilidad de Cálculo de Distancia | 2 | — |
-| 51 | Geofencing - Hook useGeofence | 3 | #50 |
-| 52 | Geofencing - Componente de Validación en Checkout | 2 | #51 |
-| 53 | Checkout - Vista Resumen y Confirmación | 3 | #49, #52 |
-| 54 | Checkout - Pantalla de Pedido Confirmado | 2 | — |
+| #   | Tarea                                             | SP  | Depende de |
+| --- | ------------------------------------------------- | --- | ---------- |
+| 48  | Checkout - Mock de Validación de Stock            | 1   | #37        |
+| 49  | Checkout - Modal de Items No Disponibles          | 3   | #48        |
+| 50  | Geofencing - Utilidad de Cálculo de Distancia     | 2   | —          |
+| 51  | Geofencing - Hook useGeofence                     | 3   | #50        |
+| 52  | Geofencing - Componente de Validación en Checkout | 2   | #51        |
+| 53  | Checkout - Vista Resumen y Confirmación           | 3   | #49, #52   |
+| 54  | Checkout - Pantalla de Pedido Confirmado          | 2   | —          |
 
 ---
 
 ### Fase 3C — Modo Kiosk
+
 > 2 tareas · 3 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 55 | Kiosk - Form Schema de Datos del Cliente | 1 | — |
-| 56 | Kiosk - Componente Formulario de Datos del Cliente | 2 | #55 |
+| #   | Tarea                                              | SP  | Depende de |
+| --- | -------------------------------------------------- | --- | ---------- |
+| 55  | Kiosk - Form Schema de Datos del Cliente           | 1   | —          |
+| 56  | Kiosk - Componente Formulario de Datos del Cliente | 2   | #55        |
 
 ---
 
 ### Fase 4A — Perfil y Pedidos Domain (paralelo)
+
 > 6 tareas · 6 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 57 | Perfil - Domain Types | 1 | — |
-| 58 | Perfil - Form Schemas (Editar y Cambiar Contraseña) | 2 | #57 |
-| 59 | Perfil - Mock API | 1 | #57 |
-| 60 | Pedidos - Domain Types | 1 | — |
-| 61 | Pedidos - Mock Data | 2 | #60 |
-| 62 | Wishlist - Domain Types | 1 | — |
+| #   | Tarea                                               | SP  | Depende de |
+| --- | --------------------------------------------------- | --- | ---------- |
+| 57  | Perfil - Domain Types                               | 1   | —          |
+| 58  | Perfil - Form Schemas (Editar y Cambiar Contraseña) | 2   | #57        |
+| 59  | Perfil - Mock API                                   | 1   | #57        |
+| 60  | Pedidos - Domain Types                              | 1   | —          |
+| 61  | Pedidos - Mock Data                                 | 2   | #60        |
+| 62  | Wishlist - Domain Types                             | 1   | —          |
 
 ---
 
 ### Fase 4B — Perfil, Pedidos y Wishlist Vistas
+
 > 8 tareas · 14 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 63 | Perfil - Vista de Perfil | 3 | #58, #59 |
-| 64 | Pedidos - Componente OrderCard | 1 | #60 |
-| 65 | Pedidos - Componente OrderTimeline | 2 | #60 |
-| 66 | Pedidos - Vista Listado | 2 | #61, #64 |
-| 67 | Pedidos - Vista Detalle de Pedido | 3 | #61, #65 |
-| 68 | Wishlist - Mock Data | 1 | #62 |
-| 69 | Wishlist - Componente WishlistItem | 2 | #62 |
-| 70 | Wishlist - Vista de Lista de Deseos | 2 | #68, #69 |
+| #   | Tarea                               | SP  | Depende de |
+| --- | ----------------------------------- | --- | ---------- |
+| 63  | Perfil - Vista de Perfil            | 3   | #58, #59   |
+| 64  | Pedidos - Componente OrderCard      | 1   | #60        |
+| 65  | Pedidos - Componente OrderTimeline  | 2   | #60        |
+| 66  | Pedidos - Vista Listado             | 2   | #61, #64   |
+| 67  | Pedidos - Vista Detalle de Pedido   | 3   | #61, #65   |
+| 68  | Wishlist - Mock Data                | 1   | #62        |
+| 69  | Wishlist - Componente WishlistItem  | 2   | #62        |
+| 70  | Wishlist - Vista de Lista de Deseos | 2   | #68, #69   |
 
 ---
 
 ### Fase 5 — Páginas Públicas y Testing
+
 > 7 tareas · 13 SP
 
-| # | Tarea | SP | Depende de |
-|---|-------|----|------------|
-| 71 | Most Wanted - Domain Types | 1 | — |
-| 72 | Most Wanted - Mock Data | 1 | #71 |
-| 73 | Most Wanted - Componente MostWantedCard | 1 | #71 |
-| 74 | Most Wanted - Vista Página Pública | 3 | #72, #73 |
-| 75 | Testing - Flujo Completo Público (Sin Auth) | 2 | #43, #44, #74 |
-| 76 | Testing - Flujo Completo Cliente (Auth) | 3 | #47, #53, #63, #66, #67, #70 |
-| 77 | Testing - Flujo Kiosk | 2 | #56, #76 |
+| #   | Tarea                                       | SP  | Depende de                   |
+| --- | ------------------------------------------- | --- | ---------------------------- |
+| 71  | Most Wanted - Domain Types                  | 1   | —                            |
+| 72  | Most Wanted - Mock Data                     | 1   | #71                          |
+| 73  | Most Wanted - Componente MostWantedCard     | 1   | #71                          |
+| 74  | Most Wanted - Vista Página Pública          | 3   | #72, #73                     |
+| 75  | Testing - Flujo Completo Público (Sin Auth) | 2   | #43, #44, #74                |
+| 76  | Testing - Flujo Completo Cliente (Auth)     | 3   | #47, #53, #63, #66, #67, #70 |
+| 77  | Testing - Flujo Kiosk                       | 2   | #56, #76                     |
 
 ---
 
 ### Resumen por Fase
 
-| Fase | Nombre | Tareas | SP | Acumulado |
-|------|--------|--------|----|-----------|
-| 0 | Config (DONE) | 5 | 5 | 5 |
-| 1A | TCG y Layout Base | 8 | 10 | 15 |
-| 1B | Layouts y Auth Domain | 10 | 12 | 27 |
-| 1C | Auth Vistas | 4 | 10 | 37 |
-| 2A | Catálogo Domain y Componentes | 8 | 10 | 47 |
-| 2B | Catálogo Avanzado + Carrito Domain | 6 | 8 | 55 |
-| 2C | Catálogo Vistas | 4 | 10 | 65 |
-| 3A | Carrito Vista | 3 | 6 | 71 |
-| 3B | Checkout y Geofencing | 7 | 14 | 85 |
-| 3C | Modo Kiosk | 2 | 3 | 88 |
-| 4A | Perfil y Pedidos Domain | 6 | 6 | 94 |
-| 4B | Vistas de Cuenta | 8 | 14 | 108 |
-| 5 | Públicas y Testing | 7 | 13 | 121 |
-| **Total** | | **77** | **121** | |
+| Fase      | Nombre                             | Tareas | SP      | Acumulado |
+| --------- | ---------------------------------- | ------ | ------- | --------- |
+| 0         | Config (DONE)                      | 5      | 5       | 5         |
+| 1A        | TCG y Layout Base                  | 8      | 10      | 15        |
+| 1B        | Layouts y Auth Domain              | 10     | 12      | 27        |
+| 1C        | Auth Vistas                        | 4      | 10      | 37        |
+| 2A        | Catálogo Domain y Componentes      | 8      | 10      | 47        |
+| 2B        | Catálogo Avanzado + Carrito Domain | 6      | 8       | 55        |
+| 2C        | Catálogo Vistas                    | 4      | 10      | 65        |
+| 3A        | Carrito Vista                      | 3      | 6       | 71        |
+| 3B        | Checkout y Geofencing              | 7      | 14      | 85        |
+| 3C        | Modo Kiosk                         | 2      | 3       | 88        |
+| 4A        | Perfil y Pedidos Domain            | 6      | 6       | 94        |
+| 4B        | Vistas de Cuenta                   | 8      | 14      | 108       |
+| 5         | Públicas y Testing                 | 7      | 13      | 121       |
+| **Total** |                                    | **77** | **121** |           |
 
 ---
 

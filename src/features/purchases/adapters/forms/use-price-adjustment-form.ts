@@ -9,7 +9,9 @@ export type { PriceAdjustmentFormData };
 
 export function usePriceAdjustmentForm() {
   const form = useForm<PriceAdjustmentFormData>({
-    resolver: zodResolver(priceAdjustmentFormSchema) as Resolver<PriceAdjustmentFormData>,
+    resolver: zodResolver(
+      priceAdjustmentFormSchema
+    ) as Resolver<PriceAdjustmentFormData>,
     defaultValues: {
       items: [],
     },

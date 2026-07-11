@@ -10,13 +10,17 @@ import { useBulkCardSearch } from './hooks/use-bulk-card-search';
 import { useBulkSearchForm } from './hooks/use-bulk-search-form';
 import BulkCardSearchInput from './bulk-card-search-input';
 import BulkCardSearchResults from './bulk-card-search-results';
-import { BulkCardSearchProps, BulkSearchFormDataPurchases, BulkSearchFormDataInventory } from './types';
+import {
+  BulkCardSearchProps,
+  BulkSearchFormDataPurchases,
+  BulkSearchFormDataInventory,
+} from './types';
 
-function BulkCardSearchFooter({ 
-  variant, 
-  fields, 
-  onCancel 
-}: { 
+function BulkCardSearchFooter({
+  variant,
+  fields,
+  onCancel,
+}: {
   variant: 'purchases' | 'inventory';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: any[]; // React Hook Form field array
@@ -26,46 +30,59 @@ function BulkCardSearchFooter({
 
   const configuredCount = useMemo(() => {
     if (!cardsData || !Array.isArray(cardsData)) return 0;
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return cardsData.filter((card: any) => {
       if (!card) return false;
-      
+
       const hasValidGuid = !!card.selectedCardGuid;
       const hasValidCondition = !!card.condition;
-      const hasValidQuantity = typeof card.quantity === 'number' && card.quantity > 0 && !isNaN(card.quantity);
-      const hasValidPrice = variant === 'purchases'
-        ? typeof card.offerPrice === 'number' && card.offerPrice >= 0 && !isNaN(card.offerPrice)
-        : typeof card.publicPrice === 'number' && card.publicPrice >= 0 && !isNaN(card.publicPrice);
-      
-      return hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice;
+      const hasValidQuantity =
+        typeof card.quantity === 'number' &&
+        card.quantity > 0 &&
+        !isNaN(card.quantity);
+      const hasValidPrice =
+        variant === 'purchases'
+          ? typeof card.offerPrice === 'number' &&
+            card.offerPrice >= 0 &&
+            !isNaN(card.offerPrice)
+          : typeof card.publicPrice === 'number' &&
+            card.publicPrice >= 0 &&
+            !isNaN(card.publicPrice);
+
+      return (
+        hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice
+      );
     }).length;
   }, [cardsData, variant]);
 
   if (fields.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3 border-t border-default-200 pt-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-semibold text-default-700">
-            {configuredCount} de {fields.length} {fields.length === 1 ? 'carta configurada' : 'cartas configuradas'}
+    <div className='border-default-200 flex flex-col gap-3 border-t pt-4'>
+      <div className='flex items-center justify-between gap-3'>
+        <div className='flex flex-col gap-1'>
+          <p className='text-default-700 text-sm font-semibold'>
+            {configuredCount} de {fields.length}{' '}
+            {fields.length === 1 ? 'carta configurada' : 'cartas configuradas'}
           </p>
           {configuredCount < fields.length && (
-            <p className="text-xs text-warning">
-              Faltan {fields.length - configuredCount} {fields.length - configuredCount === 1 ? 'carta' : 'cartas'} por configurar
+            <p className='text-warning text-xs'>
+              Faltan {fields.length - configuredCount}{' '}
+              {fields.length - configuredCount === 1 ? 'carta' : 'cartas'} por
+              configurar
             </p>
           )}
         </div>
-        <div className="flex gap-2">
-          <Button variant="flat" onPress={onCancel}>
+        <div className='flex gap-2'>
+          <Button variant='flat' onPress={onCancel}>
             Cancelar
           </Button>
           <Button
-            className="text-white"
+            className='text-white'
             style={{ backgroundColor: 'var(--color-accent)' }}
-            type="submit"
-            startContent={<Icon icon="lucide:check" />}
+            type='submit'
+            startContent={<Icon icon='lucide:check' />}
             isDisabled={fields.length === 0 || configuredCount < fields.length}
           >
             Confirmar y agregar
@@ -76,13 +93,25 @@ function BulkCardSearchFooter({
   );
 }
 
-function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: BulkCardSearchProps) {
+function BulkCardSearchRoot({
+  variant,
+  onConfirm,
+  onCancel,
+  isOpen = true,
+}: BulkCardSearchProps) {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [searchText, setSearchText] = useState('');
 
-  const { search, results, loading, error, reset: resetSearch } = useBulkCardSearch();
+  const {
+    search,
+    results,
+    loading,
+    error,
+    reset: resetSearch,
+  } = useBulkCardSearch();
 
-  const { form, fields, initializeCards, resetForm } = useBulkSearchForm(variant);
+  const { form, fields, initializeCards, resetForm } =
+    useBulkSearchForm(variant);
 
   useEffect(() => {
     if (results.length > 0) {
@@ -104,7 +133,10 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   const handleSubmit = form.handleSubmit(
     (data) => {
-      onConfirm(data as BulkSearchFormDataPurchases & BulkSearchFormDataInventory, results);
+      onConfirm(
+        data as BulkSearchFormDataPurchases & BulkSearchFormDataInventory,
+        results
+      );
       handleClear();
     },
     (_errors) => {
@@ -120,7 +152,7 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
         <BulkCardSearchInput
           value={searchText}
           onChange={setSearchText}
@@ -130,9 +162,13 @@ function BulkCardSearchRoot({ variant, onConfirm, onCancel, isOpen = true }: Bul
         />
 
         {error && (
-          <div className="flex items-center gap-2 rounded-lg border border-danger bg-danger-50 p-3">
-            <Icon icon="lucide:alert-circle" width={20} className="text-danger" />
-            <p className="text-sm text-danger">{error}</p>
+          <div className='border-danger bg-danger-50 flex items-center gap-2 rounded-lg border p-3'>
+            <Icon
+              icon='lucide:alert-circle'
+              width={20}
+              className='text-danger'
+            />
+            <p className='text-danger text-sm'>{error}</p>
           </div>
         )}
 

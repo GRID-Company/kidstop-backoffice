@@ -13,28 +13,30 @@ export type CardSummary = {
   } | null;
 };
 
-export type CardData = CardSummary | {
-  cardName?: string;
-  cardImageUrl?: string;
-  tcgType?: string;
-  tcg?: string;
-  setName?: string;
-  setCode?: string;
-  edition?: string;
-  collectorNumber?: string;
-  pokemonCardSummary?: {
-    name: string;
-    imageUri?: string | null;
-    setName?: string | null;
-    setCode?: string | null;
-  } | null;
-  magicCardSummary?: {
-    name: string;
-    imageUri?: string | null;
-    edition?: string | null;
-    collectorNumber?: string | null;
-  } | null;
-};
+export type CardData =
+  | CardSummary
+  | {
+      cardName?: string;
+      cardImageUrl?: string;
+      tcgType?: string;
+      tcg?: string;
+      setName?: string;
+      setCode?: string;
+      edition?: string;
+      collectorNumber?: string;
+      pokemonCardSummary?: {
+        name: string;
+        imageUri?: string | null;
+        setName?: string | null;
+        setCode?: string | null;
+      } | null;
+      magicCardSummary?: {
+        name: string;
+        imageUri?: string | null;
+        edition?: string | null;
+        collectorNumber?: string | null;
+      } | null;
+    };
 
 export function getCardName(item: CardData): string {
   if ('pokemonCardSummary' in item && item.pokemonCardSummary) {
@@ -81,18 +83,23 @@ export function getCardTCG(item: CardData): 'POKEMON' | 'MAGIC' {
 export function getSetInfo(item: CardData): string {
   if ('pokemonCardSummary' in item && item.pokemonCardSummary) {
     const { setName, setCode } = item.pokemonCardSummary;
-    return setName && setCode ? `${setName} (${setCode})` : setName ?? '—';
+    return setName && setCode ? `${setName} (${setCode})` : (setName ?? '—');
   }
   if ('magicCardSummary' in item && item.magicCardSummary) {
     const { edition, collectorNumber } = item.magicCardSummary;
     return edition && collectorNumber
       ? `${edition} #${collectorNumber}`
-      : edition ?? '—';
+      : (edition ?? '—');
   }
   if ('setName' in item && 'setCode' in item && item.setName && item.setCode) {
     return `${item.setName} (${item.setCode})`;
   }
-  if ('edition' in item && 'collectorNumber' in item && item.edition && item.collectorNumber) {
+  if (
+    'edition' in item &&
+    'collectorNumber' in item &&
+    item.edition &&
+    item.collectorNumber
+  ) {
     return `${item.edition} #${item.collectorNumber}`;
   }
   return '—';

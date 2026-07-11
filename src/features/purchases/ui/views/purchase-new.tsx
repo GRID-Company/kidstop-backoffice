@@ -56,21 +56,23 @@ export default function PurchaseNew() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAdvancedSearchEnabled, setIsAdvancedSearchEnabled] = useState(false);
 
-  const { 
-    duplicateConfirmation, 
-    validateAndAddItems, 
-    handleConfirmDuplicates, 
-    handleCancelDuplicates 
-  } = useDuplicateValidation(
-    existingItemIds, 
-    addItem, 
-    () => setIsAdvancedSearchEnabled(false)
+  const {
+    duplicateConfirmation,
+    validateAndAddItems,
+    handleConfirmDuplicates,
+    handleCancelDuplicates,
+  } = useDuplicateValidation(existingItemIds, addItem, () =>
+    setIsAdvancedSearchEnabled(false)
   );
 
   const handleBulkSearchConfirm = useCallback(
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
-        const newItems = mapBulkSearchToPurchaseItems(data, results, selectedTCG);
+        const newItems = mapBulkSearchToPurchaseItems(
+          data,
+          results,
+          selectedTCG
+        );
         validateAndAddItems(newItems);
       } catch {
         toast.error('Error al agregar cartas desde búsqueda masiva');

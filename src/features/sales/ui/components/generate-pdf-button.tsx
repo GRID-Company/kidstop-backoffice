@@ -23,11 +23,15 @@ function mapItemForPdf(item: ISaleItem) {
   const cardName =
     item.pokemonCardSummary?.name ?? item.magicCardSummary?.name ?? '—';
   const cardImageUrl =
-    item.pokemonCardSummary?.imageUri ?? item.magicCardSummary?.imageUri ?? undefined;
+    item.pokemonCardSummary?.imageUri ??
+    item.magicCardSummary?.imageUri ??
+    undefined;
   const setName =
     item.pokemonCardSummary?.setName ?? item.magicCardSummary?.edition ?? '—';
   const setCode =
-    item.pokemonCardSummary?.setCode ?? item.magicCardSummary?.collectorNumber ?? '—';
+    item.pokemonCardSummary?.setCode ??
+    item.magicCardSummary?.collectorNumber ??
+    '—';
   return {
     cardName,
     cardImageUrl,
@@ -68,11 +72,11 @@ export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
   }, [sale]);
 
   return (
-    <Tooltip content="Descargar picking list en PDF">
+    <Tooltip content='Descargar picking list en PDF'>
       <Button
-        variant="bordered"
-        className="border-accent text-accent"
-        startContent={<Icon icon="lucide:file-down" width={18} />}
+        variant='bordered'
+        className='border-accent text-accent'
+        startContent={<Icon icon='lucide:file-down' width={18} />}
         isLoading={isGenerating}
         onPress={handleGenerate}
       >

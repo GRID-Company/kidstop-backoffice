@@ -7,7 +7,12 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardImage } from '@/shared/components/card-image';
-import { getCardName, getCardImageUri, getCardTCG, getSetInfo } from '@/shared/utils/card-utils';
+import {
+  getCardName,
+  getCardImageUri,
+  getCardTCG,
+  getSetInfo,
+} from '@/shared/utils/card-utils';
 import { ISaleItem } from '../../domain/types';
 import { calculateItemSubtotal } from '../../domain/sales.domain';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
@@ -38,27 +43,27 @@ const COLUMN_RENDERERS: Record<string, ColumnRenderer> = {
         src={imageUri}
         alt={cardName}
         tcgType={tcg}
-        containerClassName="relative mx-auto h-10 w-10 overflow-hidden rounded bg-default-100"
-        className="object-contain"
+        containerClassName='relative mx-auto h-10 w-10 overflow-hidden rounded bg-default-100'
+        className='object-contain'
       />
     );
   },
-  cardName: (row) => (
-    <span className="font-medium">{getCardName(row)}</span>
-  ),
+  cardName: (row) => <span className='font-medium'>{getCardName(row)}</span>,
   set: (row) => (
-    <span className="text-sm text-default-500">{getSetInfo(row)}</span>
+    <span className='text-default-500 text-sm'>{getSetInfo(row)}</span>
   ),
   condition: (row) => (
-    <Chip size="sm" variant="flat">
-      {CARD_CONDITION_SHORT_LABELS[row.condition as keyof typeof CARD_CONDITION_SHORT_LABELS]}
+    <Chip size='sm' variant='flat'>
+      {
+        CARD_CONDITION_SHORT_LABELS[
+          row.condition as keyof typeof CARD_CONDITION_SHORT_LABELS
+        ]
+      }
     </Chip>
   ),
-  price: (row) => (
-    <span className="text-sm">{formatCurrency(row.price)}</span>
-  ),
+  price: (row) => <span className='text-sm'>{formatCurrency(row.price)}</span>,
   subtotal: (row) => (
-    <span className="text-sm font-semibold">
+    <span className='text-sm font-semibold'>
       {formatCurrency(calculateItemSubtotal(row))}
     </span>
   ),
@@ -75,9 +80,9 @@ export default function SaleItemsTable({
 }: SaleItemsTableProps) {
   if (!loading && items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-default-400">
-        <span className="text-4xl">📦</span>
-        <p className="mt-3 text-sm">No hay items en este pedido</p>
+      <div className='text-default-400 flex flex-col items-center justify-center py-12'>
+        <span className='text-4xl'>📦</span>
+        <p className='mt-3 text-sm'>No hay items en este pedido</p>
       </div>
     );
   }

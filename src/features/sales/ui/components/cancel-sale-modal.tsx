@@ -49,43 +49,43 @@ export default function CancelSaleModal({
   }, []);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="sm">
+    <Modal isOpen={isOpen} onClose={handleClose} size='sm'>
       <ModalContent>
-        <ModalHeader className="flex items-center gap-2">
-          <Icon icon="lucide:x-circle" className="text-danger" width={20} />
+        <ModalHeader className='flex items-center gap-2'>
+          <Icon icon='lucide:x-circle' className='text-danger' width={20} />
           <span>Cancelar pedido</span>
         </ModalHeader>
 
-        <ModalBody className="flex flex-col gap-4">
-          <p className="text-sm text-default-600">
+        <ModalBody className='flex flex-col gap-4'>
+          <p className='text-default-600 text-sm'>
             Selecciona el motivo de cancelación del pedido.
           </p>
 
           <Select
-            label="Motivo de cancelación"
-            placeholder="Selecciona un motivo"
-            selectedKeys={selectedReason ? new Set([selectedReason]) : new Set()}
+            label='Motivo de cancelación'
+            placeholder='Selecciona un motivo'
+            selectedKeys={
+              selectedReason ? new Set([selectedReason]) : new Set()
+            }
             onSelectionChange={handleReasonChange}
             isRequired
           >
             {CANCEL_REASON_OPTIONS.map((option) => (
-              <SelectItem key={option.value}>
-                {option.label}
-              </SelectItem>
+              <SelectItem key={option.value}>{option.label}</SelectItem>
             ))}
           </Select>
         </ModalBody>
 
-        <ModalFooter className="flex justify-between">
-          <Button variant="light" onPress={handleClose} className="text-accent">
+        <ModalFooter className='flex justify-between'>
+          <Button variant='light' onPress={handleClose} className='text-accent'>
             Volver
           </Button>
           <Button
-            color="danger"
-            variant="flat"
+            color='danger'
+            variant='flat'
             isLoading={loading}
             isDisabled={!selectedReason}
-            startContent={<Icon icon="lucide:x-circle" width={18} />}
+            startContent={<Icon icon='lucide:x-circle' width={18} />}
             onPress={handleConfirm}
           >
             Confirmar cancelación

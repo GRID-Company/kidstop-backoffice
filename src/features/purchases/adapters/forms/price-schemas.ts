@@ -2,20 +2,23 @@ import { z } from 'zod';
 
 export const offerPriceSchema = z.coerce
   .number()
-  .refine(val => val === 0 || val >= 0, {
+  .refine((val) => val === 0 || val >= 0, {
     message: 'El precio de oferta debe ser mayor o igual a 0',
   })
-  .transform(val => (val === 0 ? 0 : Math.floor(val)));
+  .transform((val) => (val === 0 ? 0 : Math.floor(val)));
 
 export const quantitySchema = z.coerce
   .number()
   .int()
-  .refine(val => val === 0 || val >= 1);
+  .refine((val) => val === 0 || val >= 1);
 
 export type OfferPriceValue = z.infer<typeof offerPriceSchema>;
 export type QuantityValue = z.infer<typeof quantitySchema>;
 
-export function validateOfferPrice(value: string): { isValid: boolean; price: number } {
+export function validateOfferPrice(value: string): {
+  isValid: boolean;
+  price: number;
+} {
   try {
     const result = offerPriceSchema.parse(value);
     return { isValid: true, price: result };
@@ -24,7 +27,10 @@ export function validateOfferPrice(value: string): { isValid: boolean; price: nu
   }
 }
 
-export function validateQuantity(value: string): { isValid: boolean; quantity: number } {
+export function validateQuantity(value: string): {
+  isValid: boolean;
+  quantity: number;
+} {
   try {
     const result = quantitySchema.parse(value);
     return { isValid: true, quantity: result };

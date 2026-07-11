@@ -27,16 +27,38 @@ const getSpentPercentage = (result: BudgetCheckResult): number => {
 
 type BudgetLevel = 'normal' | 'warning' | 'danger';
 
-const getBudgetLevel = (percentage: number, withinBudget: boolean): BudgetLevel => {
+const getBudgetLevel = (
+  percentage: number,
+  withinBudget: boolean
+): BudgetLevel => {
   if (!withinBudget) return 'danger';
   if (percentage >= 80) return 'warning';
   return 'normal';
 };
 
-const LEVEL_CONFIG: Record<BudgetLevel, { icon: string; label: string; progressColor: 'success' | 'warning' | 'danger' }> = {
-  normal: { icon: 'lucide:check-circle', label: 'Dentro del presupuesto', progressColor: 'success' },
-  warning: { icon: 'lucide:alert-triangle', label: 'Cerca del límite', progressColor: 'warning' },
-  danger: { icon: 'lucide:alert-circle', label: 'Excede presupuesto', progressColor: 'danger' },
+const LEVEL_CONFIG: Record<
+  BudgetLevel,
+  {
+    icon: string;
+    label: string;
+    progressColor: 'success' | 'warning' | 'danger';
+  }
+> = {
+  normal: {
+    icon: 'lucide:check-circle',
+    label: 'Dentro del presupuesto',
+    progressColor: 'success',
+  },
+  warning: {
+    icon: 'lucide:alert-triangle',
+    label: 'Cerca del límite',
+    progressColor: 'warning',
+  },
+  danger: {
+    icon: 'lucide:alert-circle',
+    label: 'Excede presupuesto',
+    progressColor: 'danger',
+  },
 };
 
 export default function BudgetIndicator({
@@ -75,15 +97,15 @@ export default function BudgetIndicator({
     <Card
       className={
         level === 'danger'
-          ? 'border-2 border-danger'
+          ? 'border-danger border-2'
           : level === 'warning'
-            ? 'border-2 border-warning'
+            ? 'border-warning border-2'
             : ''
       }
     >
-      <CardBody className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <CardBody className='flex flex-col gap-3'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
             <Icon
               icon={config.icon}
               className={
@@ -95,7 +117,7 @@ export default function BudgetIndicator({
               }
               width={20}
             />
-            <span className="text-sm font-semibold">Presupuesto</span>
+            <span className='text-sm font-semibold'>Presupuesto</span>
           </div>
           <span
             className={`text-sm font-medium ${
@@ -113,26 +135,28 @@ export default function BudgetIndicator({
         <Progress
           value={usagePercentage}
           color={config.progressColor}
-          size="md"
-          className="w-full"
+          size='md'
+          className='w-full'
           aria-label={`Uso de presupuesto: ${Math.round(usagePercentage)}%`}
         />
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-          <span className="text-default-500">Asignado</span>
-          <span className="text-right font-medium">
+        <div className='grid grid-cols-2 gap-x-4 gap-y-1 text-sm'>
+          <span className='text-default-500'>Asignado</span>
+          <span className='text-right font-medium'>
             {displayCurrency(budgetResult.budgetLimit)}
           </span>
 
-          <span className="text-default-500">Gastado previamente</span>
-          <span className="text-right font-medium">
+          <span className='text-default-500'>Gastado previamente</span>
+          <span className='text-right font-medium'>
             {displayCurrency(budgetResult.currentSpent)}{' '}
             {!isPrivacyMode && (
-              <span className="text-default-400">({Math.round(spentPercentage)}%)</span>
+              <span className='text-default-400'>
+                ({Math.round(spentPercentage)}%)
+              </span>
             )}
           </span>
 
-          <span className="text-default-500">Compra actual</span>
+          <span className='text-default-500'>Compra actual</span>
           <span
             className={`text-right font-medium ${
               level === 'danger' ? 'text-danger' : ''
@@ -141,7 +165,7 @@ export default function BudgetIndicator({
             {displayCurrency(budgetResult.purchaseTotal)}
           </span>
 
-          <span className="text-default-500">Restante</span>
+          <span className='text-default-500'>Restante</span>
           <span
             className={`text-right font-bold ${
               budgetResult.remaining < 0

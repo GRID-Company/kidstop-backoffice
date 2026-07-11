@@ -19,10 +19,7 @@ export default function SaleItemsList({
   onRemoveItem,
   isReadOnly = true,
 }: SaleItemsListProps) {
-  const adaptedItems = useMemo(
-    () => items.map(adaptSaleItem),
-    [items]
-  );
+  const adaptedItems = useMemo(() => items.map(adaptSaleItem), [items]);
 
   const calculateTotalWrapper = useMemo(
     () => () => calculateTotal(items),
@@ -48,9 +45,9 @@ export default function SaleItemsList({
       onRemoveItem={handleRemoveItem}
       calculateTotal={calculateTotalWrapper}
       isReadOnly={isReadOnly}
-      variant="sale"
-      totalLabel="Total pedido"
-      emptyMessage="No hay items en el pedido"
+      variant='sale'
+      totalLabel='Total pedido'
+      emptyMessage='No hay items en el pedido'
     />
   );
 }

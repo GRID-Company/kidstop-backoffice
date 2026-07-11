@@ -46,13 +46,31 @@ const MostWanted = {
 //   icon: 'lucide:file-search',
 // };
 
-const ADMIN_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, MostWanted, Users, Settings];
+const ADMIN_ROUTES = [
+  Catalog,
+  InventoryCards,
+  Purchases,
+  Sales,
+  Customers,
+  MostWanted,
+  Users,
+  Settings,
+];
 
-const RECEPTION_ROUTES = [Catalog, InventoryCards, Purchases, Sales, Customers, MostWanted];
+const RECEPTION_ROUTES = [
+  Catalog,
+  InventoryCards,
+  Purchases,
+  Sales,
+  Customers,
+  MostWanted,
+];
 
 const BUYER_ROUTES = [Catalog, InventoryCards, Purchases];
 
-export const MENU_ROUTES: Partial<Record<UserRole, { label: string; route: string; icon: string }[]>> = {
+export const MENU_ROUTES: Partial<
+  Record<UserRole, { label: string; route: string; icon: string }[]>
+> = {
   [UserRole.SUPERUSER]: ADMIN_ROUTES,
   [UserRole.ADMIN]: ADMIN_ROUTES,
   [UserRole.RECEPTION]: RECEPTION_ROUTES,

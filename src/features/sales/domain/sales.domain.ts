@@ -19,9 +19,12 @@ export interface WhatsAppReadyParams {
   customerPhone: string;
 }
 
-export const buildWhatsAppReadyMessage = (params: WhatsAppReadyParams): string => {
+export const buildWhatsAppReadyMessage = (
+  params: WhatsAppReadyParams
+): string => {
   const { sale } = params;
-  const customerName = sale.customer?.name || sale.kioskCustomerName || 'Cliente';
+  const customerName =
+    sale.customer?.name || sale.kioskCustomerName || 'Cliente';
 
   return [
     `Hola *${customerName}*`,

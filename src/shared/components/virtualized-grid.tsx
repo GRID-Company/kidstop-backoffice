@@ -23,7 +23,7 @@ export function VirtualizedGrid<T>({
 }: VirtualizedGridProps<T>) {
   // For now, render all items. In production, implement react-window or @tanstack/react-virtual
   // This component serves as a placeholder for future virtualization implementation
-  
+
   const gridStyle = useMemo(
     () => ({
       display: 'grid',
@@ -48,7 +48,7 @@ export function VirtualizedGrid<T>({
 //
 // Usage example:
 // import { FixedSizeGrid } from 'react-window';
-// 
+//
 // <FixedSizeGrid
 //   columnCount={columns}
 //   columnWidth={itemWidth}

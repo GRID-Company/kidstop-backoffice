@@ -6,7 +6,10 @@ type KidstopDrawerProps = React.ComponentProps<typeof Drawer> & {
   fullScreenOnTablet?: boolean;
 };
 
-const KidstopDrawer = ({ fullScreenOnTablet = true, ...props }: KidstopDrawerProps) => {
+const KidstopDrawer = ({
+  fullScreenOnTablet = true,
+  ...props
+}: KidstopDrawerProps) => {
   const isTablet = useMediaQuery(BREAKPOINTS.TABLET_MAX);
   const effectiveSize = isTablet && fullScreenOnTablet ? 'full' : props.size;
 

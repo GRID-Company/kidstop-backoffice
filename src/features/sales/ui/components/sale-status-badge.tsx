@@ -8,11 +8,14 @@ interface SaleStatusBadgeProps {
   className?: string;
 }
 
-export default function SaleStatusBadge({ status, className }: SaleStatusBadgeProps) {
+export default function SaleStatusBadge({
+  status,
+  className,
+}: SaleStatusBadgeProps) {
   return (
     <Chip
-      size="sm"
-      variant="flat"
+      size='sm'
+      variant='flat'
       color={SALE_STATUS_COLORS[status]}
       className={className}
     >

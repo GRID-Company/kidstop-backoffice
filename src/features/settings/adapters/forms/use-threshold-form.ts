@@ -6,9 +6,13 @@ import {
   thresholdSettingsSchema,
 } from './threshold-settings.schema';
 
-export function useThresholdForm(defaults?: Partial<ThresholdSettingsFormData>) {
+export function useThresholdForm(
+  defaults?: Partial<ThresholdSettingsFormData>
+) {
   return useForm<ThresholdSettingsFormData>({
-    resolver: zodResolver(thresholdSettingsSchema) as Resolver<ThresholdSettingsFormData>,
+    resolver: zodResolver(
+      thresholdSettingsSchema
+    ) as Resolver<ThresholdSettingsFormData>,
     defaultValues: {
       uncompletedOrdersLimit: DEFAULT_THRESHOLDS.uncompletedOrdersLimit,
       inventoryLimitPerCard: DEFAULT_THRESHOLDS.inventoryLimitPerCard,

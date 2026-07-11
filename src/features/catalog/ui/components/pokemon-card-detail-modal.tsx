@@ -25,12 +25,22 @@ import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard, CardCondition } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_SEARCH_LIMIT } from '../../domain/constants';
+import {
+  CARD_CONDITION_LABELS,
+  CARD_CONDITION_SHORT_LABELS,
+  CARD_SEARCH_LIMIT,
+} from '../../domain/constants';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
-import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
+import {
+  useCardDetailModal,
+  InventoryCard,
+} from '../hooks/use-card-detail-modal';
 import { useQuery } from '@apollo/client/react';
-import { PokemonCardWithMetricsDocument, PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
+import {
+  PokemonCardWithMetricsDocument,
+  PokemonCardInternalListDocument,
+} from '@/lib/api/generated/catalog-pokemon.generated';
 import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
@@ -55,18 +65,20 @@ export default function PokemonCardDetailModal({
   const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
   const prevIsOpenRef = useRef(isOpen);
-  
+
   useEffect(() => {
     const wasOpen = prevIsOpenRef.current;
     prevIsOpenRef.current = isOpen;
-    
+
     if (isOpen && !wasOpen) {
       setSelectedCard(card);
       setItemSearch('');
     }
   }, [isOpen, card]);
 
-  const { detail, loading, refetch } = usePokemonCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
+  const { detail, loading, refetch } = usePokemonCardDetail(
+    isOpen ? (selectedCard?.guid ?? null) : null
+  );
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
@@ -100,7 +112,6 @@ export default function PokemonCardDetailModal({
     onRefetch: refetch,
   });
 
-
   const handleStockAdjustClick = useCallback(() => {
     if (stockAdjustment === 0) return;
     setIsConfirmModalOpen(true);
@@ -111,19 +122,22 @@ export default function PokemonCardDetailModal({
     setIsConfirmModalOpen(false);
   }, [executeStockAdjust]);
 
-  const { data: searchData, loading: searchLoading } = useQuery(PokemonCardInternalListDocument, {
-    variables: {
-      findPokemonCardsPublicArgs: {
-        skip: 0,
-        limit: CARD_SEARCH_LIMIT,
-        search: itemSearch.trim() || undefined,
-        sort: { column: 'releaseDate', order: 'DESC' },
-        filters: {},
+  const { data: searchData, loading: searchLoading } = useQuery(
+    PokemonCardInternalListDocument,
+    {
+      variables: {
+        findPokemonCardsPublicArgs: {
+          skip: 0,
+          limit: CARD_SEARCH_LIMIT,
+          search: itemSearch.trim() || undefined,
+          sort: { column: 'releaseDate', order: 'DESC' },
+          filters: {},
+        },
       },
-    },
-    skip: !!selectedCard || itemSearch.trim().length < 2,
-    fetchPolicy: 'network-only',
-  });
+      skip: !!selectedCard || itemSearch.trim().length < 2,
+      fetchPolicy: 'network-only',
+    }
+  );
 
   const searchResults = useMemo<IPokemonCard[]>(() => {
     const raw = searchData?.pokemonCardInternalList?.data;
@@ -137,16 +151,16 @@ export default function PokemonCardDetailModal({
     setSelectedCard(card);
   }, []);
 
-
   const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
     variables: { guid: selectedCard?.guid ?? '' },
     skip: !selectedCard?.guid || !isOpen,
     fetchPolicy: 'cache-and-network',
   });
 
-  const variantMetrics = metricsData?.pokemonCardWithMetrics?.variantsMetrics?.find(
-    (v) => v?.condition === selectedVariant?.condition
-  );
+  const variantMetrics =
+    metricsData?.pokemonCardWithMetrics?.variantsMetrics?.find(
+      (v) => v?.condition === selectedVariant?.condition
+    );
 
   const totalWishlistCount = useMemo(() => {
     if (!metricsData?.pokemonCardWithMetrics?.variantsMetrics) return 0;
@@ -165,507 +179,579 @@ export default function PokemonCardDetailModal({
 
   return (
     <>
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
-      <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-2">
-          <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-normal text-default-500">
-              {selectedCard ? (
-                <>
-                  {[setName, setCode].filter(Boolean).join(' · ')}
-                  {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
-                </>
-              ) : (
-                'Buscar carta por nombre, set o código'
-              )}
+      <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
+        <DrawerContent>
+          <DrawerHeader className='flex flex-col gap-2'>
+            <span className='text-accent text-lg font-semibold'>
+              {selectedCard ? name : 'Ajuste de inventario'}
             </span>
-            {selectedCard && selectedVariant && (
-              <>
-                <Chip size="sm" variant="flat" color="primary">
-                  {LANGUAGE_LABELS[selectedLanguage]}
-                </Chip>
-                <Chip size="sm" variant="flat" color="secondary">
-                  {CARD_CONDITION_LABELS[selectedVariant.condition as CardCondition]}
-                </Chip>
-              </>
-            )}
-          </div>
-        </DrawerHeader>
-
-        <DrawerBody className="flex flex-col gap-6">
-          {!selectedCard && (
-            <CardSearch
-              searchValue={itemSearch}
-              onSearchChange={setItemSearch}
-              results={searchResults}
-              loading={searchLoading}
-              onCardSelect={handleCardSelect}
-              placeholder="Buscar carta por nombre, set o código..."
-              renderCard={(result) => (
+            <div className='flex items-center gap-2'>
+              <span className='text-default-500 text-sm font-normal'>
+                {selectedCard ? (
+                  <>
+                    {[setName, setCode].filter(Boolean).join(' · ')}
+                    {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
+                  </>
+                ) : (
+                  'Buscar carta por nombre, set o código'
+                )}
+              </span>
+              {selectedCard && selectedVariant && (
                 <>
-                  <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
-                    {result.imageUri ? (
-                      <img
-                        src={result.imageUri}
-                        alt={result.name}
-                        className="absolute inset-0 h-full w-full object-contain"
-                      />
-                    ) : (
-                      <Image
-                        src={pokemonCardPlaceholder}
-                        alt="Card placeholder"
-                        fill
-                        sizes="32px"
-                        className="object-contain"
-                      />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{result.name}</p>
-                    <p className="truncate text-xs text-default-500">
-                      {result.setName} · #{result.cardNumber}
-                    </p>
-                  </div>
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    color={result.totalStock > 0 ? 'success' : 'default'}
-                  >
-                    {result.totalStock}
+                  <Chip size='sm' variant='flat' color='primary'>
+                    {LANGUAGE_LABELS[selectedLanguage]}
+                  </Chip>
+                  <Chip size='sm' variant='flat' color='secondary'>
+                    {
+                      CARD_CONDITION_LABELS[
+                        selectedVariant.condition as CardCondition
+                      ]
+                    }
                   </Chip>
                 </>
               )}
-            />
-          )}
-
-          {selectedCard && (
-          <>
-          <div className="flex gap-6">
-            <div className="w-40 shrink-0">
-              <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg bg-default-100">
-                {(() => {
-                  const highQualityImage = getHighestQualityImage(detail?.moreImages);
-                  const displayImage = highQualityImage?.imageUrl || imageUri;
-
-                  return displayImage ? (
-                    <img
-                      src={displayImage}
-                      alt={name}
-                      className="absolute inset-0 h-full w-full object-contain p-1"
-                    />
-                  ) : (
-                    <Image
-                      src={pokemonCardPlaceholder}
-                      alt="Pokemon card placeholder"
-                      fill
-                      sizes="160px"
-                      className="object-contain p-1"
-                    />
-                  );
-                })()}
-              </div>
             </div>
+          </DrawerHeader>
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  classNames={{
-                    base: 'bg-accent/10',
-                    content: 'text-accent font-medium',
-                  }}
-                >
-                  Pokemon
-                </Chip>
-                {detail?.variant && (detail.variant.toLowerCase().includes('holo') || detail.variant.toLowerCase().includes('foil')) && (
-                  <FoilChip label={detail.variant} variant="subtle" />
-                )}
-              </div>
-
-              <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-                {setName && (
+          <DrawerBody className='flex flex-col gap-6'>
+            {!selectedCard && (
+              <CardSearch
+                searchValue={itemSearch}
+                onSearchChange={setItemSearch}
+                results={searchResults}
+                loading={searchLoading}
+                onCardSelect={handleCardSelect}
+                placeholder='Buscar carta por nombre, set o código...'
+                renderCard={(result) => (
                   <>
-                    <span className="text-default-500">Set</span>
-                    <span className="font-medium">{setName}</span>
-                  </>
-                )}
-                {setCode && (
-                  <>
-                    <span className="text-default-500">Código</span>
-                    <span className="font-medium">{setCode}</span>
-                  </>
-                )}
-                {loading ? (
-                  <>
-                    <span className="text-default-500">Número</span>
-                    <Skeleton className="h-4 w-12 rounded" />
-                  </>
-                ) : detail?.cardNumber ? (
-                  <>
-                    <span className="text-default-500">Número</span>
-                    <span className="font-medium">{detail.cardNumber}</span>
-                  </>
-                ) : null}
-                {loading ? (
-                  <>
-                    <span className="text-default-500">Rareza</span>
-                    <Skeleton className="h-4 w-20 rounded" />
-                  </>
-                ) : detail?.rarity ? (
-                  <>
-                    <span className="text-default-500">Rareza</span>
-                    <span className="font-medium">{detail.rarity}</span>
-                  </>
-                ) : null}
-                {!loading && (detail?.language || selectedCard?.language) && (
-                  <>
-                    <span className="text-default-500">Idioma</span>
-                    <span className="font-medium">
-                      {LANGUAGE_LABELS[(detail?.language ?? selectedCard?.language) || CardLanguage.English]}
-                    </span>
-                  </>
-                )}
-                {!loading && detail?.variant && (
-                  <>
-                    <span className="text-default-500">Variante</span>
-                    <span className="font-medium">{detail.variant}</span>
-                  </>
-                )}
-                {!loading && detail?.type && (
-                  <>
-                    <span className="text-default-500">Tipo</span>
-                    <div className="flex items-center gap-1">
-                      <PokemonTypeIcon type={detail.type} size="sm" />
-                      <span className="font-medium">{detail.type}</span>
+                    <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>
+                      {result.imageUri ? (
+                        <img
+                          src={result.imageUri}
+                          alt={result.name}
+                          className='absolute inset-0 h-full w-full object-contain'
+                        />
+                      ) : (
+                        <Image
+                          src={pokemonCardPlaceholder}
+                          alt='Card placeholder'
+                          fill
+                          sizes='32px'
+                          className='object-contain'
+                        />
+                      )}
                     </div>
-                  </>
-                )}
-                {!loading && detail?.hp && (
-                  <>
-                    <span className="text-default-500">HP</span>
-                    <span className="font-medium">{detail.hp}</span>
-                  </>
-                )}
-                {!loading && detail?.stage && (
-                  <>
-                    <span className="text-default-500">Etapa</span>
-                    <span className="font-medium">{detail.stage}</span>
-                  </>
-                )}
-                {!loading && detail?.releaseDate && (
-                  <>
-                    <span className="text-default-500">Lanzamiento</span>
-                    <span className="font-medium">{formatReleaseDate(detail.releaseDate)}</span>
-                  </>
-                )}
-                {!loading && detail?.artist && (
-                  <>
-                    <span className="text-default-500">Artista</span>
-                    <span className="font-medium">{detail.artist}</span>
-                  </>
-                )}
-                <span className="text-default-500">Stock total</span>
-                <span className="font-medium">{totalStock}</span>
-                {sellPrice !== null && (
-                  <>
-                    <span className="text-default-500">Precio venta</span>
-                    <span className="font-medium text-success">${sellPrice?.toFixed(2)}</span>
-                  </>
-                )}
-                <span className="text-default-500">Disponible</span>
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color={selectedCard?.availableStock ? 'success' : 'default'}
-                >
-                  {selectedCard?.availableStock ? 'Sí' : 'No'}
-                </Chip>
-              </div>
-            </div>
-          </div>
-
-          <Divider />
-
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-semibold">Idioma y condición</h4>
-            <LanguageSelector
-              value={selectedLanguage}
-              onChange={handleLanguageChange}
-              currentLanguage={detail?.language ?? selectedCard?.language ?? undefined}
-              size="sm"
-            />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-semibold">Variantes por condición</h4>
-            {loading ? (
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-20 rounded-lg" />
-                <Skeleton className="h-8 w-20 rounded-lg" />
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {Object.values(CARD_CONDITIONS).map((condition) => {
-                  const existing = availableVariants.find((v: InventoryCard) => v.condition === condition);
-                  const variant: InventoryCard = existing ?? {
-                    cardGuid: selectedCard?.guid ?? '',
-                    inventoryItemGuid: undefined,
-                    isNew: true,
-                    condition,
-                    language: selectedLanguage,
-                    stock: 0,
-                    purchasePrice: null,
-                    sellPrice: null,
-                  };
-                  const isSelected = selectedVariant?.condition === condition;
-                  return (
-                    <Button
-                      key={condition}
-                      size="sm"
-                      variant={isSelected ? 'solid' : 'bordered'}
-                      color="default"
-                      className={isSelected ? 'border-none text-white' : ''}
-                      style={
-                        isSelected ? { backgroundColor: 'var(--color-accent)' } : undefined
-                      }
-                      onPress={() => handleVariantSelect(variant)}
+                    <div className='min-w-0 flex-1'>
+                      <p className='truncate text-sm font-medium'>
+                        {result.name}
+                      </p>
+                      <p className='text-default-500 truncate text-xs'>
+                        {result.setName} · #{result.cardNumber}
+                      </p>
+                    </div>
+                    <Chip
+                      size='sm'
+                      variant='flat'
+                      color={result.totalStock > 0 ? 'success' : 'default'}
                     >
-                      {CARD_CONDITION_SHORT_LABELS[condition]} ({variant.stock})
-                    </Button>
-                  );
-                })}
-              </div>
+                      {result.totalStock}
+                    </Chip>
+                  </>
+                )}
+              />
             )}
-          </div>
 
-          {!loading && detail?.cardText && (
-            <>
-              <Divider />
-              <div className="flex flex-col gap-2">
-                <h4 className="text-sm font-semibold">Texto de la carta</h4>
-                <div className="rounded-lg bg-default-50 p-3">
-                  <div 
-                    className="text-sm text-default-700"
-                    dangerouslySetInnerHTML={{ __html: detail.cardText }}
-                  />
-                </div>
-              </div>
-            </>
-          )}
+            {selectedCard && (
+              <>
+                <div className='flex gap-6'>
+                  <div className='w-40 shrink-0'>
+                    <div className='bg-default-100 relative aspect-3/4 w-full overflow-hidden rounded-lg'>
+                      {(() => {
+                        const highQualityImage = getHighestQualityImage(
+                          detail?.moreImages
+                        );
+                        const displayImage =
+                          highQualityImage?.imageUrl || imageUri;
 
-          {selectedVariant && (
-            <>
-              <Divider />
-
-              <div className="flex flex-col gap-3">
-                <h4 className="text-sm font-semibold">
-                  Detalle de variante —{' '}
-                  {CARD_CONDITION_LABELS[selectedVariant.condition as CardCondition] ??
-                    selectedVariant.condition}
-                </h4>
-
-                <div className="grid grid-cols-3 gap-4 rounded-lg bg-default-50 p-4 text-sm">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Stock</span>
-                    <span className="text-lg font-bold">{selectedVariant.stock}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Precio compra</span>
-                    <span className="text-lg font-bold">
-                      {selectedVariant.purchasePrice !== null
-                        ? `$${selectedVariant.purchasePrice.toFixed(2)}`
-                        : '—'}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Precio venta</span>
-                    <span className="text-lg font-bold text-accent">
-                      {selectedVariant.sellPrice !== null
-                        ? `$${selectedVariant.sellPrice.toFixed(2)}`
-                        : '—'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {metricsData?.pokemonCardWithMetrics && (
-                <>
-                  <Divider />
-                  <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-semibold">Precios de mercado (MXN)</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Precio referencia (Ungraded)</span>
-                        <span className="font-bold text-accent">
-                          {metricsData.pokemonCardWithMetrics.ungradedPrice
-                            ? `$${metricsData.pokemonCardWithMetrics.ungradedPrice.toFixed(2)}`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Precio PSA 7</span>
-                        <span className="font-bold text-blue-600">
-                          {metricsData.pokemonCardWithMetrics.gradedPriceSeven
-                            ? `$${metricsData.pokemonCardWithMetrics.gradedPriceSeven.toFixed(2)}`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Total en wishlist</span>
-                        <span className="font-bold text-purple-600">
-                          {totalWishlistCount}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">En wishlist (variante)</span>
-                        <span className="font-bold text-purple-600">
-                          {variantMetrics?.wishlistCount ?? 0}
-                        </span>
-                      </div>
+                        return displayImage ? (
+                          <img
+                            src={displayImage}
+                            alt={name}
+                            className='absolute inset-0 h-full w-full object-contain p-1'
+                          />
+                        ) : (
+                          <Image
+                            src={pokemonCardPlaceholder}
+                            alt='Pokemon card placeholder'
+                            fill
+                            sizes='160px'
+                            className='object-contain p-1'
+                          />
+                        );
+                      })()}
                     </div>
                   </div>
-                </>
-              )}
 
-              <Divider />
+                  <div className='flex flex-col gap-2'>
+                    <div className='flex items-center gap-2'>
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        classNames={{
+                          base: 'bg-accent/10',
+                          content: 'text-accent font-medium',
+                        }}
+                      >
+                        Pokemon
+                      </Chip>
+                      {detail?.variant &&
+                        (detail.variant.toLowerCase().includes('holo') ||
+                          detail.variant.toLowerCase().includes('foil')) && (
+                          <FoilChip label={detail.variant} variant='subtle' />
+                        )}
+                    </div>
 
-              <div className="flex flex-col gap-4">
-                <h4 className="text-sm font-semibold">Ajustar stock</h4>
-                <Select
-                  label="Tipo de operación"
-                  placeholder="Selecciona el tipo de operación"
-                  selectedKeys={[movementType]}
-                  onSelectionChange={(keys) => {
-                    const selected = Array.from(keys)[0] as BulkOperationType;
-                    setMovementType(selected);
-                  }}
-                  size="sm"
-                >
-                  {BULK_ADJUSTMENT_OPTIONS.map((option) => (
-                    <SelectItem key={option.key} description={option.description}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  type="number"
-                  size="sm"
-                  label="Cantidad"
-                  value={String(stockAdjustment)}
-                  onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
-                  classNames={{ inputWrapper: 'border-[1px] bg-white' }}
-                />
-                <Textarea
-                  label="Notas (opcional)"
-                  placeholder="Ej: Recibido de proveedor, Daño en transporte, etc."
-                  value={stockNotes}
-                  onValueChange={setStockNotes}
-                  size="sm"
-                  maxRows={3}
-                  classNames={{ inputWrapper: 'border-[1px] bg-white' }}
-                />
-                <Button
-                  size="sm"
-                  isDisabled={stockAdjustment === 0}
-                  onPress={handleStockAdjustClick}
-                  startContent={<Icon icon="lucide:package-plus" />}
-                  className="text-white"
-                  style={{ backgroundColor: 'var(--color-accent)' }}
-                >
-                  Aplicar
-                </Button>
-              </div>
+                    <div className='mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm'>
+                      {setName && (
+                        <>
+                          <span className='text-default-500'>Set</span>
+                          <span className='font-medium'>{setName}</span>
+                        </>
+                      )}
+                      {setCode && (
+                        <>
+                          <span className='text-default-500'>Código</span>
+                          <span className='font-medium'>{setCode}</span>
+                        </>
+                      )}
+                      {loading ? (
+                        <>
+                          <span className='text-default-500'>Número</span>
+                          <Skeleton className='h-4 w-12 rounded' />
+                        </>
+                      ) : detail?.cardNumber ? (
+                        <>
+                          <span className='text-default-500'>Número</span>
+                          <span className='font-medium'>
+                            {detail.cardNumber}
+                          </span>
+                        </>
+                      ) : null}
+                      {loading ? (
+                        <>
+                          <span className='text-default-500'>Rareza</span>
+                          <Skeleton className='h-4 w-20 rounded' />
+                        </>
+                      ) : detail?.rarity ? (
+                        <>
+                          <span className='text-default-500'>Rareza</span>
+                          <span className='font-medium'>{detail.rarity}</span>
+                        </>
+                      ) : null}
+                      {!loading &&
+                        (detail?.language || selectedCard?.language) && (
+                          <>
+                            <span className='text-default-500'>Idioma</span>
+                            <span className='font-medium'>
+                              {
+                                LANGUAGE_LABELS[
+                                  (detail?.language ??
+                                    selectedCard?.language) ||
+                                    CardLanguage.English
+                                ]
+                              }
+                            </span>
+                          </>
+                        )}
+                      {!loading && detail?.variant && (
+                        <>
+                          <span className='text-default-500'>Variante</span>
+                          <span className='font-medium'>{detail.variant}</span>
+                        </>
+                      )}
+                      {!loading && detail?.type && (
+                        <>
+                          <span className='text-default-500'>Tipo</span>
+                          <div className='flex items-center gap-1'>
+                            <PokemonTypeIcon type={detail.type} size='sm' />
+                            <span className='font-medium'>{detail.type}</span>
+                          </div>
+                        </>
+                      )}
+                      {!loading && detail?.hp && (
+                        <>
+                          <span className='text-default-500'>HP</span>
+                          <span className='font-medium'>{detail.hp}</span>
+                        </>
+                      )}
+                      {!loading && detail?.stage && (
+                        <>
+                          <span className='text-default-500'>Etapa</span>
+                          <span className='font-medium'>{detail.stage}</span>
+                        </>
+                      )}
+                      {!loading && detail?.releaseDate && (
+                        <>
+                          <span className='text-default-500'>Lanzamiento</span>
+                          <span className='font-medium'>
+                            {formatReleaseDate(detail.releaseDate)}
+                          </span>
+                        </>
+                      )}
+                      {!loading && detail?.artist && (
+                        <>
+                          <span className='text-default-500'>Artista</span>
+                          <span className='font-medium'>{detail.artist}</span>
+                        </>
+                      )}
+                      <span className='text-default-500'>Stock total</span>
+                      <span className='font-medium'>{totalStock}</span>
+                      {sellPrice !== null && (
+                        <>
+                          <span className='text-default-500'>Precio venta</span>
+                          <span className='text-success font-medium'>
+                            ${sellPrice?.toFixed(2)}
+                          </span>
+                        </>
+                      )}
+                      <span className='text-default-500'>Disponible</span>
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color={
+                          selectedCard?.availableStock ? 'success' : 'default'
+                        }
+                      >
+                        {selectedCard?.availableStock ? 'Sí' : 'No'}
+                      </Chip>
+                    </div>
+                  </div>
+                </div>
 
-              <Divider />
+                <Divider />
 
-              <form
-                onSubmit={(...args) => {
-                  void handleSubmit(handlePriceSubmit)(...args);
-                }}
-                className="flex flex-col gap-4"
-              >
-                <h4 className="text-sm font-semibold">Editar precio de venta</h4>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <InputForm
-                    label="Precio de compra"
-                    type="number"
-                    controlProps={{ control, name: 'buyPrice' }}
-                  />
-                  <InputForm
-                    label="Precio de venta"
-                    type="number"
-                    controlProps={{ control, name: 'sellPrice' }}
+                <div className='flex flex-col gap-3'>
+                  <h4 className='text-sm font-semibold'>Idioma y condición</h4>
+                  <LanguageSelector
+                    value={selectedLanguage}
+                    onChange={handleLanguageChange}
+                    currentLanguage={
+                      detail?.language ?? selectedCard?.language ?? undefined
+                    }
+                    size='sm'
                   />
                 </div>
 
-                <Textarea
-                  label="Notas (opcional)"
-                  placeholder="Agregar notas sobre el cambio de precio..."
-                  value={priceNotes}
-                  onValueChange={setPriceNotes}
-                  size="sm"
-                  minRows={2}
-                />
+                <div className='flex flex-col gap-3'>
+                  <h4 className='text-sm font-semibold'>
+                    Variantes por condición
+                  </h4>
+                  {loading ? (
+                    <div className='flex gap-2'>
+                      <Skeleton className='h-8 w-20 rounded-lg' />
+                      <Skeleton className='h-8 w-20 rounded-lg' />
+                    </div>
+                  ) : (
+                    <div className='flex flex-wrap gap-2'>
+                      {Object.values(CARD_CONDITIONS).map((condition) => {
+                        const existing = availableVariants.find(
+                          (v: InventoryCard) => v.condition === condition
+                        );
+                        const variant: InventoryCard = existing ?? {
+                          cardGuid: selectedCard?.guid ?? '',
+                          inventoryItemGuid: undefined,
+                          isNew: true,
+                          condition,
+                          language: selectedLanguage,
+                          stock: 0,
+                          purchasePrice: null,
+                          sellPrice: null,
+                        };
+                        const isSelected =
+                          selectedVariant?.condition === condition;
+                        return (
+                          <Button
+                            key={condition}
+                            size='sm'
+                            variant={isSelected ? 'solid' : 'bordered'}
+                            color='default'
+                            className={
+                              isSelected ? 'border-none text-white' : ''
+                            }
+                            style={
+                              isSelected
+                                ? { backgroundColor: 'var(--color-accent)' }
+                                : undefined
+                            }
+                            onPress={() => handleVariantSelect(variant)}
+                          >
+                            {CARD_CONDITION_SHORT_LABELS[condition]} (
+                            {variant.stock})
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
-                <Button
-                  type="submit"
-                  size="sm"
-                  isDisabled={!formState.isDirty || !formState.isValid || updatingPrice}
-                  isLoading={updatingPrice}
-                  startContent={<Icon icon="lucide:save" />}
-                  className="text-white"
-                  style={{ backgroundColor: 'var(--color-accent)' }}
-                >
-                  Guardar precios
-                </Button>
-              </form>
+                {!loading && detail?.cardText && (
+                  <>
+                    <Divider />
+                    <div className='flex flex-col gap-2'>
+                      <h4 className='text-sm font-semibold'>
+                        Texto de la carta
+                      </h4>
+                      <div className='bg-default-50 rounded-lg p-3'>
+                        <div
+                          className='text-default-700 text-sm'
+                          dangerouslySetInnerHTML={{ __html: detail.cardText }}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
 
-              <Divider />
+                {selectedVariant && (
+                  <>
+                    <Divider />
 
-              {selectedVariant.inventoryItemGuid && (
-                <>
-                  <InventoryMovementsTable
-                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
-                    tcg="POKEMON"
-                  />
+                    <div className='flex flex-col gap-3'>
+                      <h4 className='text-sm font-semibold'>
+                        Detalle de variante —{' '}
+                        {CARD_CONDITION_LABELS[
+                          selectedVariant.condition as CardCondition
+                        ] ?? selectedVariant.condition}
+                      </h4>
 
-                  <Divider />
+                      <div className='bg-default-50 grid grid-cols-3 gap-4 rounded-lg p-4 text-sm'>
+                        <div className='flex flex-col items-center gap-1'>
+                          <span className='text-default-500'>Stock</span>
+                          <span className='text-lg font-bold'>
+                            {selectedVariant.stock}
+                          </span>
+                        </div>
+                        <div className='flex flex-col items-center gap-1'>
+                          <span className='text-default-500'>
+                            Precio compra
+                          </span>
+                          <span className='text-lg font-bold'>
+                            {selectedVariant.purchasePrice !== null
+                              ? `$${selectedVariant.purchasePrice.toFixed(2)}`
+                              : '—'}
+                          </span>
+                        </div>
+                        <div className='flex flex-col items-center gap-1'>
+                          <span className='text-default-500'>Precio venta</span>
+                          <span className='text-accent text-lg font-bold'>
+                            {selectedVariant.sellPrice !== null
+                              ? `$${selectedVariant.sellPrice.toFixed(2)}`
+                              : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                  <SellPriceHistoryTable
-                    inventoryItemGuid={selectedVariant.inventoryItemGuid}
-                  />
-                </>
-              )}
-            </>
-          )}
-          </>
-          )}
-        </DrawerBody>
+                    {metricsData?.pokemonCardWithMetrics && (
+                      <>
+                        <Divider />
+                        <div className='flex flex-col gap-3'>
+                          <h4 className='text-sm font-semibold'>
+                            Precios de mercado (MXN)
+                          </h4>
+                          <div className='grid grid-cols-2 gap-4 text-sm'>
+                            <div className='flex flex-col gap-1'>
+                              <span className='text-default-500'>
+                                Precio referencia (Ungraded)
+                              </span>
+                              <span className='text-accent font-bold'>
+                                {metricsData.pokemonCardWithMetrics
+                                  .ungradedPrice
+                                  ? `$${metricsData.pokemonCardWithMetrics.ungradedPrice.toFixed(2)}`
+                                  : 'N/A'}
+                              </span>
+                            </div>
+                            <div className='flex flex-col gap-1'>
+                              <span className='text-default-500'>
+                                Precio PSA 7
+                              </span>
+                              <span className='font-bold text-blue-600'>
+                                {metricsData.pokemonCardWithMetrics
+                                  .gradedPriceSeven
+                                  ? `$${metricsData.pokemonCardWithMetrics.gradedPriceSeven.toFixed(2)}`
+                                  : 'N/A'}
+                              </span>
+                            </div>
+                            <div className='flex flex-col gap-1'>
+                              <span className='text-default-500'>
+                                Total en wishlist
+                              </span>
+                              <span className='font-bold text-purple-600'>
+                                {totalWishlistCount}
+                              </span>
+                            </div>
+                            <div className='flex flex-col gap-1'>
+                              <span className='text-default-500'>
+                                En wishlist (variante)
+                              </span>
+                              <span className='font-bold text-purple-600'>
+                                {variantMetrics?.wishlistCount ?? 0}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
 
-        <DrawerFooter className="flex justify-end">
-          <Button variant="light" onPress={onClose} className="text-accent">
-            Cerrar
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </KidstopDrawer>
+                    <Divider />
 
-    {selectedVariant && (
-      <InventoryAdjustmentConfirmationModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={handleConfirmAdjustment}
-        loading={adjustLoading}
-        cardName={cardName ?? name ?? ''}
-        condition={selectedVariant.condition}
-        operationType={movementType}
-        quantity={stockAdjustment}
-        currentStock={selectedVariant.stock}
-      />
-    )}
-  </>
+                    <div className='flex flex-col gap-4'>
+                      <h4 className='text-sm font-semibold'>Ajustar stock</h4>
+                      <Select
+                        label='Tipo de operación'
+                        placeholder='Selecciona el tipo de operación'
+                        selectedKeys={[movementType]}
+                        onSelectionChange={(keys) => {
+                          const selected = Array.from(
+                            keys
+                          )[0] as BulkOperationType;
+                          setMovementType(selected);
+                        }}
+                        size='sm'
+                      >
+                        {BULK_ADJUSTMENT_OPTIONS.map((option) => (
+                          <SelectItem
+                            key={option.key}
+                            description={option.description}
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                      <Input
+                        type='number'
+                        size='sm'
+                        label='Cantidad'
+                        value={String(stockAdjustment)}
+                        onValueChange={(val) =>
+                          setStockAdjustment(parseInt(val, 10) || 0)
+                        }
+                        classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                      />
+                      <Textarea
+                        label='Notas (opcional)'
+                        placeholder='Ej: Recibido de proveedor, Daño en transporte, etc.'
+                        value={stockNotes}
+                        onValueChange={setStockNotes}
+                        size='sm'
+                        maxRows={3}
+                        classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                      />
+                      <Button
+                        size='sm'
+                        isDisabled={stockAdjustment === 0}
+                        onPress={handleStockAdjustClick}
+                        startContent={<Icon icon='lucide:package-plus' />}
+                        className='text-white'
+                        style={{ backgroundColor: 'var(--color-accent)' }}
+                      >
+                        Aplicar
+                      </Button>
+                    </div>
+
+                    <Divider />
+
+                    <form
+                      onSubmit={(...args) => {
+                        void handleSubmit(handlePriceSubmit)(...args);
+                      }}
+                      className='flex flex-col gap-4'
+                    >
+                      <h4 className='text-sm font-semibold'>
+                        Editar precio de venta
+                      </h4>
+
+                      <div className='grid grid-cols-2 gap-4'>
+                        <InputForm
+                          label='Precio de compra'
+                          type='number'
+                          controlProps={{ control, name: 'buyPrice' }}
+                        />
+                        <InputForm
+                          label='Precio de venta'
+                          type='number'
+                          controlProps={{ control, name: 'sellPrice' }}
+                        />
+                      </div>
+
+                      <Textarea
+                        label='Notas (opcional)'
+                        placeholder='Agregar notas sobre el cambio de precio...'
+                        value={priceNotes}
+                        onValueChange={setPriceNotes}
+                        size='sm'
+                        minRows={2}
+                      />
+
+                      <Button
+                        type='submit'
+                        size='sm'
+                        isDisabled={
+                          !formState.isDirty ||
+                          !formState.isValid ||
+                          updatingPrice
+                        }
+                        isLoading={updatingPrice}
+                        startContent={<Icon icon='lucide:save' />}
+                        className='text-white'
+                        style={{ backgroundColor: 'var(--color-accent)' }}
+                      >
+                        Guardar precios
+                      </Button>
+                    </form>
+
+                    <Divider />
+
+                    {selectedVariant.inventoryItemGuid && (
+                      <>
+                        <InventoryMovementsTable
+                          inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                          tcg='POKEMON'
+                        />
+
+                        <Divider />
+
+                        <SellPriceHistoryTable
+                          inventoryItemGuid={selectedVariant.inventoryItemGuid}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </DrawerBody>
+
+          <DrawerFooter className='flex justify-end'>
+            <Button variant='light' onPress={onClose} className='text-accent'>
+              Cerrar
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </KidstopDrawer>
+
+      {selectedVariant && (
+        <InventoryAdjustmentConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirmAdjustment}
+          loading={adjustLoading}
+          cardName={cardName ?? name ?? ''}
+          condition={selectedVariant.condition}
+          operationType={movementType}
+          quantity={stockAdjustment}
+          currentStock={selectedVariant.stock}
+        />
+      )}
+    </>
   );
 }

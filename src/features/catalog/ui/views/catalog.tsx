@@ -21,10 +21,13 @@ export default function Catalog() {
   const magic = useMagicCatalog(isPokemon);
   const pokemon = usePokemonCatalog(!isPokemon);
 
-  const [selectedMagicCard, setSelectedMagicCard] = useState<IMagicCard | null>(null);
+  const [selectedMagicCard, setSelectedMagicCard] = useState<IMagicCard | null>(
+    null
+  );
   const [isMagicDetailOpen, setIsMagicDetailOpen] = useState(false);
 
-  const [selectedPokemonCard, setSelectedPokemonCard] = useState<IPokemonCard | null>(null);
+  const [selectedPokemonCard, setSelectedPokemonCard] =
+    useState<IPokemonCard | null>(null);
   const [isPokemonDetailOpen, setIsPokemonDetailOpen] = useState(false);
 
   const handleMagicCardPress = useCallback((card: IMagicCard) => {
@@ -50,12 +53,12 @@ export default function Catalog() {
   return (
     <>
       <EntitiesPage>
-        <EntitiesPage.Toolbar label="Catálogo">
+        <EntitiesPage.Toolbar label='Catálogo'>
           <></>
         </EntitiesPage.Toolbar>
 
         <EntitiesPage.CardContainer>
-          <div className="mb-6">
+          <div className='mb-6'>
             {isPokemon ? (
               <CardSearch
                 onSearchChange={pokemon.setSearch}

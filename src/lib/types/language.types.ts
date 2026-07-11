@@ -40,10 +40,10 @@ export const LANGUAGE_LABELS: Record<CardLanguage, string> = {
 
 /**
  * Determines if a card language can be modified by the user.
- * 
+ *
  * @param language - The card language to check
  * @returns true if the language is modifiable (English or Spanish), false otherwise
- * 
+ *
  * @example
  * ```typescript
  * isLanguageModifiable(CardLanguage.English) // true

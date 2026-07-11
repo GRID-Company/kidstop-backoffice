@@ -1,6 +1,7 @@
 import { CLIENT_STATUSES, CUSTOMER_ROLES, ORDER_STATUSES } from './constants';
 
-export type ClientStatus = (typeof CLIENT_STATUSES)[keyof typeof CLIENT_STATUSES];
+export type ClientStatus =
+  (typeof CLIENT_STATUSES)[keyof typeof CLIENT_STATUSES];
 export type CustomerRole = (typeof CUSTOMER_ROLES)[keyof typeof CUSTOMER_ROLES];
 
 export interface ICustomer extends Record<string, unknown> {

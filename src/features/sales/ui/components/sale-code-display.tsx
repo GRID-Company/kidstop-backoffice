@@ -10,7 +10,10 @@ interface SaleCodeDisplayProps {
   className?: string;
 }
 
-export default function SaleCodeDisplay({ code, className }: SaleCodeDisplayProps) {
+export default function SaleCodeDisplay({
+  code,
+  className,
+}: SaleCodeDisplayProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -20,10 +23,10 @@ export default function SaleCodeDisplay({ code, className }: SaleCodeDisplayProp
 
   return (
     <Snippet
-      symbol=""
-      variant="flat"
+      symbol=''
+      variant='flat'
       color={copied ? 'success' : 'default'}
-      size="sm"
+      size='sm'
       onCopy={handleCopy}
       className={className}
       classNames={{
