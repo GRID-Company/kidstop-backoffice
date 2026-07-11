@@ -132,9 +132,19 @@ function BulkCardSearchRoot({
 
   const handleRemoveResult = useCallback(
     (index: number) => {
+      const resultToRemove = filteredResults[index];
       const newFilteredResults = filteredResults.filter((_, i) => i !== index);
       setFilteredResults(newFilteredResults);
-      removeCard(index);
+
+      // Only remove from form if it's a valid card (has bestMatch and no error)
+      // Invalid cards don't have form fields
+      if (resultToRemove?.bestMatch && !resultToRemove?.error) {
+        // Calculate the form field index for this result
+        const formFieldIndex = filteredResults
+          .slice(0, index)
+          .filter((r) => r.bestMatch && !r.error).length;
+        removeCard(formFieldIndex);
+      }
     },
     [filteredResults, removeCard]
   );
