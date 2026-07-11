@@ -1,18 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
+import toast from 'react-hot-toast';
 import { InventoryItemsDocument } from '@/lib/api/generated/inventory.generated';
 import { ISaleItem } from '../../domain/types';
+import { StockValidation } from '@/shared/types/stock.types';
 
-export interface StockValidation {
-  available: number;
-  requested: number;
-  hasStock: boolean;
-}
+const MAX_INVENTORY_ITEMS_FOR_VALIDATION = 1000;
 
 export interface UseSaleItemsStockValidationReturn {
   stockValidationMap: Map<string, StockValidation>;
   hasAnyStockIssue: boolean;
   loading: boolean;
+  error: Error | undefined;
 }
 
 export function useSaleItemsStockValidation(
@@ -20,13 +19,19 @@ export function useSaleItemsStockValidation(
 ): UseSaleItemsStockValidationReturn {
   const primaryTcg = useMemo(() => items[0]?.tcg || 'POKEMON', [items]);
 
-  const { data, loading } = useQuery(InventoryItemsDocument, {
+  // NOTE: Backend doesn't support filtering by specific card GUIDs.
+  // FindInventoryItemsFilter only supports: tcg, condition, language, search,
+  // pokemonFilters.rarity, and magicFilters.edition/isFoil/rarity.
+  // This query fetches more data than needed (up to 1000 items vs ~5-20 typically needed).
+  // Ideal solution would be a dedicated validateSaleItemsStock endpoint that accepts
+  // an array of items and returns only stock validation results.
+  const { data, loading, error } = useQuery(InventoryItemsDocument, {
     variables: {
       findInventoryItemsArgs: {
         filters: {
           tcg: primaryTcg,
         },
-        limit: 10000,
+        limit: MAX_INVENTORY_ITEMS_FOR_VALIDATION,
         skip: 0,
         sort: {
           column: 'createdDate',
@@ -36,6 +41,13 @@ export function useSaleItemsStockValidation(
     },
     skip: items.length === 0,
   });
+
+  useEffect(() => {
+    if (error) {
+      console.error('Stock validation error:', error);
+      toast.error('Error al validar stock disponible');
+    }
+  }, [error]);
 
   const stockValidationMap = useMemo(() => {
     const map = new Map<string, StockValidation>();
@@ -91,5 +103,6 @@ export function useSaleItemsStockValidation(
     stockValidationMap,
     hasAnyStockIssue,
     loading,
+    error: error as Error | undefined,
   };
 }

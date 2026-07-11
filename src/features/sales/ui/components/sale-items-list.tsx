@@ -5,7 +5,7 @@ import ItemsList from '@/shared/components/items-list';
 import { ISaleItem } from '../../domain/types';
 import { calculateTotal } from '../../domain/sales.domain';
 import { adaptSaleItem } from '@/shared/utils/item-adapters';
-import { StockValidation } from '../hooks/use-sale-items-stock-validation';
+import { StockValidation } from '@/shared/types/stock.types';
 
 interface SaleItemsListProps {
   items: ISaleItem[];

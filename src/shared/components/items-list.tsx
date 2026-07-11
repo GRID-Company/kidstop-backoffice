@@ -16,7 +16,7 @@ import {
   AdaptedSaleItem,
   ItemVariant,
 } from '@/shared/types/item.types';
-import { StockValidation } from '@/features/sales/ui/hooks/use-sale-items-stock-validation';
+import { StockValidation } from '@/shared/types/stock.types';
 
 type AdaptedItem = AdaptedPurchaseItem | AdaptedSaleItem;
 

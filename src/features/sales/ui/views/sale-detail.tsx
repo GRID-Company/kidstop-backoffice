@@ -30,7 +30,7 @@ import {
   getCustomerDisplayEmail,
 } from '../../adapters/mappers/sale.mapper';
 import { useSaleDetail } from '../hooks/use-sale-detail';
-import { useSaleItemsStockValidation } from '../hooks/use-sale-items-stock-validation';
+// import { useSaleItemsStockValidation } from '../hooks/use-sale-items-stock-validation';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
 import SaleItemsList from '../components/sale-items-list';
@@ -63,9 +63,16 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
     discardChanges,
   } = useSaleDetail(saleId);
 
-  const { stockValidationMap, hasAnyStockIssue } = useSaleItemsStockValidation(
-    isTerminal ? [] : items
-  );
+  // NOTE: Stock validation temporarily disabled until dedicated backend endpoint is implemented.
+  // Current implementation fetches 1000 inventory items which causes performance issues.
+  // Backend already validates stock on save, so validation errors will be shown then.
+  // See docs/BACKEND_PROPOSAL_VALIDATE_STOCK.md for the proposed solution.
+  // const {
+  //   stockValidationMap,
+  //   hasAnyStockIssue,
+  //   loading: validatingStock,
+  // } = useSaleItemsStockValidation(isTerminal ? [] : items);
+  const stockValidationMap = undefined;
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -226,19 +233,11 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                         >
                           Descartar
                         </Button>
-                        <Tooltip
-                          content={
-                            hasAnyStockIssue
-                              ? 'No se puede guardar: algunos items exceden el stock disponible'
-                              : 'Guardar cambios en items'
-                          }
-                          color={hasAnyStockIssue ? 'danger' : 'default'}
-                        >
+                        <Tooltip content='Guardar cambios en items'>
                           <Button
                             size='sm'
                             className='bg-accent text-white'
                             isLoading={mutating}
-                            isDisabled={hasAnyStockIssue}
                             onPress={saveChanges}
                             aria-label='Guardar cambios en items'
                             startContent={
@@ -258,18 +257,15 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                   {nextStatus && nextStatusLabel && nextStatusIcon && (
                     <Tooltip
                       content={
-                        hasAnyStockIssue
-                          ? 'No se puede avanzar: algunos items exceden el stock disponible'
-                          : hasChanges
-                            ? 'Guarda los cambios antes de continuar'
-                            : nextStatusLabel
+                        hasChanges
+                          ? 'Guarda los cambios antes de continuar'
+                          : nextStatusLabel
                       }
-                      color={hasAnyStockIssue ? 'danger' : 'default'}
                     >
                       <Button
                         className='bg-accent text-white'
                         isLoading={mutating}
-                        isDisabled={hasChanges || hasAnyStockIssue}
+                        isDisabled={hasChanges}
                         startContent={<Icon icon={nextStatusIcon} width={18} />}
                         onPress={handleNextStatusPress}
                       >
