@@ -804,6 +804,23 @@ EntitiesPage.Toolbar = function Toolbar({ label, className, children, ...props }
 
 **Lección:** Los componentes compound deben aceptar y propagar props HTML estándar para testing.
 
+**Aplicación en el proyecto:**
+
+Este patrón debe aplicarse a todos los componentes compound del proyecto para mantener consistencia y facilitar testing. Componentes candidatos:
+
+- `EntitiesPage.Toolbar` ✅ (ya implementado)
+- `EntitiesPage.Title`
+- `EntitiesPage.CardContainer`
+- `EntitiesPage.FlexRow`
+- Otros componentes compound en `src/shared/blocks/`
+
+**Beneficios:**
+
+- Permite agregar `data-testid` sin modificar la interfaz del componente
+- Facilita testing E2E
+- Mantiene flexibilidad para props HTML estándar (`className`, `id`, `aria-*`, etc.)
+- No rompe la API existente del componente
+
 ### Checklist para Nuevos Módulos
 
 - [ ] Configurar intercept de GraphQL en el Background

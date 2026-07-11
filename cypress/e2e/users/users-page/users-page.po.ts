@@ -1,4 +1,5 @@
 import { UsersPageSelectors } from './users-page.selectors';
+import { config } from '../../../support/consts/config.const';
 
 export default class UsersPage {
   visit() {
@@ -26,13 +27,13 @@ export default class UsersPage {
     cy.get(UsersPageSelectors.searchInput).clear().type(query);
 
     // Wait for debounce and GraphQL query
-    cy.wait('@usersQuery', { timeout: 10000 });
+    cy.wait('@usersQuery', { timeout: config.params.timeouts.graphqlQuery });
 
     // Wait for loading to finish
     cy.contains('Cargando').should('not.exist');
 
     // Small wait to ensure UI is stable
-    cy.wait(500);
+    cy.wait(config.params.timeouts.uiStabilization);
   }
 
   shouldSeeOnlyUsersMatching(query: string) {
@@ -56,17 +57,17 @@ export default class UsersPage {
     cy.get(UsersPageSelectors.filterRoleSelect).click();
 
     // Wait for dropdown to be visible and click the option
-    cy.contains('li', role, { timeout: 5000 })
+    cy.contains('li', role, { timeout: config.params.timeouts.short })
       .should('be.visible')
       .first()
       .click({ force: true });
 
     // Wait for GraphQL query
-    cy.wait('@usersQuery', { timeout: 10000 });
+    cy.wait('@usersQuery', { timeout: config.params.timeouts.graphqlQuery });
 
     // Wait for loading to finish
     cy.contains('Cargando').should('not.exist');
-    cy.wait(500);
+    cy.wait(config.params.timeouts.uiStabilization);
   }
 
   filterByStatus(status: string) {
@@ -74,17 +75,17 @@ export default class UsersPage {
     cy.get(UsersPageSelectors.filterStatusSelect).click();
 
     // Wait for dropdown to be visible and click the option
-    cy.contains('li', status, { timeout: 5000 })
+    cy.contains('li', status, { timeout: config.params.timeouts.short })
       .should('be.visible')
       .first()
       .click({ force: true });
 
     // Wait for GraphQL query
-    cy.wait('@usersQuery', { timeout: 10000 });
+    cy.wait('@usersQuery', { timeout: config.params.timeouts.graphqlQuery });
 
     // Wait for loading to finish
     cy.contains('Cargando').should('not.exist');
-    cy.wait(500);
+    cy.wait(config.params.timeouts.uiStabilization);
   }
 
   shouldSeeOnlyUsersWithRole(role: string) {
@@ -126,12 +127,12 @@ export default class UsersPage {
         cy.get(UsersPageSelectors.userFormRoleSelect).click();
 
         // Wait for dropdown to open and click the exact matching option
-        cy.contains('li', role, { timeout: 5000 })
+        cy.contains('li', role, { timeout: config.params.timeouts.short })
           .should('be.visible')
           .click({ force: true });
 
         // Wait for dropdown to close
-        cy.wait(300);
+        cy.wait(config.params.timeouts.dropdownClose);
       } else {
         cy.log(`Role "${role}" is already selected, skipping selection`);
       }
@@ -149,13 +150,13 @@ export default class UsersPage {
     });
 
     cy.get(UsersPageSelectors.userFormSaveButton).click();
-    cy.wait('@saveUser', { timeout: 30000 });
+    cy.wait('@saveUser', { timeout: config.params.timeouts.long });
   }
 
   shouldSeeSuccessMessage() {
-    cy.get(UsersPageSelectors.successToast, { timeout: 10000 }).should(
-      'be.visible'
-    );
+    cy.get(UsersPageSelectors.successToast, {
+      timeout: config.params.timeouts.graphqlQuery,
+    }).should('be.visible');
   }
 
   shouldSeeUserInList(name: string) {
@@ -223,17 +224,20 @@ export default class UsersPage {
   shouldSeeErrorMessage() {
     // Look for error message in the UI - could be in toast, modal, or inline
     // Common error indicators: "no está disponible", "error", "inválido", etc.
-    cy.get('body', { timeout: 10000 }).should(($body) => {
-      const text = $body.text().toLowerCase();
-      const hasError =
-        text.includes('error') ||
-        text.includes('no está disponible') ||
-        text.includes('inválido') ||
-        text.includes('requerido') ||
-        text.includes('duplicado');
+    cy.get('body', { timeout: config.params.timeouts.graphqlQuery }).should(
+      ($body) => {
+        const text = $body.text().toLowerCase();
+        const hasError =
+          text.includes('error') ||
+          text.includes('no está disponible') ||
+          text.includes('inválido') ||
+          text.includes('requerido') ||
+          text.includes('duplicado');
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      expect(hasError, 'Should show an error message').to.be.true;
-    });
+        // Chai assertion syntax requires this pattern
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        expect(hasError, 'Should show an error message').to.be.true;
+      }
+    );
   }
 }
