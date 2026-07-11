@@ -1,18 +1,72 @@
 'use client';
 
+import { forwardRef, useRef, useImperativeHandle } from 'react';
+import { useWatch } from 'react-hook-form';
 import { Skeleton } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import BulkCardResultCard from './bulk-card-result-card';
-import { BulkCardSearchResultsProps } from './types';
+import {
+  BulkCardSearchResultsProps,
+  BulkCardSearchResultsHandle,
+} from './types';
 import { getValidCardFormIndex } from './utils';
 
-export default function BulkCardSearchResults({
-  results,
-  variant,
-  tcgType,
-  isLoading,
-  onRemove,
-}: BulkCardSearchResultsProps) {
+const BulkCardSearchResults = forwardRef<
+  BulkCardSearchResultsHandle,
+  BulkCardSearchResultsProps
+>(function BulkCardSearchResults(
+  { results, variant, tcgType, isLoading, onRemove },
+  ref
+) {
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardsData = useWatch({ name: 'cards' });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToFirstUnconfigured: () => {
+        if (!cardsData || !Array.isArray(cardsData)) return;
+
+        let formFieldIndex = 0;
+        for (let i = 0; i < results.length; i++) {
+          const result = results[i];
+
+          if (result.error || !result.bestMatch) {
+            continue;
+          }
+
+          const card = cardsData[formFieldIndex];
+          const isConfigured =
+            card &&
+            !!card.selectedCardGuid &&
+            !!card.condition &&
+            typeof card.quantity === 'number' &&
+            card.quantity > 0 &&
+            !isNaN(card.quantity) &&
+            ((variant === 'purchases' &&
+              typeof card.offerPrice === 'number' &&
+              card.offerPrice >= 0 &&
+              !isNaN(card.offerPrice)) ||
+              (variant === 'inventory' &&
+                typeof card.publicPrice === 'number' &&
+                card.publicPrice >= 0 &&
+                !isNaN(card.publicPrice)));
+
+          if (!isConfigured && cardRefs.current[i]) {
+            cardRefs.current[i]?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+            return;
+          }
+
+          formFieldIndex++;
+        }
+      },
+    }),
+    [results, cardsData, variant]
+  );
+
   if (isLoading) {
     return (
       <div className='flex flex-col gap-3'>
@@ -56,6 +110,9 @@ export default function BulkCardSearchResults({
         return (
           <BulkCardResultCard
             key={`${result.originalLine}-${resultIndex}`}
+            ref={(el) => {
+              cardRefs.current[resultIndex] = el;
+            }}
             result={result}
             index={formFieldIndex}
             variant={variant}
@@ -66,4 +123,6 @@ export default function BulkCardSearchResults({
       })}
     </div>
   );
-}
+});
+
+export default BulkCardSearchResults;

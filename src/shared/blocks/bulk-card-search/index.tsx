@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
@@ -15,6 +15,7 @@ import {
   BulkSearchFormDataPurchases,
   BulkSearchFormDataInventory,
   BulkCardResult,
+  BulkCardSearchResultsHandle,
 } from './types';
 import { getValidCardFormIndex } from './utils';
 
@@ -104,6 +105,7 @@ function BulkCardSearchRoot({
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [searchText, setSearchText] = useState('');
   const [filteredResults, setFilteredResults] = useState<BulkCardResult[]>([]);
+  const resultsRef = useRef<BulkCardSearchResultsHandle>(null);
 
   const {
     search,
@@ -181,7 +183,10 @@ function BulkCardSearchRoot({
       handleClear();
     },
     (_errors) => {
-      toast.error('Por favor completa todos los campos requeridos');
+      resultsRef.current?.scrollToFirstUnconfigured();
+      toast.error(
+        'Completa los campos de las cartas pendientes. Se hizo scroll a la primera.'
+      );
     }
   );
 
@@ -230,6 +235,7 @@ function BulkCardSearchRoot({
         )}
 
         <BulkCardSearchResults
+          ref={resultsRef}
           results={filteredResults}
           variant={variant}
           tcgType={selectedTCG}

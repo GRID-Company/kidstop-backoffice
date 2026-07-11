@@ -161,3 +161,7 @@ export interface BulkCardSearchInventoryProps {
 export type BulkCardSearchProps =
   | BulkCardSearchPurchasesProps
   | BulkCardSearchInventoryProps;
+
+export interface BulkCardSearchResultsHandle {
+  scrollToFirstUnconfigured: () => void;
+}
