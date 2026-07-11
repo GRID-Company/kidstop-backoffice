@@ -41,7 +41,10 @@ import {
   validateOfferPrice,
   validateQuantity,
 } from '../../adapters/forms/offer-price.form.schema';
-import { calculateOfferPrice } from '../../domain/price.utils';
+import {
+  calculateOfferPrice,
+  roundUpToMultipleOf5,
+} from '../../domain/price.utils';
 import CardConditionBreakdownPopover from './condition-breakdown-popover';
 
 interface CardSearchWithMetricsProps {
@@ -301,7 +304,8 @@ function CardResultItem({
               onValueChange={(val) => {
                 const { isValid, price } = validateOfferPrice(val);
                 if (isValid) {
-                  setAddState((s) => ({ ...s, unitBuyPrice: price }));
+                  const roundedPrice = roundUpToMultipleOf5(price);
+                  setAddState((s) => ({ ...s, unitBuyPrice: roundedPrice }));
                 }
               }}
               startContent={<span className='text-default-400 text-xs'>$</span>}
