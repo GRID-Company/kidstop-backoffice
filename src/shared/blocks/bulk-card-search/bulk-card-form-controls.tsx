@@ -5,10 +5,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
-import {
-  calculateOfferPrice,
-  roundUpToMultipleOf5,
-} from '@/features/purchases/domain/price.utils';
+import { calculateOfferPrice } from '@/features/purchases/domain/price.utils';
 import { BulkCardFormControlsProps } from './types';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { LanguageSelector } from '@/shared/components/language-selector';
@@ -28,12 +25,6 @@ export default function BulkCardFormControls({
       : `cards.${index}.publicPrice`;
 
   const currentPrice = watch(priceName);
-
-  const formatPriceValue = (value: string): string => {
-    const numValue = parseFloat(value);
-    if (isNaN(numValue) || numValue <= 0) return value;
-    return String(roundUpToMultipleOf5(numValue));
-  };
 
   useEffect(() => {
     if (
@@ -122,7 +113,6 @@ export default function BulkCardFormControls({
           label: 'text-xs',
         }}
         aria-label={priceLabel}
-        formatValue={formatPriceValue}
       />
     </div>
   );

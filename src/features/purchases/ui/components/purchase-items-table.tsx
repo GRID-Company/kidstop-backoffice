@@ -27,7 +27,6 @@ import {
   validateOfferPrice,
   validateQuantity,
 } from '../../adapters/forms/offer-price.form.schema';
-import { roundUpToMultipleOf5 } from '../../domain/price.utils';
 
 interface PurchaseItemsTableProps {
   items: IPurchaseItem[];
@@ -84,8 +83,7 @@ export default function PurchaseItemsTable({
     (itemId: string, value: string) => {
       const { isValid, price } = validateOfferPrice(value);
       if (isValid) {
-        const roundedPrice = roundUpToMultipleOf5(price);
-        onUpdateItem(itemId, { offerPrice: roundedPrice });
+        onUpdateItem(itemId, { offerPrice: price });
       }
     },
     [onUpdateItem]
