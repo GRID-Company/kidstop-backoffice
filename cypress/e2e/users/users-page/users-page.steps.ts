@@ -42,7 +42,7 @@ Given('el administrador crea un usuario temporal', () => {
   usersPage.clickCreateUser();
   usersPage.enterName('Temp User');
   usersPage.enterEmail(tempEmail);
-  usersPage.selectRole('BUYER');
+  usersPage.selectRole('Comprador');
   usersPage.clickSave();
   usersPage.shouldSeeSuccessMessage();
 });
@@ -125,7 +125,7 @@ When('el administrador intenta crear otro usuario con el mismo email', () => {
     usersPage.clickCreateUser();
     usersPage.enterName('Duplicate User');
     usersPage.enterEmail(email as string);
-    usersPage.selectRole('BUYER');
+    usersPage.selectRole('Comprador');
     usersPage.clickSave();
   });
 });

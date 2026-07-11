@@ -12,22 +12,22 @@ Feature: Gestión de Usuarios
     And debería ver columnas de nombre, email, rol y estado
 
   Scenario: Buscar usuario por nombre
-    When el administrador busca "Juan"
-    Then debería ver solo usuarios que coincidan con "Juan"
+    When el administrador busca "Carlos"
+    Then debería ver solo usuarios que coincidan con "Carlos"
 
   Scenario: Filtrar usuarios por rol
-    When el administrador filtra por rol "BUYER"
+    When el administrador filtra por rol "Comprador"
     Then debería ver solo usuarios con rol "Comprador"
 
   Scenario: Filtrar usuarios activos
-    When el administrador filtra por estado "activo"
+    When el administrador filtra por estado "Activo"
     Then debería ver solo usuarios activados
 
   Scenario: Crear nuevo usuario Comprador
     When el administrador hace clic en crear usuario
     And ingresa nombre "Carlos Pérez"
     And ingresa email dinámico con prefijo "carlos.perez"
-    And selecciona rol "BUYER"
+    And selecciona rol "Comprador"
     And hace clic en guardar
     Then debería ver mensaje de éxito
     And el nuevo usuario debería aparecer en la lista
@@ -36,7 +36,7 @@ Feature: Gestión de Usuarios
     When el administrador hace clic en crear usuario
     And ingresa nombre "María García"
     And ingresa email dinámico con prefijo "maria.garcia"
-    And selecciona rol "RECEPTION"
+    And selecciona rol "Recepción"
     And hace clic en guardar
     Then debería ver mensaje de éxito
     And el nuevo usuario debería aparecer en la lista
