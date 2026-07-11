@@ -16,6 +16,7 @@ import {
   BulkSearchFormDataInventory,
   BulkCardResult,
 } from './types';
+import { getValidCardFormIndex } from './utils';
 
 function BulkCardSearchFooter({
   variant,
@@ -130,19 +131,19 @@ function BulkCardSearchRoot({
     await search(searchText, selectedTCG);
   };
 
+  /**
+   * Removes a card from the filtered results and optionally from the form.
+   * Error cards are only removed from UI, valid cards are removed from both UI and form.
+   * @param index - Index of the result to remove in the filteredResults array
+   */
   const handleRemoveResult = useCallback(
     (index: number) => {
       const resultToRemove = filteredResults[index];
       const newFilteredResults = filteredResults.filter((_, i) => i !== index);
       setFilteredResults(newFilteredResults);
 
-      // Only remove from form if it's a valid card (has bestMatch and no error)
-      // Invalid cards don't have form fields
       if (resultToRemove?.bestMatch && !resultToRemove?.error) {
-        // Calculate the form field index for this result
-        const formFieldIndex = filteredResults
-          .slice(0, index)
-          .filter((r) => r.bestMatch && !r.error).length;
+        const formFieldIndex = getValidCardFormIndex(filteredResults, index);
         removeCard(formFieldIndex);
       }
     },
@@ -156,14 +157,20 @@ function BulkCardSearchRoot({
     resetForm();
   };
 
+  /**
+   * Handles form submission by filtering out error cards and notifying the user.
+   * Only valid cards (without errors) are passed to the onConfirm callback.
+   * If any cards with errors are present, the user is notified via toast.
+   */
   const handleSubmit = form.handleSubmit(
     (data) => {
       const validResults = filteredResults.filter((result) => !result.error);
       const errorCount = filteredResults.length - validResults.length;
 
       if (errorCount > 0) {
-        toast.success(
-          `Se omitieron ${errorCount} ${errorCount === 1 ? 'carta' : 'cartas'} con error`
+        toast(
+          `Se omitieron ${errorCount} ${errorCount === 1 ? 'carta' : 'cartas'} con error`,
+          { icon: 'ℹ️' }
         );
       }
 

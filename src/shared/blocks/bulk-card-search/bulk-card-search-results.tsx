@@ -4,6 +4,7 @@ import { Skeleton } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import BulkCardResultCard from './bulk-card-result-card';
 import { BulkCardSearchResultsProps } from './types';
+import { getValidCardFormIndex } from './utils';
 
 export default function BulkCardSearchResults({
   results,
@@ -50,10 +51,7 @@ export default function BulkCardSearchResults({
   return (
     <div className='flex flex-col gap-3'>
       {results.map((result, resultIndex) => {
-        // Calculate the form field index by counting valid cards before this one
-        const formFieldIndex = results
-          .slice(0, resultIndex)
-          .filter((r) => r.bestMatch && !r.error).length;
+        const formFieldIndex = getValidCardFormIndex(results, resultIndex);
 
         return (
           <BulkCardResultCard
