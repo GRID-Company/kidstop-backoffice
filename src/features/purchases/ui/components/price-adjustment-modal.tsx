@@ -23,7 +23,7 @@ import {
   calculateTotal,
   validatePriceAdjustment,
 } from '../../domain/purchases.domain';
-import { calculatePublicPrice } from '../../domain/price.utils';
+import { calculatePublicPrice } from '@/lib/utils/price.utils';
 import {
   usePriceAdjustmentForm,
   PriceAdjustmentFormData,

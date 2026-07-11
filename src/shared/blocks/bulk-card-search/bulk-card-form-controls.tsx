@@ -5,7 +5,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
-import { calculateOfferPrice } from '@/features/purchases/domain/price.utils';
+import { calculateOfferPrice } from '@/lib/utils/price.utils';
 import { BulkCardFormControlsProps } from './types';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { LanguageSelector } from '@/shared/components/language-selector';

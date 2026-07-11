@@ -41,7 +41,7 @@ import {
   validateOfferPrice,
   validateQuantity,
 } from '../../adapters/forms/offer-price.form.schema';
-import { calculateOfferPrice } from '../../domain/price.utils';
+import { calculateOfferPrice } from '@/lib/utils/price.utils';
 import CardConditionBreakdownPopover from './condition-breakdown-popover';
 
 interface CardSearchWithMetricsProps {
