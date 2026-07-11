@@ -1,9 +1,17 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
 import CatalogPage from './catalog-page.po';
+import { config } from '../../../support/consts/config.const';
 
 const catalogPage = new CatalogPage();
 
 // Background
+Given('el usuario está autenticado', () => {
+  cy.login(
+    config.params.logins.admin.email,
+    config.params.logins.admin.password
+  );
+});
+
 Given('el usuario está en la página de catálogo', () => {
   catalogPage.setupGraphQLIntercepts();
   catalogPage.visit();
