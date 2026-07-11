@@ -51,6 +51,7 @@ export function useCardSearch() {
           skip: 0,
           limit: 5,
           sort: { column: 'releaseDate', order: 'DESC' },
+          prioritizeSearch: true,
           search: debouncedSearch.trim() || undefined,
           filters: {
             rarity: pokemonFilters?.rarity || undefined,
