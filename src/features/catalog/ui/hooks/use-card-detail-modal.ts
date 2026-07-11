@@ -10,6 +10,7 @@ import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
 import { TCGType } from '@/lib/types/tcg.types';
 import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
+import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
 
 export interface InventoryCard {
   cardGuid: string;
@@ -165,7 +166,7 @@ export function useCardDetailModal({
     if (
       !detail ||
       !selectedVariant ||
-      (stockAdjustment === 0 && movementType !== BulkOperationType.ManualSet)
+      isStockAdjustmentDisabled(stockAdjustment, movementType)
     )
       return;
     try {

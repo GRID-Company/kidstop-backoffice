@@ -45,6 +45,7 @@ import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
 import InventoryMovementsTable from './inventory-movements-table';
 import SellPriceHistoryTable from './sell-price-history-table';
 
@@ -112,8 +113,7 @@ export default function MagicCardDetailModal({
   });
 
   const handleStockAdjustClick = useCallback(() => {
-    if (stockAdjustment === 0 && movementType !== BulkOperationType.ManualSet)
-      return;
+    if (isStockAdjustmentDisabled(stockAdjustment, movementType)) return;
     setIsConfirmModalOpen(true);
   }, [stockAdjustment, movementType]);
 
@@ -586,10 +586,10 @@ export default function MagicCardDetailModal({
                       />
                       <Button
                         size='sm'
-                        isDisabled={
-                          stockAdjustment === 0 &&
-                          movementType !== BulkOperationType.ManualSet
-                        }
+                        isDisabled={isStockAdjustmentDisabled(
+                          stockAdjustment,
+                          movementType
+                        )}
                         onPress={handleStockAdjustClick}
                         startContent={<Icon icon='lucide:package-plus' />}
                         className='text-white'
