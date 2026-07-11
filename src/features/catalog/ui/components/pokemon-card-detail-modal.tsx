@@ -48,6 +48,7 @@ import { toPokemonCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
 import InventoryMovementsTable from './inventory-movements-table';
 import SellPriceHistoryTable from './sell-price-history-table';
 
@@ -113,9 +114,9 @@ export default function PokemonCardDetailModal({
   });
 
   const handleStockAdjustClick = useCallback(() => {
-    if (stockAdjustment === 0) return;
+    if (isStockAdjustmentDisabled(stockAdjustment, movementType)) return;
     setIsConfirmModalOpen(true);
-  }, [stockAdjustment]);
+  }, [stockAdjustment, movementType]);
 
   const handleConfirmAdjustment = useCallback(async () => {
     await executeStockAdjust();
@@ -648,7 +649,10 @@ export default function PokemonCardDetailModal({
                       />
                       <Button
                         size='sm'
-                        isDisabled={stockAdjustment === 0}
+                        isDisabled={isStockAdjustmentDisabled(
+                          stockAdjustment,
+                          movementType
+                        )}
                         onPress={handleStockAdjustClick}
                         startContent={<Icon icon='lucide:package-plus' />}
                         className='text-white'
