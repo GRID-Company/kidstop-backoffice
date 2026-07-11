@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import toast from 'react-hot-toast';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
+import { isValidPrice, isValidQuantity } from '@/lib/utils/validation.utils';
 import { useBulkCardSearch } from './hooks/use-bulk-card-search';
 import { useBulkSearchForm } from './hooks/use-bulk-search-form';
 import BulkCardSearchInput from './bulk-card-search-input';
@@ -15,6 +16,7 @@ import {
   BulkSearchFormDataPurchases,
   BulkSearchFormDataInventory,
   BulkCardResult,
+  BulkCardSearchResultsHandle,
 } from './types';
 import { getValidCardFormIndex } from './utils';
 
@@ -22,11 +24,13 @@ function BulkCardSearchFooter({
   variant,
   fields,
   onCancel,
+  onScrollToUnconfigured,
 }: {
   variant: 'purchases' | 'inventory';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: any[]; // React Hook Form field array
   onCancel: () => void;
+  onScrollToUnconfigured: () => void;
 }) {
   const cardsData = useWatch({ name: 'cards' });
 
@@ -39,18 +43,11 @@ function BulkCardSearchFooter({
 
       const hasValidGuid = !!card.selectedCardGuid;
       const hasValidCondition = !!card.condition;
-      const hasValidQuantity =
-        typeof card.quantity === 'number' &&
-        card.quantity > 0 &&
-        !isNaN(card.quantity);
+      const hasValidQuantity = isValidQuantity(card.quantity);
       const hasValidPrice =
         variant === 'purchases'
-          ? typeof card.offerPrice === 'number' &&
-            card.offerPrice >= 0 &&
-            !isNaN(card.offerPrice)
-          : typeof card.publicPrice === 'number' &&
-            card.publicPrice >= 0 &&
-            !isNaN(card.publicPrice);
+          ? isValidPrice(card.offerPrice)
+          : isValidPrice(card.publicPrice);
 
       return (
         hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice
@@ -69,11 +66,15 @@ function BulkCardSearchFooter({
             {fields.length === 1 ? 'carta configurada' : 'cartas configuradas'}
           </p>
           {configuredCount < fields.length && (
-            <p className='text-warning text-xs'>
+            <button
+              type='button'
+              onClick={onScrollToUnconfigured}
+              className='text-warning hover:text-warning-600 cursor-pointer text-left text-xs underline decoration-dotted underline-offset-2 transition-colors'
+            >
               Faltan {fields.length - configuredCount}{' '}
               {fields.length - configuredCount === 1 ? 'carta' : 'cartas'} por
               configurar
-            </p>
+            </button>
           )}
         </div>
         <div className='flex gap-2'>
@@ -104,6 +105,7 @@ function BulkCardSearchRoot({
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [searchText, setSearchText] = useState('');
   const [filteredResults, setFilteredResults] = useState<BulkCardResult[]>([]);
+  const resultsRef = useRef<BulkCardSearchResultsHandle>(null);
 
   const {
     search,
@@ -189,6 +191,10 @@ function BulkCardSearchRoot({
     onCancel();
   };
 
+  const handleScrollToUnconfigured = () => {
+    resultsRef.current?.scrollToFirstUnconfigured();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -230,6 +236,7 @@ function BulkCardSearchRoot({
         )}
 
         <BulkCardSearchResults
+          ref={resultsRef}
           results={filteredResults}
           variant={variant}
           tcgType={selectedTCG}
@@ -241,6 +248,7 @@ function BulkCardSearchRoot({
           variant={variant}
           fields={fields}
           onCancel={handleCancel}
+          onScrollToUnconfigured={handleScrollToUnconfigured}
         />
       </form>
     </FormProvider>
