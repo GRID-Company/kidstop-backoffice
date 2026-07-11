@@ -141,6 +141,8 @@ export type PokemonBatchCardSearchQueryVariables = Types.Exact<{
 
 export type PokemonBatchCardSearchQuery = {
   pokemonBatchCardSearch: {
+    successfulCount: number;
+    totalCount: number;
     results: Array<{
       originalLine: string;
       parsedQuantity: number | null;
@@ -774,6 +776,11 @@ export const PokemonBatchCardSearchDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successfulCount' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'totalCount' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'results' },

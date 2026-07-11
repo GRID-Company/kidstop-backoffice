@@ -77,6 +77,8 @@ query MagicCardWithMetrics($guid: String!) {
 
 query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
   magicBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
       originalLine
       parsedQuantity

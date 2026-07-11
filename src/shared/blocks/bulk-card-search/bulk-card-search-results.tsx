@@ -4,12 +4,14 @@ import { Skeleton } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import BulkCardResultCard from './bulk-card-result-card';
 import { BulkCardSearchResultsProps } from './types';
+import { getValidCardFormIndex } from './utils';
 
 export default function BulkCardSearchResults({
   results,
   variant,
   tcgType,
   isLoading,
+  onRemove,
 }: BulkCardSearchResultsProps) {
   if (isLoading) {
     return (
@@ -48,15 +50,20 @@ export default function BulkCardSearchResults({
 
   return (
     <div className='flex flex-col gap-3'>
-      {results.map((result, index) => (
-        <BulkCardResultCard
-          key={`${result.originalLine}-${index}`}
-          result={result}
-          index={index}
-          variant={variant}
-          tcgType={tcgType}
-        />
-      ))}
+      {results.map((result, resultIndex) => {
+        const formFieldIndex = getValidCardFormIndex(results, resultIndex);
+
+        return (
+          <BulkCardResultCard
+            key={`${result.originalLine}-${resultIndex}`}
+            result={result}
+            index={formFieldIndex}
+            variant={variant}
+            tcgType={tcgType}
+            onRemove={onRemove ? () => onRemove(resultIndex) : undefined}
+          />
+        );
+      })}
     </div>
   );
 }

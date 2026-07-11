@@ -114,6 +114,7 @@ export interface BulkCardSearchResultsProps {
   variant: BulkSearchVariant;
   tcgType: TCGType;
   isLoading: boolean;
+  onRemove?: (index: number) => void;
 }
 
 export interface BulkCardResultCardProps {
@@ -121,6 +122,7 @@ export interface BulkCardResultCardProps {
   index: number;
   variant: BulkSearchVariant;
   tcgType: TCGType;
+  onRemove?: () => void;
 }
 
 export interface BulkCardRelatedSelectorProps {

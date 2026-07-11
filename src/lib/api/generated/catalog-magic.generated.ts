@@ -100,6 +100,8 @@ export type MagicBatchCardSearchQueryVariables = Types.Exact<{
 
 export type MagicBatchCardSearchQuery = {
   magicBatchCardSearch: {
+    successfulCount: number;
+    totalCount: number;
     results: Array<{
       originalLine: string;
       parsedQuantity: number | null;
@@ -536,6 +538,11 @@ export const MagicBatchCardSearchDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successfulCount' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'totalCount' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'results' },
