@@ -49,16 +49,23 @@ export default function BulkCardSearchResults({
 
   return (
     <div className='flex flex-col gap-3'>
-      {results.map((result, index) => (
-        <BulkCardResultCard
-          key={`${result.originalLine}-${index}`}
-          result={result}
-          index={index}
-          variant={variant}
-          tcgType={tcgType}
-          onRemove={onRemove ? () => onRemove(index) : undefined}
-        />
-      ))}
+      {results.map((result, resultIndex) => {
+        // Calculate the form field index by counting valid cards before this one
+        const formFieldIndex = results
+          .slice(0, resultIndex)
+          .filter((r) => r.bestMatch && !r.error).length;
+
+        return (
+          <BulkCardResultCard
+            key={`${result.originalLine}-${resultIndex}`}
+            result={result}
+            index={formFieldIndex}
+            variant={variant}
+            tcgType={tcgType}
+            onRemove={onRemove ? () => onRemove(resultIndex) : undefined}
+          />
+        );
+      })}
     </div>
   );
 }
