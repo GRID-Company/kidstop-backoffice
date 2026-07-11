@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const offerPriceSchema = z.coerce
   .number()
-  .refine((val) => val === 0 || val >= 0, {
-    message: 'El precio de oferta debe ser mayor o igual a 0',
+  .refine((val) => val === 0 || val > 0, {
+    message: 'El precio de oferta debe ser mayor a 0',
   })
   .transform((val) => (val === 0 ? 0 : Math.floor(val)));
 

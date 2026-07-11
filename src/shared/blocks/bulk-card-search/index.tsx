@@ -6,6 +6,7 @@ import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import toast from 'react-hot-toast';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
+import { isValidPrice, isValidQuantity } from '@/lib/utils/validation.utils';
 import { useBulkCardSearch } from './hooks/use-bulk-card-search';
 import { useBulkSearchForm } from './hooks/use-bulk-search-form';
 import BulkCardSearchInput from './bulk-card-search-input';
@@ -42,18 +43,11 @@ function BulkCardSearchFooter({
 
       const hasValidGuid = !!card.selectedCardGuid;
       const hasValidCondition = !!card.condition;
-      const hasValidQuantity =
-        typeof card.quantity === 'number' &&
-        card.quantity > 0 &&
-        !isNaN(card.quantity);
+      const hasValidQuantity = isValidQuantity(card.quantity);
       const hasValidPrice =
         variant === 'purchases'
-          ? typeof card.offerPrice === 'number' &&
-            card.offerPrice > 0 &&
-            !isNaN(card.offerPrice)
-          : typeof card.publicPrice === 'number' &&
-            card.publicPrice > 0 &&
-            !isNaN(card.publicPrice);
+          ? isValidPrice(card.offerPrice)
+          : isValidPrice(card.publicPrice);
 
       return (
         hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice

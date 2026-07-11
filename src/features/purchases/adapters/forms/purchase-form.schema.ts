@@ -28,8 +28,8 @@ const purchaseItemSchema = z.object({
     .refine((val) => val === 0 || val >= 1, {
       message: 'La cantidad debe ser al menos 1',
     }),
-  offerPrice: z.coerce.number().refine((val) => val === 0 || val >= 0, {
-    message: 'El precio de compra debe ser mayor o igual a 0',
+  offerPrice: z.coerce.number().refine((val) => val === 0 || val > 0, {
+    message: 'El precio de compra debe ser mayor a 0',
   }),
   referencePrice: z.coerce
     .number()

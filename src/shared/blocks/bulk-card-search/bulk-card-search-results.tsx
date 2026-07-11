@@ -4,6 +4,7 @@ import { forwardRef, useRef, useImperativeHandle } from 'react';
 import { useWatch } from 'react-hook-form';
 import { Skeleton } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { isValidPrice, isValidQuantity } from '@/lib/utils/validation.utils';
 import BulkCardResultCard from './bulk-card-result-card';
 import {
   BulkCardSearchResultsProps,
@@ -40,17 +41,9 @@ const BulkCardSearchResults = forwardRef<
             card &&
             !!card.selectedCardGuid &&
             !!card.condition &&
-            typeof card.quantity === 'number' &&
-            card.quantity > 0 &&
-            !isNaN(card.quantity) &&
-            ((variant === 'purchases' &&
-              typeof card.offerPrice === 'number' &&
-              card.offerPrice > 0 &&
-              !isNaN(card.offerPrice)) ||
-              (variant === 'inventory' &&
-                typeof card.publicPrice === 'number' &&
-                card.publicPrice > 0 &&
-                !isNaN(card.publicPrice)));
+            isValidQuantity(card.quantity) &&
+            ((variant === 'purchases' && isValidPrice(card.offerPrice)) ||
+              (variant === 'inventory' && isValidPrice(card.publicPrice)));
 
           if (!isConfigured && cardRefs.current[i]) {
             cardRefs.current[i]?.scrollIntoView({

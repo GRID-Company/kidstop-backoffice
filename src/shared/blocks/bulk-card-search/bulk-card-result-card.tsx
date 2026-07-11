@@ -13,6 +13,7 @@ import PriceMetricsSkeleton from './components/price-metrics-skeleton';
 import { useCardMetrics } from './hooks/use-card-metrics';
 import { BulkCardResultCardProps } from './types';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { isValidPrice, isValidQuantity } from '@/lib/utils/validation.utils';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
@@ -118,10 +119,8 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
     const isConfigured = useMemo(() => {
       const hasValidGuid = !!selectedCardGuid;
       const hasValidCondition = !!condition;
-      const hasValidQuantity =
-        typeof quantity === 'number' && quantity > 0 && !isNaN(quantity);
-      const hasValidPrice =
-        typeof price === 'number' && price > 0 && !isNaN(price);
+      const hasValidQuantity = isValidQuantity(quantity);
+      const hasValidPrice = isValidPrice(price);
 
       return (
         hasValidGuid && hasValidCondition && hasValidQuantity && hasValidPrice
