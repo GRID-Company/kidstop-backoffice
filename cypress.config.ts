@@ -2,6 +2,7 @@ import { defineConfig } from 'cypress';
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor';
 import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor';
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild';
+import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter.js';
 
 export default defineConfig({
   e2e: {
@@ -43,8 +44,7 @@ export default defineConfig({
         })
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('cypress-terminal-report/src/installLogsPrinter')(on);
+      installLogsPrinter(on);
 
       return config;
     },
