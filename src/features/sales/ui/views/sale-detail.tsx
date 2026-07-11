@@ -30,6 +30,7 @@ import {
   getCustomerDisplayEmail,
 } from '../../adapters/mappers/sale.mapper';
 import { useSaleDetail } from '../hooks/use-sale-detail';
+import { useSaleItemsStockValidation } from '../hooks/use-sale-items-stock-validation';
 import SaleStatusBadge from '../components/sale-status-badge';
 import SaleCodeDisplay from '../components/sale-code-display';
 import SaleItemsList from '../components/sale-items-list';
@@ -61,6 +62,10 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
     saveChanges,
     discardChanges,
   } = useSaleDetail(saleId);
+
+  const { stockValidationMap, hasAnyStockIssue } = useSaleItemsStockValidation(
+    isTerminal ? [] : items
+  );
 
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -173,6 +178,7 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
               onUpdateItem={updateItem}
               onRemoveItem={removeItem}
               isReadOnly={!isEditable}
+              stockValidationMap={stockValidationMap}
             />
           </div>
         </EntitiesPage.CardContainer>
@@ -220,16 +226,28 @@ export default function SaleDetail({ saleId }: SaleDetailProps) {
                         >
                           Descartar
                         </Button>
-                        <Button
-                          size='sm'
-                          className='bg-accent text-white'
-                          isLoading={mutating}
-                          onPress={saveChanges}
-                          aria-label='Guardar cambios en items'
-                          startContent={<Icon icon='lucide:save' width={16} />}
+                        <Tooltip
+                          content={
+                            hasAnyStockIssue
+                              ? 'No se puede guardar: algunos items exceden el stock disponible'
+                              : 'Guardar cambios en items'
+                          }
+                          color={hasAnyStockIssue ? 'danger' : 'default'}
                         >
-                          Guardar cambios
-                        </Button>
+                          <Button
+                            size='sm'
+                            className='bg-accent text-white'
+                            isLoading={mutating}
+                            isDisabled={hasAnyStockIssue}
+                            onPress={saveChanges}
+                            aria-label='Guardar cambios en items'
+                            startContent={
+                              <Icon icon='lucide:save' width={16} />
+                            }
+                          >
+                            Guardar cambios
+                          </Button>
+                        </Tooltip>
                       </div>
                     </div>
                   );

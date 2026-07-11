@@ -5,12 +5,14 @@ import ItemsList from '@/shared/components/items-list';
 import { ISaleItem } from '../../domain/types';
 import { calculateTotal } from '../../domain/sales.domain';
 import { adaptSaleItem } from '@/shared/utils/item-adapters';
+import { StockValidation } from '../hooks/use-sale-items-stock-validation';
 
 interface SaleItemsListProps {
   items: ISaleItem[];
   onUpdateItem?: (itemId: string, updates: Partial<ISaleItem>) => void;
   onRemoveItem?: (itemId: string) => void;
   isReadOnly?: boolean;
+  stockValidationMap?: Map<string, StockValidation>;
 }
 
 export default function SaleItemsList({
@@ -18,6 +20,7 @@ export default function SaleItemsList({
   onUpdateItem,
   onRemoveItem,
   isReadOnly = true,
+  stockValidationMap,
 }: SaleItemsListProps) {
   const adaptedItems = useMemo(() => items.map(adaptSaleItem), [items]);
 
@@ -48,6 +51,7 @@ export default function SaleItemsList({
       variant='sale'
       totalLabel='Total pedido'
       emptyMessage='No hay items en el pedido'
+      stockValidationMap={stockValidationMap}
     />
   );
 }

@@ -20,6 +20,7 @@ import {
   AdaptedSaleItem,
   ItemVariant,
 } from '@/shared/utils/item-adapters';
+import { StockValidation } from '@/features/sales/ui/hooks/use-sale-items-stock-validation';
 
 type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
 
@@ -30,6 +31,7 @@ interface ItemCardProps {
   isReadOnly?: boolean;
   variant?: ItemVariant;
   allItems?: ItemCardData[];
+  stockValidation?: StockValidation;
 }
 
 function PriceMetric({
@@ -76,6 +78,7 @@ export default function ItemCard({
   isReadOnly = false,
   variant = 'purchase',
   allItems = [],
+  stockValidation,
 }: ItemCardProps) {
   const { control } = useFormContext();
   const { isPrivacyMode: _isPrivacyMode } = usePrivacyModeStore();
@@ -158,7 +161,7 @@ export default function ItemCard({
               </h4>
 
               {item.tcgType === 'POKEMON' &&
-                ((isPurchaseItem(item) && item.language) ||
+                (item.language ||
                   item.cardNumber ||
                   item.rarity ||
                   item.type ||
@@ -166,7 +169,7 @@ export default function ItemCard({
                   item.variant ||
                   item.stage) && (
                   <div className='flex flex-wrap items-center gap-1.5'>
-                    {isPurchaseItem(item) && item.language && (
+                    {item.language && (
                       <Chip
                         size='sm'
                         variant='flat'
@@ -235,12 +238,12 @@ export default function ItemCard({
                 )}
 
               {item.tcgType === 'MAGIC' &&
-                ((isPurchaseItem(item) && item.language) ||
+                (item.language ||
                   item.collectorNumber ||
                   item.rarity ||
                   item.isFoil) && (
                   <div className='flex flex-wrap items-center gap-1.5'>
-                    {isPurchaseItem(item) && item.language && (
+                    {item.language && (
                       <Chip
                         size='sm'
                         variant='flat'
@@ -336,6 +339,22 @@ export default function ItemCard({
                 )}
               </div>
             )}
+
+            {variant === 'sale' &&
+              stockValidation &&
+              !stockValidation.hasStock && (
+                <div className='mt-2'>
+                  <Chip size='sm' color='danger' variant='flat'>
+                    <div className='flex items-center gap-1'>
+                      <Icon icon='lucide:alert-triangle' width={12} />
+                      <span className='text-[10px]'>
+                        Stock insuficiente (disponible:{' '}
+                        {stockValidation.available})
+                      </span>
+                    </div>
+                  </Chip>
+                </div>
+              )}
           </div>
         </div>
 
