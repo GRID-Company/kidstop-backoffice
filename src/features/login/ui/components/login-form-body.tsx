@@ -20,6 +20,7 @@ export default function LoginFormBody({
         placeholder='Ingresa tu correo electrónico'
         isDisabled={loading}
         className='mb-6'
+        data-testid='login-email-input'
         controlProps={{
           control,
           name: 'emailAddress',
@@ -30,6 +31,7 @@ export default function LoginFormBody({
         label='Contraseña *'
         placeholder='Contraseña'
         isDisabled={loading}
+        data-testid='login-password-input'
         controlProps={{
           control,
           name: 'password',
@@ -42,6 +44,7 @@ export default function LoginFormBody({
         isLoading={loading}
         disabled={loading}
         color='primary'
+        data-testid='login-submit-button'
       >
         Iniciar sesión
       </Button>

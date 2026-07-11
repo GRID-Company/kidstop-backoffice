@@ -1,0 +1,6 @@
+{
+  "stepDefinitions": ["cypress/e2e/**/*.steps.ts"],
+  "messages": {
+    "enabled": false
+  }
+}
