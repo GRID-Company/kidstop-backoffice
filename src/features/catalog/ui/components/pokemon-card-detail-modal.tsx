@@ -180,7 +180,12 @@ export default function PokemonCardDetailModal({
 
   return (
     <>
-      <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
+      <KidstopDrawer
+        isOpen={isOpen}
+        onClose={onClose}
+        size='xl'
+        data-testid='pokemon-card-detail-modal'
+      >
         <DrawerContent>
           <DrawerHeader className='flex flex-col gap-2'>
             <span className='text-accent text-lg font-semibold'>
@@ -485,6 +490,7 @@ export default function PokemonCardDetailModal({
                                 : undefined
                             }
                             onPress={() => handleVariantSelect(variant)}
+                            data-testid={`variant-button-${condition.toLowerCase().replace(/_/g, '-')}`}
                           >
                             {CARD_CONDITION_SHORT_LABELS[condition]} (
                             {variant.stock})
@@ -618,6 +624,7 @@ export default function PokemonCardDetailModal({
                           setMovementType(selected);
                         }}
                         size='sm'
+                        data-testid='stock-movement-type-select'
                       >
                         {BULK_ADJUSTMENT_OPTIONS.map((option) => (
                           <SelectItem
@@ -637,6 +644,7 @@ export default function PokemonCardDetailModal({
                           setStockAdjustment(parseInt(val, 10) || 0)
                         }
                         classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                        data-testid='stock-adjustment-input'
                       />
                       <Textarea
                         label='Notas (opcional)'
@@ -646,6 +654,7 @@ export default function PokemonCardDetailModal({
                         size='sm'
                         maxRows={3}
                         classNames={{ inputWrapper: 'border-[1px] bg-white' }}
+                        data-testid='stock-notes-textarea'
                       />
                       <Button
                         size='sm'
@@ -657,6 +666,7 @@ export default function PokemonCardDetailModal({
                         startContent={<Icon icon='lucide:package-plus' />}
                         className='text-white'
                         style={{ backgroundColor: 'var(--color-accent)' }}
+                        data-testid='save-stock-adjustment-button'
                       >
                         Aplicar
                       </Button>
@@ -694,6 +704,7 @@ export default function PokemonCardDetailModal({
                         onValueChange={setPriceNotes}
                         size='sm'
                         minRows={2}
+                        data-testid='price-notes-textarea'
                       />
 
                       <Button
@@ -708,6 +719,7 @@ export default function PokemonCardDetailModal({
                         startContent={<Icon icon='lucide:save' />}
                         className='text-white'
                         style={{ backgroundColor: 'var(--color-accent)' }}
+                        data-testid='save-price-button'
                       >
                         Guardar precios
                       </Button>
@@ -736,7 +748,12 @@ export default function PokemonCardDetailModal({
           </DrawerBody>
 
           <DrawerFooter className='flex justify-end'>
-            <Button variant='light' onPress={onClose} className='text-accent'>
+            <Button
+              variant='light'
+              onPress={onClose}
+              className='text-accent'
+              data-testid='close-modal-button'
+            >
               Cerrar
             </Button>
           </DrawerFooter>
