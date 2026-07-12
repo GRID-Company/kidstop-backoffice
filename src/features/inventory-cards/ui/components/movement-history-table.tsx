@@ -18,6 +18,8 @@ import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { formatUnixDateTime } from '@/lib/utils/format-date';
 import { CardImage } from '@/shared/components/card-image';
+import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { IInventoryMovement } from '../../domain/types';
 import {
   MOVEMENT_TYPE_LABELS,
@@ -41,6 +43,8 @@ interface MovementHistoryTableProps {
 const COLUMNS = [
   { key: 'createdDate', label: 'Fecha', allowsSorting: true },
   { key: 'cardName', label: 'Carta', allowsSorting: true },
+  { key: 'condition', label: 'Condición', allowsSorting: true },
+  { key: 'language', label: 'Idioma', allowsSorting: true },
   { key: 'movementType', label: 'Tipo', allowsSorting: true },
   { key: 'quantity', label: 'Cantidad', allowsSorting: true },
   { key: 'userName', label: 'Usuario', allowsSorting: true },
@@ -72,6 +76,18 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
             </p>
           </div>
         </div>
+      );
+    case 'condition':
+      return (
+        <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-xs'>
+          {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
+        </span>
+      );
+    case 'language':
+      return (
+        <span className='text-sm'>
+          {LANGUAGE_LABELS[item.language] ?? item.language}
+        </span>
       );
     case 'movementType':
       return (
@@ -119,19 +135,19 @@ function MovementMobileCardComponent({
 
   return (
     <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
-      <CardBody className='flex flex-row gap-3 !p-4'>
+      <CardBody className='flex flex-row gap-3 p-4!'>
         <CardImage
           src={item.cardImageUrl}
           alt={item.cardName}
           tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
-          containerClassName='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded bg-default-100'
+          containerClassName='relative h-14 w-10 shrink-0 overflow-hidden rounded bg-default-100'
           className='object-contain'
         />
 
         <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <div className='flex items-start justify-between gap-2'>
             <p className='truncate text-sm font-semibold'>{item.cardName}</p>
-            <span className={`flex-shrink-0 text-sm font-bold ${qtyClass}`}>
+            <span className={`shrink-0 text-sm font-bold ${qtyClass}`}>
               {qtyText}
             </span>
           </div>
@@ -141,6 +157,12 @@ function MovementMobileCardComponent({
           </p>
 
           <div className='flex flex-wrap items-center gap-2'>
+            <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-[10px]'>
+              {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
+            </span>
+            <span className='text-default-500 text-[10px]'>
+              {LANGUAGE_LABELS[item.language]}
+            </span>
             <Chip
               size='sm'
               variant='flat'

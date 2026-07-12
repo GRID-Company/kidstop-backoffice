@@ -36,6 +36,8 @@ export interface IInventoryMovement {
   setCode: string;
   cardNumber: string;
   tcg: string;
+  condition: CardCondition;
+  language: CardLanguage;
   movementType: MovementType;
   quantity: number;
   notes: string;
