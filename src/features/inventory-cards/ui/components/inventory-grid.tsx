@@ -17,6 +17,7 @@ import {
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { IInventoryItem } from '../../domain/types';
 import StockIndicator from './stock-indicator';
 
@@ -36,6 +37,7 @@ const COLUMNS = [
   { key: 'name', label: 'Carta', allowsSorting: true },
   { key: 'setName', label: 'Set', allowsSorting: true },
   { key: 'condition', label: 'Condición', allowsSorting: true },
+  { key: 'language', label: 'Idioma', allowsSorting: true },
   { key: 'stock', label: 'Stock', allowsSorting: true },
   { key: 'stockStatus', label: 'Estado', allowsSorting: true },
   { key: 'sellPrice', label: 'Precio', allowsSorting: true },
@@ -104,6 +106,12 @@ function renderCell(item: IInventoryItem, columnKey: string) {
       return (
         <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-xs'>
           {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
+        </span>
+      );
+    case 'language':
+      return (
+        <span className='text-sm'>
+          {LANGUAGE_LABELS[item.language] ?? item.language}
         </span>
       );
     case 'stock':
@@ -182,6 +190,9 @@ function InventoryMobileCard({
           <div className='flex flex-wrap items-center gap-2'>
             <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-[10px]'>
               {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
+            </span>
+            <span className='text-default-500 text-[10px]'>
+              {LANGUAGE_LABELS[item.language]}
             </span>
             <StockIndicator stockStatus={item.stockStatus} stock={item.stock} />
           </div>

@@ -7,6 +7,8 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { InventoryMovementsDocument } from '@/lib/api/generated/inventory.generated';
 import { formatDate } from '@/lib/utils/format-date';
+import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import {
   MOVEMENT_TYPE_LABELS,
   MOVEMENT_TYPE_COLORS,
@@ -74,6 +76,41 @@ export default function InventoryMovementsTable({
                 movement.movementType as keyof typeof MOVEMENT_TYPE_LABELS
               ] ?? movement.movementType}
             </Chip>
+          );
+        },
+      },
+      {
+        key: 'condition',
+        label: 'Condición',
+        allowSorting: false,
+        customCol: (item: unknown) => {
+          const movement = item as {
+            inventoryItem: { condition: string };
+          };
+          return (
+            <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-xs'>
+              {CARD_CONDITION_SHORT_LABELS[
+                movement.inventoryItem
+                  .condition as keyof typeof CARD_CONDITION_SHORT_LABELS
+              ] ?? movement.inventoryItem.condition}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'language',
+        label: 'Idioma',
+        allowSorting: false,
+        customCol: (item: unknown) => {
+          const movement = item as {
+            inventoryItem: { language: string };
+          };
+          return (
+            <span className='text-xs'>
+              {LANGUAGE_LABELS[
+                movement.inventoryItem.language as keyof typeof LANGUAGE_LABELS
+              ] ?? movement.inventoryItem.language}
+            </span>
           );
         },
       },

@@ -67,6 +67,8 @@ export function fromApiInventoryMovement(
       inventoryItem.magicCardSummary?.collectorNumber ??
       '',
     tcg: inventoryItem.tcg,
+    condition: inventoryItem.condition as IInventoryMovement['condition'],
+    language: inventoryItem.language,
     movementType: movement.movementType as IInventoryMovement['movementType'],
     quantity: movement.quantity,
     notes: movement.notes,

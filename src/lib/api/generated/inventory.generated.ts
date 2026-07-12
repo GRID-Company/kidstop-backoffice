@@ -59,6 +59,7 @@ export type InventoryMovementsQuery = {
         guid: string;
         tcg: string;
         condition: string;
+        language: Types.CardLanguage;
         stock: number;
         pokemonCardSummary: {
           guid: string;
@@ -400,6 +401,10 @@ export const InventoryMovementsDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',

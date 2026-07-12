@@ -51,6 +51,7 @@ query InventoryMovements(
         guid
         tcg
         condition
+        language
         stock
         pokemonCardSummary {
           guid
