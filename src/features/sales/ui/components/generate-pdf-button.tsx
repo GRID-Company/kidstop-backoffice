@@ -9,6 +9,7 @@ import {
   PickingListData,
 } from '@/lib/utils/pdf-generator';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { ISale, ISaleItem } from '../../domain/types';
 import {
   getCustomerDisplayEmail,
@@ -32,12 +33,20 @@ function mapItemForPdf(item: ISaleItem) {
     item.pokemonCardSummary?.setCode ??
     item.magicCardSummary?.collectorNumber ??
     '—';
+  const cardNumber = item.pokemonCardSummary?.cardNumber ?? null;
+  const variant = item.pokemonCardSummary?.variant ?? null;
+  const isFoil = item.magicCardSummary?.isFoil ?? null;
+
   return {
     cardName,
     cardImageUrl,
     setName: setName ?? '—',
     setCode: setCode ?? '—',
     condition: CARD_CONDITION_SHORT_LABELS[item.condition],
+    language: LANGUAGE_LABELS[item.language],
+    cardNumber,
+    variant,
+    isFoil,
     quantity: item.quantity,
     unitPrice: item.price,
   };
