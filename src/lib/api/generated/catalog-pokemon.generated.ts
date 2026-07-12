@@ -127,6 +127,7 @@ export type PokemonCardWithMetricsQuery = {
     gradedPriceEightOrAbove: number | null;
     variantsMetrics: Array<{
       condition: string;
+      language: string;
       stock: number;
       lastSellDate: unknown | null;
       avgDaysInInventory: number | null;
@@ -175,6 +176,7 @@ export type PokemonBatchCardSearchQuery = {
           gradedPriceEightOrAbove: number | null;
           variantsMetrics: Array<{
             condition: string;
+            language: string;
             stock: number;
             lastSellDate: unknown | null;
             avgDaysInInventory: number | null;
@@ -203,6 +205,7 @@ export type PokemonBatchCardSearchQuery = {
           gradedPriceEightOrAbove: number | null;
           variantsMetrics: Array<{
             condition: string;
+            language: string;
             stock: number;
             lastSellDate: unknown | null;
             avgDaysInInventory: number | null;
@@ -695,6 +698,10 @@ export const PokemonCardWithMetricsDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
                       },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {
                         kind: 'Field',
@@ -924,6 +931,13 @@ export const PokemonBatchCardSearchDocument = {
                                           kind: 'Field',
                                           name: {
                                             kind: 'Name',
+                                            value: 'language',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
                                             value: 'stock',
                                           },
                                         },
@@ -1060,6 +1074,13 @@ export const PokemonBatchCardSearchDocument = {
                                           name: {
                                             kind: 'Name',
                                             value: 'condition',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'language',
                                           },
                                         },
                                         {

@@ -360,6 +360,7 @@ export type FindMagicCardsPublicFilter = {
   /** Edition/Collection guid */
   edition?: InputMaybe<Scalars['String']['input']>;
   isFoil?: InputMaybe<Scalars['Boolean']['input']>;
+  language?: InputMaybe<Scalars['String']['input']>;
   rarity?: InputMaybe<Scalars['String']['input']>;
   sellPrice?: InputMaybe<NumericRangeFilter>;
   stockStatus?: InputMaybe<Scalars['String']['input']>;
@@ -421,6 +422,7 @@ export type FindPokemonCardsPublicFilter = {
   condition?: InputMaybe<Scalars['String']['input']>;
   /** Default: Pokemon Card */
   genre?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<Scalars['String']['input']>;
   rarity?: InputMaybe<Scalars['String']['input']>;
   sellPrice?: InputMaybe<NumericRangeFilter>;
   /** Collection guid */
@@ -814,6 +816,7 @@ export type MagicCardTopSold = {
 export type MagicCardVariantMetrics = {
   avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
   condition: Scalars['String']['output'];
+  language: Scalars['String']['output'];
   lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
   stock: Scalars['Int']['output'];
   wishlistCount: Scalars['Int']['output'];
@@ -1480,6 +1483,7 @@ export type PokemonCardTopSold = {
 export type PokemonCardVariantMetrics = {
   avgDaysInInventory?: Maybe<Scalars['Float']['output']>;
   condition: Scalars['String']['output'];
+  language: Scalars['String']['output'];
   lastSellDate?: Maybe<Scalars['TimestampScalar']['output']>;
   stock: Scalars['Int']['output'];
   wishlistCount: Scalars['Int']['output'];
