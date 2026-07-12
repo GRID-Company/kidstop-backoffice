@@ -109,6 +109,7 @@ query PokemonCardWithMetrics($guid: String!) {
   pokemonCardWithMetrics(guid: $guid) {
     variantsMetrics {
       condition
+      language
       stock
       lastSellDate
       avgDaysInInventory
@@ -155,6 +156,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory
@@ -183,6 +185,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory

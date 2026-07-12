@@ -6,10 +6,11 @@ import { CardCondition } from '../../domain/types';
 import { useUpdateInventoryPrice } from './use-update-inventory-price';
 import { useAdjustInventoryStock } from './use-adjust-inventory-stock';
 import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
+import { useStockAdjustmentForm } from '../../adapters/forms/use-stock-adjustment-form';
 import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
 import { TCGType } from '@/lib/types/tcg.types';
-import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
 
 export interface InventoryCard {
@@ -60,17 +61,14 @@ export function useCardDetailModal({
   const [selectedLanguage, setSelectedLanguage] = useState<CardLanguage>(
     card?.language || DEFAULT_CARD_LANGUAGE
   );
-  const [stockAdjustment, setStockAdjustment] = useState<number>(0);
-  const [stockNotes, setStockNotes] = useState<string>('');
-  const [priceNotes, setPriceNotes] = useState<string>('');
-  const [movementType, setMovementType] = useState<BulkOperationType>(
-    BulkOperationType.ManualEntry
-  );
+
   const { handleUpdatePrice, loading: updatingPrice } =
     useUpdateInventoryPrice();
   const { handleAdjustStock, loading: adjustLoading } =
     useAdjustInventoryStock();
+
   const { control, handleSubmit, formState, reset, watch } = useCardPriceForm();
+  const stockForm = useStockAdjustmentForm();
 
   // Sync selectedLanguage with detail's language when detail loads
   useEffect(() => {
@@ -150,23 +148,24 @@ export function useCardDetailModal({
           language: selectedVariant.language,
           purchasePrice: data.buyPrice,
           sellPrice: data.sellPrice,
-          notes: priceNotes.trim() || undefined,
+          notes: data.notes?.trim() || undefined,
           tcgType,
         });
-        setPriceNotes('');
+        reset();
         onRefetch();
       } catch {
         // Error ya manejado en handleUpdatePrice
       }
     },
-    [detail, selectedVariant, handleUpdatePrice, priceNotes, tcgType, onRefetch]
+    [detail, selectedVariant, handleUpdatePrice, tcgType, onRefetch, reset]
   );
 
   const executeStockAdjust = useCallback(async () => {
+    const formValues = stockForm.getValues();
     if (
       !detail ||
       !selectedVariant ||
-      isStockAdjustmentDisabled(stockAdjustment, movementType)
+      isStockAdjustmentDisabled(formValues.quantity, formValues.movementType)
     )
       return;
     try {
@@ -174,13 +173,12 @@ export function useCardDetailModal({
         cardGuid: selectedVariant.cardGuid,
         condition: selectedVariant.condition,
         language: selectedVariant.language,
-        quantity: stockAdjustment,
-        notes: stockNotes.trim() || undefined,
+        quantity: formValues.quantity,
+        notes: formValues.notes?.trim() || undefined,
         tcgType,
-        operationType: movementType,
+        operationType: formValues.movementType,
       });
-      setStockAdjustment(0);
-      setStockNotes('');
+      stockForm.reset();
       onRefetch();
     } catch {
       // Error ya manejado en handleAdjustStock
@@ -188,11 +186,9 @@ export function useCardDetailModal({
   }, [
     detail,
     selectedVariant,
-    stockAdjustment,
-    stockNotes,
+    stockForm,
     handleAdjustStock,
     tcgType,
-    movementType,
     onRefetch,
   ]);
 
@@ -201,14 +197,6 @@ export function useCardDetailModal({
     selectedLanguage,
     availableVariants,
     handleLanguageChange,
-    stockAdjustment,
-    setStockAdjustment,
-    stockNotes,
-    setStockNotes,
-    priceNotes,
-    setPriceNotes,
-    movementType,
-    setMovementType,
     handleVariantSelect,
     handlePriceSubmit,
     executeStockAdjust,
@@ -219,5 +207,8 @@ export function useCardDetailModal({
     updatingPrice,
     adjustLoading,
     cardName: detail?.name,
+    stockControl: stockForm.control,
+    stockFormState: stockForm.formState,
+    stockWatch: stockForm.watch,
   };
 }

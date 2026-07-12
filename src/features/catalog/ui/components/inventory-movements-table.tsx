@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { Chip } from '@heroui/react';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -12,6 +12,7 @@ import {
   MOVEMENT_TYPE_COLORS,
 } from '@/features/inventory-cards/domain/constants';
 import { DEFAULT_HISTORY_LIMIT } from '../../domain/constants';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 
 /**
  * Displays inventory movement history for a specific inventory item
@@ -27,10 +28,12 @@ export default function InventoryMovementsTable({
   inventoryItemGuid,
   tcg,
 }: InventoryMovementsTableProps) {
+  const [page, setPage] = useState(1);
+
   const { data, loading, error } = useQuery(InventoryMovementsDocument, {
     variables: {
       findInventoryMovementsArgs: {
-        skip: 0,
+        skip: (page - 1) * DEFAULT_HISTORY_LIMIT,
         limit: DEFAULT_HISTORY_LIMIT,
         sort: { column: 'createdDate', order: 'DESC' },
         filters: {
@@ -45,6 +48,9 @@ export default function InventoryMovementsTable({
   const movements = useMemo(() => {
     return data?.inventoryMovements?.data ?? [];
   }, [data]);
+
+  const totalCount = data?.inventoryMovements?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_HISTORY_LIMIT));
 
   const columns: ITableColumn[] = useMemo(
     () => [
@@ -147,7 +153,6 @@ export default function InventoryMovementsTable({
 
   return (
     <div className='flex flex-col gap-3'>
-      <h4 className='text-sm font-semibold'>Historial de movimientos</h4>
       <DataTable
         cols={columns}
         data={movements}
@@ -158,6 +163,17 @@ export default function InventoryMovementsTable({
         <p className='text-default-400 py-4 text-center text-sm'>
           No hay movimientos registrados
         </p>
+      )}
+
+      {totalPages > 1 && (
+        <div className='mt-4 flex justify-center'>
+          <KidstopPagination
+            total={totalPages}
+            page={page}
+            onChange={setPage}
+            showControls
+          />
+        </div>
       )}
     </div>
   );

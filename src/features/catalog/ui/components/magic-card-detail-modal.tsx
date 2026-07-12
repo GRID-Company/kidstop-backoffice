@@ -11,16 +11,13 @@ import {
   Button,
   Chip,
   Divider,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
+  Tabs,
+  Tab,
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Icon } from '@iconify/react';
 import { useQuery } from '@apollo/client/react';
-
-import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
 import { IMagicCard, CardCondition } from '../../domain/types';
 import {
@@ -38,16 +35,18 @@ import {
   MagicCardWithMetricsDocument,
   MagicCardInternalListDocument,
 } from '@/lib/api/generated/catalog-magic.generated';
-import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
-import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
+import { CardLanguage } from '@/lib/api/schema-types';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
-import InventoryMovementsTable from './inventory-movements-table';
-import SellPriceHistoryTable from './sell-price-history-table';
+import StockAdjustmentTab from './card-detail-tabs/stock-adjustment-tab';
+import PriceEditTab from './card-detail-tabs/price-edit-tab';
+import MovementsHistoryTab from './card-detail-tabs/movements-history-tab';
+import PriceHistoryTab from './card-detail-tabs/price-history-tab';
+import VariantInfoTab from './card-detail-tabs/variant-info-tab';
 
 interface MagicCardDetailModalProps {
   card: IMagicCard | null;
@@ -86,14 +85,9 @@ export default function MagicCardDetailModal({
     selectedLanguage,
     availableVariants,
     handleLanguageChange,
-    stockAdjustment,
-    setStockAdjustment,
-    stockNotes,
-    setStockNotes,
-    priceNotes,
-    setPriceNotes,
-    movementType,
-    setMovementType,
+    stockControl,
+    stockFormState,
+    stockWatch,
     handleVariantSelect,
     handlePriceSubmit,
     executeStockAdjust,
@@ -112,10 +106,14 @@ export default function MagicCardDetailModal({
     onRefetch: refetch,
   });
 
+  const [selectedTab, setSelectedTab] = useState('info');
+
   const handleStockAdjustClick = useCallback(() => {
-    if (isStockAdjustmentDisabled(stockAdjustment, movementType)) return;
+    const formValues = stockWatch();
+    if (isStockAdjustmentDisabled(formValues.quantity, formValues.movementType))
+      return;
     setIsConfirmModalOpen(true);
-  }, [stockAdjustment, movementType]);
+  }, [stockWatch]);
 
   const handleConfirmAdjustment = useCallback(async () => {
     await executeStockAdjust();
@@ -169,7 +167,9 @@ export default function MagicCardDetailModal({
 
   const variantMetrics =
     metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
-      (v) => v?.condition === selectedVariant?.condition
+      (v) =>
+        v?.condition === selectedVariant?.condition &&
+        v?.language === selectedVariant?.language
     );
 
   const totalWishlistCount = useMemo(() => {
@@ -185,7 +185,7 @@ export default function MagicCardDetailModal({
       <KidstopDrawer
         isOpen={isOpen}
         onClose={onClose}
-        size='xl'
+        size='4xl'
         data-testid='magic-card-detail-modal'
       >
         <DrawerContent>
@@ -418,267 +418,102 @@ export default function MagicCardDetailModal({
                   <>
                     <Divider />
 
-                    <div className='flex flex-col gap-3'>
-                      <h4 className='text-sm font-semibold'>
-                        Detalle —{' '}
-                        {
-                          CARD_CONDITION_LABELS[
-                            selectedVariant.condition as keyof typeof CARD_CONDITION_LABELS
-                          ]
-                        }
-                      </h4>
-
-                      <div className='bg-default-50 grid grid-cols-3 gap-4 rounded-lg p-4 text-sm'>
-                        <div className='flex flex-col items-center gap-1'>
-                          <span className='text-default-500'>Stock</span>
-                          <span className='text-lg font-bold'>
-                            {selectedVariant.stock}
-                          </span>
-                        </div>
-                        <div className='flex flex-col items-center gap-1'>
-                          <span className='text-default-500'>
-                            Precio compra
-                          </span>
-                          <span className='text-lg font-bold'>
-                            ${(selectedVariant.purchasePrice ?? 0).toFixed(2)}
-                          </span>
-                        </div>
-                        <div className='flex flex-col items-center gap-1'>
-                          <span className='text-default-500'>Precio venta</span>
-                          <span className='text-accent text-lg font-bold'>
-                            ${(selectedVariant.sellPrice ?? 0).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {variantMetrics && (
-                        <div className='grid grid-cols-2 gap-4 text-sm'>
-                          <div className='flex flex-col gap-1'>
-                            <span className='text-default-500'>
-                              Última venta
-                            </span>
-                            <span className='font-medium'>
-                              {variantMetrics.lastSellDate
-                                ? new Date(
-                                    variantMetrics.lastSellDate as number
-                                  ).toLocaleDateString()
-                                : 'N/A'}
-                            </span>
-                          </div>
-                          <div className='flex flex-col gap-1'>
-                            <span className='text-default-500'>
-                              Días en inventario
-                            </span>
-                            <span className='font-medium'>
-                              {variantMetrics.avgDaysInInventory ?? 0} días
-                            </span>
-                          </div>
-                          <div className='flex flex-col gap-1'>
-                            <span className='text-default-500'>
-                              En wishlist
-                            </span>
-                            <span className='font-medium'>
-                              {variantMetrics.wishlistCount ?? 0}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {metricsData?.magicCardWithMetrics && (
-                      <>
-                        <Divider />
-                        <div className='flex flex-col gap-3'>
-                          <h4 className='text-sm font-semibold'>
-                            Precios de mercado (MXN)
-                          </h4>
-                          <div className='grid grid-cols-3 gap-4 text-sm'>
-                            <div className='flex flex-col gap-1'>
-                              <span className='text-default-500'>
-                                Precio retail
-                              </span>
-                              <span className='font-bold text-green-600'>
-                                {metricsData.magicCardWithMetrics.priceRetail
-                                  ? `$${metricsData.magicCardWithMetrics.priceRetail.toFixed(2)}`
-                                  : 'N/A'}
-                              </span>
-                            </div>
-                            <div className='flex flex-col gap-1'>
-                              <span className='text-default-500'>
-                                Precio compra
-                              </span>
-                              <span className='font-bold text-blue-600'>
-                                {metricsData.magicCardWithMetrics.priceBuy
-                                  ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
-                                  : 'N/A'}
-                              </span>
-                            </div>
-                            <div className='flex flex-col gap-1'>
-                              <span className='text-default-500'>
-                                Precio referencia
-                              </span>
-                              <span className='text-accent font-bold'>
-                                {metricsData.magicCardWithMetrics.priceBuy
-                                  ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
-                                  : 'N/A'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className='grid grid-cols-2 gap-4 text-sm'>
-                            <div className='flex flex-col gap-1'>
-                              <span className='text-default-500'>
-                                Total en wishlist
-                              </span>
-                              <span className='font-bold text-purple-600'>
-                                {totalWishlistCount}
-                              </span>
-                            </div>
-                            <div className='flex flex-col gap-1'>
-                              <span className='text-default-500'>
-                                En wishlist (variante)
-                              </span>
-                              <span className='font-bold text-purple-600'>
-                                {variantMetrics?.wishlistCount ?? 0}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    <Divider />
-
-                    <div className='flex flex-col gap-4'>
-                      <h4 className='text-sm font-semibold'>Ajustar stock</h4>
-                      <Select
-                        label='Tipo de operación'
-                        placeholder='Selecciona el tipo de operación'
-                        selectedKeys={[movementType]}
-                        onSelectionChange={(keys) => {
-                          const selected = Array.from(
-                            keys
-                          )[0] as BulkOperationType;
-                          setMovementType(selected);
-                        }}
-                        size='sm'
-                        data-testid='stock-movement-type-select'
-                      >
-                        {BULK_ADJUSTMENT_OPTIONS.map((option) => (
-                          <SelectItem
-                            key={option.key}
-                            description={option.description}
-                          >
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                      <Input
-                        type='number'
-                        size='sm'
-                        label='Cantidad'
-                        value={String(stockAdjustment)}
-                        onValueChange={(val) =>
-                          setStockAdjustment(parseInt(val, 10) || 0)
-                        }
-                        classNames={{ inputWrapper: 'border-[1px] bg-white' }}
-                        data-testid='stock-adjustment-input'
-                      />
-                      <Textarea
-                        label='Notas (opcional)'
-                        placeholder='Ej: Recibido de proveedor, Daño en transporte, etc.'
-                        value={stockNotes}
-                        onValueChange={setStockNotes}
-                        size='sm'
-                        maxRows={3}
-                        classNames={{ inputWrapper: 'border-[1px] bg-white' }}
-                        data-testid='stock-notes-textarea'
-                      />
-                      <Button
-                        size='sm'
-                        isDisabled={isStockAdjustmentDisabled(
-                          stockAdjustment,
-                          movementType
-                        )}
-                        onPress={handleStockAdjustClick}
-                        startContent={<Icon icon='lucide:package-plus' />}
-                        className='text-white'
-                        style={{ backgroundColor: 'var(--color-accent)' }}
-                        data-testid='save-stock-adjustment-button'
-                      >
-                        Aplicar
-                      </Button>
-                    </div>
-
-                    <Divider />
-
-                    <form
-                      onSubmit={(...args) => {
-                        void handleSubmit(handlePriceSubmit)(...args);
+                    <Tabs
+                      aria-label='Opciones de gestión de carta'
+                      fullWidth
+                      color='default'
+                      selectedKey={selectedTab}
+                      onSelectionChange={(key) => setSelectedTab(key as string)}
+                      classNames={{
+                        tabList: 'w-full',
+                        tab: 'text-accent',
+                        cursor: 'bg-accent',
+                        tabContent: 'group-data-[selected=true]:text-white',
                       }}
-                      className='flex flex-col gap-4'
                     >
-                      <h4 className='text-sm font-semibold'>Editar precios</h4>
-
-                      <div className='grid grid-cols-2 gap-4'>
-                        <InputForm
-                          label='Precio de compra'
-                          type='number'
-                          controlProps={{ control, name: 'buyPrice' }}
+                      <Tab key='info' title='Información'>
+                        <VariantInfoTab
+                          stock={selectedVariant.stock}
+                          purchasePrice={selectedVariant.purchasePrice}
+                          sellPrice={selectedVariant.sellPrice}
+                          marketPrices={
+                            metricsData?.magicCardWithMetrics
+                              ? {
+                                  priceRetail:
+                                    metricsData.magicCardWithMetrics
+                                      .priceRetail,
+                                  priceBuy:
+                                    metricsData.magicCardWithMetrics.priceBuy,
+                                }
+                              : undefined
+                          }
+                          wishlistMetrics={{
+                            total: totalWishlistCount,
+                            variant: variantMetrics?.wishlistCount ?? 0,
+                          }}
+                          additionalMetrics={
+                            variantMetrics
+                              ? {
+                                  lastSellDate: variantMetrics.lastSellDate
+                                    ? new Date(
+                                        variantMetrics.lastSellDate as
+                                          | string
+                                          | number
+                                      ).getTime()
+                                    : null,
+                                  avgDaysInInventory:
+                                    variantMetrics.avgDaysInInventory,
+                                }
+                              : undefined
+                          }
                         />
-                        <InputForm
-                          label='Precio de venta'
-                          type='number'
-                          controlProps={{ control, name: 'sellPrice' }}
-                        />
-                      </div>
+                      </Tab>
 
-                      <Textarea
-                        label='Notas (opcional)'
-                        placeholder='Agregar notas sobre el cambio de precio...'
-                        value={priceNotes}
-                        onValueChange={setPriceNotes}
-                        size='sm'
-                        minRows={2}
-                        data-testid='price-notes-textarea'
-                      />
+                      <Tab key='stock' title='Ajustar stock'>
+                        <StockAdjustmentTab control={stockControl} />
+                      </Tab>
 
-                      <Button
-                        type='submit'
-                        size='sm'
-                        isDisabled={!formState.isDirty || !formState.isValid}
-                        isLoading={updatingPrice}
-                        startContent={<Icon icon='lucide:save' />}
-                        className='text-white'
-                        style={{ backgroundColor: 'var(--color-accent)' }}
-                        data-testid='save-price-button'
-                      >
-                        Guardar precios
-                      </Button>
-                    </form>
+                      <Tab key='price' title='Editar precio de venta'>
+                        <form
+                          onSubmit={(...args) => {
+                            void handleSubmit(handlePriceSubmit)(...args);
+                          }}
+                        >
+                          <PriceEditTab
+                            control={control}
+                            formState={formState}
+                          />
+                        </form>
+                      </Tab>
 
-                    <Divider />
+                      {selectedVariant.inventoryItemGuid && (
+                        <>
+                          <Tab key='movements' title='Movimientos'>
+                            <MovementsHistoryTab
+                              inventoryItemGuid={
+                                selectedVariant.inventoryItemGuid
+                              }
+                              tcgType='MAGIC'
+                            />
+                          </Tab>
 
-                    {selectedVariant.inventoryItemGuid && (
-                      <>
-                        <InventoryMovementsTable
-                          inventoryItemGuid={selectedVariant.inventoryItemGuid}
-                          tcg='MAGIC'
-                        />
-
-                        <Divider />
-
-                        <SellPriceHistoryTable
-                          inventoryItemGuid={selectedVariant.inventoryItemGuid}
-                        />
-                      </>
-                    )}
+                          <Tab key='price-history' title='Historial de precios'>
+                            <PriceHistoryTab
+                              inventoryItemGuid={
+                                selectedVariant.inventoryItemGuid
+                              }
+                            />
+                          </Tab>
+                        </>
+                      )}
+                    </Tabs>
                   </>
                 )}
               </>
             )}
           </DrawerBody>
 
-          <DrawerFooter className='flex justify-end'>
+          <DrawerFooter className='flex justify-end gap-4'>
             <Button
               variant='light'
               onPress={onClose}
@@ -687,6 +522,31 @@ export default function MagicCardDetailModal({
             >
               Cerrar
             </Button>
+
+            {selectedTab === 'stock' && (
+              <KidstopButton
+                variant='accent'
+                onPress={handleStockAdjustClick}
+                isLoading={adjustLoading}
+                isDisabled={!stockFormState.isValid || !stockFormState.isDirty}
+                startContent={<Icon icon='lucide:package-plus' />}
+                data-testid='save-stock-adjustment-button'
+              >
+                Aplicar ajuste
+              </KidstopButton>
+            )}
+
+            {selectedTab === 'price' && (
+              <KidstopButton
+                variant='accent'
+                onPress={() => void handleSubmit(handlePriceSubmit)()}
+                isLoading={updatingPrice}
+                startContent={<Icon icon='lucide:save' />}
+                data-testid='save-price-button'
+              >
+                Guardar precios
+              </KidstopButton>
+            )}
           </DrawerFooter>
         </DrawerContent>
       </KidstopDrawer>
@@ -699,8 +559,8 @@ export default function MagicCardDetailModal({
           loading={adjustLoading}
           cardName={cardName ?? name ?? ''}
           condition={selectedVariant.condition}
-          operationType={movementType}
-          quantity={stockAdjustment}
+          operationType={stockWatch('movementType')}
+          quantity={stockWatch('quantity')}
           currentStock={selectedVariant.stock}
         />
       )}

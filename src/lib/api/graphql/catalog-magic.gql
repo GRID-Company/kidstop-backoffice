@@ -65,6 +65,7 @@ query MagicCardWithMetrics($guid: String!) {
   magicCardWithMetrics(guid: $guid) {
     variantsMetrics {
       condition
+      language
       stock
       lastSellDate
       avgDaysInInventory
@@ -98,6 +99,7 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory

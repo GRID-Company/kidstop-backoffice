@@ -86,6 +86,7 @@ export type MagicCardWithMetricsQuery = {
     priceBuy: number | null;
     variantsMetrics: Array<{
       condition: string;
+      language: string;
       stock: number;
       lastSellDate: unknown | null;
       avgDaysInInventory: number | null;
@@ -124,6 +125,7 @@ export type MagicBatchCardSearchQuery = {
           priceBuy: number | null;
           variantsMetrics: Array<{
             condition: string;
+            language: string;
             stock: number;
             lastSellDate: unknown | null;
             avgDaysInInventory: number | null;
@@ -467,6 +469,10 @@ export const MagicCardWithMetricsDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
                       },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {
                         kind: 'Field',
@@ -631,6 +637,13 @@ export const MagicBatchCardSearchDocument = {
                                           name: {
                                             kind: 'Name',
                                             value: 'condition',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'language',
                                           },
                                         },
                                         {
