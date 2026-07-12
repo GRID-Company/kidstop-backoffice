@@ -167,7 +167,9 @@ export default function MagicCardDetailModal({
 
   const variantMetrics =
     metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
-      (v) => v?.condition === selectedVariant?.condition
+      (v) =>
+        v?.condition === selectedVariant?.condition &&
+        v?.language === selectedVariant?.language
     );
 
   const totalWishlistCount = useMemo(() => {

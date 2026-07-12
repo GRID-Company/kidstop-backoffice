@@ -160,7 +160,9 @@ export default function PokemonCardDetailModal({
 
   const variantMetrics =
     metricsData?.pokemonCardWithMetrics?.variantsMetrics?.find(
-      (v) => v?.condition === selectedVariant?.condition
+      (v) =>
+        v?.condition === selectedVariant?.condition &&
+        v?.language === selectedVariant?.language
     );
 
   const totalWishlistCount = useMemo(() => {
