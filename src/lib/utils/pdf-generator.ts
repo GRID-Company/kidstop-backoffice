@@ -218,6 +218,29 @@ function drawCheckbox(doc: jsPDF, x: number, y: number, accent: RGB): void {
   doc.setLineWidth(0.2);
 }
 
+function drawBadge(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  text: string,
+  bgColor: RGB,
+  textColor: RGB
+): number {
+  doc.setFontSize(4.5);
+  doc.setFont('helvetica', 'bold');
+  const textWidth = doc.getTextWidth(text);
+  const badgeWidth = textWidth + 2;
+  const badgeHeight = 3;
+
+  doc.setFillColor(...bgColor);
+  doc.roundedRect(x, y - 2.2, badgeWidth, badgeHeight, 0.5, 0.5, 'F');
+
+  doc.setTextColor(...textColor);
+  doc.text(text, x + 1, y);
+
+  return badgeWidth + 1.5;
+}
+
 function drawCardCell(
   doc: jsPDF,
   x: number,
@@ -277,32 +300,68 @@ function drawCardCell(
   doc.text(setLines.slice(0, 2).join('\n'), textX, textY);
   textY += setLines.length > 1 ? 4.5 : 3;
 
-  const metadataParts: string[] = [];
+  let badgeX = textX;
+  const badgeY = textY;
+
   if (item.language) {
-    metadataParts.push(item.language);
-  }
-  if (item.cardNumber) {
-    metadataParts.push(`#${item.cardNumber}`);
-  }
-  if (item.variant) {
-    metadataParts.push(item.variant);
-  }
-  if (metadataParts.length > 0) {
-    doc.setFontSize(4.5);
-    doc.setTextColor(100, 100, 100);
-    const metadataText = metadataParts.join(' · ');
-    const metadataLines: string[] = doc.splitTextToSize(metadataText, textW);
-    doc.text(metadataLines.slice(0, 1).join(''), textX, textY);
-    textY += 2.5;
+    badgeX += drawBadge(
+      doc,
+      badgeX,
+      badgeY,
+      item.language,
+      [220, 220, 220],
+      [80, 80, 80]
+    );
   }
 
-  const conditionParts: string[] = [item.condition];
-  if (item.isFoil) {
-    conditionParts.push('Foil');
+  if (item.cardNumber) {
+    badgeX += drawBadge(
+      doc,
+      badgeX,
+      badgeY,
+      `#${item.cardNumber}`,
+      [240, 240, 240],
+      [100, 100, 100]
+    );
   }
-  doc.setFontSize(5);
-  doc.setTextColor(110, 110, 110);
-  doc.text(conditionParts.join(' · '), textX, textY);
+
+  if (item.variant) {
+    badgeX += drawBadge(
+      doc,
+      badgeX,
+      badgeY,
+      item.variant,
+      [250, 240, 220],
+      [150, 100, 50]
+    );
+  }
+
+  if (item.language || item.cardNumber || item.variant) {
+    textY += 3.5;
+  }
+
+  badgeX = textX;
+  const conditionBadgeY = textY;
+
+  badgeX += drawBadge(
+    doc,
+    badgeX,
+    conditionBadgeY,
+    item.condition,
+    [230, 245, 255],
+    [50, 100, 150]
+  );
+
+  if (item.isFoil) {
+    drawBadge(
+      doc,
+      badgeX,
+      conditionBadgeY,
+      'Foil',
+      [255, 215, 0],
+      [120, 80, 0]
+    );
+  }
 
   const textBottom = y + IMAGE_HEIGHT + CARD_TEXT_HEIGHT - 2;
   drawCheckbox(doc, textX, textBottom - 2.5, accent);

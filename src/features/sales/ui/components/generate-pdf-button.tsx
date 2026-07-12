@@ -33,10 +33,7 @@ function mapItemForPdf(item: ISaleItem) {
     item.pokemonCardSummary?.setCode ??
     item.magicCardSummary?.collectorNumber ??
     '—';
-  const cardNumber =
-    item.pokemonCardSummary?.cardNumber ??
-    item.magicCardSummary?.collectorNumber ??
-    null;
+  const cardNumber = item.pokemonCardSummary?.cardNumber ?? null;
   const variant = item.pokemonCardSummary?.variant ?? null;
   const isFoil = item.magicCardSummary?.isFoil ?? null;
 
