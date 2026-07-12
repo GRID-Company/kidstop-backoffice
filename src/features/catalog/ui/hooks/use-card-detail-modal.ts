@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
@@ -61,6 +61,7 @@ export function useCardDetailModal({
   const [selectedLanguage, setSelectedLanguage] = useState<CardLanguage>(
     card?.language || DEFAULT_CARD_LANGUAGE
   );
+  const isInitialLoadRef = useRef(true);
 
   const { handleUpdatePrice, loading: updatingPrice } =
     useUpdateInventoryPrice();
@@ -70,12 +71,13 @@ export function useCardDetailModal({
   const { control, handleSubmit, formState, reset, watch } = useCardPriceForm();
   const stockForm = useStockAdjustmentForm();
 
-  // Sync selectedLanguage with detail's language when detail loads
+  // Sync selectedLanguage with detail's language only on initial load
   useEffect(() => {
-    if (detail?.language) {
+    if (detail?.language && isInitialLoadRef.current) {
       setSelectedLanguage(detail.language);
+      isInitialLoadRef.current = false;
     }
-  }, [detail]);
+  }, [detail?.language]);
 
   const availableVariants = useMemo(() => {
     if (!detail?.inventoryCards || !card?.guid) return [];
@@ -94,16 +96,30 @@ export function useCardDetailModal({
 
   useEffect(() => {
     if (availableVariants.length > 0) {
-      const nmVariant = availableVariants.find(
-        (v: InventoryCard) => v.condition === CARD_CONDITIONS.NEAR_MINT
-      );
-      setSelectedVariant(nmVariant ?? availableVariants[0]);
+      // Try to preserve the current condition
+      const currentCondition = selectedVariant?.condition;
+      const sameConditionVariant = currentCondition
+        ? availableVariants.find(
+            (v: InventoryCard) => v.condition === currentCondition
+          )
+        : null;
+
+      if (sameConditionVariant) {
+        // Preserve selected condition
+        setSelectedVariant(sameConditionVariant);
+      } else {
+        // Fallback: NM or first available
+        const nmVariant = availableVariants.find(
+          (v: InventoryCard) => v.condition === CARD_CONDITIONS.NEAR_MINT
+        );
+        setSelectedVariant(nmVariant ?? availableVariants[0]);
+      }
     } else if (card?.guid) {
       setSelectedVariant({
         cardGuid: card.guid,
         inventoryItemGuid: undefined,
         isNew: true,
-        condition: CARD_CONDITIONS.NEAR_MINT,
+        condition: selectedVariant?.condition ?? CARD_CONDITIONS.NEAR_MINT,
         language: selectedLanguage,
         stock: 0,
         purchasePrice: null,
@@ -113,6 +129,11 @@ export function useCardDetailModal({
       setSelectedVariant(null);
     }
   }, [availableVariants, selectedLanguage, card]);
+
+  // Reset isInitialLoadRef when card changes
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+  }, [card?.guid]);
 
   useEffect(() => {
     if (selectedVariant) {

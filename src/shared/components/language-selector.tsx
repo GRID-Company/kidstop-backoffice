@@ -55,6 +55,7 @@ export function LanguageSelector({
       isDisabled={isDisabled}
       size={size}
       className={className}
+      disallowEmptySelection={true}
       description={
         !isModifiable ? 'Este idioma no puede ser modificado' : undefined
       }
