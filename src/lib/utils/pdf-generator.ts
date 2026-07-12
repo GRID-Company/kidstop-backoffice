@@ -10,6 +10,10 @@ export interface PickingListItem {
   setName: string;
   setCode: string;
   condition: string;
+  language: string;
+  cardNumber: string | null;
+  variant: string | null;
+  isFoil: boolean | null;
   quantity: number;
   unitPrice: number;
 }
@@ -34,7 +38,7 @@ const GRID_COLS = 5;
 const CARD_GAP = 3;
 const CARD_WIDTH = (CONTENT_WIDTH - CARD_GAP * (GRID_COLS - 1)) / GRID_COLS;
 const IMAGE_HEIGHT = CARD_WIDTH * 1.3;
-const CARD_TEXT_HEIGHT = 20;
+const CARD_TEXT_HEIGHT = 26;
 const CARD_CELL_HEIGHT = IMAGE_HEIGHT + CARD_TEXT_HEIGHT + CARD_GAP;
 
 const HEADER_BAND_HEIGHT = 18;
@@ -254,22 +258,53 @@ function drawCardCell(
 
   const textX = x + 2.5;
   const textW = CARD_WIDTH - 5;
-  const textTop = y + IMAGE_HEIGHT + 3.5;
-  const textBottom = y + IMAGE_HEIGHT + CARD_TEXT_HEIGHT - 2;
+  let textY = y + IMAGE_HEIGHT + 3;
 
-  doc.setFontSize(6.5);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 30, 30);
   const nameLines: string[] = doc.splitTextToSize(item.cardName, textW);
-  doc.text(nameLines.slice(0, 2).join('\n'), textX, textTop);
+  doc.text(nameLines.slice(0, 2).join('\n'), textX, textY);
+  textY += nameLines.length > 1 ? 5 : 3.5;
 
-  const midY = textTop + (nameLines.length > 1 ? 6 : 4);
-  doc.setFontSize(5.5);
+  doc.setFontSize(5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(110, 110, 110);
-  doc.text(`${item.setName} (${item.setCode})`, textX, midY);
-  doc.text(item.condition, textX, midY + 3);
+  const setLines: string[] = doc.splitTextToSize(
+    `${item.setName} (${item.setCode})`,
+    textW
+  );
+  doc.text(setLines.slice(0, 2).join('\n'), textX, textY);
+  textY += setLines.length > 1 ? 4.5 : 3;
 
+  const metadataParts: string[] = [];
+  if (item.language) {
+    metadataParts.push(item.language);
+  }
+  if (item.cardNumber) {
+    metadataParts.push(`#${item.cardNumber}`);
+  }
+  if (item.variant) {
+    metadataParts.push(item.variant);
+  }
+  if (metadataParts.length > 0) {
+    doc.setFontSize(4.5);
+    doc.setTextColor(100, 100, 100);
+    const metadataText = metadataParts.join(' · ');
+    const metadataLines: string[] = doc.splitTextToSize(metadataText, textW);
+    doc.text(metadataLines.slice(0, 1).join(''), textX, textY);
+    textY += 2.5;
+  }
+
+  const conditionParts: string[] = [item.condition];
+  if (item.isFoil) {
+    conditionParts.push('Foil');
+  }
+  doc.setFontSize(5);
+  doc.setTextColor(110, 110, 110);
+  doc.text(conditionParts.join(' · '), textX, textY);
+
+  const textBottom = y + IMAGE_HEIGHT + CARD_TEXT_HEIGHT - 2;
   drawCheckbox(doc, textX, textBottom - 2.5, accent);
 
   doc.setFontSize(7);
