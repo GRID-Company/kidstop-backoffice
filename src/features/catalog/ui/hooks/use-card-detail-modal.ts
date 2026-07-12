@@ -115,16 +115,16 @@ export function useCardDetailModal({
         setSelectedVariant(nmVariant ?? availableVariants[0]);
       }
     } else if (card?.guid) {
-      setSelectedVariant({
+      setSelectedVariant((prev) => ({
         cardGuid: card.guid,
         inventoryItemGuid: undefined,
         isNew: true,
-        condition: selectedVariant?.condition ?? CARD_CONDITIONS.NEAR_MINT,
+        condition: prev?.condition ?? CARD_CONDITIONS.NEAR_MINT,
         language: selectedLanguage,
         stock: 0,
         purchasePrice: null,
         sellPrice: null,
-      });
+      }));
     } else {
       setSelectedVariant(null);
     }
