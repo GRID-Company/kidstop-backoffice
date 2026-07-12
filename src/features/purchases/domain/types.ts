@@ -47,6 +47,9 @@ export interface IPurchaseItem extends Record<string, unknown> {
   type?: string | null;
   hp?: string | null;
   stage?: string | null;
+  rarity?: string | null;
+  isFoil?: boolean | null;
+  collectorNumber?: string | null;
   condition: CardCondition;
   language: CardLanguage;
   quantity: number;
@@ -96,6 +99,12 @@ export interface ICardSearchResult {
   imageUrl: string;
   tcgType: TCGType;
   language: CardLanguage;
+  variant?: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
+  isFoil?: boolean | null;
+  collectorNumber?: string | null;
   metrics: ICardSearchMetrics;
 }
 

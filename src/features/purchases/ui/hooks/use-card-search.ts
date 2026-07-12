@@ -167,6 +167,10 @@ export function useCardSearch() {
           imageUrl: card.imageUri || '',
           tcgType: TCG_TYPES.POKEMON,
           language: card.language,
+          variant: card.variant,
+          type: card.type,
+          hp: card.hp,
+          stage: card.stage,
           metrics: {
             referencePrice: card.sellPrice || 0,
             currentStock: card.availableStock ? 1 : 0,
@@ -192,6 +196,8 @@ export function useCardSearch() {
           imageUrl: card.imageUri || '',
           tcgType: TCG_TYPES.MAGIC,
           language: card.language,
+          isFoil: card.isFoil,
+          collectorNumber: card.collectorNumber,
           metrics: {
             referencePrice: card.sellPrice || 0,
             currentStock: card.availableStock ? 1 : 0,
