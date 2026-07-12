@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { Chip } from '@heroui/react';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
@@ -8,6 +8,7 @@ import { ITableColumn } from '@/lib/types/datatable.types';
 import { InventoryItemSellPriceHistoryDocument } from '@/lib/api/generated/inventory.generated';
 import { formatDate } from '@/lib/utils/format-date';
 import { DEFAULT_HISTORY_LIMIT } from '../../domain/constants';
+import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 
 /**
  * Displays sell price change history for a specific inventory item
@@ -35,12 +36,14 @@ const REASON_COLORS: Record<
 export default function SellPriceHistoryTable({
   inventoryItemGuid,
 }: SellPriceHistoryTableProps) {
+  const [page, setPage] = useState(1);
+
   const { data, loading, error } = useQuery(
     InventoryItemSellPriceHistoryDocument,
     {
       variables: {
         findSellPriceHistoryArgs: {
-          skip: 0,
+          skip: (page - 1) * DEFAULT_HISTORY_LIMIT,
           limit: DEFAULT_HISTORY_LIMIT,
           sort: { column: 'createdDate', order: 'DESC' },
           filters: {
@@ -55,6 +58,9 @@ export default function SellPriceHistoryTable({
   const priceHistory = useMemo(() => {
     return data?.inventoryItemSellPriceHistory?.data ?? [];
   }, [data]);
+
+  const totalCount = data?.inventoryItemSellPriceHistory?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_HISTORY_LIMIT));
 
   const columns: ITableColumn[] = useMemo(
     () => [
@@ -162,7 +168,6 @@ export default function SellPriceHistoryTable({
 
   return (
     <div className='flex flex-col gap-3'>
-      <h4 className='text-sm font-semibold'>Historial de precios de venta</h4>
       <DataTable
         cols={columns}
         data={priceHistory}
@@ -173,6 +178,17 @@ export default function SellPriceHistoryTable({
         <p className='text-default-400 py-4 text-center text-sm'>
           No hay cambios de precio registrados
         </p>
+      )}
+
+      {totalPages > 1 && (
+        <div className='mt-4 flex justify-center'>
+          <KidstopPagination
+            total={totalPages}
+            page={page}
+            onChange={setPage}
+            showControls
+          />
+        </div>
       )}
     </div>
   );

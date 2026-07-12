@@ -79,11 +79,11 @@ When('intenta ingresar un precio negativo {string}', (price: string) => {
 
 // When - Actions - Navigation
 When('el usuario navega a la pestaña de historial de movimientos', () => {
-  cy.wait(TIMEOUTS.DEBOUNCE);
+  cardDetailModal.navigateToMovementsTab();
 });
 
 When('el usuario navega a la pestaña de historial de precios', () => {
-  cy.wait(TIMEOUTS.DEBOUNCE);
+  cardDetailModal.navigateToPriceHistoryTab();
 });
 
 // Then - Assertions - Modal

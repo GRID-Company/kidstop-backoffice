@@ -16,6 +16,7 @@ export const cardPriceFormSchema = z.object({
   sellPrice: z.coerce.number().refine((val) => val === 0 || val >= MIN_PRICE, {
     message: 'El precio de venta debe ser mayor o igual a 0',
   }),
+  notes: z.string().optional(),
 });
 
 export type CardPriceFormData = z.infer<typeof cardPriceFormSchema>;

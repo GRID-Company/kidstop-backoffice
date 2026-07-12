@@ -22,6 +22,12 @@ export const CardDetailModalSelectors = {
   priceNotesTextarea: '[data-testid="price-notes-textarea"]',
   savePriceButton: '[data-testid="save-price-button"]',
 
+  // Tabs
+  tabStock: '[data-testid="tab-stock"]',
+  tabPrice: '[data-testid="tab-price"]',
+  tabMovements: '[data-testid="tab-movements"]',
+  tabPriceHistory: '[data-testid="tab-price-history"]',
+
   // Success/Error Messages
   successMessage: '[role="status"]',
   errorMessage: '[role="alert"]',

@@ -162,9 +162,29 @@ export default class CardDetailModal {
     cy.get('body').should('contain', 'Precio venta');
   }
 
-  // Tabs/Sections (if applicable)
+  // Tabs/Sections
   navigateToTab(tabName: string) {
     cy.contains('button', tabName).click();
+    cy.wait(TIMEOUTS.DEBOUNCE);
+  }
+
+  navigateToStockTab() {
+    cy.get(CardDetailModalSelectors.tabStock).click();
+    cy.wait(TIMEOUTS.DEBOUNCE);
+  }
+
+  navigateToPriceTab() {
+    cy.get(CardDetailModalSelectors.tabPrice).click();
+    cy.wait(TIMEOUTS.DEBOUNCE);
+  }
+
+  navigateToMovementsTab() {
+    cy.contains('button', 'Historial de movimientos').click();
+    cy.wait(TIMEOUTS.DEBOUNCE);
+  }
+
+  navigateToPriceHistoryTab() {
+    cy.contains('button', 'Historial de precios').click();
     cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
