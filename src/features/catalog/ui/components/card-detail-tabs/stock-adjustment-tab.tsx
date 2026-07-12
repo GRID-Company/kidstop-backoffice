@@ -17,7 +17,7 @@ export default function StockAdjustmentTab({
 }: StockAdjustmentTabProps) {
   return (
     <div
-      className='mx-auto flex max-w-2xl flex-col gap-4'
+      className='mx-auto flex max-w-4xl flex-col gap-4'
       data-testid='tab-stock'
     >
       <div className='flex flex-col gap-4 sm:flex-row'>

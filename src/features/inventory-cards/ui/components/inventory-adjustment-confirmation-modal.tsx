@@ -10,8 +10,9 @@ import {
   Chip,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 import { CARD_CONDITION_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { BULK_ADJUSTMENT_OPTIONS } from '../../domain/constants';
 
 interface InventoryAdjustmentConfirmationModalProps {
@@ -21,6 +22,7 @@ interface InventoryAdjustmentConfirmationModalProps {
   loading?: boolean;
   cardName: string;
   condition: string;
+  language: CardLanguage;
   operationType: BulkOperationType;
   quantity: number;
   currentStock: number;
@@ -44,6 +46,7 @@ export default function InventoryAdjustmentConfirmationModal({
   loading = false,
   cardName,
   condition,
+  language,
   operationType,
   quantity,
   currentStock,
@@ -98,6 +101,12 @@ export default function InventoryAdjustmentConfirmationModal({
                 {CARD_CONDITION_LABELS[
                   condition as keyof typeof CARD_CONDITION_LABELS
                 ] ?? condition}
+              </span>
+            </div>
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Idioma</span>
+              <span className='text-sm font-medium'>
+                {LANGUAGE_LABELS[language]}
               </span>
             </div>
             <div className='flex items-center justify-between'>

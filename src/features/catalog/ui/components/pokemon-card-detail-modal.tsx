@@ -668,6 +668,7 @@ export default function PokemonCardDetailModal({
           loading={adjustLoading}
           cardName={cardName ?? name ?? ''}
           condition={selectedVariant.condition}
+          language={selectedVariant.language}
           operationType={stockWatch('movementType')}
           quantity={stockWatch('quantity')}
           currentStock={selectedVariant.stock}
