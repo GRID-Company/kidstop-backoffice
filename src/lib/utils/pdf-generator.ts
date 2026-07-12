@@ -44,12 +44,27 @@ const CARD_CELL_HEIGHT = IMAGE_HEIGHT + CARD_TEXT_HEIGHT + CARD_GAP;
 const HEADER_BAND_HEIGHT = 18;
 const CHECKBOX_SIZE = 3;
 
+const BADGE_FONT_SIZE = 4.5;
+const BADGE_PADDING = 2;
+const BADGE_HEIGHT = 3;
+const BADGE_VERTICAL_OFFSET = 2.2;
+const BADGE_BORDER_RADIUS = 0.5;
+const BADGE_SPACING = 1.5;
+
 type RGB = [number, number, number];
 
 const TCG_COLORS: Record<string, { accent: RGB; accentLight: RGB }> = {
   POKEMON: { accent: [229, 50, 35], accentLight: [254, 236, 235] },
   MAGIC: { accent: [232, 93, 38], accentLight: [254, 240, 233] },
 };
+
+const BADGE_COLORS = {
+  LANGUAGE: { bg: [220, 220, 220] as RGB, text: [80, 80, 80] as RGB },
+  CARD_NUMBER: { bg: [240, 240, 240] as RGB, text: [100, 100, 100] as RGB },
+  VARIANT: { bg: [250, 240, 220] as RGB, text: [150, 100, 50] as RGB },
+  CONDITION: { bg: [230, 245, 255] as RGB, text: [50, 100, 150] as RGB },
+  FOIL: { bg: [255, 215, 0] as RGB, text: [120, 80, 0] as RGB },
+} as const;
 
 function getTcgColors(tcgType: string) {
   return TCG_COLORS[tcgType] ?? TCG_COLORS.POKEMON;
@@ -226,19 +241,26 @@ function drawBadge(
   bgColor: RGB,
   textColor: RGB
 ): number {
-  doc.setFontSize(4.5);
+  doc.setFontSize(BADGE_FONT_SIZE);
   doc.setFont('helvetica', 'bold');
   const textWidth = doc.getTextWidth(text);
-  const badgeWidth = textWidth + 2;
-  const badgeHeight = 3;
+  const badgeWidth = textWidth + BADGE_PADDING;
 
   doc.setFillColor(...bgColor);
-  doc.roundedRect(x, y - 2.2, badgeWidth, badgeHeight, 0.5, 0.5, 'F');
+  doc.roundedRect(
+    x,
+    y - BADGE_VERTICAL_OFFSET,
+    badgeWidth,
+    BADGE_HEIGHT,
+    BADGE_BORDER_RADIUS,
+    BADGE_BORDER_RADIUS,
+    'F'
+  );
 
   doc.setTextColor(...textColor);
   doc.text(text, x + 1, y);
 
-  return badgeWidth + 1.5;
+  return badgeWidth + BADGE_SPACING;
 }
 
 function drawCardCell(
@@ -309,8 +331,8 @@ function drawCardCell(
       badgeX,
       badgeY,
       item.language,
-      [220, 220, 220],
-      [80, 80, 80]
+      BADGE_COLORS.LANGUAGE.bg,
+      BADGE_COLORS.LANGUAGE.text
     );
   }
 
@@ -320,8 +342,8 @@ function drawCardCell(
       badgeX,
       badgeY,
       `${item.cardNumber}`,
-      [240, 240, 240],
-      [100, 100, 100]
+      BADGE_COLORS.CARD_NUMBER.bg,
+      BADGE_COLORS.CARD_NUMBER.text
     );
   }
 
@@ -331,8 +353,8 @@ function drawCardCell(
       badgeX,
       badgeY,
       item.variant,
-      [250, 240, 220],
-      [150, 100, 50]
+      BADGE_COLORS.VARIANT.bg,
+      BADGE_COLORS.VARIANT.text
     );
   }
 
@@ -348,8 +370,8 @@ function drawCardCell(
     badgeX,
     conditionBadgeY,
     item.condition,
-    [230, 245, 255],
-    [50, 100, 150]
+    BADGE_COLORS.CONDITION.bg,
+    BADGE_COLORS.CONDITION.text
   );
 
   if (item.isFoil) {
@@ -358,8 +380,8 @@ function drawCardCell(
       badgeX,
       conditionBadgeY,
       'Foil',
-      [255, 215, 0],
-      [120, 80, 0]
+      BADGE_COLORS.FOIL.bg,
+      BADGE_COLORS.FOIL.text
     );
   }
 
