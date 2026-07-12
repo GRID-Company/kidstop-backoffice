@@ -2,6 +2,8 @@ import { forwardRef } from 'react';
 import { Chip } from '@heroui/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CardImage } from '@/shared/components/card-image';
+import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { PriceAdjustmentItemProps } from './price-adjustment-types';
@@ -13,6 +15,15 @@ const PriceAdjustmentItem = forwardRef<
   { item, index, control, displayCurrency, hasError, autoCalculatedItems },
   ref
 ) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
+
   return (
     <div
       ref={ref}
@@ -29,6 +40,10 @@ const PriceAdjustmentItem = forwardRef<
           className='object-cover'
           fill
           sizes='48px'
+          enablePreview
+          onImageClick={() =>
+            openPreview(item.cardImageUrl, item.cardName, item.tcgType)
+          }
         />
         <div className='flex flex-1 flex-col gap-1'>
           <div className='flex items-center gap-2'>
@@ -90,6 +105,13 @@ const PriceAdjustmentItem = forwardRef<
           )}
         </div>
       </div>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 });

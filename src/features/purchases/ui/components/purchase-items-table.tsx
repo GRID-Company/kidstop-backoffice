@@ -13,6 +13,8 @@ import { formatCurrency } from '@/lib/utils/format-currency';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { CardImage } from '@/shared/components/card-image';
+import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CardCondition, IPurchaseItem } from '../../domain/types';
 import {
   CARD_CONDITION_OPTIONS,
@@ -47,6 +49,14 @@ export default function PurchaseItemsTable({
   const { isPrivacyMode } = usePrivacyModeStore();
   const { itemsWithPrices, refetch: refetchPrices } =
     useItemsReferencePrices(items);
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   // Expose refetch to parent when requested
   useEffect(() => {
@@ -105,6 +115,10 @@ export default function PurchaseItemsTable({
               className='object-cover'
               fill
               sizes='36px'
+              enablePreview
+              onImageClick={() =>
+                openPreview(item.cardImageUrl, item.cardName, item.tcgType)
+              }
             />
             <div className='flex flex-col items-start'>
               <span className='text-sm font-medium'>{item.cardName}</span>
@@ -286,6 +300,13 @@ export default function PurchaseItemsTable({
           <span className='text-sm'>No hay items en la compra</span>
         </div>
       )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }
