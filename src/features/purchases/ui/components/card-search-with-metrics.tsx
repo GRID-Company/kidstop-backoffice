@@ -414,7 +414,7 @@ export default function CardSearchWithMetrics({
         cardImageUrl: card.imageUrl,
         setName: card.setName,
         setCode: card.setCode,
-        cardNumber: card.number,
+        cardNumber: card.number ? `#${card.number}` : undefined,
         tcgType: card.tcgType,
         variant: card.variant,
         type: card.type,

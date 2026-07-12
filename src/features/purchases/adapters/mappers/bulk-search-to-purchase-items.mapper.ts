@@ -36,8 +36,10 @@ export function mapBulkSearchToPurchaseItems(
       cardName: selectedCard.name,
       cardImageUrl: selectedCard.imageUri || '',
       setName: selectedCard.edition,
-      setCode: selectedCard.collectorNumber,
-      cardNumber: selectedCard.collectorNumber,
+      setCode: '',
+      cardNumber: selectedCard.collectorNumber
+        ? `#${selectedCard.collectorNumber}`
+        : undefined,
       tcgType,
       variant: selectedCard.variant,
       type: selectedCard.type,

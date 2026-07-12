@@ -22,7 +22,7 @@ export function adaptPurchaseItem(item: IPurchaseItem): AdaptedPurchaseItem {
     hp: item.hp,
     stage: item.stage,
     rarity: item.rarity,
-    isFoil: item.isFoil ?? undefined,
+    isFoil: item.isFoil !== null ? item.isFoil : undefined,
     collectorNumber: item.collectorNumber,
     tcgType: item.tcgType,
     condition: item.condition,
