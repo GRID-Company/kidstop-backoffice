@@ -319,7 +319,7 @@ function drawCardCell(
       doc,
       badgeX,
       badgeY,
-      `#${item.cardNumber}`,
+      `${item.cardNumber}`,
       [240, 240, 240],
       [100, 100, 100]
     );
