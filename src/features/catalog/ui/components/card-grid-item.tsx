@@ -6,8 +6,6 @@ import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import { CardBody } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
-import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { ICard } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 
@@ -23,15 +21,6 @@ function CardGridItemComponent({ card, onPress }: CardGridItemProps) {
     return { totalStock: total, lowestSellPrice: lowest };
   }, [card.variants]);
 
-  const {
-    isOpen: isPreviewOpen,
-    imageUrl: previewImageUrl,
-    alt: previewAlt,
-    tcgType: previewTcgType,
-    openPreview,
-    closePreview,
-  } = useCardImagePreview();
-
   return (
     <KidstopCard
       isPressable={!!onPress}
@@ -39,22 +28,7 @@ function CardGridItemComponent({ card, onPress }: CardGridItemProps) {
       className='h-full'
     >
       <CardBody className='flex flex-col gap-3 !p-0'>
-        <div
-          className='bg-default-100 relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-t-md transition-opacity hover:opacity-80'
-          onClick={(e) => {
-            e.stopPropagation();
-            openPreview(card.imageUrl, card.name, card.tcgType);
-          }}
-          role='button'
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.stopPropagation();
-              openPreview(card.imageUrl, card.name, card.tcgType);
-            }
-          }}
-          aria-label={`Ver ${card.name} en tamaño completo`}
-        >
+        <div className='bg-default-100 relative aspect-[3/4] w-full overflow-hidden rounded-t-md'>
           {card.imageUrl ? (
             <Image
               src={card.imageUrl}
@@ -108,13 +82,6 @@ function CardGridItemComponent({ card, onPress }: CardGridItemProps) {
           </div>
         </div>
       </CardBody>
-      <CardImagePreviewModal
-        isOpen={isPreviewOpen}
-        onClose={closePreview}
-        imageUrl={previewImageUrl}
-        alt={previewAlt}
-        tcgType={previewTcgType}
-      />
     </KidstopCard>
   );
 }

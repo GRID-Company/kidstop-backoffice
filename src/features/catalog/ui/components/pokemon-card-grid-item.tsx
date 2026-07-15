@@ -6,8 +6,6 @@ import { CardBody, Chip } from '@heroui/react';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import FoilChip from '@/shared/components/foil-chip';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
-import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { IPokemonCard, CardCondition } from '../../domain/types';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
@@ -22,14 +20,6 @@ export default function PokemonCardGridItem({
   onPress,
 }: PokemonCardGridItemProps) {
   const sellPrice = card.sellPrice ?? 0;
-  const {
-    isOpen: isPreviewOpen,
-    imageUrl: previewImageUrl,
-    alt: previewAlt,
-    tcgType: previewTcgType,
-    openPreview,
-    closePreview,
-  } = useCardImagePreview();
 
   return (
     <KidstopCard
@@ -39,22 +29,7 @@ export default function PokemonCardGridItem({
       data-testid='pokemon-card-item'
     >
       <CardBody className='flex flex-col gap-3 !p-0'>
-        <div
-          className='bg-default-100 relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-t-md transition-opacity hover:opacity-80'
-          onClick={(e) => {
-            e.stopPropagation();
-            openPreview(card.imageUri, card.name, 'POKEMON');
-          }}
-          role='button'
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.stopPropagation();
-              openPreview(card.imageUri, card.name, 'POKEMON');
-            }
-          }}
-          aria-label={`Ver ${card.name} en tamaño completo`}
-        >
+        <div className='bg-default-100 relative aspect-[3/4] w-full overflow-hidden rounded-t-md'>
           {card.imageUri ? (
             <Image
               src={card.imageUri}
@@ -155,13 +130,6 @@ export default function PokemonCardGridItem({
           )}
         </div>
       </CardBody>
-      <CardImagePreviewModal
-        isOpen={isPreviewOpen}
-        onClose={closePreview}
-        imageUrl={previewImageUrl}
-        alt={previewAlt}
-        tcgType={previewTcgType}
-      />
     </KidstopCard>
   );
 }
