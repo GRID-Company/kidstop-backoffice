@@ -38,14 +38,16 @@ function CardImageComponent({
       ? 'cursor-pointer hover:opacity-80 transition-opacity'
       : '';
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     if (enablePreview && onImageClick) {
+      e.stopPropagation();
       onImageClick();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (enablePreview && onImageClick && e.key === 'Enter') {
+      e.stopPropagation();
       onImageClick();
     }
   };
