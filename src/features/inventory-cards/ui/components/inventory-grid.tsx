@@ -16,6 +16,8 @@ import {
 } from '@heroui/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { IInventoryItem } from '../../domain/types';
@@ -61,12 +63,43 @@ function formatDays(days: number | null): string {
   return `${days.toFixed(1)}d`;
 }
 
-function renderCell(item: IInventoryItem, columnKey: string) {
+function renderCell(
+  item: IInventoryItem,
+  columnKey: string,
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void
+) {
   switch (columnKey) {
     case 'name':
       return (
         <div className='flex items-center gap-3'>
-          <div className='bg-default-100 relative h-28 w-20 flex-shrink-0 overflow-hidden rounded'>
+          <div
+            className='bg-default-100 relative h-28 w-20 flex-shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+            onClick={(e) => {
+              e.stopPropagation();
+              openPreview(
+                item.imageUrl,
+                item.name,
+                item.tcg as 'POKEMON' | 'MAGIC'
+              );
+            }}
+            role='button'
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.stopPropagation();
+                openPreview(
+                  item.imageUrl,
+                  item.name,
+                  item.tcg as 'POKEMON' | 'MAGIC'
+                );
+              }
+            }}
+            aria-label={`Ver ${item.name} en tamaño completo`}
+          >
             {item.imageUrl ? (
               <img
                 src={item.imageUrl}
@@ -146,14 +179,43 @@ function renderCell(item: IInventoryItem, columnKey: string) {
 function InventoryMobileCard({
   item,
   onPress,
+  openPreview,
 }: {
   item: IInventoryItem;
   onPress?: (item: IInventoryItem) => void;
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void;
 }) {
   return (
     <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
       <CardBody className='flex flex-row gap-3 !p-4'>
-        <div className='bg-default-100 relative h-32 w-24 flex-shrink-0 overflow-hidden rounded'>
+        <div
+          className='bg-default-100 relative h-32 w-24 flex-shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+          onClick={(e) => {
+            e.stopPropagation();
+            openPreview(
+              item.imageUrl,
+              item.name,
+              item.tcg as 'POKEMON' | 'MAGIC'
+            );
+          }}
+          role='button'
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.stopPropagation();
+              openPreview(
+                item.imageUrl,
+                item.name,
+                item.tcg as 'POKEMON' | 'MAGIC'
+              );
+            }
+          }}
+          aria-label={`Ver ${item.name} en tamaño completo`}
+        >
           {item.imageUrl ? (
             <img
               src={item.imageUrl}
@@ -218,6 +280,14 @@ export default function InventoryGrid({
   onSortChange,
   onItemPress,
 }: InventoryGridProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
   if (isLoading) {
     return (
       <div className='flex flex-col gap-3'>
@@ -268,7 +338,7 @@ export default function InventoryGrid({
               >
                 {COLUMNS.map((col) => (
                   <TableCell key={col.key} className='text-center'>
-                    {renderCell(item, col.key)}
+                    {renderCell(item, col.key, openPreview)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -283,6 +353,7 @@ export default function InventoryGrid({
             key={item.guid}
             item={item}
             onPress={onItemPress}
+            openPreview={openPreview}
           />
         ))}
       </div>
@@ -301,6 +372,13 @@ export default function InventoryGrid({
           />
         </div>
       )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }
