@@ -1,8 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Pagination,
   Skeleton,
@@ -16,7 +13,8 @@ import {
 } from '@heroui/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
@@ -76,50 +74,23 @@ function renderCell(
     case 'name':
       return (
         <div className='flex items-center gap-3'>
-          <div
-            className='bg-default-100 relative h-28 w-20 flex-shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-            onClick={(e) => {
-              e.stopPropagation();
+          <CardImage
+            src={item.imageUrl}
+            alt={item.name}
+            tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+            containerClassName='relative h-28 w-20 flex-shrink-0 overflow-hidden rounded bg-default-100'
+            className='object-contain'
+            fill
+            sizes='80px'
+            enablePreview
+            onImageClick={() =>
               openPreview(
                 item.imageUrl,
                 item.name,
                 item.tcg as 'POKEMON' | 'MAGIC'
-              );
-            }}
-            role='button'
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.stopPropagation();
-                openPreview(
-                  item.imageUrl,
-                  item.name,
-                  item.tcg as 'POKEMON' | 'MAGIC'
-                );
-              }
-            }}
-            aria-label={`Ver ${item.name} en tamaño completo`}
-          >
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                className='absolute inset-0 h-full w-full object-contain'
-              />
-            ) : (
-              <Image
-                src={
-                  item.tcg === 'MAGIC'
-                    ? magicCardPlaceholder
-                    : pokemonCardPlaceholder
-                }
-                alt='Card placeholder'
-                fill
-                sizes='80px'
-                className='object-contain'
-              />
-            )}
-          </div>
+              )
+            }
+          />
           <div className='min-w-0'>
             <p className='truncate text-sm font-medium'>{item.name}</p>
             <p className='text-default-400 truncate text-xs'>
@@ -192,50 +163,23 @@ function InventoryMobileCard({
   return (
     <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
       <CardBody className='flex flex-row gap-3 !p-4'>
-        <div
-          className='bg-default-100 relative h-32 w-24 flex-shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-          onClick={(e) => {
-            e.stopPropagation();
+        <CardImage
+          src={item.imageUrl}
+          alt={item.name}
+          tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+          containerClassName='relative h-32 w-24 shrink-0 overflow-hidden rounded bg-default-100'
+          className='object-contain'
+          fill
+          sizes='96px'
+          enablePreview
+          onImageClick={() =>
             openPreview(
               item.imageUrl,
               item.name,
               item.tcg as 'POKEMON' | 'MAGIC'
-            );
-          }}
-          role='button'
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.stopPropagation();
-              openPreview(
-                item.imageUrl,
-                item.name,
-                item.tcg as 'POKEMON' | 'MAGIC'
-              );
-            }
-          }}
-          aria-label={`Ver ${item.name} en tamaño completo`}
-        >
-          {item.imageUrl ? (
-            <img
-              src={item.imageUrl}
-              alt={item.name}
-              className='absolute inset-0 h-full w-full object-contain'
-            />
-          ) : (
-            <Image
-              src={
-                item.tcg === 'MAGIC'
-                  ? magicCardPlaceholder
-                  : pokemonCardPlaceholder
-              }
-              alt='Card placeholder'
-              fill
-              sizes='96px'
-              className='object-contain'
-            />
-          )}
-        </div>
+            )
+          }
+        />
 
         <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <div className='flex items-start justify-between gap-2'>

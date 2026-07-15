@@ -18,7 +18,7 @@ import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { ICard, ICardVariant } from '../../domain/types';
 import {

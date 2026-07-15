@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { Chip } from '@heroui/react';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CardImage } from '@/shared/components/card-image';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';

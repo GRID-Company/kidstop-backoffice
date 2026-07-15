@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import BulkCardRelatedSelector from './bulk-card-related-selector';

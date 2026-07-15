@@ -4,7 +4,7 @@ import { RadioGroup, Radio, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { BulkCardRelatedSelectorProps } from './types';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';

@@ -7,7 +7,7 @@ import { DataTable } from '@/shared/blocks/data-table/data-table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardImage } from '@/shared/components/card-image';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import {
   getCardName,

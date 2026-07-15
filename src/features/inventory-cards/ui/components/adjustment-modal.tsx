@@ -19,7 +19,7 @@ import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import InputForm from '@/shared/base/form-controls/input-form';

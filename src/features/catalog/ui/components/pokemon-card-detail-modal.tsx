@@ -20,7 +20,7 @@ import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Icon } from '@iconify/react';
 import FoilChip from '@/shared/components/foil-chip';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';

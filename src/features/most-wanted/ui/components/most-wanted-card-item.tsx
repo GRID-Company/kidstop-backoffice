@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Chip, Switch, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { IMostWantedCard } from '../../domain/types';
 import { MOST_WANTED_PRIORITY_LABELS } from '../../domain/constants';

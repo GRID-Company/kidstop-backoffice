@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Modal, ModalContent, Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
@@ -15,7 +14,7 @@ interface CardImagePreviewModalProps {
   tcgType: 'POKEMON' | 'MAGIC';
 }
 
-export default function CardImagePreviewModal({
+export function CardImagePreviewModal({
   isOpen,
   onClose,
   imageUrl,
@@ -24,24 +23,6 @@ export default function CardImagePreviewModal({
 }: CardImagePreviewModalProps) {
   const placeholder =
     tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder;
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    },
-    [onClose]
-  );
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-      };
-    }
-  }, [isOpen, handleKeyDown]);
 
   return (
     <Modal
