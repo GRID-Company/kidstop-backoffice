@@ -9,7 +9,8 @@ import MovementDetailDrawer from '../components/movement-detail-drawer';
 import { IInventoryMovement } from '../../domain/types';
 
 export default function MovementsContent() {
-  const [selectedMovement, setSelectedMovement] = useState<IInventoryMovement | null>(null);
+  const [selectedMovement, setSelectedMovement] =
+    useState<IInventoryMovement | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const {
@@ -40,7 +41,7 @@ export default function MovementsContent() {
 
   return (
     <>
-      <div className="mb-6">
+      <div className='mb-6'>
         <MovementFilters
           onSearchChange={setSearch}
           onFilterChange={handleFilterChange}

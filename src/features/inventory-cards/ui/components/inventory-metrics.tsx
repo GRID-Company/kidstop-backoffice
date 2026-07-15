@@ -65,19 +65,19 @@ export default function InventoryMetrics({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
       {METRIC_CARDS.map((card) => (
         <KidstopCard key={card.key}>
-          <CardBody className="flex flex-row items-center gap-4 !p-4">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10">
-              <Icon icon={card.icon} className="text-xl text-accent" />
+          <CardBody className='flex flex-row items-center gap-4 !p-4'>
+            <div className='bg-accent/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg'>
+              <Icon icon={card.icon} className='text-accent text-xl' />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs text-default-400">{card.label}</p>
+            <div className='min-w-0'>
+              <p className='text-default-400 text-xs'>{card.label}</p>
               {loading ? (
-                <Skeleton className="mt-1 h-6 w-24 rounded" />
+                <Skeleton className='mt-1 h-6 w-24 rounded' />
               ) : (
-                <p className="truncate text-lg font-semibold">
+                <p className='truncate text-lg font-semibold'>
                   {formatMetric(card.key, values[card.key])}
                 </p>
               )}

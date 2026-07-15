@@ -1,4 +1,4 @@
-import { useEffect, useState, type PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import {
   getKeyValue,
   Spinner,
@@ -12,18 +12,22 @@ import {
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import { ITableColumn } from '@/lib/types/datatable.types';
 
-type DataTableProps = {
-  cols: ITableColumn[];
-  data: any[];
+type DataTableProps<
+  T extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  cols: ITableColumn<T>[];
+  data: T[];
   isLoading: boolean;
   selectable?: boolean;
-  setSelectedKeys?: (selected: any[]) => void;
+  setSelectedKeys?: (selected: unknown[]) => void;
   selectedKeys?: Set<string>;
   rowClickable?: boolean;
-  onRowClick?: (item: any) => void;
+  onRowClick?: (item: T) => void;
 } & Partial<TableProps>;
 
-export function DataTable({
+export function DataTable<
+  T extends Record<string, unknown> = Record<string, unknown>,
+>({
   cols,
   data,
   isLoading,
@@ -33,7 +37,7 @@ export function DataTable({
   rowClickable = false,
   onRowClick,
   ...tableProps
-}: PropsWithChildren<DataTableProps>) {
+}: PropsWithChildren<DataTableProps<T>>) {
   return (
     <KidstopTable
       {...tableProps}
@@ -41,8 +45,10 @@ export function DataTable({
       className='animate-in fade-in'
       selectedKeys={selectedKeys}
       selectionMode={selectable ? 'multiple' : 'none'}
-      onSelectionChange={(e: any) => {
-        setSelectedKeys && setSelectedKeys(e);
+      onSelectionChange={(e: unknown) => {
+        if (setSelectedKeys) {
+          setSelectedKeys(e as unknown[]);
+        }
       }}
       checkboxesProps={{
         color: 'secondary',
@@ -73,12 +79,22 @@ export function DataTable({
         }
       >
         {(item) => (
-          <TableRow 
-            key={item.guid ?? item.id ?? item.key}
-            className={rowClickable ? 'cursor-pointer hover:bg-[#F5F9FF] transition-colors duration-150' : ''}
-            onClick={rowClickable && onRowClick ? () => onRowClick(item) : undefined}
+          <TableRow
+            key={
+              ((item as Record<string, unknown>).guid as string) ??
+              ((item as Record<string, unknown>).id as string) ??
+              ((item as Record<string, unknown>).key as string)
+            }
+            className={
+              rowClickable
+                ? 'cursor-pointer transition-colors duration-150 hover:bg-[#F5F9FF]'
+                : ''
+            }
+            onClick={
+              rowClickable && onRowClick ? () => onRowClick(item) : undefined
+            }
           >
-            {cols.map((col: ITableColumn) => (
+            {cols.map((col: ITableColumn<T>) => (
               <TableCell
                 key={col.key}
                 className={`text-center ${col?.className ?? ''}`}

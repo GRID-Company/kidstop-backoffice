@@ -30,38 +30,39 @@ export default function SellerDeleteModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isDismissable={!isLoading}>
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">
+        <ModalHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>
             Eliminar vendedor
           </span>
         </ModalHeader>
 
         <ModalBody>
-          <div className="flex flex-col gap-3">
-            <p className="text-sm text-default-600">
+          <div className='flex flex-col gap-3'>
+            <p className='text-default-600 text-sm'>
               ¿Estás seguro de que deseas eliminar al vendedor{' '}
-              <span className="font-semibold text-accent">{seller?.name}</span>?
+              <span className='text-accent font-semibold'>{seller?.name}</span>?
             </p>
-            <p className="text-xs text-default-500">
-              Esta acción es irreversible. Los datos del vendedor se marcarán como eliminados pero se preservarán para las compras existentes.
+            <p className='text-default-500 text-xs'>
+              Esta acción es irreversible. Los datos del vendedor se marcarán
+              como eliminados pero se preservarán para las compras existentes.
             </p>
           </div>
         </ModalBody>
 
         <ModalFooter>
           <Button
-            variant="light"
+            variant='light'
             onPress={onClose}
             isDisabled={isLoading}
-            className="text-accent"
+            className='text-accent'
           >
             Cancelar
           </Button>
           <Button
             onPress={onConfirm}
             isLoading={isLoading}
-            startContent={!isLoading && <Icon icon="lucide:trash-2" />}
-            className="text-white"
+            startContent={!isLoading && <Icon icon='lucide:trash-2' />}
+            className='text-white'
             style={{ backgroundColor: 'var(--color-accent)' }}
           >
             {isLoading ? 'Eliminando...' : 'Eliminar'}

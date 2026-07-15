@@ -4,15 +4,23 @@ import { useQuery } from '@apollo/client/react';
 import { InventoryMovementsDocument } from '@/lib/api/generated/inventory.generated';
 import { fromApiInventoryMovement } from '../../adapters/mappers/inventory.mapper';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
-import { DateRange, IInventoryMovement, MovementFilters } from '../../domain/types';
+import {
+  DateRange,
+  IInventoryMovement,
+  MovementFilters,
+} from '../../domain/types';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 
 export function useMovementSearch() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [search, setSearch] = useState('');
-  const [filters, setFilters] = useState<Omit<MovementFilters, 'search' | 'dateRange'>>({});
+  const [filters, setFilters] = useState<
+    Omit<MovementFilters, 'search' | 'dateRange'>
+  >({});
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>({
+  const [sortDescriptor, setSortDescriptor] = useState<
+    SortDescriptor | undefined
+  >({
     column: 'createdDate',
     direction: 'descending',
   });
@@ -55,27 +63,30 @@ export function useMovementSearch() {
   const sortColumn = sortDescriptor?.column as string | undefined;
   const sortOrder = sortDescriptor?.direction === 'descending' ? 'DESC' : 'ASC';
 
-  const { data, loading, error, refetch } = useQuery(InventoryMovementsDocument, {
-    variables: {
-      findInventoryMovementsArgs: {
-        skip: (page - 1) * DEFAULT_PAGE_SIZE,
-        limit: DEFAULT_PAGE_SIZE,
-        sort: { column: sortColumn ?? 'createdDate', order: sortOrder },
-        search: search.trim() || undefined,
-        filters: {
-          tcg: selectedTCG,
-          movementType: filters.movementType || undefined,
-          ...(dateRange && {
-            createdDate: {
-              filterType: ':daterange:',
-              range: { from: dateRange.start, to: dateRange.end },
-            },
-          }),
+  const { data, loading, error, refetch } = useQuery(
+    InventoryMovementsDocument,
+    {
+      variables: {
+        findInventoryMovementsArgs: {
+          skip: (page - 1) * DEFAULT_PAGE_SIZE,
+          limit: DEFAULT_PAGE_SIZE,
+          sort: { column: sortColumn ?? 'createdDate', order: sortOrder },
+          search: search.trim() || undefined,
+          filters: {
+            tcg: selectedTCG,
+            movementType: filters.movementType || undefined,
+            ...(dateRange && {
+              createdDate: {
+                filterType: ':daterange:',
+                range: { from: dateRange.start, to: dateRange.end },
+              },
+            }),
+          },
         },
       },
-    },
-    fetchPolicy: 'network-only',
-  });
+      fetchPolicy: 'network-only',
+    }
+  );
 
   const items = useMemo<IInventoryMovement[]>(() => {
     if (!data?.inventoryMovements?.data) return [];

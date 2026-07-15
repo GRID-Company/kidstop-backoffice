@@ -13,15 +13,29 @@ interface UseItemsMetricsReturn {
   refetch: () => void;
 }
 
-export function usePurchaseItemsMetrics(items: IPurchaseItem[]): UseItemsMetricsReturn {
+export function usePurchaseItemsMetrics(
+  items: IPurchaseItem[]
+): UseItemsMetricsReturn {
   const [metricsCache, setMetricsCache] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState(false);
 
-  const pokemonItems = useMemo(() => items.filter((i) => i.tcgType === TCG_TYPES.POKEMON), [items]);
-  const magicItems = useMemo(() => items.filter((i) => i.tcgType === TCG_TYPES.MAGIC), [items]);
+  const pokemonItems = useMemo(
+    () => items.filter((i) => i.tcgType === TCG_TYPES.POKEMON),
+    [items]
+  );
+  const magicItems = useMemo(
+    () => items.filter((i) => i.tcgType === TCG_TYPES.MAGIC),
+    [items]
+  );
 
-  const pokemonCardGuids = useMemo(() => [...new Set(pokemonItems.map((i) => i.cardGuid))], [pokemonItems]);
-  const magicCardGuids = useMemo(() => [...new Set(magicItems.map((i) => i.cardGuid))], [magicItems]);
+  const pokemonCardGuids = useMemo(
+    () => [...new Set(pokemonItems.map((i) => i.cardGuid))],
+    [pokemonItems]
+  );
+  const magicCardGuids = useMemo(
+    () => [...new Set(magicItems.map((i) => i.cardGuid))],
+    [magicItems]
+  );
 
   const [fetchPokemonMetrics, { loading: pokemonLoading }] = useLazyQuery(
     PokemonCardWithMetricsDocument,
@@ -91,11 +105,19 @@ export function usePurchaseItemsMetrics(items: IPurchaseItem[]): UseItemsMetrics
 
   const itemsWithMetrics = useMemo(() => {
     return items.map((item) => {
-      const cachedMetrics = metricsCache[item.cardGuid] as { variantsMetrics?: unknown } | undefined;
+      const cachedMetrics = metricsCache[item.cardGuid] as
+        | { variantsMetrics?: unknown }
+        | undefined;
 
-      if (cachedMetrics && 'variantsMetrics' in cachedMetrics && cachedMetrics.variantsMetrics) {
+      if (
+        cachedMetrics &&
+        'variantsMetrics' in cachedMetrics &&
+        cachedMetrics.variantsMetrics
+      ) {
         const variantMetrics = extractVariantMetrics(
-          cachedMetrics.variantsMetrics as Parameters<typeof extractVariantMetrics>[0],
+          cachedMetrics.variantsMetrics as Parameters<
+            typeof extractVariantMetrics
+          >[0],
           item.condition
         );
 
@@ -103,7 +125,8 @@ export function usePurchaseItemsMetrics(items: IPurchaseItem[]): UseItemsMetrics
           return {
             ...item,
             metrics: {
-              referencePrice: item.metrics?.referencePrice ?? item.referencePrice ?? 0,
+              referencePrice:
+                item.metrics?.referencePrice ?? item.referencePrice ?? 0,
               currentStock: variantMetrics.stock,
               lastSaleDate: variantMetrics.lastSaleDate,
               daysInInventory: variantMetrics.daysInInventory,

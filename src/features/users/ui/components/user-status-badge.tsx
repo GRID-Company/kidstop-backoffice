@@ -20,10 +20,11 @@ export default function UserStatusBadge({
 
   return (
     <Chip
-      size="sm"
+      size='sm'
       color={STATUS_COLOR_MAP[status]}
-      variant="flat"
+      variant='flat'
       className={className}
+      data-testid='user-status'
     >
       {USER_STATUS_LABELS[status]}
     </Chip>

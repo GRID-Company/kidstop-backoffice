@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
 
-export interface ITableColumn {
+export interface ITableColumn<T = Record<string, unknown>> {
   key: string;
   label: string;
   allowSorting?: boolean;
   className?: string;
-  customCol?: (row: any) => ReactNode;
+  customCol?: (row: T) => ReactNode;
 }
 
 export interface ITableSort {
@@ -17,7 +17,7 @@ export interface IPaginatedApiArgs {
   skip: number;
   limit: number;
   sort: ITableSort;
-  filters?: any;
+  filters?: Record<string, unknown>;
   search?: string;
 }
 

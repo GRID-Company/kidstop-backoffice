@@ -33,19 +33,15 @@ export function useCardVariantMetrics(
   condition: CardCondition,
   tcgType: TCGType
 ): UseCardVariantMetricsReturn {
-  const [fetchPokemonMetrics, { data: pokemonData, loading: pokemonLoading }] = useLazyQuery(
-    PokemonCardWithMetricsDocument,
-    {
+  const [fetchPokemonMetrics, { data: pokemonData, loading: pokemonLoading }] =
+    useLazyQuery(PokemonCardWithMetricsDocument, {
       fetchPolicy: 'cache-and-network',
-    }
-  );
+    });
 
-  const [fetchMagicMetrics, { data: magicData, loading: magicLoading }] = useLazyQuery(
-    MagicCardWithMetricsDocument,
-    {
+  const [fetchMagicMetrics, { data: magicData, loading: magicLoading }] =
+    useLazyQuery(MagicCardWithMetricsDocument, {
       fetchPolicy: 'cache-and-network',
-    }
-  );
+    });
 
   useEffect(() => {
     if (tcgType === TCG_TYPES.POKEMON) {

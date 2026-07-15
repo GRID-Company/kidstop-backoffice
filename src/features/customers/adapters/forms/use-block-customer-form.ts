@@ -5,9 +5,13 @@ import {
   blockCustomerFormSchema,
 } from './block-customer-form.schema';
 
-export function useBlockCustomerForm(defaults?: Partial<BlockCustomerFormData>) {
+export function useBlockCustomerForm(
+  defaults?: Partial<BlockCustomerFormData>
+) {
   return useForm<BlockCustomerFormData>({
-    resolver: zodResolver(blockCustomerFormSchema) as Resolver<BlockCustomerFormData>,
+    resolver: zodResolver(
+      blockCustomerFormSchema
+    ) as Resolver<BlockCustomerFormData>,
     defaultValues: {
       reason: '',
       ...defaults,

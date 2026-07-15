@@ -15,17 +15,17 @@ Panel administrativo de **Kidstop Singles Platform** para operar compras, invent
 
 ## Módulos
 
-| Módulo | Descripción |
-|--------|-------------|
-| **Login** | Autenticación, sesión via cookies, recuperación de contraseña |
-| **Usuarios** | CRUD de staff (Admin, Recepción, Comprador) |
-| **Catálogo** | Búsqueda de cartas con contexto TCG, catálogo interno, precios públicos |
-| **Compras** | Buylist con negociación, presupuesto, cotización WhatsApp, modo privacidad |
-| **Inventario** | Stock por Carta + Variante + Condición, movimientos, métricas |
-| **Ventas** | Pedidos desde Carpeta Digital, picking list PDF, código Shopify |
-| **Clientes** | Clasificación VIP, bloqueos, validación de ubicación |
-| **Most Wanted** | Configuración de páginas públicas por TCG con drag & drop |
-| **Configuración** | Geofence, umbrales, presupuestos, límites de inventario |
+| Módulo            | Descripción                                                                |
+| ----------------- | -------------------------------------------------------------------------- |
+| **Login**         | Autenticación, sesión via cookies, recuperación de contraseña              |
+| **Usuarios**      | CRUD de staff (Admin, Recepción, Comprador)                                |
+| **Catálogo**      | Búsqueda de cartas con contexto TCG, catálogo interno, precios públicos    |
+| **Compras**       | Buylist con negociación, presupuesto, cotización WhatsApp, modo privacidad |
+| **Inventario**    | Stock por Carta + Variante + Condición, movimientos, métricas              |
+| **Ventas**        | Pedidos desde Carpeta Digital, picking list PDF, código Shopify            |
+| **Clientes**      | Clasificación VIP, bloqueos, validación de ubicación                       |
+| **Most Wanted**   | Configuración de páginas públicas por TCG con drag & drop                  |
+| **Configuración** | Geofence, umbrales, presupuestos, límites de inventario                    |
 
 ## Configuración Inicial
 
@@ -42,6 +42,7 @@ cp .env.template .env
 ```
 
 **Variables mínimas requeridas:**
+
 - `NEXT_PUBLIC_GRAPHQL_ENDPOINT` — URL del API GraphQL
 - `NEXT_PUBLIC_API_URL` — URL del API para Apollo Client
 
@@ -135,15 +136,15 @@ Ver [docs/MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) para la
 
 ## Documentación
 
-| Documento | Descripción |
-|-----------|-------------|
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura, patrones, capas y convenciones |
-| [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) | Contexto del proyecto, glosario, roles y módulos |
-| [BACKEND_SPEC.md](docs/BACKEND_SPEC.md) | Especificación GraphQL del backend (NestJS) |
-| [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) | Guía de migración mock → Apollo |
-| [CARPETA_DIGITAL_TEMPLATE.md](docs/CARPETA_DIGITAL_TEMPLATE.md) | Template para el repo de la Carpeta Digital |
-| [KSP - Alcance y requerimientos del MVP.md](docs/KSP%20-%20Alcance%20y%20requerimientos%20del%20MVP.md) | Documento de alcance completo del MVP |
-| [ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) | Configuración de variables de entorno |
+| Documento                                                                                               | Descripción                                      |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md)                                                                 | Arquitectura, patrones, capas y convenciones     |
+| [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md)                                                           | Contexto del proyecto, glosario, roles y módulos |
+| [BACKEND_SPEC.md](docs/BACKEND_SPEC.md)                                                                 | Especificación GraphQL del backend (NestJS)      |
+| [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md)                                         | Guía de migración mock → Apollo                  |
+| [CARPETA_DIGITAL_TEMPLATE.md](docs/CARPETA_DIGITAL_TEMPLATE.md)                                         | Template para el repo de la Carpeta Digital      |
+| [KSP - Alcance y requerimientos del MVP.md](docs/KSP%20-%20Alcance%20y%20requerimientos%20del%20MVP.md) | Documento de alcance completo del MVP            |
+| [ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md)                                                       | Configuración de variables de entorno            |
 
 ## Troubleshooting
 

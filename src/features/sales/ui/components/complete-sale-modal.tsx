@@ -40,64 +40,68 @@ export default function CompleteSaleModal({
   if (!sale) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} size='sm'>
       <ModalContent>
-        <ModalHeader className="flex items-center gap-2">
-          <Icon icon="lucide:check-circle" className="text-success" width={20} />
+        <ModalHeader className='flex items-center gap-2'>
+          <Icon
+            icon='lucide:check-circle'
+            className='text-success'
+            width={20}
+          />
           <span>Completar venta</span>
         </ModalHeader>
 
-        <ModalBody className="flex flex-col gap-4">
-          <p className="text-sm text-default-600">
+        <ModalBody className='flex flex-col gap-4'>
+          <p className='text-default-600 text-sm'>
             ¿Confirmas que el cliente recolectó su pedido?
           </p>
 
-          <div className="flex flex-col gap-2 rounded-lg bg-default-50 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Código</span>
-              <span className="text-sm font-semibold text-accent">
+          <div className='bg-default-50 flex flex-col gap-2 rounded-lg p-3'>
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Código</span>
+              <span className='text-accent text-sm font-semibold'>
                 {sale.saleCode}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Cliente</span>
-              <span className="text-sm font-medium">
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Cliente</span>
+              <span className='text-sm font-medium'>
                 {getCustomerDisplayName(
                   sale.customer?.name,
                   sale.kioskCustomerName
                 )}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Items</span>
-              <Chip size="sm" variant="flat">
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Items</span>
+              <Chip size='sm' variant='flat'>
                 {itemCount} {itemCount === 1 ? 'carta' : 'cartas'}
               </Chip>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Total</span>
-              <span className="text-sm font-bold text-accent">
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Total</span>
+              <span className='text-accent text-sm font-bold'>
                 {formatCurrency(sale.total)}
               </span>
             </div>
           </div>
 
-          <p className="text-xs text-default-400">
+          <p className='text-default-400 text-xs'>
             Al confirmar, el inventario se descontará automáticamente mediante
             lógica FIFO.
           </p>
         </ModalBody>
 
-        <ModalFooter className="flex justify-between">
-          <Button variant="light" onPress={onClose} className="text-accent">
+        <ModalFooter className='flex justify-between'>
+          <Button variant='light' onPress={onClose} className='text-accent'>
             Cancelar
           </Button>
           <Button
-            color="success"
+            color='success'
             isLoading={loading}
-            startContent={<Icon icon="lucide:check-circle" width={18} />}
+            startContent={<Icon icon='lucide:check-circle' width={18} />}
             onPress={handleConfirm}
-            className="text-white"
+            className='text-white'
           >
             Confirmar entrega
           </Button>

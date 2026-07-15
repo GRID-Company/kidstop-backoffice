@@ -8,19 +8,23 @@ export interface CatalogFilters {
   sortOrder?: 'ASC' | 'DESC';
 }
 
-interface UseCatalogSearchProps {
+interface UseCatalogSearchProps<TCard, TCollection> {
   listDocument: DocumentNode;
   collectionsDocument: DocumentNode;
   raritiesDocument: DocumentNode;
   variantsDocument?: DocumentNode;
   genresDocument?: DocumentNode;
-  getVarsFunction: (page: number, search: string, filters: CatalogFilters) => any;
-  mapCardFunction: (card: any) => any;
-  mapCollectionFunction: (collection: any) => any;
+  getVarsFunction: (
+    page: number,
+    search: string,
+    filters: CatalogFilters
+  ) => Record<string, unknown>;
+  mapCardFunction: (card: unknown) => TCard;
+  mapCollectionFunction: (collection: unknown) => TCollection;
   skip?: boolean;
 }
 
-export function useCatalogSearch({
+export function useCatalogSearch<TCard, TCollection>({
   listDocument,
   collectionsDocument,
   raritiesDocument,
@@ -30,7 +34,7 @@ export function useCatalogSearch({
   mapCardFunction,
   mapCollectionFunction,
   skip = false,
-}: UseCatalogSearchProps) {
+}: UseCatalogSearchProps<TCard, TCollection>) {
   const [page, setPage] = useState(1);
   const [search, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<CatalogFilters>({});
@@ -47,7 +51,7 @@ export function useCatalogSearch({
 
   const { data: collectionsData, loading: collectionsLoading } = useQuery(
     collectionsDocument,
-    { 
+    {
       fetchPolicy: 'cache-first',
       skip,
       notifyOnNetworkStatusChange: false,
@@ -56,7 +60,7 @@ export function useCatalogSearch({
 
   const { data: raritiesData, loading: raritiesLoading } = useQuery(
     raritiesDocument,
-    { 
+    {
       fetchPolicy: 'cache-first',
       skip,
       notifyOnNetworkStatusChange: false,
@@ -79,7 +83,12 @@ export function useCatalogSearch({
   const dataKey = Object.keys(data || {}).find(
     (key) => key.includes('InternalList') || key.includes('CardList')
   );
-  const cardData = dataKey ? (data as any)?.[dataKey] : null;
+  const cardData = dataKey
+    ? ((data as Record<string, unknown>)?.[dataKey] as {
+        data?: unknown[];
+        count?: number;
+      } | null)
+    : null;
   const cards = useMemo(() => {
     if (!cardData?.data) return [];
     return cardData.data.map(mapCardFunction);
@@ -93,7 +102,11 @@ export function useCatalogSearch({
   const collectionsKey = Object.keys(collectionsData || {}).find(
     (key) => key.includes('Collections') || key.includes('Editions')
   );
-  const collectionsRaw = collectionsKey ? (collectionsData as any)?.[collectionsKey] : [];
+  const collectionsRaw = collectionsKey
+    ? ((collectionsData as Record<string, unknown>)?.[
+        collectionsKey
+      ] as unknown[])
+    : [];
   const collections = useMemo(
     () => collectionsRaw?.map(mapCollectionFunction) ?? [],
     [collectionsRaw, mapCollectionFunction]
@@ -104,7 +117,10 @@ export function useCatalogSearch({
     (key) => key.includes('Rarities') || key.includes('Rarity')
   );
   const rarities = useMemo(
-    () => (raritiesKey ? (raritiesData as any)?.[raritiesKey] : []) ?? [],
+    () =>
+      (raritiesKey
+        ? ((raritiesData as Record<string, unknown>)?.[raritiesKey] as string[])
+        : []) ?? [],
     [raritiesData, raritiesKey]
   );
 
@@ -113,7 +129,10 @@ export function useCatalogSearch({
     (key) => key.includes('Variants') || key.includes('Variant')
   );
   const variants = useMemo(
-    () => (variantsKey ? (variantsData as any)?.[variantsKey] : []) ?? [],
+    () =>
+      (variantsKey
+        ? ((variantsData as Record<string, unknown>)?.[variantsKey] as string[])
+        : []) ?? [],
     [variantsData, variantsKey]
   );
 
@@ -122,29 +141,32 @@ export function useCatalogSearch({
     (key) => key.includes('Genres') || key.includes('Genre')
   );
   const genres = useMemo(
-    () => (genresKey ? (genresData as any)?.[genresKey] : []) ?? [],
+    () =>
+      (genresKey
+        ? ((genresData as Record<string, unknown>)?.[genresKey] as string[])
+        : []) ?? [],
     [genresData, genresKey]
   );
 
-  const setSearch = useCallback(
-    (value: string) => {
-      setSearchTerm(value);
+  const setSearch = useCallback((value: string) => {
+    setSearchTerm(value);
+    setPage(1);
+  }, []);
+
+  const handleFilterChange = useCallback(
+    (key: string, value: string | boolean) => {
+      setFilters((prev) => {
+        if (value === '') {
+          const next = { ...prev };
+          delete next[key as keyof CatalogFilters];
+          return next;
+        }
+        return { ...prev, [key]: value };
+      });
       setPage(1);
     },
     []
   );
-
-  const handleFilterChange = useCallback((key: string, value: string | boolean) => {
-    setFilters((prev) => {
-      if (value === '') {
-        const next = { ...prev };
-        delete next[key as keyof CatalogFilters];
-        return next;
-      }
-      return { ...prev, [key]: value };
-    });
-    setPage(1);
-  }, []);
 
   const handleSortChange = useCallback((sortValue: string) => {
     setFilters((prev) => {

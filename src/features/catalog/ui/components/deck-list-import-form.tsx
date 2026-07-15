@@ -30,24 +30,24 @@ export default function DeckListImportForm({
   const canImport = rawText.trim().length > 0 && !hasImported;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       <TcgSegmentedSelector />
 
       <Textarea
-        label="Lista de cartas"
+        label='Lista de cartas'
         placeholder={PLACEHOLDER_TEXT}
         value={rawText}
         onValueChange={onTextChange}
         minRows={6}
         maxRows={16}
-        description="Pokémon (Limitless): [cant] [nombre] [set] [núm] — Magic (Moxfield): [cant] [nombre] ([set]) [núm]"
-        aria-label="Lista de cartas en formato Limitless TCG o Moxfield"
+        description='Pokémon (Limitless): [cant] [nombre] [set] [núm] — Magic (Moxfield): [cant] [nombre] ([set]) [núm]'
+        aria-label='Lista de cartas en formato Limitless TCG o Moxfield'
       />
 
-      <div className="flex gap-2">
+      <div className='flex gap-2'>
         <Button
-          color="primary"
-          startContent={<Icon icon="lucide:upload" />}
+          color='primary'
+          startContent={<Icon icon='lucide:upload' />}
           onPress={onImport}
           isDisabled={!canImport}
         >
@@ -55,8 +55,8 @@ export default function DeckListImportForm({
         </Button>
         {rawText.trim().length > 0 && (
           <Button
-            variant="flat"
-            startContent={<Icon icon="lucide:trash-2" />}
+            variant='flat'
+            startContent={<Icon icon='lucide:trash-2' />}
             onPress={onClear}
           >
             Limpiar

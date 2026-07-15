@@ -1,5 +1,6 @@
 import { ITableSort } from '@/lib/types/datatable.types';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { CARD_SEARCH_LIMIT } from '@/lib/consts/card.consts';
 
 export {
   CARD_CONDITIONS,
@@ -12,12 +13,16 @@ export {
   MAGIC_RARITY_OPTIONS,
 } from '@/lib/types/card.types';
 
+export { CARD_SEARCH_LIMIT };
+
 export const DEFAULT_CARD_CONDITION = CARD_CONDITIONS.NEAR_MINT;
 
 export function getDefaultVariant<T extends { condition: string }>(
   variants: T[]
 ): T {
-  return variants.find((v) => v.condition === DEFAULT_CARD_CONDITION) ?? variants[0];
+  return (
+    variants.find((v) => v.condition === DEFAULT_CARD_CONDITION) ?? variants[0]
+  );
 }
 
 export const DEFAULT_CARDS_SORT: ITableSort = {
@@ -26,8 +31,6 @@ export const DEFAULT_CARDS_SORT: ITableSort = {
 };
 
 export const DEFAULT_PAGE_SIZE = 20;
-
-export const CARD_SEARCH_LIMIT = 6;
 
 export const POKEMON_SORT_OPTIONS = [
   { label: 'Nombre A → Z', value: 'name_ASC' },
@@ -40,6 +43,8 @@ export const POKEMON_SORT_OPTIONS = [
 export const MAGIC_SORT_OPTIONS = [
   { label: 'Nombre A → Z', value: 'name_ASC' },
   { label: 'Nombre Z → A', value: 'name_DESC' },
+  { label: 'Precio menor', value: 'sellPrice_ASC' },
+  { label: 'Precio mayor', value: 'sellPrice_DESC' },
   { label: 'Rareza', value: 'rarity_ASC' },
   { label: 'Set', value: 'setName_ASC' },
 ];
@@ -52,3 +57,5 @@ export const STOCK_STATUS_OPTIONS = [
   { label: 'No disponible', value: 'UNAVAILABLE' },
   { label: 'Esperando recolección', value: 'AWAITING_PICKUP' },
 ];
+
+export const DEFAULT_HISTORY_LIMIT = 10;

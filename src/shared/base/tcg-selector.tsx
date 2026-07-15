@@ -26,7 +26,7 @@ export default memo(function TcgSelector() {
           variant='lightDark'
           startContent={
             currentOption && (
-              <Icon icon={currentOption.icon} className='text-lg text-accent' />
+              <Icon icon={currentOption.icon} className='text-accent text-lg' />
             )
           }
           endContent={

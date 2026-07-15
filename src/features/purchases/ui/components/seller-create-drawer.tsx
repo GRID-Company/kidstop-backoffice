@@ -49,73 +49,73 @@ export default function SellerCreateDrawer({
   }, [reset, onClose]);
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={handleClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={handleClose} size='lg'>
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">
+        <DrawerHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>
             Nuevo vendedor
           </span>
-          <span className="text-sm font-normal text-default-500">
+          <span className='text-default-500 text-sm font-normal'>
             Registrar un nuevo vendedor en el sistema
           </span>
         </DrawerHeader>
 
         <DrawerBody>
           <form
-            id="seller-create-form"
+            id='seller-create-form'
             onSubmit={(...args) => {
               void handleSubmit(handleFormSubmit)(...args);
             }}
-            className="flex flex-col gap-4"
+            className='flex flex-col gap-4'
           >
             <InputForm
-              label="Nombre"
-              placeholder="Nombre del vendedor"
+              label='Nombre'
+              placeholder='Nombre del vendedor'
               controlProps={{ control, name: 'name' }}
               isRequired
-              aria-label="Nombre del vendedor"
+              aria-label='Nombre del vendedor'
             />
 
             <InputForm
-              label="Celular"
-              placeholder="+52 55 1234 5678"
+              label='Celular'
+              placeholder='+52 55 1234 5678'
               controlProps={{ control, name: 'phone' }}
               formatValue={formatPhoneNumber}
               isRequired
-              aria-label="Celular del vendedor"
+              aria-label='Celular del vendedor'
             />
 
             <InputForm
-              label="Email"
-              placeholder="correo@ejemplo.com"
+              label='Email'
+              placeholder='correo@ejemplo.com'
               controlProps={{ control, name: 'email' }}
-              aria-label="Email del vendedor"
+              aria-label='Email del vendedor'
             />
 
             <Divider />
 
             <TextareaForm
-              label="Notas (opcional)"
-              placeholder="Notas sobre el vendedor"
+              label='Notas (opcional)'
+              placeholder='Notas sobre el vendedor'
               controlProps={{ control, name: 'notes' }}
               minRows={3}
               maxRows={5}
-              aria-label="Notas del vendedor"
+              aria-label='Notas del vendedor'
             />
           </form>
         </DrawerBody>
 
-        <DrawerFooter className="flex justify-between">
-          <Button variant="light" onPress={handleClose} className="text-accent">
+        <DrawerFooter className='flex justify-between'>
+          <Button variant='light' onPress={handleClose} className='text-accent'>
             Cancelar
           </Button>
           <Button
-            type="submit"
-            form="seller-create-form"
+            type='submit'
+            form='seller-create-form'
             isDisabled={!formState.isValid || isLoading}
             isLoading={isLoading}
-            startContent={!isLoading && <Icon icon="lucide:user-plus" />}
-            className="text-white"
+            startContent={!isLoading && <Icon icon='lucide:user-plus' />}
+            className='text-white'
             style={{ backgroundColor: 'var(--color-accent)' }}
           >
             {isLoading ? 'Creando...' : 'Crear vendedor'}

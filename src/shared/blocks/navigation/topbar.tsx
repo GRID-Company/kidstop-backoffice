@@ -38,11 +38,10 @@ export default function Topbar({ className }: { className?: string }) {
   return (
     <>
       <Navbar
-        className={`shadow-none ${className} sticky top-0 z-40 bg-page-bg/80 backdrop-blur-lg backdrop-saturate-150 border-b border-divider`}
+        className={`shadow-none ${className} bg-page-bg/80 border-divider sticky top-0 z-40 border-b backdrop-blur-lg backdrop-saturate-150`}
         isBlurred={false}
         classNames={{
-          wrapper:
-            'px-4 lg:px-0 h-12 xl:h-22 max-w-full',
+          wrapper: 'px-4 lg:px-0 h-12 xl:h-22 max-w-full',
         }}
         isMenuOpen={isMenuOpen}
         onMenuOpenChange={setIsMenuOpen}
@@ -74,7 +73,7 @@ export default function Topbar({ className }: { className?: string }) {
           />
         </NavbarContent>
 
-        <NavbarMenu className='top-12 !bg-page-bg px-4 py-8 xl:hidden'>
+        <NavbarMenu className='!bg-page-bg top-12 px-4 py-8 xl:hidden'>
           <NavbarMenuItem key='tcg-selector' className='mb-2'>
             <TcgSegmentedSelector />
           </NavbarMenuItem>

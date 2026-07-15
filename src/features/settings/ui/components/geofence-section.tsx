@@ -13,7 +13,11 @@ interface GeofenceSectionProps {
   onSave: (geofence: IGeofenceConfig) => void;
 }
 
-export function GeofenceContent({ geofence, isLoading, onSave }: GeofenceSectionProps) {
+export function GeofenceContent({
+  geofence,
+  isLoading,
+  onSave,
+}: GeofenceSectionProps) {
   const { control, handleSubmit, formState, reset } = useGeofenceForm({
     center: geofence.center,
     radiusKm: geofence.radiusKm,
@@ -38,38 +42,38 @@ export function GeofenceContent({ geofence, isLoading, onSave }: GeofenceSection
       onSubmit={(...args) => {
         void handleSubmit(onSubmit)(...args);
       }}
-      className="flex flex-col gap-4"
+      className='flex flex-col gap-4'
     >
-      <div className="flex items-center gap-2">
-        <Icon icon="lucide:map-pin" className="text-lg text-accent" />
-        <h4 className="text-base font-semibold">Geofence</h4>
+      <div className='flex items-center gap-2'>
+        <Icon icon='lucide:map-pin' className='text-accent text-lg' />
+        <h4 className='text-base font-semibold'>Geofence</h4>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
         <InputForm
-          label="Latitud (centro)"
-          placeholder="20.6597"
-          type="number"
+          label='Latitud (centro)'
+          placeholder='20.6597'
+          type='number'
           controlProps={{ control, name: 'center.lat' }}
         />
         <InputForm
-          label="Longitud (centro)"
-          placeholder="-103.3496"
-          type="number"
+          label='Longitud (centro)'
+          placeholder='-103.3496'
+          type='number'
           controlProps={{ control, name: 'center.lng' }}
         />
         <InputForm
-          label="Radio (km)"
-          placeholder="10"
-          type="number"
+          label='Radio (km)'
+          placeholder='10'
+          type='number'
           controlProps={{ control, name: 'radiusKm' }}
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className='flex justify-end'>
         <KidstopButton
-          variant="accent"
-          type="submit"
+          variant='accent'
+          type='submit'
           isDisabled={!formState.isDirty || !formState.isValid}
           isLoading={isLoading}
         >
@@ -82,7 +86,7 @@ export function GeofenceContent({ geofence, isLoading, onSave }: GeofenceSection
 
 export default function GeofenceSection(props: GeofenceSectionProps) {
   return (
-    <SettingsSection title="Geofence" icon="lucide:map-pin">
+    <SettingsSection title='Geofence' icon='lucide:map-pin'>
       <GeofenceContent {...props} />
     </SettingsSection>
   );

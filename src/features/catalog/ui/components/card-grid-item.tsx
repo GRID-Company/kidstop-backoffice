@@ -25,52 +25,56 @@ function CardGridItemComponent({ card, onPress }: CardGridItemProps) {
     <KidstopCard
       isPressable={!!onPress}
       onPress={() => onPress?.(card)}
-      className="h-full"
+      className='h-full'
     >
-      <CardBody className="flex flex-col gap-3 !p-0">
-        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-t-md bg-default-100">
+      <CardBody className='flex flex-col gap-3 !p-0'>
+        <div className='bg-default-100 relative aspect-[3/4] w-full overflow-hidden rounded-t-md'>
           {card.imageUrl ? (
             <Image
               src={card.imageUrl}
               alt={card.name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-contain p-2"
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw'
+              className='object-contain p-2'
             />
           ) : (
             <Image
-              src={card.tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-              alt="Card placeholder"
+              src={
+                card.tcgType === 'MAGIC'
+                  ? magicCardPlaceholder
+                  : pokemonCardPlaceholder
+              }
+              alt='Card placeholder'
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-contain p-2"
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw'
+              className='object-contain p-2'
             />
           )}
         </div>
 
-        <div className="flex flex-col gap-1.5 px-4 pb-4">
-          <p className="truncate text-sm font-semibold">{card.name}</p>
+        <div className='flex flex-col gap-1.5 px-4 pb-4'>
+          <p className='truncate text-sm font-semibold'>{card.name}</p>
 
-          <p className="truncate text-xs text-default-500">
+          <p className='text-default-500 truncate text-xs'>
             {card.setName} · {card.setCode} · #{card.number}
           </p>
 
-          <p className="text-xs text-default-400">{card.rarity}</p>
+          <p className='text-default-400 text-xs'>{card.rarity}</p>
 
-          <div className="mt-1 flex items-center justify-between">
-            <span className="text-sm font-bold text-success">
+          <div className='mt-1 flex items-center justify-between'>
+            <span className='text-success text-sm font-bold'>
               ${lowestSellPrice.toFixed(2)}
             </span>
-            <span className="text-xs text-default-500">
+            <span className='text-default-500 text-xs'>
               Stock: {totalStock}
             </span>
           </div>
 
-          <div className="mt-1 flex flex-wrap gap-1">
+          <div className='mt-1 flex flex-wrap gap-1'>
             {card.variants.map((v) => (
               <span
                 key={v.id}
-                className="rounded-full bg-default-100 px-2 py-0.5 text-[10px] text-default-600"
+                className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-[10px]'
               >
                 {CARD_CONDITION_SHORT_LABELS[v.condition]} ({v.stock})
               </span>

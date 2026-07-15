@@ -18,14 +18,14 @@ Authorization: Bearer {{auth_token}}
 
 ## Roles & Permissions
 
-| Role | Description |
-|------|-------------|
-| `SUPERUSER` | Full system access, bypasses all role checks |
-| `ADMIN` | User management, configuration, full CRUD |
-| `RECEPTION` | Front-desk operations |
-| `BUYER` | Purchase operations |
-| `CLIENT` | Registered customer |
-| `CLIENT_KIOSK` | In-store kiosk customer |
+| Role           | Description                                  |
+| -------------- | -------------------------------------------- |
+| `SUPERUSER`    | Full system access, bypasses all role checks |
+| `ADMIN`        | User management, configuration, full CRUD    |
+| `RECEPTION`    | Front-desk operations                        |
+| `BUYER`        | Purchase operations                          |
+| `CLIENT`       | Registered customer                          |
+| `CLIENT_KIOSK` | In-store kiosk customer                      |
 
 ## Available Endpoints
 
@@ -562,10 +562,10 @@ query ResendEmailInvite($guid: String!) {
 
 **Error Cases:**
 
-| Error | Condition | Message |
-|-------|-----------|---------|
-| `NotFoundException` | User GUID not found | "Usuario no encontrado" |
-| `BadRequestException` | User already registered | "El usuario ya completó su registro" |
+| Error                 | Condition                                                              | Message                                       |
+| --------------------- | ---------------------------------------------------------------------- | --------------------------------------------- |
+| `NotFoundException`   | User GUID not found                                                    | "Usuario no encontrado"                       |
+| `BadRequestException` | User already registered                                                | "El usuario ya completó su registro"          |
 | `BadRequestException` | User role doesn't require invitation (CLIENT, CLIENT_KIOSK, SUPERUSER) | "Este tipo de usuario no requiere invitación" |
 
 **Use Cases:**
@@ -605,13 +605,13 @@ query ClientDetails($clientGuid: String!) {
 
 **Response Fields:**
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `orderCount` | `Int` | Total number of orders (sales) for the client (any status) |
-| `totalOrdersAmount` | `Float` | Sum of all order totals (any status) |
-| `completedOrdersAmount` | `Float` | Sum of only completed (COMPLETED status) order totals |
-| `unreachableCancellations` | `Int` | Number of orders cancelled with CLIENT_UNREACHABLE reason |
-| `lastOrderDate` | `DateTime` | Timestamp of the most recent order, or null if no orders |
+| Field                      | Type       | Description                                                |
+| -------------------------- | ---------- | ---------------------------------------------------------- |
+| `orderCount`               | `Int`      | Total number of orders (sales) for the client (any status) |
+| `totalOrdersAmount`        | `Float`    | Sum of all order totals (any status)                       |
+| `completedOrdersAmount`    | `Float`    | Sum of only completed (COMPLETED status) order totals      |
+| `unreachableCancellations` | `Int`      | Number of orders cancelled with CLIENT_UNREACHABLE reason  |
+| `lastOrderDate`            | `DateTime` | Timestamp of the most recent order, or null if no orders   |
 
 **Business Rules:**
 
@@ -623,12 +623,12 @@ query ClientDetails($clientGuid: String!) {
 
 ## Available Filters Summary
 
-| Filter | Type | Description |
-|--------|------|-------------|
-| `active` | `Boolean` | Filter by account active status |
-| `role` | `MultipleValues` | Filter by one or more roles using `filterType: ":multiple_values:"` |
-| `clientStatus` | `String` | Filter by client status (STANDARD, VIP, BLOCKED) |
-| `search` | `String` | Free-text search on name and email |
+| Filter         | Type             | Description                                                         |
+| -------------- | ---------------- | ------------------------------------------------------------------- |
+| `active`       | `Boolean`        | Filter by account active status                                     |
+| `role`         | `MultipleValues` | Filter by one or more roles using `filterType: ":multiple_values:"` |
+| `clientStatus` | `String`         | Filter by client status (STANDARD, VIP, BLOCKED)                    |
+| `search`       | `String`         | Free-text search on name and email                                  |
 
 ## Frontend Integration Examples
 
@@ -805,8 +805,8 @@ const createUser = async (
     const { data } = await client.mutate({
       mutation: CREATE_USER,
       variables: {
-        createUserInput: { emailAddress, name, role, phone }
-      }
+        createUserInput: { emailAddress, name, role, phone },
+      },
     });
     console.log('User created:', data.createUser);
     await fetchUsers();
@@ -818,14 +818,19 @@ const createUser = async (
 // Update User
 const updateUser = async (
   guid: string,
-  updates: Partial<{ name: string; emailAddress: string; phone: string; role: string }>
+  updates: Partial<{
+    name: string;
+    emailAddress: string;
+    phone: string;
+    role: string;
+  }>
 ) => {
   try {
     const { data } = await client.mutate({
       mutation: UPDATE_USER,
       variables: {
-        updateUserInput: { guid, ...updates }
-      }
+        updateUserInput: { guid, ...updates },
+      },
     });
     console.log('User updated:', data.updateUser.message);
     await fetchUsers();
@@ -839,7 +844,7 @@ const deleteUser = async (guid: string) => {
   try {
     const { data } = await client.mutate({
       mutation: DELETE_USER,
-      variables: { guid }
+      variables: { guid },
     });
     console.log('User deleted:', data.deleteUser.message);
     await fetchUsers();
@@ -849,13 +854,16 @@ const deleteUser = async (guid: string) => {
 };
 
 // Set Client Status
-const setClientStatus = async (guid: string, clientStatus: 'STANDARD' | 'VIP' | 'BLOCKED') => {
+const setClientStatus = async (
+  guid: string,
+  clientStatus: 'STANDARD' | 'VIP' | 'BLOCKED'
+) => {
   try {
     const { data } = await client.mutate({
       mutation: SET_CLIENT_STATUS,
       variables: {
-        setClientStatusInput: { guid, clientStatus }
-      }
+        setClientStatusInput: { guid, clientStatus },
+      },
     });
     console.log('Client status updated:', data.setClientStatus.message);
     await fetchUsers();
@@ -869,7 +877,7 @@ const resendEmailInvite = async (guid: string) => {
   try {
     const { data } = await client.query({
       query: RESEND_EMAIL_INVITE,
-      variables: { guid }
+      variables: { guid },
     });
     console.log('Invitation resent:', data.resendEmailInvite.message);
   } catch (error) {

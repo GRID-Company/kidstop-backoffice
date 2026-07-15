@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { PurchasesDocument } from '@/lib/api/generated/purchases.generated';
@@ -44,12 +44,13 @@ export function usePurchases(): UsePurchasesReturn {
           tcg: selectedTCG,
           status: filters.status,
           buyer: filters.buyerGuid,
-          ...(dateFrom && dateTo && {
-            createdDate: {
-              filterType: ':daterange:',
-              range: { from: dateFrom, to: dateTo },
-            },
-          }),
+          ...(dateFrom &&
+            dateTo && {
+              createdDate: {
+                filterType: ':daterange:',
+                range: { from: dateFrom, to: dateTo },
+              },
+            }),
         },
         search: filters.search?.trim() || undefined,
       },

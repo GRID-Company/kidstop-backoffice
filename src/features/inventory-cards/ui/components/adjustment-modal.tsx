@@ -17,21 +17,31 @@ import {
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, Controller } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import { CARD_CONDITION_SHORT_LABELS, CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
+import {
+  CARD_CONDITION_SHORT_LABELS,
+  CARD_CONDITION_OPTIONS,
+  CardCondition,
+} from '@/lib/types/card.types';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
+import { LanguageSelector } from '@/shared/components/language-selector';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
-import { toPokemonCard, toMagicCard } from '@/features/catalog/adapters/mappers/card.mapper';
+import {
+  toPokemonCard,
+  toMagicCard,
+} from '@/features/catalog/adapters/mappers/card.mapper';
 import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
 import { IInventoryItem } from '../../domain/types';
-import { fromApiInventoryItem } from '../../adapters/mappers/inventory.mapper';
 import {
   BULK_ADJUSTMENT_OPTIONS,
   STOCK_STATUS_LABELS,
@@ -64,7 +74,15 @@ export default function AdjustmentModal({
   const [resolvedItem, setResolvedItem] = useState<IInventoryItem | null>(item);
   const [itemSearch, setItemSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState<CatalogCard | null>(null);
-  const [selectedCondition, setSelectedCondition] = useState<string>('');
+  const [_selectedCondition, setSelectedCondition] = useState<string>('');
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   useEffect(() => {
     if (isOpen) {
@@ -77,33 +95,39 @@ export default function AdjustmentModal({
 
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
 
-  const { data: pokemonData, loading: pokemonLoading } = useQuery(PokemonCardInternalListDocument, {
-    variables: {
-      findPokemonCardsPublicArgs: {
-        skip: 0,
-        limit: 6,
-        search: itemSearch.trim() || undefined,
-        sort: { column: 'releaseDate', order: 'DESC' },
-        filters: {},
+  const { data: pokemonData, loading: pokemonLoading } = useQuery(
+    PokemonCardInternalListDocument,
+    {
+      variables: {
+        findPokemonCardsPublicArgs: {
+          skip: 0,
+          limit: 6,
+          search: itemSearch.trim() || undefined,
+          sort: { column: 'releaseDate', order: 'DESC' },
+          filters: {},
+        },
       },
-    },
-    skip: !isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
-    fetchPolicy: 'network-only',
-  });
+      skip: !isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
+      fetchPolicy: 'network-only',
+    }
+  );
 
-  const { data: magicData, loading: magicLoading } = useQuery(MagicCardInternalListDocument, {
-    variables: {
-      findMagicCardsPublicArgs: {
-        skip: 0,
-        limit: 6,
-        search: itemSearch.trim() || undefined,
-        sort: { column: 'releaseDate', order: 'DESC' },
-        filters: {},
+  const { data: magicData, loading: magicLoading } = useQuery(
+    MagicCardInternalListDocument,
+    {
+      variables: {
+        findMagicCardsPublicArgs: {
+          skip: 0,
+          limit: 6,
+          search: itemSearch.trim() || undefined,
+          sort: { column: 'releaseDate', order: 'DESC' },
+          filters: {},
+        },
       },
-    },
-    skip: isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
-    fetchPolicy: 'network-only',
-  });
+      skip: isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
+      fetchPolicy: 'network-only',
+    }
+  );
 
   const searchLoading = isPokemon ? pokemonLoading : magicLoading;
 
@@ -128,37 +152,50 @@ export default function AdjustmentModal({
     setSelectedCondition('');
   }, []);
 
-  const handleConditionSelect = useCallback((condition: string) => {
-    if (!selectedCard) return;
-    
-    const variant = selectedCard.variants.find(v => v.condition === condition);
-    const stock = variant?.stock ?? 0;
-    
-    const simulatedItem: IInventoryItem = {
-      guid: variant?.guid ?? '',
-      cardGuid: selectedCard.guid,
-      name: selectedCard.name,
-      setName: 'setName' in selectedCard ? selectedCard.setName ?? '' : selectedCard.edition ?? '',
-      setCode: 'setCode' in selectedCard ? selectedCard.setCode ?? '' : '',
-      number: 'cardNumber' in selectedCard ? selectedCard.cardNumber ?? '' : selectedCard.collectorNumber ?? '',
-      rarity: ('rarity' in selectedCard ? selectedCard.rarity : null) ?? '',
-      imageUrl: selectedCard.imageUri ?? '',
-      tcg: selectedTCG,
-      condition: condition as any,
-      stock,
-      stockStatus: stock > 0 ? 'AVAILABLE' : 'UNAVAILABLE',
-      purchasePrice: variant?.purchasePrice ?? 0,
-      sellPrice: variant?.sellPrice ?? selectedCard.sellPrice ?? 0,
-      lastSellDate: null,
-      avgDaysInInventory: null,
-    };
-    
-    setResolvedItem(simulatedItem);
-    setSelectedCard(null);
-    setSelectedCondition('');
-  }, [selectedCard, selectedTCG]);
+  const handleConditionSelect = useCallback(
+    (condition: string) => {
+      if (!selectedCard) return;
 
-  const { control, handleSubmit, formState, reset, watch } = useAdjustmentForm();
+      const variant = selectedCard.variants.find(
+        (v) => v.condition === condition
+      );
+      const stock = variant?.stock ?? 0;
+
+      const simulatedItem: IInventoryItem = {
+        guid: variant?.guid ?? '',
+        cardGuid: selectedCard.guid,
+        name: selectedCard.name,
+        setName:
+          'setName' in selectedCard
+            ? (selectedCard.setName ?? '')
+            : (selectedCard.edition ?? ''),
+        setCode: 'setCode' in selectedCard ? (selectedCard.setCode ?? '') : '',
+        number:
+          'cardNumber' in selectedCard
+            ? (selectedCard.cardNumber ?? '')
+            : (selectedCard.collectorNumber ?? ''),
+        rarity: ('rarity' in selectedCard ? selectedCard.rarity : null) ?? '',
+        imageUrl: selectedCard.imageUri ?? '',
+        tcg: selectedTCG,
+        condition: condition as CardCondition,
+        language: selectedCard.language as CardLanguage,
+        stock,
+        stockStatus: stock > 0 ? 'AVAILABLE' : 'UNAVAILABLE',
+        purchasePrice: variant?.purchasePrice ?? 0,
+        sellPrice: variant?.sellPrice ?? selectedCard.sellPrice ?? 0,
+        lastSellDate: null,
+        avgDaysInInventory: null,
+      };
+
+      setResolvedItem(simulatedItem);
+      setSelectedCard(null);
+      setSelectedCondition('');
+    },
+    [selectedCard, selectedTCG]
+  );
+
+  const { control, handleSubmit, formState, reset, watch } =
+    useAdjustmentForm();
 
   useEffect(() => {
     if (resolvedItem) {
@@ -184,88 +221,109 @@ export default function AdjustmentModal({
     return null;
   }, [resolvedItem, isExit, quantity]);
 
-  const handleFormSubmit: SubmitHandler<InventoryAdjustmentFormData> = useCallback(
-    (data) => {
-      if (!resolvedItem || !onSubmit) return;
-      if (data.bulkOperationType === BulkOperationType.ManualExit && !validateStock(resolvedItem.stock, -data.quantity)) return;
-      onSubmit(data);
-    },
-    [resolvedItem, onSubmit]
-  );
+  const handleFormSubmit: SubmitHandler<InventoryAdjustmentFormData> =
+    useCallback(
+      (data) => {
+        if (!resolvedItem || !onSubmit) return;
+        if (
+          data.bulkOperationType === BulkOperationType.ManualExit &&
+          !validateStock(resolvedItem.stock, -data.quantity)
+        )
+          return;
+        onSubmit(data);
+      },
+      [resolvedItem, onSubmit]
+    );
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='lg'>
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">Ajuste de inventario</span>
-          <span className="text-sm font-normal text-default-500">
+        <DrawerHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>
+            Ajuste de inventario
+          </span>
+          <span className='text-default-500 text-sm font-normal'>
             Registrar movimiento manual de stock
           </span>
         </DrawerHeader>
 
-        <DrawerBody className="flex flex-col gap-6">
+        <DrawerBody className='flex flex-col gap-6'>
           {!resolvedItem && !selectedCard ? (
-            <div className="flex flex-col gap-4">
+            <div className='flex flex-col gap-4'>
               <Input
-                placeholder="Buscar carta por nombre, set o código..."
+                placeholder='Buscar carta por nombre, set o código...'
                 value={itemSearch}
                 onValueChange={setItemSearch}
-                startContent={<Icon icon="lucide:search" className="text-default-400" />}
+                startContent={
+                  <Icon icon='lucide:search' className='text-default-400' />
+                }
                 isClearable
                 onClear={() => setItemSearch('')}
                 autoFocus
               />
 
               {searchLoading && (
-                <div className="flex justify-center py-4">
-                  <Spinner size="sm" />
+                <div className='flex justify-center py-4'>
+                  <Spinner size='sm' />
                 </div>
               )}
 
-              {!searchLoading && itemSearch.trim().length >= 2 && searchResults.length === 0 && (
-                <p className="text-center text-sm text-default-400">
-                  No se encontraron cartas en el catálogo
-                </p>
-              )}
+              {!searchLoading &&
+                itemSearch.trim().length >= 2 &&
+                searchResults.length === 0 && (
+                  <p className='text-default-400 text-center text-sm'>
+                    No se encontraron cartas en el catálogo
+                  </p>
+                )}
 
               {searchResults.length > 0 && (
-                <div className="flex flex-col gap-2">
+                <div className='flex flex-col gap-2'>
                   {searchResults.map((result) => {
-                    const setName = 'setName' in result ? result.setName : result.edition;
-                    const number = 'cardNumber' in result ? result.cardNumber : result.collectorNumber;
+                    const setName =
+                      'setName' in result ? result.setName : result.edition;
+                    const number =
+                      'cardNumber' in result
+                        ? result.cardNumber
+                        : result.collectorNumber;
                     return (
                       <button
                         key={result.guid}
-                        type="button"
+                        type='button'
                         onClick={() => handleCardSelect(result)}
-                        className="flex items-center gap-3 rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
+                        className='border-default-200 hover:bg-default-50 flex items-center gap-3 rounded-lg border p-3 text-left transition'
                       >
-                        <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
+                        <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>
                           {result.imageUri ? (
                             <img
                               src={result.imageUri}
                               alt={result.name}
-                              className="absolute inset-0 h-full w-full object-contain"
+                              className='absolute inset-0 h-full w-full object-contain'
                             />
                           ) : (
                             <Image
-                              src={isPokemon ? pokemonCardPlaceholder : magicCardPlaceholder}
-                              alt="Card placeholder"
+                              src={
+                                isPokemon
+                                  ? pokemonCardPlaceholder
+                                  : magicCardPlaceholder
+                              }
+                              alt='Card placeholder'
                               fill
-                              sizes="32px"
-                              className="object-contain"
+                              sizes='32px'
+                              className='object-contain'
                             />
                           )}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">{result.name}</p>
-                          <p className="truncate text-xs text-default-500">
+                        <div className='min-w-0 flex-1'>
+                          <p className='truncate text-sm font-medium'>
+                            {result.name}
+                          </p>
+                          <p className='text-default-500 truncate text-xs'>
                             {setName} · #{number}
                           </p>
                         </div>
                         <Chip
-                          size="sm"
-                          variant="flat"
+                          size='sm'
+                          variant='flat'
                           color={result.totalStock > 0 ? 'success' : 'default'}
                         >
                           {result.totalStock}
@@ -277,69 +335,112 @@ export default function AdjustmentModal({
               )}
 
               {itemSearch.trim().length < 2 && (
-                <p className="text-center text-sm text-default-400">
+                <p className='text-default-400 text-center text-sm'>
                   Escribe al menos 2 caracteres para buscar
                 </p>
               )}
             </div>
           ) : selectedCard ? (
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-4 rounded-lg bg-default-50 p-4">
-                <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
+            <div className='flex flex-col gap-4'>
+              <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
+                <div
+                  className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+                  onClick={() =>
+                    openPreview(
+                      selectedCard.imageUri ?? null,
+                      selectedCard.name,
+                      selectedTCG as 'POKEMON' | 'MAGIC'
+                    )
+                  }
+                  role='button'
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      openPreview(
+                        selectedCard.imageUri ?? null,
+                        selectedCard.name,
+                        selectedTCG as 'POKEMON' | 'MAGIC'
+                      );
+                    }
+                  }}
+                  aria-label={`Ver ${selectedCard.name} en tamaño completo`}
+                >
                   {selectedCard.imageUri ? (
                     <img
                       src={selectedCard.imageUri}
                       alt={selectedCard.name}
-                      className="absolute inset-0 h-full w-full object-contain"
+                      className='absolute inset-0 h-full w-full object-contain'
                     />
                   ) : (
                     <Image
-                      src={isPokemon ? pokemonCardPlaceholder : magicCardPlaceholder}
-                      alt="Card placeholder"
+                      src={
+                        isPokemon
+                          ? pokemonCardPlaceholder
+                          : magicCardPlaceholder
+                      }
+                      alt='Card placeholder'
                       fill
-                      sizes="48px"
-                      className="object-contain"
+                      sizes='48px'
+                      className='object-contain'
                     />
                   )}
                 </div>
 
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="truncate text-sm font-semibold">{selectedCard.name}</p>
-                  <p className="truncate text-xs text-default-500">
-                    {'setName' in selectedCard ? selectedCard.setName : selectedCard.edition} · #{'cardNumber' in selectedCard ? selectedCard.cardNumber : selectedCard.collectorNumber}
+                <div className='flex min-w-0 flex-1 flex-col gap-1'>
+                  <p className='truncate text-sm font-semibold'>
+                    {selectedCard.name}
+                  </p>
+                  <p className='text-default-500 truncate text-xs'>
+                    {'setName' in selectedCard
+                      ? selectedCard.setName
+                      : selectedCard.edition}{' '}
+                    · #
+                    {'cardNumber' in selectedCard
+                      ? selectedCard.cardNumber
+                      : selectedCard.collectorNumber}
                   </p>
                 </div>
 
                 <button
-                  type="button"
-                  onClick={() => { setSelectedCard(null); setItemSearch(''); }}
-                  className="self-start text-default-400 hover:text-default-700"
-                  aria-label="Cambiar carta"
+                  type='button'
+                  onClick={() => {
+                    setSelectedCard(null);
+                    setItemSearch('');
+                  }}
+                  className='text-default-400 hover:text-default-700 self-start'
+                  aria-label='Cambiar carta'
                 >
-                  <Icon icon="lucide:x" />
+                  <Icon icon='lucide:x' />
                 </button>
               </div>
 
               <Divider />
 
-              <div className="flex flex-col gap-3">
-                <p className="text-sm font-medium">Selecciona la condición</p>
-                <div className="grid grid-cols-2 gap-2">
+              <div className='flex flex-col gap-3'>
+                <p className='text-sm font-medium'>Selecciona la condición</p>
+                <div className='grid grid-cols-2 gap-2'>
                   {CARD_CONDITION_OPTIONS.map((option) => {
-                    const variant = selectedCard.variants.find(v => v.condition === option.value);
+                    const variant = selectedCard.variants.find(
+                      (v) => v.condition === option.value
+                    );
                     const stock = variant?.stock ?? 0;
                     return (
                       <button
                         key={option.value}
-                        type="button"
+                        type='button'
                         onClick={() => handleConditionSelect(option.value)}
-                        className="flex items-center justify-between rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
+                        className='border-default-200 hover:bg-default-50 flex items-center justify-between rounded-lg border p-3 text-left transition'
                       >
-                        <div className="flex flex-col gap-1">
-                          <p className="text-sm font-medium">{option.label}</p>
-                          <p className="text-xs text-default-500">Stock: {stock}</p>
+                        <div className='flex flex-col gap-1'>
+                          <p className='text-sm font-medium'>{option.label}</p>
+                          <p className='text-default-500 text-xs'>
+                            Stock: {stock}
+                          </p>
                         </div>
-                        <Icon icon="lucide:chevron-right" className="text-default-400" />
+                        <Icon
+                          icon='lucide:chevron-right'
+                          className='text-default-400'
+                        />
                       </button>
                     );
                   })}
@@ -348,113 +449,173 @@ export default function AdjustmentModal({
             </div>
           ) : resolvedItem ? (
             <>
-              <div className="flex gap-4 rounded-lg bg-default-50 p-4">
-                <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-default-100">
+              <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
+                <div
+                  className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+                  onClick={() =>
+                    openPreview(
+                      resolvedItem.imageUrl,
+                      resolvedItem.name,
+                      resolvedItem.tcg as 'POKEMON' | 'MAGIC'
+                    )
+                  }
+                  role='button'
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      openPreview(
+                        resolvedItem.imageUrl,
+                        resolvedItem.name,
+                        resolvedItem.tcg as 'POKEMON' | 'MAGIC'
+                      );
+                    }
+                  }}
+                  aria-label={`Ver ${resolvedItem.name} en tamaño completo`}
+                >
                   {resolvedItem.imageUrl ? (
                     <img
                       src={resolvedItem.imageUrl}
                       alt={resolvedItem.name}
-                      className="absolute inset-0 h-full w-full object-contain"
+                      className='absolute inset-0 h-full w-full object-contain'
                     />
                   ) : (
                     <Image
-                      src={resolvedItem.tcg === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-                      alt="Card placeholder"
+                      src={
+                        resolvedItem.tcg === 'MAGIC'
+                          ? magicCardPlaceholder
+                          : pokemonCardPlaceholder
+                      }
+                      alt='Card placeholder'
                       fill
-                      sizes="48px"
-                      className="object-contain"
+                      sizes='48px'
+                      className='object-contain'
                     />
                   )}
                 </div>
 
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="truncate text-sm font-semibold">{resolvedItem.name}</p>
-                  <p className="truncate text-xs text-default-500">
-                    {resolvedItem.setName} ({resolvedItem.setCode}) · #{resolvedItem.number}
+                <div className='flex min-w-0 flex-1 flex-col gap-1'>
+                  <p className='truncate text-sm font-semibold'>
+                    {resolvedItem.name}
                   </p>
-                  <div className="flex items-center gap-2">
+                  <p className='text-default-500 truncate text-xs'>
+                    {resolvedItem.setName} ({resolvedItem.setCode}) · #
+                    {resolvedItem.number}
+                  </p>
+                  <div className='flex items-center gap-2'>
                     <Chip
-                      size="sm"
-                      variant="flat"
-                      classNames={{ base: 'bg-default-100', content: 'text-default-600' }}
+                      size='sm'
+                      variant='flat'
+                      classNames={{
+                        base: 'bg-default-100',
+                        content: 'text-default-600',
+                      }}
                     >
-                      {CARD_CONDITION_SHORT_LABELS[resolvedItem.condition] ?? resolvedItem.condition}
+                      {CARD_CONDITION_SHORT_LABELS[resolvedItem.condition] ??
+                        resolvedItem.condition}
                     </Chip>
                     <Chip
-                      size="sm"
-                      variant="flat"
-                      color={STOCK_STATUS_COLORS[resolvedItem.stockStatus] ?? 'default'}
+                      size='sm'
+                      variant='flat'
+                      color={
+                        STOCK_STATUS_COLORS[resolvedItem.stockStatus] ??
+                        'default'
+                      }
                     >
-                      {STOCK_STATUS_LABELS[resolvedItem.stockStatus]} · {resolvedItem.stock}
+                      {STOCK_STATUS_LABELS[resolvedItem.stockStatus]} ·{' '}
+                      {resolvedItem.stock}
                     </Chip>
                   </div>
                 </div>
 
                 {!item && (
-                <button
-                  type="button"
-                  onClick={() => { setResolvedItem(null); setItemSearch(''); }}
-                  className="self-start text-default-400 hover:text-default-700"
-                  aria-label="Cambiar carta"
-                >
-                  <Icon icon="lucide:x" />
-                </button>
-              )}
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setResolvedItem(null);
+                      setItemSearch('');
+                    }}
+                    className='text-default-400 hover:text-default-700 self-start'
+                    aria-label='Cambiar carta'
+                  >
+                    <Icon icon='lucide:x' />
+                  </button>
+                )}
               </div>
 
               <Divider />
 
               <form
-                id="adjustment-form"
-                onSubmit={(...args) => { void handleSubmit(handleFormSubmit)(...args); }}
-                className="flex flex-col gap-4"
+                id='adjustment-form'
+                onSubmit={(...args) => {
+                  void handleSubmit(handleFormSubmit)(...args);
+                }}
+                className='flex flex-col gap-4'
               >
                 <SelectForm
-                  label="Tipo de operación"
-                  placeholder="Selecciona el tipo de operación"
+                  label='Tipo de operación'
+                  placeholder='Selecciona el tipo de operación'
                   items={BULK_ADJUSTMENT_OPTIONS}
                   controlProps={{ control, name: 'bulkOperationType' }}
                   isRequired
-                  aria-label="Tipo de operación de inventario"
+                  aria-label='Tipo de operación de inventario'
+                />
+
+                <Controller
+                  name='language'
+                  control={control}
+                  render={({ field }) => (
+                    <LanguageSelector
+                      value={field.value as CardLanguage}
+                      onChange={field.onChange}
+                      currentLanguage={resolvedItem.language}
+                      label='Idioma'
+                    />
+                  )}
                 />
 
                 <InputForm
-                  label="Cantidad"
-                  type="number"
-                  min={bulkOperationType === BulkOperationType.ManualSet ? 0 : 1}
+                  label='Cantidad'
+                  type='number'
+                  min={
+                    bulkOperationType === BulkOperationType.ManualSet ? 0 : 1
+                  }
                   controlProps={{ control, name: 'quantity' }}
                   isRequired
-                  description={isExit ? `Stock disponible: ${resolvedItem.stock}` : undefined}
+                  description={
+                    isExit
+                      ? `Stock disponible: ${resolvedItem.stock}`
+                      : undefined
+                  }
                   isInvalid={!!stockError}
                   errorMessage={stockError ?? undefined}
-                  aria-label="Cantidad a ajustar"
+                  aria-label='Cantidad a ajustar'
                 />
 
                 <TextareaForm
-                  label="Notas / Razón (opcional)"
-                  placeholder="Describe el motivo del ajuste"
+                  label='Notas / Razón (opcional)'
+                  placeholder='Describe el motivo del ajuste'
                   controlProps={{ control, name: 'notes' }}
                   minRows={3}
                   maxRows={5}
-                  aria-label="Notas del ajuste"
+                  aria-label='Notas del ajuste'
                 />
               </form>
             </>
           ) : null}
         </DrawerBody>
 
-        <DrawerFooter className="flex justify-between">
-          <Button variant="light" onPress={onClose} className="text-accent">
+        <DrawerFooter className='flex justify-between'>
+          <Button variant='light' onPress={onClose} className='text-accent'>
             Cancelar
           </Button>
           {resolvedItem && (
             <Button
-              type="submit"
-              form="adjustment-form"
+              type='submit'
+              form='adjustment-form'
               isDisabled={!formState.isValid || !!stockError || isSubmitting}
               isLoading={isSubmitting}
-              startContent={<Icon icon="lucide:save" />}
-              className="text-white"
+              startContent={<Icon icon='lucide:save' />}
+              className='text-white'
               style={{ backgroundColor: 'var(--color-accent)' }}
             >
               Registrar ajuste
@@ -462,6 +623,13 @@ export default function AdjustmentModal({
           )}
         </DrawerFooter>
       </DrawerContent>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopDrawer>
   );
 }

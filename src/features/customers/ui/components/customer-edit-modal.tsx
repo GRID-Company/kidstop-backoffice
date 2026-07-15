@@ -53,63 +53,62 @@ export default function CustomerEditModal({
   if (!customer) return null;
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="lg">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='lg'>
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">
+        <DrawerHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>
             Editar cliente
           </span>
-          <span className="text-sm font-normal text-default-500">
+          <span className='text-default-500 text-sm font-normal'>
             {customer.name}
           </span>
         </DrawerHeader>
 
         <DrawerBody>
           <form
-            id="customer-edit-form"
+            id='customer-edit-form'
             onSubmit={(...args) => {
               void handleSubmit(handleConfirm)(...args);
             }}
-            className="flex flex-col gap-4"
+            className='flex flex-col gap-4'
           >
             <InputForm
-              label="Nombre"
-              placeholder="Nombre del cliente"
+              label='Nombre'
+              placeholder='Nombre del cliente'
               controlProps={{ control, name: 'name' }}
               isRequired
-              aria-label="Nombre del cliente"
+              aria-label='Nombre del cliente'
             />
 
             <InputForm
-              label="Email"
-              placeholder="correo@ejemplo.com"
+              label='Email'
+              placeholder='correo@ejemplo.com'
               controlProps={{ control, name: 'emailAddress' }}
               isRequired
-              aria-label="Email del cliente"
+              aria-label='Email del cliente'
             />
 
             <InputForm
-              label="Teléfono"
-              placeholder="+52 55 1234 5678"
+              label='Teléfono'
+              placeholder='+52 55 1234 5678'
               controlProps={{ control, name: 'phone' }}
               formatValue={formatPhoneNumber}
-              aria-label="Teléfono del cliente"
+              aria-label='Teléfono del cliente'
             />
-
           </form>
         </DrawerBody>
 
-        <DrawerFooter className="flex justify-between">
-          <Button variant="light" onPress={onClose} className="text-accent">
+        <DrawerFooter className='flex justify-between'>
+          <Button variant='light' onPress={onClose} className='text-accent'>
             Cancelar
           </Button>
           <Button
-            type="submit"
-            form="customer-edit-form"
-            color="primary"
+            type='submit'
+            form='customer-edit-form'
+            color='primary'
             isLoading={loading}
             isDisabled={!formState.isValid}
-            startContent={<Icon icon="lucide:save" />}
+            startContent={<Icon icon='lucide:save' />}
           >
             Guardar cambios
           </Button>

@@ -1,7 +1,7 @@
-import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
 import { DateRange } from '@/lib/types/date.types';
 import { MOVEMENT_TYPES, STOCK_STATUSES } from './constants';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type MovementType = (typeof MOVEMENT_TYPES)[keyof typeof MOVEMENT_TYPES];
 
@@ -18,6 +18,7 @@ export interface IInventoryItem {
   imageUrl: string;
   tcg: string;
   condition: CardCondition;
+  language: CardLanguage;
   stock: number;
   stockStatus: StockStatus;
   purchasePrice: number;
@@ -35,6 +36,8 @@ export interface IInventoryMovement {
   setCode: string;
   cardNumber: string;
   tcg: string;
+  condition: CardCondition;
+  language: CardLanguage;
   movementType: MovementType;
   quantity: number;
   notes: string;

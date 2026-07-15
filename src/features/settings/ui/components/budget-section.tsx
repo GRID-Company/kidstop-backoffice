@@ -1,4 +1,13 @@
-import { Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
+import {
+  Select,
+  SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from '@heroui/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
@@ -18,7 +27,11 @@ interface BudgetSectionProps {
 
 function UtilizationBadge({ utilization }: { utilization: number }) {
   const color =
-    utilization >= 90 ? 'text-danger' : utilization >= 70 ? 'text-warning' : 'text-success';
+    utilization >= 90
+      ? 'text-danger'
+      : utilization >= 70
+        ? 'text-warning'
+        : 'text-success';
   return <span className={`text-sm font-medium ${color}`}>{utilization}%</span>;
 }
 
@@ -45,25 +58,29 @@ function BudgetFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} size='sm'>
       <ModalContent>
         <ModalHeader>
           {defaults?.buyerGuid ? 'Editar presupuesto' : 'Asignar presupuesto'}
         </ModalHeader>
         <ModalBody>
           <form
-            id="budget-form"
-            onSubmit={(...args) => { void handleSubmit(onSubmit)(...args); }}
-            className="flex flex-col gap-4"
+            id='budget-form'
+            onSubmit={(...args) => {
+              void handleSubmit(onSubmit)(...args);
+            }}
+            className='flex flex-col gap-4'
           >
             <Controller
               control={control}
-              name="buyerGuid"
+              name='buyerGuid'
               render={({ field, fieldState }) => (
                 <Select
-                  label="Comprador"
+                  label='Comprador'
                   selectedKeys={field.value ? [field.value] : []}
-                  onSelectionChange={(keys) => field.onChange([...keys][0] ?? '')}
+                  onSelectionChange={(keys) =>
+                    field.onChange([...keys][0] ?? '')
+                  }
                   isDisabled={!!defaults?.buyerGuid}
                   isInvalid={!!fieldState.error}
                   errorMessage={fieldState.error?.message}
@@ -76,37 +93,39 @@ function BudgetFormModal({
             />
             <Controller
               control={control}
-              name="tcg"
+              name='tcg'
               render={({ field, fieldState }) => (
                 <Select
-                  label="TCG"
+                  label='TCG'
                   selectedKeys={field.value ? [field.value] : []}
-                  onSelectionChange={(keys) => field.onChange([...keys][0] ?? '')}
+                  onSelectionChange={(keys) =>
+                    field.onChange([...keys][0] ?? '')
+                  }
                   isDisabled={!!defaults?.tcg}
                   isInvalid={!!fieldState.error}
                   errorMessage={fieldState.error?.message}
                 >
-                  <SelectItem key="POKEMON">Pokémon</SelectItem>
-                  <SelectItem key="MAGIC">Magic</SelectItem>
+                  <SelectItem key='POKEMON'>Pokémon</SelectItem>
+                  <SelectItem key='MAGIC'>Magic</SelectItem>
                 </Select>
               )}
             />
             <InputForm
-              label="Monto mensual asignado"
-              placeholder="0"
-              type="number"
+              label='Monto mensual asignado'
+              placeholder='0'
+              type='number'
               controlProps={{ control, name: 'assignedAmount' }}
             />
           </form>
         </ModalBody>
         <ModalFooter>
-          <KidstopButton variant="bordered" onPress={onClose}>
+          <KidstopButton variant='bordered' onPress={onClose}>
             Cancelar
           </KidstopButton>
           <KidstopButton
-            variant="accent"
-            type="submit"
-            form="budget-form"
+            variant='accent'
+            type='submit'
+            form='budget-form'
             isDisabled={!formState.isValid}
             isLoading={loading}
           >
@@ -118,9 +137,16 @@ function BudgetFormModal({
   );
 }
 
-export default function BudgetSection({ budgets, buyers, loading, onSave }: BudgetSectionProps) {
+export default function BudgetSection({
+  budgets,
+  buyers,
+  loading,
+  onSave,
+}: BudgetSectionProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [editingBudget, setEditingBudget] = useState<IBudgetConfig | null>(null);
+  const [editingBudget, setEditingBudget] = useState<IBudgetConfig | null>(
+    null
+  );
 
   const handleEdit = (budget: IBudgetConfig) => {
     setEditingBudget(budget);
@@ -138,10 +164,10 @@ export default function BudgetSection({ budgets, buyers, loading, onSave }: Budg
   };
 
   return (
-    <SettingsSection title="Presupuestos por Comprador" icon="lucide:wallet">
-      <div className="flex flex-col gap-4">
+    <SettingsSection title='Presupuestos por Comprador' icon='lucide:wallet'>
+      <div className='flex flex-col gap-4'>
         {budgets.length === 0 && !loading && (
-          <p className="text-sm text-default-400">
+          <p className='text-default-400 text-sm'>
             No hay presupuestos asignados.
           </p>
         )}
@@ -149,45 +175,45 @@ export default function BudgetSection({ budgets, buyers, loading, onSave }: Budg
         {budgets.map((budget) => (
           <div
             key={budget.guid}
-            className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3"
+            className='border-default-200 flex items-center justify-between rounded-lg border px-4 py-3'
           >
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium">{budget.buyer.name}</span>
-              <span className="text-xs text-default-400">{budget.tcg}</span>
+            <div className='flex flex-col gap-0.5'>
+              <span className='text-sm font-medium'>{budget.buyer.name}</span>
+              <span className='text-default-400 text-xs'>{budget.tcg}</span>
             </div>
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex flex-col items-end">
-                <span className="text-xs text-default-400">Asignado</span>
-                <span className="font-medium">
+            <div className='flex items-center gap-6 text-sm'>
+              <div className='flex flex-col items-end'>
+                <span className='text-default-400 text-xs'>Asignado</span>
+                <span className='font-medium'>
                   ${budget.assignedAmount.toLocaleString('es-MX')}
                 </span>
               </div>
-              <div className="flex flex-col items-end">
-                <span className="text-xs text-default-400">Usado</span>
-                <span className="font-medium">
+              <div className='flex flex-col items-end'>
+                <span className='text-default-400 text-xs'>Usado</span>
+                <span className='font-medium'>
                   ${budget.usedAmount.toLocaleString('es-MX')}
                 </span>
               </div>
-              <div className="flex flex-col items-end">
-                <span className="text-xs text-default-400">Uso</span>
+              <div className='flex flex-col items-end'>
+                <span className='text-default-400 text-xs'>Uso</span>
                 <UtilizationBadge utilization={budget.utilization} />
               </div>
               <KidstopButton
                 isIconOnly
-                variant="bordered"
-                size="sm"
+                variant='bordered'
+                size='sm'
                 onPress={() => handleEdit(budget)}
               >
-                <Icon icon="lucide:pencil" className="text-sm" />
+                <Icon icon='lucide:pencil' className='text-sm' />
               </KidstopButton>
             </div>
           </div>
         ))}
 
-        <div className="flex justify-start">
+        <div className='flex justify-start'>
           <KidstopButton
-            variant="accent"
-            startContent={<Icon icon="lucide:plus" />}
+            variant='accent'
+            startContent={<Icon icon='lucide:plus' />}
             onPress={handleAdd}
           >
             Asignar presupuesto

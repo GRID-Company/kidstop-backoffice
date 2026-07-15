@@ -44,22 +44,23 @@ export default function CardPrioritySelector<T extends FieldValues>({
     <Controller
       {...controlProps}
       render={({ field: { value, onChange }, fieldState: { error } }) => (
-        <div className="flex flex-col gap-2">
+        <div className='flex flex-col gap-2'>
           {label && (
-            <span className="text-sm font-medium text-default-700">
+            <span className='text-default-700 text-sm font-medium'>
               {label}
             </span>
           )}
 
-          <div className="flex gap-2">
+          <div className='flex gap-2'>
             {MOST_WANTED_PRIORITY_OPTIONS.map((option) => {
-              const config = PRIORITY_CONFIG[option.value as MostWantedPriority];
+              const config =
+                PRIORITY_CONFIG[option.value as MostWantedPriority];
               const isSelected = value === option.value;
 
               return (
                 <Button
                   key={option.value}
-                  size="sm"
+                  size='sm'
                   variant={isSelected ? 'solid' : 'bordered'}
                   className={
                     isSelected
@@ -76,7 +77,7 @@ export default function CardPrioritySelector<T extends FieldValues>({
           </div>
 
           {error?.message && (
-            <span className="text-xs text-danger">{error.message}</span>
+            <span className='text-danger text-xs'>{error.message}</span>
           )}
         </div>
       )}

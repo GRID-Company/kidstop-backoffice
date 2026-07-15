@@ -1,8 +1,11 @@
-query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) {
+query MagicCardInternalList(
+  $findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
+) {
   magicCardInternalList(findMagicCardsPublicArgs: $findMagicCardsPublicArgs) {
     data {
       guid
       name
+      language
       edition
       collectorNumber
       isFoil
@@ -13,6 +16,7 @@ query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!
       inventoryCards {
         guid
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -26,6 +30,7 @@ query MagicCardInternalDetail($guid: String!) {
   magicCardInternalDetail(guid: $guid) {
     guid
     name
+    language
     edition
     collectorNumber
     isFoil
@@ -36,6 +41,7 @@ query MagicCardInternalDetail($guid: String!) {
     inventoryCards {
       guid
       condition
+      language
       stock
       purchasePrice
       sellPrice
@@ -59,6 +65,7 @@ query MagicCardWithMetrics($guid: String!) {
   magicCardWithMetrics(guid: $guid) {
     variantsMetrics {
       condition
+      language
       stock
       lastSellDate
       avgDaysInInventory
@@ -71,44 +78,49 @@ query MagicCardWithMetrics($guid: String!) {
 
 query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
   magicBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
-    originalLine
-    parsedQuantity
-    parsedName
-    parsedSet
-    parsedNumber
-    bestMatch {
-      guid
-      name
-      edition
-      collectorNumber
-      imageUri
-      isFoil
-      sellPrice
-      totalStock
-      cardMetrics {
-        variantsMetrics {
-          condition
-          stock
-          lastSellDate
-          avgDaysInInventory
-          wishlistCount
+      originalLine
+      parsedQuantity
+      parsedName
+      parsedSet
+      parsedNumber
+      bestMatch {
+        guid
+        name
+        language
+        edition
+        collectorNumber
+        imageUri
+        isFoil
+        sellPrice
+        totalStock
+        cardMetrics {
+          variantsMetrics {
+            condition
+            language
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          priceRetail
+          priceBuy
         }
-        priceRetail
-        priceBuy
       }
-    }
-    relatedCards {
-      guid
-      name
-      edition
-      collectorNumber
-      imageUri
-      isFoil
-      sellPrice
-      totalStock
-    }
-    error
+      relatedCards {
+        guid
+        name
+        language
+        edition
+        collectorNumber
+        imageUri
+        isFoil
+        sellPrice
+        totalStock
+      }
+      error
     }
   }
 }

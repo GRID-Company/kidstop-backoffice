@@ -28,20 +28,20 @@ export default function SendReadyWhatsAppButton({
       sale,
       customerPhone,
     });
-    
+
     window.open(url, '_blank', 'noopener,noreferrer');
   }, [sale, customerPhone]);
 
   if (!canSend) return null;
 
   return (
-    <Tooltip content="Notificar al cliente por WhatsApp que su pedido está listo">
+    <Tooltip content='Notificar al cliente por WhatsApp que su pedido está listo'>
       <Button
-        color="success"
-        variant="solid"
-        startContent={<Icon icon="lucide:message-circle" width={18} />}
+        color='success'
+        variant='solid'
+        startContent={<Icon icon='lucide:message-circle' width={18} />}
         onPress={handleSend}
-        className="font-medium"
+        className='font-medium'
       >
         Notificar vía WhatsApp
       </Button>

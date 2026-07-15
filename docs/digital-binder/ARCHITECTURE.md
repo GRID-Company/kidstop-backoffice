@@ -124,24 +124,31 @@ src/
 ## Módulos del Sistema
 
 ### auth
+
 Login con email/contraseña, registro de nuevos clientes, recuperación de contraseña vía email. Cuenta unificada entre dominios Pokémon y Magic. Sesión via cookies HTTP-only.
 
 ### catalog
+
 Página principal de la aplicación. Grid de cartas disponibles con búsqueda por nombre, filtros (set, rareza, precio, stock), detalle de carta con variantes y condiciones. Botones de agregar al carrito y wishlist.
 
 ### cart
+
 Carrito de compras con store Zustand persistido en localStorage. Vista de carrito con controles de cantidad. Checkout con validación de stock, modal de faltantes, geofencing (Google Maps) para no-VIP, formulario Kiosk (nombre + correo) y confirmación de pedido.
 
 ### wishlist
+
 Lista de deseos del usuario autenticado. Grid de cartas con indicador de stock. Agregar al carrito si disponible. No accesible para Público ni Kiosk.
 
 ### orders
+
 Historial de pedidos del cliente filtrado por TCG del dominio. Listado con código, fecha, total y estado. Detalle con items y timeline de estados. No accesible para Kiosk.
 
 ### profile
+
 Datos del usuario autenticado (nombre, email, teléfono, tipo). Edición inline y cambio de contraseña. No accesible para Kiosk.
 
 ### most-wanted
+
 Página pública sin autenticación. Grid de cartas más buscadas por TCG. Optimizada para pantalla/TV (modo display fullscreen). Auto-refresh periódico.
 
 ### Estado Actual de Integración
@@ -308,18 +315,22 @@ const [quantity, setQuantity] = useState(1);
 Tres stores globales con persistencia:
 
 **auth.ts** — Sesión del usuario (user, token, role):
+
 ```typescript
 const { user, token, setSession, clearSession } = useAuthStore();
 ```
 
 **tcg-context.ts** — TCG derivado del dominio (read-only):
+
 ```typescript
 const tcg = useTCGContext(); // POKEMON o MAGIC, según hostname
 ```
 
 **cart.ts** — Carrito de compras:
+
 ```typescript
-const { items, addItem, removeItem, updateQuantity, clearCart, totalPrice } = useCartStore();
+const { items, addItem, removeItem, updateQuantity, clearCart, totalPrice } =
+  useCartStore();
 ```
 
 ### Server State (Apollo Client)
@@ -338,6 +349,7 @@ const { data, loading, error, refetch } = useQuery(DocumentNode, {
 ### GraphQL Setup
 
 Mismo setup que el backoffice:
+
 - Apollo Client con auth link (Bearer token)
 - Error link con logout automático en 401
 - GraphQL Codegen para tipos automáticos
@@ -349,6 +361,7 @@ npm run codegen
 ```
 
 Genera tipos desde el schema del backend en:
+
 - `src/lib/api/schema-types.ts` — Tipos base
 - `src/lib/api/generated/*.generated.ts` — DocumentNodes tipados
 
@@ -356,11 +369,11 @@ Genera tipos desde el schema del backend en:
 
 ### Grupos de Rutas
 
-| Grupo | Rutas | Acceso |
-|-------|-------|--------|
-| `(public)` | `/`, `/carta/[id]`, `/most-wanted` | Todos |
-| `(authenticated)` | `/carrito`, `/checkout`, `/perfil`, `/pedidos`, `/wishlist` | Autenticados |
-| `(not-authenticated)` | `/login`, `/registro`, `/recuperar-contrasena` | Solo no autenticados |
+| Grupo                 | Rutas                                                       | Acceso               |
+| --------------------- | ----------------------------------------------------------- | -------------------- |
+| `(public)`            | `/`, `/carta/[id]`, `/most-wanted`                          | Todos                |
+| `(authenticated)`     | `/carrito`, `/checkout`, `/perfil`, `/pedidos`, `/wishlist` | Autenticados         |
+| `(not-authenticated)` | `/login`, `/registro`, `/recuperar-contrasena`              | Solo no autenticados |
 
 ### Middleware (proxy.ts)
 
@@ -375,21 +388,25 @@ Genera tipos desde el schema del backend en:
 ## Seguridad
 
 ### Authentication
+
 - Cookie-based auth (HTTP-only)
 - Sesión compartida entre dominios Pokémon y Magic
 
 ### Authorization por Rol
+
 - Público: solo catálogo y most-wanted
 - Cliente: todo excepto compra remota
 - VIP: todo, sin restricción de geofence
 - Kiosk: catálogo + carrito + checkout, sin perfil/pedidos/wishlist
 
 ### Geofencing
+
 - Validación de ubicación en checkout para no-VIP
 - Google Maps JavaScript API
 - Coordenadas y radio configurables via env
 
 ### Input Validation
+
 - Validar en cliente (Zod)
 - Validar en servidor (siempre)
 

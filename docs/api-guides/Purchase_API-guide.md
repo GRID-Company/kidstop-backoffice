@@ -48,6 +48,16 @@ WAITING_PRICE → FINALIZED  (ADMIN/BUYER — all items need sellPrice, payments
 - `HEAVILY_PLAYED`
 - `DAMAGED`
 
+### Card Languages
+
+- `ENGLISH`
+- `SPANISH`
+- `JAPANESE`
+- `KOREAN`
+- `CHINESE`
+
+> **Language rules:** Magic cards accept `ENGLISH` or `SPANISH` only. Pokemon card language must match the card's original language.
+
 ---
 
 ## Available Endpoints
@@ -82,6 +92,7 @@ query Purchases($findPurchasesArgs: FindPurchasesArgs!) {
       items {
         guid
         condition
+        language
         offerPrice
         referencePrice
         sellPrice
@@ -198,18 +209,23 @@ query Purchase($guid: String!) {
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       sellPrice
       quantity
       tcg
-      pokemonCard {
-        guid
-        titleName
-      }
-      magicCard {
+      pokemonCardSummary {
         guid
         name
+        setName
+        cardNumber
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
       }
     }
     payments {
@@ -260,6 +276,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       quantity
@@ -297,15 +314,16 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
       {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
-        "offerPrice": 10.00,
-        "referencePrice": 15.00,
+        "language": "ENGLISH",
+        "offerPrice": 10.0,
+        "referencePrice": 15.0,
         "quantity": 1
       }
     ],
     "payments": [
       {
         "method": "CASH",
-        "amount": 10.00
+        "amount": 10.0
       }
     ]
   }
@@ -323,7 +341,8 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
       {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
-        "offerPrice": 10.00,
+        "language": "ENGLISH",
+        "offerPrice": 10.0,
         "quantity": 1
       }
     ]
@@ -340,6 +359,7 @@ mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
 - `items`: Required array with:
   - `pokemonCardGuid` or `magicCardGuid`: Card identifier (based on tcg)
   - `condition`: Card condition enum
+  - `language`: Required — Card language enum (see Language Rules above)
   - `offerPrice`: Price offered to seller per unit
   - `referencePrice`: Optional market/reference price
   - `quantity`: Number of units (> 0)
@@ -393,11 +413,11 @@ mutation UpdatePurchase($updatePurchaseInput: UpdatePurchaseInput!) {
     "payments": [
       {
         "method": "CASH",
-        "amount": 10.00
+        "amount": 10.0
       },
       {
         "method": "STORE_CREDIT",
-        "amount": 5.00
+        "amount": 5.0
       }
     ]
   }
@@ -419,7 +439,9 @@ mutation UpdatePurchase($updatePurchaseInput: UpdatePurchaseInput!) {
 **Access:** ADMIN, BUYER, RECEPTION
 
 ```graphql
-mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput!) {
+mutation UpdatePurchaseItems(
+  $updatePurchaseItemsInput: UpdatePurchaseItemsInput!
+) {
   updatePurchaseItems(updatePurchaseItemsInput: $updatePurchaseItemsInput) {
     guid
     reference
@@ -428,14 +450,15 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
     items {
       guid
       condition
+      language
       offerPrice
       referencePrice
       quantity
-      pokemonCard {
+      pokemonCardSummary {
         guid
-        titleName
+        name
       }
-      magicCard {
+      magicCardSummary {
         guid
         name
       }
@@ -454,15 +477,16 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
       {
         "pokemonCardGuid": "CARD_GUID",
         "condition": "NEAR_MINT",
-        "offerPrice": 5.00,
-        "referencePrice": 8.00,
+        "language": "ENGLISH",
+        "offerPrice": 5.0,
+        "referencePrice": 8.0,
         "quantity": 2
       }
     ],
     "updateItems": [
       {
         "itemGuid": "EXISTING_ITEM_GUID",
-        "offerPrice": 12.00,
+        "offerPrice": 12.0,
         "quantity": 3
       }
     ],
@@ -492,7 +516,9 @@ mutation UpdatePurchaseItems($updatePurchaseItemsInput: UpdatePurchaseItemsInput
 **Access:** ADMIN, BUYER only
 
 ```graphql
-mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusInput!) {
+mutation UpdatePurchaseStatus(
+  $updatePurchaseStatusInput: UpdatePurchaseStatusInput!
+) {
   updatePurchaseStatus(updatePurchaseStatusInput: $updatePurchaseStatusInput) {
     guid
     reference
@@ -530,8 +556,12 @@ mutation UpdatePurchaseStatus($updatePurchaseStatusInput: UpdatePurchaseStatusIn
 **Access:** ADMIN, BUYER
 
 ```graphql
-mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!) {
-  setPurchaseItemSellPrice(setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput) {
+mutation SetPurchaseItemSellPrice(
+  $setPurchaseItemSellPriceInput: SetPurchaseItemSellPriceInput!
+) {
+  setPurchaseItemSellPrice(
+    setPurchaseItemSellPriceInput: $setPurchaseItemSellPriceInput
+  ) {
     guid
     offerPrice
     referencePrice
@@ -549,7 +579,7 @@ mutation SetPurchaseItemSellPrice($setPurchaseItemSellPriceInput: SetPurchaseIte
   "setPurchaseItemSellPriceInput": {
     "purchaseItemGuid": "PURCHASE_ITEM_GUID",
     "sellPrice": 19.99,
-    "referencePrice": 15.00
+    "referencePrice": 15.0
   }
 }
 ```
@@ -605,7 +635,7 @@ mutation FinalizePurchase($purchaseGuid: String!) {
 - All items must have `sellPrice` set (non-null)
 - If payments are provided, sum must equal the purchase total
 - For each item:
-  - Finds or creates matching InventoryItem (card + tcg + condition)
+  - Finds or creates matching InventoryItem (card + tcg + condition + language)
   - Increments stock by item quantity
   - Updates InventoryItem `purchasePrice` and `sellPrice`
   - Creates InventoryMovement (PURCHASE_ENTRY)

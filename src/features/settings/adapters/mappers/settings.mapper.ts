@@ -81,9 +81,13 @@ export function fromApiToThresholds(
   config: GlobalConfigQuery['globalConfig']['config']
 ): IThresholdConfig {
   return {
-    uncompletedOrdersLimit: config.saleCancellationBlockThreshold ?? DEFAULT_THRESHOLDS.uncompletedOrdersLimit,
-    inventoryLimitPerCard: config.inventoryLimit ?? DEFAULT_THRESHOLDS.inventoryLimitPerCard,
-    purchasePercentage: config.purchasePercentage ?? DEFAULT_THRESHOLDS.purchasePercentage,
+    uncompletedOrdersLimit:
+      config.saleCancellationBlockThreshold ??
+      DEFAULT_THRESHOLDS.uncompletedOrdersLimit,
+    inventoryLimitPerCard:
+      config.inventoryLimit ?? DEFAULT_THRESHOLDS.inventoryLimitPerCard,
+    purchasePercentage:
+      config.purchasePercentage ?? DEFAULT_THRESHOLDS.purchasePercentage,
   };
 }
 
@@ -103,7 +107,7 @@ export function fromApiToOperatingHours(
 }
 
 export function fromApiBanners(
-  banners: any
+  banners: Partial<IBannerConfig> | null | undefined
 ): IBannerConfig {
   if (!banners) return DEFAULT_BANNER_CONFIG;
   return {
@@ -120,7 +124,9 @@ export function fromApiToSettings(
     geofence: fromApiToGeofence(api.config.geofence),
     thresholds: fromApiToThresholds(api.config),
     operatingHours: fromApiToOperatingHours(api.config.operationSchedule),
-    bannerGuids: fromApiBanners((api.config as any).bannerGuids),
+    bannerGuids: fromApiBanners(
+      api.config.bannerGuids as Partial<IBannerConfig> | null | undefined
+    ),
     createdDate: String(api.createdDate),
     updatedDate: String(api.updatedDate),
   };
@@ -154,13 +160,27 @@ function slotToApiDay(slot: IOperatingHoursSlot) {
 export function toOperatingHoursMutationInput(operatingHours: IOperatingHours) {
   return {
     operationSchedule: {
-      monday: operatingHours.monday ? slotToApiDay(operatingHours.monday) : null,
-      tuesday: operatingHours.tuesday ? slotToApiDay(operatingHours.tuesday) : null,
-      wednesday: operatingHours.wednesday ? slotToApiDay(operatingHours.wednesday) : null,
-      thursday: operatingHours.thursday ? slotToApiDay(operatingHours.thursday) : null,
-      friday: operatingHours.friday ? slotToApiDay(operatingHours.friday) : null,
-      saturday: operatingHours.saturday ? slotToApiDay(operatingHours.saturday) : null,
-      sunday: operatingHours.sunday ? slotToApiDay(operatingHours.sunday) : null,
+      monday: operatingHours.monday
+        ? slotToApiDay(operatingHours.monday)
+        : null,
+      tuesday: operatingHours.tuesday
+        ? slotToApiDay(operatingHours.tuesday)
+        : null,
+      wednesday: operatingHours.wednesday
+        ? slotToApiDay(operatingHours.wednesday)
+        : null,
+      thursday: operatingHours.thursday
+        ? slotToApiDay(operatingHours.thursday)
+        : null,
+      friday: operatingHours.friday
+        ? slotToApiDay(operatingHours.friday)
+        : null,
+      saturday: operatingHours.saturday
+        ? slotToApiDay(operatingHours.saturday)
+        : null,
+      sunday: operatingHours.sunday
+        ? slotToApiDay(operatingHours.sunday)
+        : null,
     },
   };
 }

@@ -17,18 +17,25 @@ import toast from 'react-hot-toast';
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
 import Search from '@/shared/base/heorui-overrides/search';
+import { ExportButton } from '@/shared/base/export-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { ISale, SaleStatus } from '../../domain/types';
 import { SALE_STATUS_OPTIONS } from '../../domain/constants';
-import { getCustomerDisplayName, getCustomerDisplayEmail } from '../../adapters/mappers/sale.mapper';
+import {
+  getCustomerDisplayName,
+  getCustomerDisplayEmail,
+} from '../../adapters/mappers/sale.mapper';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { useSales } from '../hooks/use-sales';
+import { useExportSales } from '../hooks/use-export-sales';
 import SaleStatusBadge from '../components/sale-status-badge';
 
 export default function Sales() {
   const router = useRouter();
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const {
     sales,
     totalCount,
@@ -45,6 +52,7 @@ export default function Sales() {
     loading,
     error,
   } = useSales();
+  const { handleExport, exporting } = useExportSales();
 
   useEffect(() => {
     if (error) {
@@ -54,7 +62,9 @@ export default function Sales() {
 
   const handleStatusChange = useCallback(
     (keys: unknown) => {
-      const selected = Array.from(keys as Set<string>)[0] as SaleStatus | undefined;
+      const selected = Array.from(keys as Set<string>)[0] as
+        | SaleStatus
+        | undefined;
       setStatusFilter(selected || undefined);
     },
     [setStatusFilter]
@@ -81,14 +91,43 @@ export default function Sales() {
     [router]
   );
 
-  const columns: ITableColumn[] = useMemo(
+  const handleExportClick = useCallback(() => {
+    handleExport({
+      findSalesArgs: {
+        skip: 0,
+        limit: 0,
+        sort: { column: 'createdDate', order: 'DESC' },
+        search: filters.search?.trim() || undefined,
+        filters: {
+          tcg: selectedTCG,
+          status: filters.status || undefined,
+          customer: filters.customer || undefined,
+          ...(filters.dateFrom || filters.dateTo
+            ? {
+                createdDate: {
+                  filterType: ':daterange:',
+                  range: {
+                    from: filters.dateFrom,
+                    to: filters.dateTo,
+                  },
+                },
+              }
+            : {}),
+        },
+      },
+    });
+  }, [handleExport, selectedTCG, filters]);
+
+  const columns: ITableColumn<ISale>[] = useMemo(
     () => [
       {
         key: 'saleCode',
         label: 'Código',
         className: '!text-left min-w-[140px]',
         customCol: (row: ISale) => (
-          <span className="text-sm font-semibold text-accent">{row.saleCode}</span>
+          <span className='text-accent text-sm font-semibold'>
+            {row.saleCode}
+          </span>
         ),
       },
       {
@@ -102,12 +141,18 @@ export default function Sales() {
         label: 'Cliente',
         className: '!text-left min-w-[160px]',
         customCol: (row: ISale) => (
-          <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">
-              {getCustomerDisplayName(row.customer?.name, row.kioskCustomerName)}
+          <div className='flex flex-col items-start'>
+            <span className='text-sm font-medium'>
+              {getCustomerDisplayName(
+                row.customer?.name,
+                row.kioskCustomerName
+              )}
             </span>
-            <span className="text-xs text-default-400">
-              {getCustomerDisplayEmail(row.customer?.emailAddress, row.kioskCustomerEmail)}
+            <span className='text-default-400 text-xs'>
+              {getCustomerDisplayEmail(
+                row.customer?.emailAddress,
+                row.kioskCustomerEmail
+              )}
             </span>
           </div>
         ),
@@ -117,9 +162,12 @@ export default function Sales() {
         label: 'Items',
         className: 'w-[80px]',
         customCol: (row: ISale) => {
-          const count = row.items.reduce((sum, i) => sum + i.quantity, 0);
+          const count = row.items.reduce(
+            (sum: number, i: { quantity: number }) => sum + i.quantity,
+            0
+          );
           return (
-            <Chip size="sm" variant="flat">
+            <Chip size='sm' variant='flat'>
               {count} {count === 1 ? 'carta' : 'cartas'}
             </Chip>
           );
@@ -130,7 +178,7 @@ export default function Sales() {
         label: 'Total',
         className: 'min-w-[120px]',
         customCol: (row: ISale) => (
-          <span className="text-sm font-semibold">
+          <span className='text-sm font-semibold'>
             {formatCurrency(row.total)}
           </span>
         ),
@@ -140,7 +188,7 @@ export default function Sales() {
         label: 'Fecha',
         className: 'min-w-[120px]',
         customCol: (row: ISale) => (
-          <span className="text-sm text-default-500">
+          <span className='text-default-500 text-sm'>
             {formatDate(row.createdDate)}
           </span>
         ),
@@ -151,15 +199,15 @@ export default function Sales() {
         className: 'w-[60px]',
         customCol: (row: ISale) => (
           <div onClick={(e) => e.stopPropagation()}>
-            <Tooltip content="Ver detalle">
+            <Tooltip content='Ver detalle'>
               <Button
                 isIconOnly
-                size="sm"
-                variant="light"
+                size='sm'
+                variant='light'
                 aria-label={`Ver pedido ${row.saleCode}`}
                 onPress={() => router.push(`/ventas/${row.guid}`)}
               >
-                <Icon icon="lucide:eye" width={16} />
+                <Icon icon='lucide:eye' width={16} />
               </Button>
             </Tooltip>
           </div>
@@ -171,31 +219,31 @@ export default function Sales() {
 
   return (
     <EntitiesPage>
-      <EntitiesPage.Toolbar label="Pedidos / Ventas">
-        <></>
+      <EntitiesPage.Toolbar label='Pedidos / Ventas'>
+        <ExportButton onPress={handleExportClick} isLoading={exporting} />
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="min-w-[240px] flex-1">
+        <div className='flex flex-col gap-4'>
+          <div className='flex flex-wrap items-end gap-3'>
+            <div className='min-w-[240px] flex-1'>
               <Search
-                label="Buscar"
-                placeholder="Código, cliente o carta..."
+                label='Buscar'
+                placeholder='Código, cliente o carta...'
                 value={filters.search || ''}
                 onValueChange={setSearch}
-                aria-label="Buscar pedidos"
+                aria-label='Buscar pedidos'
                 isClearable
                 onClear={() => setSearch('')}
               />
             </div>
 
             <Select
-              aria-label="Filtrar por estado"
-              label="Estado"
-              size="sm"
-              variant="bordered"
-              className="w-[180px]"
+              aria-label='Filtrar por estado'
+              label='Estado'
+              size='sm'
+              variant='bordered'
+              className='w-[180px]'
               selectedKeys={
                 filters.status ? new Set([filters.status]) : new Set()
               }
@@ -213,12 +261,12 @@ export default function Sales() {
             </Select>
 
             <Input
-              aria-label="Fecha desde"
-              type="date"
-              label="Desde"
-              size="sm"
-              variant="bordered"
-              className="w-[160px]"
+              aria-label='Fecha desde'
+              type='date'
+              label='Desde'
+              size='sm'
+              variant='bordered'
+              className='w-[160px]'
               onValueChange={handleDateFromChange}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white',
@@ -227,12 +275,12 @@ export default function Sales() {
             />
 
             <Input
-              aria-label="Fecha hasta"
-              type="date"
-              label="Hasta"
-              size="sm"
-              variant="bordered"
-              className="w-[160px]"
+              aria-label='Fecha hasta'
+              type='date'
+              label='Hasta'
+              size='sm'
+              variant='bordered'
+              className='w-[160px]'
               onValueChange={handleDateToChange}
               classNames={{
                 inputWrapper: 'border-[1px] bg-white',
@@ -242,10 +290,10 @@ export default function Sales() {
 
             {hasActiveFilters && (
               <Button
-                size="sm"
-                variant="flat"
+                size='sm'
+                variant='flat'
                 onPress={resetFilters}
-                startContent={<Icon icon="lucide:x" width={14} />}
+                startContent={<Icon icon='lucide:x' width={14} />}
               >
                 Limpiar
               </Button>
@@ -253,28 +301,28 @@ export default function Sales() {
           </div>
 
           {hasActiveFilters && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-default-400">
+            <div className='flex items-center gap-2'>
+              <span className='text-default-400 text-xs'>
                 {totalCount} {totalCount === 1 ? 'resultado' : 'resultados'}
               </span>
             </div>
           )}
         </div>
 
-        <div className="mt-4">
-          <DataTable 
-            cols={columns} 
-            data={sales} 
-            isLoading={loading} 
+        <div className='mt-4'>
+          <DataTable<ISale>
+            cols={columns}
+            data={sales}
+            isLoading={loading}
             rowClickable={true}
             onRowClick={handleRowClick}
           />
         </div>
 
         {sales.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-default-400">
-            <Icon icon="lucide:receipt" width={40} className="mb-2" />
-            <span className="text-sm">
+          <div className='text-default-400 flex flex-col items-center justify-center py-12'>
+            <Icon icon='lucide:receipt' width={40} className='mb-2' />
+            <span className='text-sm'>
               {hasActiveFilters
                 ? 'No se encontraron pedidos con esos filtros'
                 : 'No hay pedidos registrados'}
@@ -283,7 +331,7 @@ export default function Sales() {
         )}
 
         {totalPages > 1 && (
-          <div className="mt-4 flex justify-center">
+          <div className='mt-4 flex justify-center'>
             <KidstopPagination
               total={totalPages}
               page={page}

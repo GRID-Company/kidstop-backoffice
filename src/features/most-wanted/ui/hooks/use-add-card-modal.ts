@@ -14,17 +14,23 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedCard, setSelectedCard] = useState<IPokemonCard | IMagicCard | null>(null);
+  const [selectedCard, setSelectedCard] = useState<
+    IPokemonCard | IMagicCard | null
+  >(null);
 
   const form = useMostWantedForm();
 
-  const { cards: pokemonCards, loading: pokemonLoading, setSearch: setPokemonSearch } = usePokemonCatalog(
-    selectedTCG !== 'POKEMON'
-  );
+  const {
+    cards: pokemonCards,
+    loading: pokemonLoading,
+    setSearch: setPokemonSearch,
+  } = usePokemonCatalog(selectedTCG !== 'POKEMON');
 
-  const { cards: magicCards, loading: magicLoading, setSearch: setMagicSearch } = useMagicCatalog(
-    selectedTCG !== 'MAGIC'
-  );
+  const {
+    cards: magicCards,
+    loading: magicLoading,
+    setSearch: setMagicSearch,
+  } = useMagicCatalog(selectedTCG !== 'MAGIC');
 
   useEffect(() => {
     if (selectedTCG === 'POKEMON') {
@@ -41,9 +47,13 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
 
   const searchResults = useMemo(() => {
     if (selectedTCG === 'POKEMON') {
-      return pokemonCards.filter((card: any) => !existingCardGuids.has(card.guid));
+      return pokemonCards.filter(
+        (card: any) => !existingCardGuids.has(card.guid)
+      );
     } else if (selectedTCG === 'MAGIC') {
-      return magicCards.filter((card: any) => !existingCardGuids.has(card.guid));
+      return magicCards.filter(
+        (card: any) => !existingCardGuids.has(card.guid)
+      );
     }
     return [];
   }, [pokemonCards, magicCards, existingCardGuids, selectedTCG]);

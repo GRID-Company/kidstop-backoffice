@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { useDebounce } from '@/lib/hooks/use-debounce';
+import { CARD_SEARCH_LIMIT } from '@/lib/consts/card.consts';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
@@ -29,13 +30,19 @@ export function useCardSearch() {
   const debouncedSearch = useDebounce(search, 800);
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
 
-  const [filters, setFilters] = useState<PokemonCatalogFilters | MagicCatalogFilters>({});
+  const [filters, setFilters] = useState<
+    PokemonCatalogFilters | MagicCatalogFilters
+  >({});
   const [resetKey, setResetKey] = useState(0);
 
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
 
-  const pokemonFilters = isPokemon ? (filters as PokemonCatalogFilters) : undefined;
-  const magicFilters = !isPokemon ? (filters as MagicCatalogFilters) : undefined;
+  const pokemonFilters = isPokemon
+    ? (filters as PokemonCatalogFilters)
+    : undefined;
+  const magicFilters = !isPokemon
+    ? (filters as MagicCatalogFilters)
+    : undefined;
 
   const { data: pokemonData, loading: pokemonLoading } = useQuery(
     PokemonCardInternalListDocument,
@@ -43,8 +50,9 @@ export function useCardSearch() {
       variables: {
         findPokemonCardsPublicArgs: {
           skip: 0,
-          limit: 5,
+          limit: CARD_SEARCH_LIMIT,
           sort: { column: 'releaseDate', order: 'DESC' },
+          prioritizeSearch: true,
           search: debouncedSearch.trim() || undefined,
           filters: {
             rarity: pokemonFilters?.rarity || undefined,
@@ -65,7 +73,7 @@ export function useCardSearch() {
       variables: {
         findMagicCardsPublicArgs: {
           skip: 0,
-          limit: 5,
+          limit: CARD_SEARCH_LIMIT,
           sort: { column: 'releaseDate', order: 'DESC' },
           search: debouncedSearch.trim() || undefined,
           filters: {
@@ -81,10 +89,13 @@ export function useCardSearch() {
     }
   );
 
-  const { data: pokemonCollectionsData } = useQuery(PokemonCardCollectionsDocument, {
-    fetchPolicy: 'cache-first',
-    skip: !isPokemon,
-  });
+  const { data: pokemonCollectionsData } = useQuery(
+    PokemonCardCollectionsDocument,
+    {
+      fetchPolicy: 'cache-first',
+      skip: !isPokemon,
+    }
+  );
 
   const { data: pokemonRaritiesData } = useQuery(PokemonCardRaritiesDocument, {
     fetchPolicy: 'cache-first',
@@ -101,10 +112,13 @@ export function useCardSearch() {
     skip: !isPokemon,
   });
 
-  const { data: magicCollectionsData } = useQuery(MagicCardCollectionsDocument, {
-    fetchPolicy: 'cache-first',
-    skip: isPokemon,
-  });
+  const { data: magicCollectionsData } = useQuery(
+    MagicCardCollectionsDocument,
+    {
+      fetchPolicy: 'cache-first',
+      skip: isPokemon,
+    }
+  );
 
   const { data: magicRaritiesData } = useQuery(MagicCardRaritiesDocument, {
     fetchPolicy: 'cache-first',
@@ -113,11 +127,13 @@ export function useCardSearch() {
 
   const collections: IPokemonCollection[] | IMagicCollection[] = useMemo(() => {
     if (isPokemon) {
-      return (pokemonCollectionsData?.pokemonCardCollections ?? []).map((c) => ({
-        guid: c.guid,
-        name: c.name,
-        code: c.code ?? null,
-      }));
+      return (pokemonCollectionsData?.pokemonCardCollections ?? []).map(
+        (c) => ({
+          guid: c.guid,
+          name: c.name,
+          code: c.code ?? null,
+        })
+      );
     }
     return (magicCollectionsData?.magicCardCollections ?? []).map((c) => ({
       guid: c.guid,
@@ -140,60 +156,75 @@ export function useCardSearch() {
     if (selectedTCG === TCG_TYPES.POKEMON) {
       if (!pokemonData?.pokemonCardInternalList?.data) return [];
 
-      return pokemonData.pokemonCardInternalList.data.map((card): ICardSearchResult => ({
-        guid: card.guid,
-        name: card.name,
-        setName: card.setName || '',
-        setCode: card.setCode || '',
-        number: card.cardNumber || '',
-        rarity: '',
-        imageUrl: card.imageUri || '',
-        tcgType: TCG_TYPES.POKEMON,
-        metrics: {
-          referencePrice: card.sellPrice || 0,
-          currentStock: card.availableStock ? 1 : 0,
-          lastSaleDate: null,
-          daysInInventory: 0,
-          wishlistCount: 0,
-        },
-      }));
+      return pokemonData.pokemonCardInternalList.data.map(
+        (card): ICardSearchResult => ({
+          guid: card.guid,
+          name: card.name,
+          setName: card.setName || '',
+          setCode: card.setCode || '',
+          number: card.cardNumber || '',
+          rarity: '',
+          imageUrl: card.imageUri || '',
+          tcgType: TCG_TYPES.POKEMON,
+          language: card.language,
+          variant: card.variant,
+          type: card.type,
+          hp: card.hp,
+          stage: card.stage,
+          metrics: {
+            referencePrice: card.sellPrice || 0,
+            currentStock: card.availableStock ? 1 : 0,
+            lastSaleDate: null,
+            daysInInventory: 0,
+            wishlistCount: 0,
+          },
+        })
+      );
     }
 
     if (selectedTCG === TCG_TYPES.MAGIC) {
       if (!magicData?.magicCardInternalList?.data) return [];
 
-      return magicData.magicCardInternalList.data.map((card): ICardSearchResult => ({
-        guid: card.guid,
-        name: card.name,
-        setName: card.edition || '',
-        setCode: '',
-        number: card.collectorNumber || '',
-        rarity: '',
-        imageUrl: card.imageUri || '',
-        tcgType: TCG_TYPES.MAGIC,
-        metrics: {
-          referencePrice: card.sellPrice || 0,
-          currentStock: card.availableStock ? 1 : 0,
-          lastSaleDate: null,
-          daysInInventory: 0,
-          wishlistCount: 0,
-        },
-      }));
+      return magicData.magicCardInternalList.data.map(
+        (card): ICardSearchResult => ({
+          guid: card.guid,
+          name: card.name,
+          setName: card.edition || '',
+          setCode: '',
+          number: card.collectorNumber || '',
+          rarity: '',
+          imageUrl: card.imageUri || '',
+          tcgType: TCG_TYPES.MAGIC,
+          language: card.language,
+          isFoil: card.isFoil,
+          collectorNumber: card.collectorNumber,
+          metrics: {
+            referencePrice: card.sellPrice || 0,
+            currentStock: card.availableStock ? 1 : 0,
+            lastSaleDate: null,
+            daysInInventory: 0,
+            wishlistCount: 0,
+          },
+        })
+      );
     }
 
     return [];
   }, [debouncedSearch, selectedTCG, pokemonData, magicData]);
 
-  const handleFilterChange = useCallback((key: string, value: string | boolean) => {
-    setFilters((prev) => {
-      if (value === '') {
-        const next = { ...prev };
-        delete next[key as keyof typeof next];
-        return next;
-      }
-      return { ...prev, [key]: value };
-    });
-  }, []);
+  const handleFilterChange = useCallback(
+    (key: string, value: string | boolean) => {
+      setFilters((prev) => {
+        if (value === '') {
+          const next = { ...prev };
+          delete next[key as keyof typeof next];
+          return next;
+        }
+        return { ...prev, [key]: value };
+      });
+    },
+    []
+  );
 
   const resetFilters = useCallback(() => {
     setFilters({});

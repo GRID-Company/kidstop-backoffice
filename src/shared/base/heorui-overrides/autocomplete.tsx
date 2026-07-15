@@ -3,7 +3,6 @@ import {
   AutocompleteItem,
   Autocomplete,
 } from '@heroui/react';
-import { type ISelectOption } from './select';
 
 export interface IAutocompleteOption {
   value: string;
@@ -29,6 +28,7 @@ export default function KidstopAutocomplete({
       allowsCustomValue={true}
       {...autocompleteProps}
     >
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {(item: any) => (
         <AutocompleteItem key={item.value} textValue={item.label}>
           <div className='max-w-full truncate'>

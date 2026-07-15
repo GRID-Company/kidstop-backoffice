@@ -20,42 +20,48 @@ export function useDuplicateValidation(
   addItem: (item: IPurchaseItem) => void,
   onComplete?: () => void
 ): UseDuplicateValidationReturn {
-  const [duplicateConfirmation, setDuplicateConfirmation] = useState<DuplicateConfirmation | null>(null);
+  const [duplicateConfirmation, setDuplicateConfirmation] =
+    useState<DuplicateConfirmation | null>(null);
 
-  const validateAndAddItems = useCallback((newItems: IPurchaseItem[]) => {
-    const uniqueItems: IPurchaseItem[] = [];
-    const duplicateItems: IPurchaseItem[] = [];
-    
-    newItems.forEach(item => {
-      const itemKey = getItemKey(item);
-      if (existingItemIds.has(itemKey)) {
-        duplicateItems.push(item);
-      } else {
-        uniqueItems.push(item);
+  const validateAndAddItems = useCallback(
+    (newItems: IPurchaseItem[]) => {
+      const uniqueItems: IPurchaseItem[] = [];
+      const duplicateItems: IPurchaseItem[] = [];
+
+      newItems.forEach((item) => {
+        const itemKey = getItemKey(item);
+        if (existingItemIds.has(itemKey)) {
+          duplicateItems.push(item);
+        } else {
+          uniqueItems.push(item);
+        }
+      });
+
+      if (duplicateItems.length > 0) {
+        setDuplicateConfirmation({ uniqueItems, duplicateItems });
+        return;
       }
-    });
-    
-    if (duplicateItems.length > 0) {
-      setDuplicateConfirmation({ uniqueItems, duplicateItems });
-      return;
-    }
-    
-    if (uniqueItems.length === 0) {
-      toast.error('Todas las cartas ya están agregadas a la compra');
-      return;
-    }
-    
-    uniqueItems.forEach((item) => addItem(item));
-    toast.success(`${uniqueItems.length} cartas agregadas exitosamente`);
-    onComplete?.();
-  }, [existingItemIds, addItem, onComplete]);
+
+      if (uniqueItems.length === 0) {
+        toast.error('Todas las cartas ya están agregadas a la compra');
+        return;
+      }
+
+      uniqueItems.forEach((item) => addItem(item));
+      toast.success(`${uniqueItems.length} cartas agregadas exitosamente`);
+      onComplete?.();
+    },
+    [existingItemIds, addItem, onComplete]
+  );
 
   const handleConfirmDuplicates = useCallback(() => {
     if (!duplicateConfirmation) return;
-    
+
     duplicateConfirmation.uniqueItems.forEach((item) => addItem(item));
-    toast.success(`${duplicateConfirmation.uniqueItems.length} cartas agregadas exitosamente`);
-    
+    toast.success(
+      `${duplicateConfirmation.uniqueItems.length} cartas agregadas exitosamente`
+    );
+
     setDuplicateConfirmation(null);
     onComplete?.();
   }, [duplicateConfirmation, addItem, onComplete]);

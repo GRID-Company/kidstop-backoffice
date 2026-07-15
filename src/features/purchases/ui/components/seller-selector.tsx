@@ -27,7 +27,12 @@ export default function SellerSelector<T extends FieldValues>({
   const [search, setSearch] = useState<string | undefined>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { sellers, createSeller, getSellerById, creating } = useSellers(search);
+  const {
+    sellers,
+    createSeller,
+    getSellerById: _getSellerById,
+    creating,
+  } = useSellers(search);
 
   const sellerOptions: ISelectOption[] = useMemo(
     () =>
@@ -49,31 +54,31 @@ export default function SellerSelector<T extends FieldValues>({
   );
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <div className="flex-1">
+    <div className='flex flex-col gap-2'>
+      <div className='flex items-center gap-2'>
+        <div className='flex-1'>
           <FormAutocomplete
             items={sellerOptions}
             controlProps={controlProps}
-            label="Vendedor"
-            placeholder="Buscar vendedor por nombre o teléfono..."
+            label='Vendedor'
+            placeholder='Buscar vendedor por nombre o teléfono...'
             isRequired
-            aria-label="Selector de vendedor"
+            aria-label='Selector de vendedor'
             onInputChange={setSearch}
             onSelectIcon={
               <Icon
-                icon="lucide:user-check"
-                className="-mr-[1px] h-5 text-xl text-accent"
+                icon='lucide:user-check'
+                className='text-accent -mr-[1px] h-5 text-xl'
               />
             }
           />
         </div>
         <Button
-          variant="flat"
+          variant='flat'
           onPress={() => setIsDrawerOpen(true)}
-          startContent={<Icon icon="lucide:user-plus" />}
-          className="shrink-0 text-accent"
-          aria-label="Crear nuevo vendedor"
+          startContent={<Icon icon='lucide:user-plus' />}
+          className='text-accent shrink-0'
+          aria-label='Crear nuevo vendedor'
         >
           Nuevo
         </Button>

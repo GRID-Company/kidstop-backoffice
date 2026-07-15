@@ -45,16 +45,32 @@
 }
 
 @keyframes mw-shimmer {
-  0%, 100% { background-position: 100% 0; }
-  50% { background-position: -100% 0; }
+  0%,
+  100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: -100% 0;
+  }
 }
 
 @keyframes mw-bg-shimmer {
-  0% { background-position: 150% 0; }
-  100% { background-position: -150% 0; }
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -150% 0;
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 4px rgba(185, 28, 28, 0.3); }
-  50% { box-shadow: 0 0 14px rgba(185, 28, 28, 0.7), 0 0 28px rgba(185, 28, 28, 0.3); }
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba(185, 28, 28, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 14px rgba(185, 28, 28, 0.7),
+      0 0 28px rgba(185, 28, 28, 0.3);
+  }
 }

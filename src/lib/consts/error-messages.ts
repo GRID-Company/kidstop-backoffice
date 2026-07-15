@@ -10,8 +10,6 @@ export const ERROR_MESSAGES = {
     'El enlace para cambiar la contraseña no es válido o ha expirado.',
   CHANGE_PASSWORD_ERROR:
     'Error al cambiar la contraseña. Por favor, intenta de nuevo.',
-  REGISTER_INVALID_LINK:
-    'El enlace de registro no es válido o ha expirado.',
-  REGISTER_ERROR:
-    'Error al crear la contraseña. Por favor, intenta de nuevo.',
+  REGISTER_INVALID_LINK: 'El enlace de registro no es válido o ha expirado.',
+  REGISTER_ERROR: 'Error al crear la contraseña. Por favor, intenta de nuevo.',
 };

@@ -26,8 +26,9 @@ export default function BannerSection({
     try {
       bannerSettingsSchema.parse({ pokemonFile: file });
       setPokemonFile(file);
-    } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || 'Error validando archivo');
+    } catch (error: unknown) {
+      const err = error as { errors?: Array<{ message: string }> };
+      toast.error(err.errors?.[0]?.message || 'Error validando archivo');
     }
   }, []);
 
@@ -35,8 +36,9 @@ export default function BannerSection({
     try {
       bannerSettingsSchema.parse({ magicFile: file });
       setMagicFile(file);
-    } catch (error: any) {
-      toast.error(error.errors?.[0]?.message || 'Error validando archivo');
+    } catch (error: unknown) {
+      const err = error as { errors?: Array<{ message: string }> };
+      toast.error(err.errors?.[0]?.message || 'Error validando archivo');
     }
   }, []);
 
@@ -59,15 +61,16 @@ export default function BannerSection({
   }, [pokemonFile, magicFile, onSave]);
 
   return (
-    <SettingsSection title="Banners de Carpetas Digitales" icon="lucide:image">
-      <div className="flex flex-col gap-6">
-        <p className="text-sm text-default-500">
-          Configura los banners que se mostrarán en las carpetas digitales de Pokémon y Magic.
-          Los archivos se subirán al servidor y se asociarán a la configuración global.
+    <SettingsSection title='Banners de Carpetas Digitales' icon='lucide:image'>
+      <div className='flex flex-col gap-6'>
+        <p className='text-default-500 text-sm'>
+          Configura los banners que se mostrarán en las carpetas digitales de
+          Pokémon y Magic. Los archivos se subirán al servidor y se asociarán a
+          la configuración global.
         </p>
 
         <BannerUploadDropzone
-          tcg="pokemon"
+          tcg='pokemon'
           currentBannerGuid={banners.pokemon}
           onFileSelect={handlePokemonFileSelect}
           isLoading={isLoading || isSaving}
@@ -77,7 +80,7 @@ export default function BannerSection({
         <Divider />
 
         <BannerUploadDropzone
-          tcg="magic"
+          tcg='magic'
           currentBannerGuid={banners.magic}
           onFileSelect={handleMagicFileSelect}
           isLoading={isLoading || isSaving}
@@ -86,9 +89,9 @@ export default function BannerSection({
 
         <Divider />
 
-        <div className="flex justify-end">
+        <div className='flex justify-end'>
           <KidstopButton
-            variant="accent"
+            variant='accent'
             onClick={handleSave}
             isLoading={isSaving}
             isDisabled={!pokemonFile && !magicFile}

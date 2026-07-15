@@ -38,8 +38,20 @@ export default function Users() {
   const [toggleTarget, setToggleTarget] = useState<UserRow | null>(null);
   const [resendTarget, setResendTarget] = useState<UserRow | null>(null);
 
-  const { users, totalCount, loading, creating, updating, deleting, resending, toggleUserStatus, createUser, updateUser, deleteUser, resendEmailInvite } =
-    useUsers(page, search, filters);
+  const {
+    users,
+    totalCount,
+    loading,
+    creating,
+    updating,
+    deleting,
+    resending,
+    toggleUserStatus,
+    createUser,
+    updateUser,
+    deleteUser,
+    resendEmailInvite,
+  } = useUsers(page, search, filters);
 
   const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
 
@@ -80,9 +92,12 @@ export default function Users() {
     setIsModalOpen(true);
   }, []);
 
-  const handleRowClick = useCallback((user: UserRow) => {
-    handleOpenEdit(user);
-  }, [handleOpenEdit]);
+  const handleRowClick = useCallback(
+    (user: UserRow) => {
+      handleOpenEdit(user);
+    },
+    [handleOpenEdit]
+  );
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
@@ -119,93 +134,118 @@ export default function Users() {
     setResendTarget(null);
   }, [resendTarget, resendEmailInvite]);
 
-  const COLS: ITableColumn[] = useMemo(() => [
-    {
-      key: 'name',
-      label: 'Nombre',
-      allowSorting: true,
-      customCol: (row: UserRow) => row.name ?? 'Sin nombre',
-    },
-    {
-      key: 'emailAddress',
-      label: 'Correo electrónico',
-      allowSorting: true,
-    },
-    {
-      key: 'role',
-      label: 'Rol',
-      customCol: (row: UserRow) => <UserRoleBadge role={row.role as UserRole} />,
-    },
-    {
-      key: 'active',
-      label: 'Estado',
-      customCol: (row: UserRow) => <UserStatusBadge active={row.active} />,
-    },
-    {
-      key: 'actions',
-      label: '',
-      className: 'w-12',
-      customCol: (row: UserRow) => (
-        <div onClick={(e) => e.stopPropagation()}>
-          <Dropdown>
-            <DropdownTrigger>
-              <Button variant="light" size="sm" isIconOnly>
-                <Icon icon="lucide:more-horizontal" />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Acciones de usuario">
-              <DropdownItem
-                key="edit"
-                startContent={<Icon icon="lucide:pencil" />}
-                onPress={() => handleOpenEdit(row)}
-              >
-                Editar
-              </DropdownItem>
-              <DropdownItem
-                key="toggle-status"
-                startContent={<Icon icon={row.active ? 'lucide:user-x' : 'lucide:user-check'} />}
-                onPress={() => setToggleTarget(row)}
-                className={row.active ? 'text-warning' : 'text-success'}
-              >
-                {row.active ? 'Desactivar' : 'Activar'}
-              </DropdownItem>
-              {!row.signedUp ? (
-                <DropdownItem
-                  key="resend-invite"
-                  startContent={<Icon icon="lucide:mail" />}
-                  onPress={() => setResendTarget(row)}
-                  className="text-primary"
+  const COLS: ITableColumn<UserRow>[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        label: 'Nombre',
+        allowSorting: true,
+        customCol: (row: UserRow) => (
+          <span data-testid='user-name'>{row.name ?? 'Sin nombre'}</span>
+        ),
+      },
+      {
+        key: 'emailAddress',
+        label: 'Correo electrónico',
+        allowSorting: true,
+        customCol: (row: UserRow) => (
+          <span data-testid='user-email'>{row.emailAddress}</span>
+        ),
+      },
+      {
+        key: 'role',
+        label: 'Rol',
+        customCol: (row: UserRow) => (
+          <UserRoleBadge role={row.role as UserRole} />
+        ),
+      },
+      {
+        key: 'active',
+        label: 'Estado',
+        customCol: (row: UserRow) => <UserStatusBadge active={row.active} />,
+      },
+      {
+        key: 'actions',
+        label: '',
+        className: 'w-12',
+        customCol: (row: UserRow) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  variant='light'
+                  size='sm'
+                  isIconOnly
+                  data-testid='user-actions-button'
                 >
-                  Reenviar invitación
+                  <Icon icon='lucide:more-horizontal' />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label='Acciones de usuario'>
+                <DropdownItem
+                  key='edit'
+                  data-testid='edit-user-button'
+                  startContent={<Icon icon='lucide:pencil' />}
+                  onPress={() => handleOpenEdit(row)}
+                >
+                  Editar
                 </DropdownItem>
-              ) : null}
-              <DropdownItem
-                key="delete"
-                startContent={<Icon icon="lucide:trash-2" />}
-                onPress={() => setDeleteTarget(row)}
-                className="text-danger"
-                color="danger"
-              >
-                Eliminar
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </div>
-      ),
-    },
-  ], [handleOpenEdit]);
+                <DropdownItem
+                  key='toggle-status'
+                  data-testid='toggle-user-status-button'
+                  startContent={
+                    <Icon
+                      icon={row.active ? 'lucide:user-x' : 'lucide:user-check'}
+                    />
+                  }
+                  onPress={() => setToggleTarget(row)}
+                  className={row.active ? 'text-warning' : 'text-success'}
+                >
+                  {row.active ? 'Desactivar' : 'Activar'}
+                </DropdownItem>
+                {!row.signedUp ? (
+                  <DropdownItem
+                    key='resend-invite'
+                    startContent={<Icon icon='lucide:mail' />}
+                    onPress={() => setResendTarget(row)}
+                    className='text-primary'
+                  >
+                    Reenviar invitación
+                  </DropdownItem>
+                ) : null}
+                <DropdownItem
+                  key='delete'
+                  startContent={<Icon icon='lucide:trash-2' />}
+                  onPress={() => setDeleteTarget(row)}
+                  className='text-danger'
+                  color='danger'
+                >
+                  Eliminar
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        ),
+      },
+    ],
+    [handleOpenEdit]
+  );
 
   return (
     <>
       <EntitiesPage>
-        <EntitiesPage.Toolbar label="Usuarios">
+        <EntitiesPage.Toolbar label='Usuarios' data-testid='users-page-title'>
           <EntitiesPage.FlexRow>
-            <AddNewButton label="Nuevo usuario" onPress={handleOpenCreate} />
+            <AddNewButton
+              label='Nuevo usuario'
+              onPress={handleOpenCreate}
+              data-testid='create-user-button'
+            />
           </EntitiesPage.FlexRow>
         </EntitiesPage.Toolbar>
 
         <EntitiesPage.CardContainer>
-          <div className="mb-4 flex items-center gap-4">
+          <div className='mb-4 flex items-center gap-4'>
             <UserFiltersPanel
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
@@ -218,10 +258,11 @@ export default function Users() {
             isLoading={loading}
             rowClickable={true}
             onRowClick={handleRowClick}
+            data-testid='users-list'
           />
 
           {totalPages > 1 && (
-            <div className="mt-4 flex justify-center">
+            <div className='mt-4 flex justify-center'>
               <KidstopPagination
                 total={totalPages}
                 page={page}
@@ -245,10 +286,10 @@ export default function Users() {
       <ConfirmationModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Eliminar usuario"
+        title='Eliminar usuario'
         message={`¿Estás seguro de que deseas eliminar a ${deleteTarget?.name ?? deleteTarget?.emailAddress}? Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
-        confirmVariant="danger"
+        confirmLabel='Eliminar'
+        confirmVariant='danger'
         onConfirm={handleConfirmDelete}
         isLoading={deleting}
       />
@@ -271,10 +312,10 @@ export default function Users() {
       <ConfirmationModal
         isOpen={!!resendTarget}
         onClose={() => setResendTarget(null)}
-        title="Reenviar invitación"
+        title='Reenviar invitación'
         message={`¿Deseas reenviar la invitación a ${resendTarget?.name ?? resendTarget?.emailAddress}? Se enviará un nuevo correo de registro.`}
-        confirmLabel="Reenviar"
-        confirmVariant="primary"
+        confirmLabel='Reenviar'
+        confirmVariant='primary'
         onConfirm={handleConfirmResend}
         isLoading={resending}
       />

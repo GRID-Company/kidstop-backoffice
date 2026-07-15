@@ -23,24 +23,24 @@ export default function BulkCardSearchInput({
   const canSearch = value.trim().length > 0 && !isLoading;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       <Textarea
-        label="Lista de cartas"
+        label='Lista de cartas'
         placeholder={PLACEHOLDER_TEXT}
         value={value}
         onValueChange={onChange}
         minRows={6}
         maxRows={16}
-        description="Pokémon (Limitless): [cant] [nombre] [set] [núm] — Magic (Moxfield): [cant] [nombre] ([set]) [núm]"
-        aria-label="Lista de cartas en formato Limitless TCG o Moxfield"
+        description='Pokémon (Limitless): [cant] [nombre] [set] [núm] — Magic (Moxfield): [cant] [nombre] ([set]) [núm]'
+        aria-label='Lista de cartas en formato Limitless TCG o Moxfield'
         isDisabled={isDisabled || isLoading}
       />
 
-      <div className="flex gap-2">
+      <div className='flex gap-2'>
         <Button
-          className="text-white"
+          className='text-white'
           style={{ backgroundColor: 'var(--color-accent)' }}
-          startContent={!isLoading && <Icon icon="lucide:search" />}
+          startContent={!isLoading && <Icon icon='lucide:search' />}
           onPress={onSearch}
           isDisabled={!canSearch || isDisabled}
           isLoading={isLoading}
@@ -49,8 +49,8 @@ export default function BulkCardSearchInput({
         </Button>
         {value.trim().length > 0 && (
           <Button
-            variant="flat"
-            startContent={<Icon icon="lucide:trash-2" />}
+            variant='flat'
+            startContent={<Icon icon='lucide:trash-2' />}
             onPress={onClear}
             isDisabled={isLoading}
           >

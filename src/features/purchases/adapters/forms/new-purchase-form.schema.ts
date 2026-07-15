@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CardCondition } from '../../domain/types';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { offerPriceSchema, quantitySchema } from './price-schemas';
 
 const newPurchaseItemSchema = z.object({
@@ -10,7 +10,14 @@ const newPurchaseItemSchema = z.object({
   setName: z.string(),
   setCode: z.string(),
   tcgType: z.enum(['POKEMON', 'MAGIC']),
-  condition: z.enum(['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED', 'HEAVILY_PLAYED', 'DAMAGED'] as const),
+  condition: z.enum([
+    'NEAR_MINT',
+    'LIGHTLY_PLAYED',
+    'MODERATELY_PLAYED',
+    'HEAVILY_PLAYED',
+    'DAMAGED',
+  ] as const),
+  language: z.nativeEnum(CardLanguage),
   quantity: quantitySchema,
   offerPrice: offerPriceSchema,
   referencePrice: z.number().optional(),
@@ -19,7 +26,9 @@ const newPurchaseItemSchema = z.object({
 });
 
 export const newPurchaseFormSchema = z.object({
-  items: z.array(newPurchaseItemSchema).min(1, 'Debe agregar al menos una carta'),
+  items: z
+    .array(newPurchaseItemSchema)
+    .min(1, 'Debe agregar al menos una carta'),
 });
 
 export type NewPurchaseFormData = z.infer<typeof newPurchaseFormSchema>;

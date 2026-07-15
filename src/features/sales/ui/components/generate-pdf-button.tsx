@@ -9,6 +9,7 @@ import {
   PickingListData,
 } from '@/lib/utils/pdf-generator';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { ISale, ISaleItem } from '../../domain/types';
 import {
   getCustomerDisplayEmail,
@@ -23,17 +24,29 @@ function mapItemForPdf(item: ISaleItem) {
   const cardName =
     item.pokemonCardSummary?.name ?? item.magicCardSummary?.name ?? '—';
   const cardImageUrl =
-    item.pokemonCardSummary?.imageUri ?? item.magicCardSummary?.imageUri ?? undefined;
+    item.pokemonCardSummary?.imageUri ??
+    item.magicCardSummary?.imageUri ??
+    undefined;
   const setName =
     item.pokemonCardSummary?.setName ?? item.magicCardSummary?.edition ?? '—';
   const setCode =
-    item.pokemonCardSummary?.setCode ?? item.magicCardSummary?.collectorNumber ?? '—';
+    item.pokemonCardSummary?.setCode ??
+    item.magicCardSummary?.collectorNumber ??
+    '—';
+  const cardNumber = item.pokemonCardSummary?.cardNumber ?? null;
+  const variant = item.pokemonCardSummary?.variant ?? null;
+  const isFoil = item.magicCardSummary?.isFoil ?? null;
+
   return {
     cardName,
     cardImageUrl,
     setName: setName ?? '—',
     setCode: setCode ?? '—',
     condition: CARD_CONDITION_SHORT_LABELS[item.condition],
+    language: LANGUAGE_LABELS[item.language],
+    cardNumber,
+    variant,
+    isFoil,
     quantity: item.quantity,
     unitPrice: item.price,
   };
@@ -68,11 +81,11 @@ export default function GeneratePdfButton({ sale }: GeneratePdfButtonProps) {
   }, [sale]);
 
   return (
-    <Tooltip content="Descargar picking list en PDF">
+    <Tooltip content='Descargar picking list en PDF'>
       <Button
-        variant="bordered"
-        className="border-accent text-accent"
-        startContent={<Icon icon="lucide:file-down" width={18} />}
+        variant='bordered'
+        className='border-accent text-accent'
+        startContent={<Icon icon='lucide:file-down' width={18} />}
         isLoading={isGenerating}
         onPress={handleGenerate}
       >

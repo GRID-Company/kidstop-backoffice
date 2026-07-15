@@ -29,7 +29,7 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
       };
     });
 
-    const errorLink = new ErrorLink(({ error, operation }) => {
+    const errorLink = new ErrorLink(({ error, operation: _operation }) => {
       if (CombinedGraphQLErrors.is(error)) {
         const code = error.extensions?.code;
         const message = error.message;
@@ -39,7 +39,11 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
           code === 401 ||
           message === 'Unauthorized';
 
-        if (isAuthError && !redirectRef.current && !window.location.href.includes('/login')) {
+        if (
+          isAuthError &&
+          !redirectRef.current &&
+          !window.location.href.includes('/login')
+        ) {
           redirectRef.current = true;
           logout('Sesión expirada. Por favor inicia sesión nuevamente.', false);
           setTimeout(() => {

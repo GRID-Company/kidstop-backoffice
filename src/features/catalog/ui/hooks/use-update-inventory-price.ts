@@ -1,21 +1,26 @@
 import { useCallback } from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
-import { InventoryItemsDocument, CreateInventoryMovementDocument } from '@/lib/api/generated/inventory.generated';
+import {
+  InventoryItemsDocument,
+  CreateInventoryMovementDocument,
+} from '@/lib/api/generated/inventory.generated';
 import {
   UpdateInventoryItemPricesDocument,
   PokemonCardInternalDetailDocument,
 } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType } from '@/lib/types/tcg.types';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 
 interface UpdatePriceParams {
   cardGuid: string;
   inventoryItemGuid?: string;
   condition: string;
+  language: CardLanguage;
   purchasePrice: number;
   sellPrice: number;
+  notes?: string;
   tcgType: TCGType;
 }
 
@@ -28,9 +33,15 @@ export function useUpdateInventoryPrice() {
     refetchQueries: [InventoryItemsDocument],
   });
 
-  const [updatePrice, { loading }] = useMutation(UpdateInventoryItemPricesDocument, {
-    refetchQueries: [PokemonCardInternalDetailDocument, MagicCardInternalDetailDocument],
-  });
+  const [updatePrice, { loading }] = useMutation(
+    UpdateInventoryItemPricesDocument,
+    {
+      refetchQueries: [
+        PokemonCardInternalDetailDocument,
+        MagicCardInternalDetailDocument,
+      ],
+    }
+  );
 
   const handleUpdatePrice = useCallback(
     async (params: UpdatePriceParams) => {
@@ -44,7 +55,11 @@ export function useUpdateInventoryPrice() {
                 skip: 0,
                 limit: 200,
                 sort: { column: 'createdDate', order: 'DESC' },
-                filters: { tcg: params.tcgType, condition: params.condition },
+                filters: {
+                  tcg: params.tcgType,
+                  condition: params.condition,
+                  language: params.language,
+                },
               },
             },
           });
@@ -66,14 +81,19 @@ export function useUpdateInventoryPrice() {
                     cardGuid: params.cardGuid,
                     condition: params.condition,
                     tcg: params.tcgType,
+                    language: params.language,
                     bulkOperationType: BulkOperationType.ManualSet,
                     quantity: 0,
-                    notes: 'Creación automática para establecer precios',
+                    notes:
+                      params.notes ||
+                      'Creación automática para establecer precios',
                   },
                 },
               });
             } catch (error) {
-              toast.error('Error al crear el item en inventario. Por favor intenta de nuevo.');
+              toast.error(
+                'Error al crear el item en inventario. Por favor intenta de nuevo.'
+              );
               throw error;
             }
 
@@ -83,7 +103,11 @@ export function useUpdateInventoryPrice() {
                   skip: 0,
                   limit: 200,
                   sort: { column: 'createdDate', order: 'DESC' },
-                  filters: { tcg: params.tcgType, condition: params.condition },
+                  filters: {
+                    tcg: params.tcgType,
+                    condition: params.condition,
+                    language: params.language,
+                  },
                 },
               },
             });
@@ -98,7 +122,9 @@ export function useUpdateInventoryPrice() {
             });
 
             if (!newMatch) {
-              toast.error('No se pudo crear el item en inventario. Por favor intenta de nuevo.');
+              toast.error(
+                'No se pudo crear el item en inventario. Por favor intenta de nuevo.'
+              );
               throw new Error('Inventory item creation failed');
             }
 
@@ -107,7 +133,10 @@ export function useUpdateInventoryPrice() {
             inventoryItemGuid = match.guid;
           }
         } catch (error) {
-          if (error instanceof Error && error.message === 'Inventory item creation failed') {
+          if (
+            error instanceof Error &&
+            error.message === 'Inventory item creation failed'
+          ) {
             return;
           }
           toast.error('Error al buscar items en inventario');
@@ -122,6 +151,7 @@ export function useUpdateInventoryPrice() {
               inventoryItemGuid,
               purchasePrice: params.purchasePrice,
               sellPrice: params.sellPrice,
+              notes: params.notes,
             },
           },
         });

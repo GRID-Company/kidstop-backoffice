@@ -32,6 +32,7 @@ export type SalesQuery = {
         guid: string;
         tcg: string;
         condition: string;
+        language: Types.CardLanguage;
         quantity: number;
         price: number;
         pokemonCardSummary: {
@@ -90,6 +91,7 @@ export type SaleQuery = {
       guid: string;
       tcg: string;
       condition: string;
+      language: Types.CardLanguage;
       quantity: number;
       price: number;
       pokemonCardSummary: {
@@ -163,6 +165,7 @@ export type UpdateSaleItemMutation = {
       guid: string;
       tcg: string;
       condition: string;
+      language: Types.CardLanguage;
       quantity: number;
       price: number;
       pokemonCardSummary: {
@@ -206,6 +209,7 @@ export type RemoveSaleItemMutation = {
       guid: string;
       tcg: string;
       condition: string;
+      language: Types.CardLanguage;
       quantity: number;
       price: number;
       pokemonCardSummary: {
@@ -233,6 +237,12 @@ export type RemoveSaleItemMutation = {
     }> | null;
   };
 };
+
+export type ExportSalesQueryVariables = Types.Exact<{
+  findSalesArgs: Types.FindSalesArgs;
+}>;
+
+export type ExportSalesQuery = { exportSales: { success: boolean } };
 
 export const SalesDocument = {
   kind: 'Document',
@@ -352,6 +362,10 @@ export const SalesDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',
@@ -572,6 +586,10 @@ export const SaleDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       {
                         kind: 'Field',
@@ -879,6 +897,10 @@ export const UpdateSaleItemDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'quantity' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'price' } },
@@ -1047,6 +1069,10 @@ export const RemoveSaleItemDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'quantity' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'price' } },
@@ -1155,3 +1181,54 @@ export const RemoveSaleItemDocument = {
   RemoveSaleItemMutation,
   RemoveSaleItemMutationVariables
 >;
+export const ExportSalesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'ExportSales' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findSalesArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindSalesArgs' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'exportSales' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findSalesArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findSalesArgs' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ExportSalesQuery, ExportSalesQueryVariables>;

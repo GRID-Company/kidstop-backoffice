@@ -42,6 +42,7 @@ export interface BulkCardData {
   isFoil?: boolean;
   rarity?: string;
   variant?: string | null;
+  language?: string;
   sellPrice: number | null;
   totalStock: number;
   availableStock?: boolean;
@@ -68,6 +69,7 @@ export interface BulkCardResult {
 export interface BulkCardFormDataPurchases {
   selectedCardGuid: string;
   condition: CardCondition;
+  language: import('@/lib/api/schema-types').CardLanguage;
   quantity: number;
   offerPrice: number;
 }
@@ -75,11 +77,14 @@ export interface BulkCardFormDataPurchases {
 export interface BulkCardFormDataInventory {
   selectedCardGuid: string;
   condition: CardCondition;
+  language: import('@/lib/api/schema-types').CardLanguage;
   quantity: number;
   publicPrice: number;
 }
 
-export type BulkCardFormData = BulkCardFormDataPurchases | BulkCardFormDataInventory;
+export type BulkCardFormData =
+  | BulkCardFormDataPurchases
+  | BulkCardFormDataInventory;
 
 export interface BulkSearchFormDataPurchases {
   searchText: string;
@@ -91,7 +96,9 @@ export interface BulkSearchFormDataInventory {
   cards: BulkCardFormDataInventory[];
 }
 
-export type BulkSearchFormData = BulkSearchFormDataPurchases | BulkSearchFormDataInventory;
+export type BulkSearchFormData =
+  | BulkSearchFormDataPurchases
+  | BulkSearchFormDataInventory;
 
 export interface BulkCardSearchInputProps {
   value: string;
@@ -107,6 +114,7 @@ export interface BulkCardSearchResultsProps {
   variant: BulkSearchVariant;
   tcgType: TCGType;
   isLoading: boolean;
+  onRemove?: (index: number) => void;
 }
 
 export interface BulkCardResultCardProps {
@@ -114,6 +122,7 @@ export interface BulkCardResultCardProps {
   index: number;
   variant: BulkSearchVariant;
   tcgType: TCGType;
+  onRemove?: () => void;
 }
 
 export interface BulkCardRelatedSelectorProps {
@@ -131,16 +140,28 @@ export interface BulkCardFormControlsProps {
 
 export interface BulkCardSearchPurchasesProps {
   variant: 'purchases';
-  onConfirm: (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => void;
+  onConfirm: (
+    data: BulkSearchFormDataPurchases,
+    results: BulkCardResult[]
+  ) => void;
   onCancel: () => void;
   isOpen?: boolean;
 }
 
 export interface BulkCardSearchInventoryProps {
   variant: 'inventory';
-  onConfirm: (data: BulkSearchFormDataInventory, results: BulkCardResult[]) => void;
+  onConfirm: (
+    data: BulkSearchFormDataInventory,
+    results: BulkCardResult[]
+  ) => void;
   onCancel: () => void;
   isOpen?: boolean;
 }
 
-export type BulkCardSearchProps = BulkCardSearchPurchasesProps | BulkCardSearchInventoryProps;
+export type BulkCardSearchProps =
+  | BulkCardSearchPurchasesProps
+  | BulkCardSearchInventoryProps;
+
+export interface BulkCardSearchResultsHandle {
+  scrollToFirstUnconfigured: () => void;
+}

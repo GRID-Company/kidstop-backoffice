@@ -1,4 +1,10 @@
-import { IGeofenceConfig, IOperatingHours, IThresholdConfig, IBannerConfig, SettingsSection } from './types';
+import {
+  IGeofenceConfig,
+  IOperatingHours,
+  IThresholdConfig,
+  IBannerConfig,
+  SettingsSection,
+} from './types';
 
 export const SETTINGS_SECTIONS: Record<SettingsSection, string> = {
   general: 'General',
@@ -42,7 +48,10 @@ export const DAYS_OF_WEEK = [
   'sunday',
 ] as const;
 
-export const DAYS_OF_WEEK_LABELS: Record<(typeof DAYS_OF_WEEK)[number], string> = {
+export const DAYS_OF_WEEK_LABELS: Record<
+  (typeof DAYS_OF_WEEK)[number],
+  string
+> = {
   monday: 'Lunes',
   tuesday: 'Martes',
   wednesday: 'Miércoles',

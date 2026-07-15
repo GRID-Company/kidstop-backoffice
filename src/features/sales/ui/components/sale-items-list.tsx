@@ -5,12 +5,14 @@ import ItemsList from '@/shared/components/items-list';
 import { ISaleItem } from '../../domain/types';
 import { calculateTotal } from '../../domain/sales.domain';
 import { adaptSaleItem } from '@/shared/utils/item-adapters';
+import { StockValidation } from '@/shared/types/stock.types';
 
 interface SaleItemsListProps {
   items: ISaleItem[];
   onUpdateItem?: (itemId: string, updates: Partial<ISaleItem>) => void;
   onRemoveItem?: (itemId: string) => void;
   isReadOnly?: boolean;
+  stockValidationMap?: Map<string, StockValidation>;
 }
 
 export default function SaleItemsList({
@@ -18,18 +20,16 @@ export default function SaleItemsList({
   onUpdateItem,
   onRemoveItem,
   isReadOnly = true,
+  stockValidationMap,
 }: SaleItemsListProps) {
-  const adaptedItems = useMemo(
-    () => items.map(adaptSaleItem),
-    [items]
-  );
+  const adaptedItems = useMemo(() => items.map(adaptSaleItem), [items]);
 
   const calculateTotalWrapper = useMemo(
     () => () => calculateTotal(items),
     [items]
   );
 
-  const handleUpdateItem = (itemId: string, updates: any) => {
+  const handleUpdateItem = (itemId: string, updates: Partial<ISaleItem>) => {
     if (onUpdateItem) {
       onUpdateItem(itemId, updates);
     }
@@ -48,9 +48,10 @@ export default function SaleItemsList({
       onRemoveItem={handleRemoveItem}
       calculateTotal={calculateTotalWrapper}
       isReadOnly={isReadOnly}
-      variant="sale"
-      totalLabel="Total pedido"
-      emptyMessage="No hay items en el pedido"
+      variant='sale'
+      totalLabel='Total pedido'
+      emptyMessage='No hay items en el pedido'
+      stockValidationMap={stockValidationMap}
     />
   );
 }

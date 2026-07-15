@@ -37,16 +37,23 @@ export default function PokemonTypeIcon({
   className = '',
 }: PokemonTypeIconProps) {
   if (!type) return null;
-  
-  const typeConfig = TYPE_ICONS[type] || { icon: 'mdi:help-circle', color: 'text-default-400' };
+
+  const typeConfig = TYPE_ICONS[type] || {
+    icon: 'mdi:help-circle',
+    color: 'text-default-400',
+  };
 
   const iconSize = SIZE_MAP[size];
 
   if (showLabel) {
     return (
       <div className={`flex items-center gap-1 ${className}`}>
-        <Icon icon={typeConfig.icon} width={iconSize} className={typeConfig.color} />
-        <span className="text-xs text-default-600">{type}</span>
+        <Icon
+          icon={typeConfig.icon}
+          width={iconSize}
+          className={typeConfig.color}
+        />
+        <span className='text-default-600 text-xs'>{type}</span>
       </div>
     );
   }

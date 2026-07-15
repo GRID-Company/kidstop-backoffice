@@ -1,0 +1,257 @@
+
+> kidstop-backoffice@0.1.0 lint
+> eslint
+
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/app/api/image-proxy/route.ts
+  37:12  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/app/api/logout/route.ts
+  3:28  error  'req' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/components/magic-card-detail-modal.tsx
+   65:28  error  'detailLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  147:9   error  'variants' is assigned a value but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+  304:60  error  Optional chain expressions can return undefined by design - using a non-null assertion is unsafe and wrong  @typescript-eslint/no-non-null-asserted-optional-chain
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/components/magic-card-grid-item.tsx
+  15:9  error  'hasStock' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/components/pokemon-card-detail-modal.tsx
+  324:60  error  Optional chain expressions can return undefined by design - using a non-null assertion is unsafe and wrong  @typescript-eslint/no-non-null-asserted-optional-chain
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/hooks/use-card-detail-modal.ts
+   26:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   27:9   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  155:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/hooks/use-catalog-search.ts
+   17:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   18:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   18:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   19:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   19:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/hooks/use-magic-catalog.ts
+  18:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/catalog/ui/hooks/use-pokemon-catalog.ts
+  22:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/inventory-cards/adapters/mappers/inventory.mapper.ts
+  11:9   error  'isPokemon' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  65:52  error  Unexpected any. Specify a different type                                              @typescript-eslint/no-explicit-any
+  78:32  error  Unexpected any. Specify a different type                                              @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/inventory-cards/ui/components/adjustment-modal.tsx
+   68:10  error  'selectedCondition' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  148:31  error  Unexpected any. Specify a different type                                                      @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/inventory-cards/ui/components/inventory-filters.tsx
+  52:9  error  'dateRangeValue' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  60:9  error  'handleDateChange' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/inventory-cards/ui/views/inventory.tsx
+  128:40  error  'bulkLoading' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/most-wanted/ui/hooks/use-add-card-modal.ts
+  44:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/most-wanted/ui/hooks/use-most-wanted-list.ts
+   19:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/most-wanted/ui/views/most-wanted-config.tsx
+  19:5  error  'loading' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/components/payment-split-modal.tsx
+  68:5  error  Definition for rule 'react-hooks/exhaustive-deps' was not found  react-hooks/exhaustive-deps
+  79:5  error  Definition for rule 'react-hooks/exhaustive-deps' was not found  react-hooks/exhaustive-deps
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/components/price-adjustment-modal.tsx
+  50:11  error  'fields' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/components/purchase-timeline.tsx
+  44:17  error  'isFuture' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/components/seller-selector.tsx
+  30:34  error  'getSellerById' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/hooks/use-card-metrics-cache.ts
+   9:25  error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  13:32  error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  21:3   error  'dataExtractor' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  23:67  error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+  40:51  error  Unexpected any. Specify a different type                                         @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/hooks/use-items-reference-prices.ts
+  23:9  error  'pokemonCardGuids' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  24:9  error  'magicCardGuids' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/hooks/use-new-purchase.ts
+   74:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   81:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  122:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/hooks/use-purchase-detail.ts
+  132:35   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:121  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  177:112  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:29   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:27   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:107  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  278:10   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  285:79   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  444:13   error  Empty block statement                     no-empty
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/views/purchase-detail.tsx
+   60:5   error  'itemsForm' is assigned a value but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   61:5   error  'paymentsForm' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   73:5   error  'total' is assigned a value but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  142:16  error  'error' is defined but never used                                                        @typescript-eslint/no-unused-vars
+  182:16  error  'error' is defined but never used                                                        @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/purchases/ui/views/purchase-new.tsx
+  75:16  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/sales/ui/components/sale-items-list.tsx
+  32:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/sales/ui/components/sale-timeline.tsx
+  44:17  error  'isFuture' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/settings/adapters/mappers/banner.mapper.ts
+  12:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/settings/adapters/mappers/settings.mapper.ts
+  106:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/settings/ui/components/banner-section.tsx
+  29:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/features/settings/ui/components/banner-upload-dropzone.tsx
+  31:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/lib/store/auth.ts
+  22:11  error  'get' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/lib/types/datatable.types.ts
+   8:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/lib/types/inventory.types.ts
+  33:3  error  Duplicate enum member value transparent  @typescript-eslint/no-duplicate-enum-values
+  34:3  error  Duplicate enum member value transparent  @typescript-eslint/no-duplicate-enum-values
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/lib/utils/use-infinite-scroll.ts
+  54:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  71:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  72:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  82:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  83:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  96:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/lib/utils/use-paginated-datatable.ts
+   11:20  error  Unexpected any. Specify a different type                                            @typescript-eslint/no-explicit-any
+   31:32  error  Unexpected any. Specify a different type                                            @typescript-eslint/no-explicit-any
+   56:15  error  'filters' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  104:26  error  Unexpected any. Specify a different type                                            @typescript-eslint/no-explicit-any
+  121:26  error  Unexpected any. Specify a different type                                            @typescript-eslint/no-explicit-any
+  138:47  error  Unexpected any. Specify a different type                                            @typescript-eslint/no-explicit-any
+  167:17  error  'search' is assigned a value but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/base/form-controls/form-async-autocomplete.tsx
+   16:3   error  'TData' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   16:11  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   17:37  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   17:59  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   19:10  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   23:25  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   28:11  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   29:37  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+   29:59  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+  154:11  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+  155:37  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+  155:59  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+  163:37  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/base/form-controls/form-autocomplete.tsx
+  22:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/base/heorui-overrides/autocomplete.tsx
+  31:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/base/heorui-overrides/table.tsx
+  3:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/blocks/bulk-card-search/bulk-card-result-card.tsx
+  19:10  error  'MetricItem' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/blocks/bulk-card-search/index.tsx
+   21:11  error  Unexpected any. Specify a different type                                  @typescript-eslint/no-explicit-any
+   29:36  error  Unexpected any. Specify a different type                                  @typescript-eslint/no-explicit-any
+  105:25  error  Unexpected any. Specify a different type                                  @typescript-eslint/no-explicit-any
+  108:6   error  'errors' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/blocks/confirmation-modal/confirmation-modal.tsx
+  25:3  error  'confirmVariant' is assigned a value but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/blocks/data-table/columns/time-col.tsx
+  2:9  error  'parsedDate' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/blocks/data-table/data-table.tsx
+  17:9   error  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  20:32  error  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  23:23  error  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  44:30  error  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  45:9   error  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/components/item-card.tsx
+  75:11  error  'isPrivacyMode' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/components/items-list.tsx
+  45:11  error  'fields' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/components/virtualized-grid.tsx
+  21:3  error  'overscan' is assigned a value but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  22:3  error  'itemHeight' is assigned a value but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/providers/apollo-provider.tsx
+  32:47  error  'operation' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/utils/__tests__/phone-format.test.ts
+  76:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/utils/__tests__/phone-validation.test.ts
+  36:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/carlos/Documents/Projects/kidstop-backoffice/src/shared/utils/card-utils.ts
+  25:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 144 problems (144 errors, 0 warnings)
+

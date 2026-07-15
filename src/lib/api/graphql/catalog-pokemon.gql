@@ -1,8 +1,13 @@
-query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
-  pokemonCardInternalList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+query PokemonCardInternalList(
+  $findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!
+) {
+  pokemonCardInternalList(
+    findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs
+  ) {
     data {
       guid
       name
+      language
       cardNumber
       setName
       setCode
@@ -24,6 +29,7 @@ query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPubli
       inventoryCards {
         guid
         condition
+        language
         stock
         purchasePrice
         sellPrice
@@ -37,6 +43,7 @@ query PokemonCardInternalDetail($guid: String!) {
   pokemonCardInternalDetail(guid: $guid) {
     guid
     name
+    language
     cardNumber
     rarity
     variant
@@ -58,6 +65,7 @@ query PokemonCardInternalDetail($guid: String!) {
     inventoryCards {
       guid
       condition
+      language
       stock
       purchasePrice
       sellPrice
@@ -85,8 +93,12 @@ query PokemonCardGenres {
   pokemonCardGenres
 }
 
-mutation UpdateInventoryItemPrices($updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!) {
-  updateInventoryItemPrices(updateInventoryItemPricesInput: $updateInventoryItemPricesInput) {
+mutation UpdateInventoryItemPrices(
+  $updateInventoryItemPricesInput: UpdateInventoryItemPricesInput!
+) {
+  updateInventoryItemPrices(
+    updateInventoryItemPricesInput: $updateInventoryItemPricesInput
+  ) {
     guid
     purchasePrice
     sellPrice
@@ -97,6 +109,7 @@ query PokemonCardWithMetrics($guid: String!) {
   pokemonCardWithMetrics(guid: $guid) {
     variantsMetrics {
       condition
+      language
       stock
       lastSellDate
       avgDaysInInventory
@@ -110,6 +123,8 @@ query PokemonCardWithMetrics($guid: String!) {
 
 query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
       originalLine
       parsedQuantity
@@ -119,6 +134,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
       bestMatch {
         guid
         name
+        language
         cardNumber
         setName
         setCode
@@ -140,6 +156,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory
@@ -150,32 +167,34 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
           gradedPriceEightOrAbove
         }
       }
-    relatedCards {
-      guid
-      name
-      cardNumber
-      setName
-      setCode
-      variant
-      imageUri
-      sellPrice
-      totalStock
-      availableStock
-      type
-      hp
-      stage
-      cardMetrics {
-        variantsMetrics {
-          condition
-          stock
-          lastSellDate
-          avgDaysInInventory
-          wishlistCount
+      relatedCards {
+        guid
+        name
+        language
+        cardNumber
+        setName
+        setCode
+        variant
+        imageUri
+        sellPrice
+        totalStock
+        availableStock
+        type
+        hp
+        stage
+        cardMetrics {
+          variantsMetrics {
+            condition
+            language
+            stock
+            lastSellDate
+            avgDaysInInventory
+            wishlistCount
+          }
+          ungradedPrice
+          gradedPriceSeven
+          gradedPriceEightOrAbove
         }
-        ungradedPrice
-        gradedPriceSeven
-        gradedPriceEightOrAbove
-      }
       }
       error
     }

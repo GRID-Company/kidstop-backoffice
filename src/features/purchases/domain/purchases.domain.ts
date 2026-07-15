@@ -1,10 +1,19 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
-import { CARD_CONDITION_SHORT_LABELS, CardCondition } from '@/lib/types/card.types';
+import {
+  CARD_CONDITION_SHORT_LABELS,
+  CardCondition,
+} from '@/lib/types/card.types';
 import { TCGType } from '@/lib/types/tcg.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { buildWhatsAppUrl } from '@/lib/utils/whatsapp.utils';
 import { DEFAULT_BUDGET_LIMIT, DEFAULT_INVENTORY_LIMIT } from './constants';
-import { IPaymentDetail, IPurchaseItem, ISeller, PurchaseFilters } from './types';
+import {
+  IPaymentDetail,
+  IPurchaseItem,
+  ISeller,
+  PurchaseFilters,
+} from './types';
 
 export const getPurchasesVars = (
   args: IPaginatedApiArgs,
@@ -23,8 +32,13 @@ export const getPurchasesVars = (
   };
 };
 
-export const getItemKey = (item: { cardGuid: string; condition: CardCondition }): string => {
-  return `${item.cardGuid}:${item.condition}`;
+export const getItemKey = (item: {
+  cardGuid: string;
+  condition: CardCondition;
+  language?: CardLanguage;
+}): string => {
+  const language = item.language || CardLanguage.English;
+  return `${item.cardGuid}:${item.condition}:${language}`;
 };
 
 export const calculateItemSubtotal = (item: IPurchaseItem): number => {
@@ -107,7 +121,9 @@ export interface WhatsAppQuoteParams {
   tcgType: TCGType;
 }
 
-export const buildWhatsAppQuoteMessage = (params: WhatsAppQuoteParams): string => {
+export const buildWhatsAppQuoteMessage = (
+  params: WhatsAppQuoteParams
+): string => {
   const { seller, items, tcgType } = params;
   const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
   const total = calculateTotal(items);
@@ -231,7 +247,9 @@ export const validatePriceAdjustment = (
   };
 };
 
-export const validateWhatsAppQuote = (params: Partial<WhatsAppQuoteParams>): WhatsAppQuoteValidation => {
+export const validateWhatsAppQuote = (
+  params: Partial<WhatsAppQuoteParams>
+): WhatsAppQuoteValidation => {
   const errors: string[] = [];
 
   if (!params.seller) {

@@ -11,11 +11,15 @@ import {
   ReorderMostWantedCardsDocument,
 } from '@/lib/api/generated/most-wanted.generated';
 import { IMostWantedCard, MostWantedPriority } from '../../domain/types';
-import { toAddMostWantedCardInput, toUpdateMostWantedCardInput } from '../../adapters/mappers/most-wanted.mapper';
+import {
+  toAddMostWantedCardInput,
+  toUpdateMostWantedCardInput,
+} from '../../adapters/mappers/most-wanted.mapper';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
 
 const PRIORITY_ORDER = { HIGH: 0, MEDIUM: 1, LOW: 2 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleMutationError = (error: any, defaultMessage: string): string => {
   console.error(defaultMessage, error);
   if (error.graphQLErrors?.length > 0) {
@@ -42,28 +46,44 @@ export function useMostWantedList() {
     fetchPolicy: 'cache-and-network',
   });
 
-  const [addMutation, { loading: adding }] = useMutation(AddMostWantedCardDocument, {
-    refetchQueries: [MostWantedCardsDocument],
-  });
+  const [addMutation, { loading: adding }] = useMutation(
+    AddMostWantedCardDocument,
+    {
+      refetchQueries: [MostWantedCardsDocument],
+    }
+  );
 
-  const [updateMutation, { loading: updating }] = useMutation(UpdateMostWantedCardDocument, {
-    refetchQueries: [MostWantedCardsDocument],
-  });
+  const [updateMutation, { loading: updating }] = useMutation(
+    UpdateMostWantedCardDocument,
+    {
+      refetchQueries: [MostWantedCardsDocument],
+    }
+  );
 
-  const [removeMutation, { loading: removing }] = useMutation(RemoveMostWantedCardDocument, {
-    refetchQueries: [MostWantedCardsDocument],
-  });
+  const [removeMutation, { loading: removing }] = useMutation(
+    RemoveMostWantedCardDocument,
+    {
+      refetchQueries: [MostWantedCardsDocument],
+    }
+  );
 
-  const [reorderMutation, { loading: reordering }] = useMutation(ReorderMostWantedCardsDocument, {
-    refetchQueries: [MostWantedCardsDocument],
-  });
+  const [reorderMutation, { loading: reordering }] = useMutation(
+    ReorderMostWantedCardsDocument,
+    {
+      refetchQueries: [MostWantedCardsDocument],
+    }
+  );
 
   const items = useMemo(() => {
     const cards = (data?.mostWantedCards.data ?? []) as IMostWantedCard[];
     return [...cards].sort((a, b) => {
-      const priorityDiff = PRIORITY_ORDER[a.priority as keyof typeof PRIORITY_ORDER] - PRIORITY_ORDER[b.priority as keyof typeof PRIORITY_ORDER];
+      const priorityDiff =
+        PRIORITY_ORDER[a.priority as keyof typeof PRIORITY_ORDER] -
+        PRIORITY_ORDER[b.priority as keyof typeof PRIORITY_ORDER];
       if (priorityDiff !== 0) return priorityDiff;
-      return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
+      return (
+        new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
+      );
     });
   }, [data]);
 
@@ -73,6 +93,7 @@ export function useMostWantedList() {
         const input = toAddMostWantedCardInput(formData, selectedTCG);
         await addMutation({ variables: { addMostWantedCardInput: input } });
         toast.success('Carta agregada a Most Wanted');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const message = handleMutationError(error, 'Error al agregar carta');
         toast.error(message);
@@ -83,11 +104,21 @@ export function useMostWantedList() {
   );
 
   const updateCard = useCallback(
-    async (guid: string, updates: { priority?: MostWantedPriority; notes?: string; active?: boolean }) => {
+    async (
+      guid: string,
+      updates: {
+        priority?: MostWantedPriority;
+        notes?: string;
+        active?: boolean;
+      }
+    ) => {
       try {
         const input = toUpdateMostWantedCardInput(guid, updates);
-        await updateMutation({ variables: { updateMostWantedCardInput: input } });
+        await updateMutation({
+          variables: { updateMostWantedCardInput: input },
+        });
         toast.success('Carta actualizada');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const message = handleMutationError(error, 'Error al actualizar carta');
         toast.error(message);
@@ -100,9 +131,14 @@ export function useMostWantedList() {
   const toggleActive = useCallback(
     async (guid: string, currentActive: boolean) => {
       try {
-        const input = toUpdateMostWantedCardInput(guid, { active: !currentActive });
-        await updateMutation({ variables: { updateMostWantedCardInput: input } });
+        const input = toUpdateMostWantedCardInput(guid, {
+          active: !currentActive,
+        });
+        await updateMutation({
+          variables: { updateMostWantedCardInput: input },
+        });
         toast.success(currentActive ? 'Carta desactivada' : 'Carta activada');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const message = handleMutationError(error, 'Error al cambiar estado');
         toast.error(message);
@@ -117,6 +153,7 @@ export function useMostWantedList() {
       try {
         await removeMutation({ variables: { mostWantedCardGuid: guid } });
         toast.success('Carta eliminada de Most Wanted');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const message = handleMutationError(error, 'Error al eliminar carta');
         toast.error(message);
@@ -165,6 +202,7 @@ export function useMostWantedList() {
           },
         });
         toast.success('Orden actualizado');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         const message = handleMutationError(error, 'Error al reordenar');
         toast.error(message);

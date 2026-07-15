@@ -5,6 +5,7 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
       tcg
       condition
       stock
+      language
       purchasePrice
       sellPrice
       lastSellDate
@@ -32,7 +33,9 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
   }
 }
 
-query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs!) {
+query InventoryMovements(
+  $findInventoryMovementsArgs: FindInventoryMovementsArgs!
+) {
   inventoryMovements(findInventoryMovementsArgs: $findInventoryMovementsArgs) {
     data {
       guid
@@ -48,6 +51,7 @@ query InventoryMovements($findInventoryMovementsArgs: FindInventoryMovementsArgs
         guid
         tcg
         condition
+        language
         stock
         pokemonCardSummary {
           guid
@@ -80,8 +84,12 @@ query IndicatorsInventoryItems($tcg: String, $forceRefresh: Boolean) {
   }
 }
 
-mutation CreateInventoryMovement($createInventoryMovementInput: CreateInventoryMovementInput!) {
-  createInventoryMovement(createInventoryMovementInput: $createInventoryMovementInput) {
+mutation CreateInventoryMovement(
+  $createInventoryMovementInput: CreateInventoryMovementInput!
+) {
+  createInventoryMovement(
+    createInventoryMovementInput: $createInventoryMovementInput
+  ) {
     guid
     movementType
     quantity
@@ -97,5 +105,31 @@ mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
     createdCount
     updatedCount
     errors
+  }
+}
+
+query InventoryItemSellPriceHistory(
+  $findSellPriceHistoryArgs: FindSellPriceHistoryArgs!
+) {
+  inventoryItemSellPriceHistory(
+    findSellPriceHistoryArgs: $findSellPriceHistoryArgs
+  ) {
+    data {
+      guid
+      previousPrice
+      newPrice
+      reason
+      notes
+      createdDate
+      createdBy {
+        name
+      }
+      inventoryItem {
+        guid
+        tcg
+        condition
+      }
+    }
+    count
   }
 }

@@ -8,10 +8,14 @@ import {
 
 const MOXFIELD_LINE_REGEX = /^(\d+)\s+(.+?)\s+\(([A-Za-z0-9]+)\)\s+(\S+)$/;
 const LIMITLESS_LINE_REGEX = /^(\d+)\s+(.+?)\s+([A-Za-z]{2,5})\s+(\d+)$/;
-const SECTION_HEADER_REGEX = /^(Pokémon|Trainer|Energy|Sideboard|Maybeboard)\s*:\s*\d*$/i;
+const SECTION_HEADER_REGEX =
+  /^(Pokémon|Trainer|Energy|Sideboard|Maybeboard)\s*:\s*\d*$/i;
 
 export function detectFormat(text: string): DeckListFormat {
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
 
   for (const line of lines) {
     if (SECTION_HEADER_REGEX.test(line)) return 'limitless';
@@ -59,7 +63,8 @@ export function parseDeckListLine(
     };
   }
 
-  const regex = format === 'moxfield' ? MOXFIELD_LINE_REGEX : LIMITLESS_LINE_REGEX;
+  const regex =
+    format === 'moxfield' ? MOXFIELD_LINE_REGEX : LIMITLESS_LINE_REGEX;
   const match = trimmed.match(regex);
 
   if (!match) {
@@ -112,7 +117,10 @@ export function parseDeckListText(text: string): IDeckListLine[] {
   return text
     .split('\n')
     .map((line, index) => parseDeckListLine(line, index + 1, format))
-    .filter((line) => line.error !== 'Línea vacía' && line.error !== 'Encabezado de sección');
+    .filter(
+      (line) =>
+        line.error !== 'Línea vacía' && line.error !== 'Encabezado de sección'
+    );
 }
 
 export function resolveCardsFromCatalog(

@@ -28,24 +28,34 @@ export default function PokemonCardGrid({
 
   if (cards.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-default-400">
-        <span className="text-5xl">🔍</span>
-        <p className="mt-4 text-lg font-medium">No se encontraron cartas</p>
-        <p className="text-sm">Intenta ajustar los filtros de búsqueda</p>
+      <div
+        className='text-default-400 flex flex-col items-center justify-center py-16'
+        data-testid='pokemon-cards-empty'
+      >
+        <span className='text-5xl'>🔍</span>
+        <p className='mt-4 text-lg font-medium'>No se encontraron cartas</p>
+        <p className='text-sm'>Intenta ajustar los filtros de búsqueda</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className='flex flex-col gap-6'>
+      <div
+        className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        data-testid='pokemon-cards-grid'
+      >
         {cards.map((card) => (
-          <PokemonCardGridItem key={card.guid} card={card} onPress={onCardPress} />
+          <PokemonCardGridItem
+            key={card.guid}
+            card={card}
+            onPress={onCardPress}
+          />
         ))}
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center">
+        <div className='flex justify-center'>
           <KidstopPagination
             total={totalPages}
             page={page}

@@ -8,7 +8,7 @@ import {
 
 interface IUsePaginatedDatatable {
   defaultSort: ITableSort;
-  defaultFilters?: any;
+  defaultFilters?: Record<string, unknown>;
   onFiltersChange?: () => void;
 }
 
@@ -28,7 +28,7 @@ export const usePaginatedDatatable = ({
   );
 
   const filtersMap = useRef(new Map());
-  const searchTimeout = useRef<any>(null);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const [paginatedArgs, setPaginatedArgs] =
     useState<IPaginatedApiArgs>(defaultArgs);
@@ -53,7 +53,7 @@ export const usePaginatedDatatable = ({
         },
       });
     } else if (paginatedArgs.filters !== undefined) {
-      const { filters, ...newArgs } = paginatedArgs;
+      const { filters: _filters, ...newArgs } = paginatedArgs;
       setPaginatedArgs({ ...newArgs, skip: 0 });
     }
     setCurrentPage(1);
@@ -101,7 +101,7 @@ export const usePaginatedDatatable = ({
 
   // ADD DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterDateRange = useCallback(
-    (key: string, value: any | null) => {
+    (key: string, value: { from?: Date; to?: Date } | null) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {
@@ -118,7 +118,7 @@ export const usePaginatedDatatable = ({
 
   // ADD DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterNumericRange = useCallback(
-    (key: string, value: any | null) => {
+    (key: string, value: { from: number; to?: number } | null) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {
@@ -135,7 +135,11 @@ export const usePaginatedDatatable = ({
 
   // ADD RELATIONAL DATERANGE FILTER TO FILTERS MAP, THEN EMIT UPDATED FILTERS LIST
   const handleFilterRelationDateRange = useCallback(
-    (key: string, relationKey: string, value: any | null) => {
+    (
+      key: string,
+      relationKey: string,
+      value: { from?: Date; to?: Date } | null
+    ) => {
       if (value === null) filtersMap.current.delete(key);
       if (value !== null)
         filtersMap.current.set(key, {
@@ -164,7 +168,7 @@ export const usePaginatedDatatable = ({
         return;
       }
       if (paginatedArgs.search !== undefined) {
-        const { search, ...newArgs } = paginatedArgs;
+        const { search: _search, ...newArgs } = paginatedArgs;
         setPaginatedArgs(newArgs);
       }
     }, 250);

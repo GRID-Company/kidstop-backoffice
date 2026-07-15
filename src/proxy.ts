@@ -5,7 +5,13 @@ const PUBLIC_PAGES = ['/login', '/nueva-contrasena', '/recuperar-contrasena'];
 const PROTECTED_PREFIXES = ['/usuarios', '/clientes'];
 
 const ROLE_ROUTES: Record<string, string[]> = {
-  BUYER: ['/catalogo', '/compras', '/inventario-cartas', '/most-wanted', '/deck-builder'],
+  BUYER: [
+    '/catalogo',
+    '/compras',
+    '/inventario-cartas',
+    '/most-wanted',
+    '/deck-builder',
+  ],
   RECEPTION: [
     '/catalogo',
     '/compras',
@@ -53,7 +59,8 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('jwt')?.value ?? null;
   const role = request.cookies.get('role')?.value ?? null;
-  const logoutInProgress = request.cookies.get('logout_in_progress')?.value ?? null;
+  const logoutInProgress =
+    request.cookies.get('logout_in_progress')?.value ?? null;
 
   if (startsWithAny(pathname, PUBLIC_PAGES) && token && !logoutInProgress) {
     const url = request.nextUrl.clone();
@@ -82,7 +89,10 @@ export function proxy(request: NextRequest) {
       .flat()
       .some((route) => pathname.startsWith(route));
 
-    if (isProtectedRoute && !allowedRoutes.some((route) => pathname.startsWith(route))) {
+    if (
+      isProtectedRoute &&
+      !allowedRoutes.some((route) => pathname.startsWith(route))
+    ) {
       const defaultRoute = DEFAULT_ROUTE_BY_ROLE[role] || '/catalogo';
       return NextResponse.redirect(new URL(defaultRoute, request.url));
     }

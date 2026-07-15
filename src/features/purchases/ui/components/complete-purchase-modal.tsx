@@ -26,7 +26,7 @@ interface CompletePurchaseModalProps {
 
 /**
  * Custom confirmation modal for completing a purchase.
- * 
+ *
  * Note: This is a custom implementation instead of using the shared ConfirmationModal
  * because it requires domain-specific layout to display purchase details (reference,
  * seller, item count, total paid) in a structured format that helps users verify
@@ -50,62 +50,76 @@ export default function CompletePurchaseModal({
   const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} size='sm'>
       <ModalContent>
-        <ModalHeader className="flex items-center gap-2">
-          <Icon icon="lucide:check-circle" className="text-success" width={20} />
+        <ModalHeader className='flex items-center gap-2'>
+          <Icon
+            icon='lucide:check-circle'
+            className='text-success'
+            width={20}
+          />
           <span>Finalizar compra</span>
         </ModalHeader>
 
-        <ModalBody className="flex flex-col gap-4">
-          <p className="text-sm text-default-600">
-            ¿Confirmas que deseas finalizar esta compra y registrarla en inventario?
+        <ModalBody className='flex flex-col gap-4'>
+          <p className='text-default-600 text-sm'>
+            ¿Confirmas que deseas finalizar esta compra y registrarla en
+            inventario?
           </p>
 
-          <div className="flex flex-col gap-2 rounded-lg bg-default-50 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Referencia</span>
-              <span className="text-sm font-semibold text-accent">
+          <div className='bg-default-50 flex flex-col gap-2 rounded-lg p-3'>
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Referencia</span>
+              <span className='text-accent text-sm font-semibold'>
                 {purchase.reference}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Vendedor</span>
-              <span className="text-sm font-medium">
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Vendedor</span>
+              <span className='text-sm font-medium'>
                 {purchase.seller.name}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Items</span>
-              <Chip size="sm" variant="flat">
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Items</span>
+              <Chip size='sm' variant='flat'>
                 {itemCount} {itemCount === 1 ? 'carta' : 'cartas'}
               </Chip>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-default-400">Total pagado</span>
-              <span className="text-sm font-bold text-accent">
+            <div className='flex items-center justify-between'>
+              <span className='text-default-400 text-xs'>Total pagado</span>
+              <span className='text-accent text-sm font-bold'>
                 {formatCurrency(totalPaid)}
               </span>
             </div>
           </div>
 
-          <p className="text-xs text-default-400">
-            Al confirmar, las cartas se registrarán automáticamente en el inventario
-            con los precios de venta configurados.
+          <p className='text-default-400 text-xs'>
+            Al confirmar, las cartas se registrarán automáticamente en el
+            inventario con los precios de venta configurados.
           </p>
         </ModalBody>
 
-        <ModalFooter className="flex justify-between">
-          <Button variant="light" onPress={onClose} className="text-accent" isDisabled={loading}>
+        <ModalFooter className='flex justify-between'>
+          <Button
+            variant='light'
+            onPress={onClose}
+            className='text-accent'
+            isDisabled={loading}
+          >
             Cancelar
           </Button>
           <Button
-            color="success"
+            color='success'
             isLoading={loading}
             isDisabled={loading}
-            startContent={!loading ? <Icon icon="lucide:check-circle" width={18} /> : undefined}
+            startContent={
+              !loading ? (
+                <Icon icon='lucide:check-circle' width={18} />
+              ) : undefined
+            }
             onPress={handleConfirm}
-            className="text-white"
+            className='text-white'
           >
             Confirmar finalización
           </Button>

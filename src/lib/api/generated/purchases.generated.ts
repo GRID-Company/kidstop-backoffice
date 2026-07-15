@@ -28,6 +28,7 @@ export type PurchasesQuery = {
       items: Array<{
         guid: string;
         condition: string;
+        language: Types.CardLanguage;
         offerPrice: number;
         referencePrice: number | null;
         sellPrice: number | null;
@@ -86,6 +87,7 @@ export type PurchaseQuery = {
     items: Array<{
       guid: string;
       condition: string;
+      language: Types.CardLanguage;
       offerPrice: number;
       referencePrice: number | null;
       sellPrice: number | null;
@@ -135,6 +137,7 @@ export type CreatePurchaseMutation = {
     items: Array<{
       guid: string;
       condition: string;
+      language: Types.CardLanguage;
       offerPrice: number;
       referencePrice: number | null;
       quantity: number;
@@ -202,6 +205,7 @@ export type UpdatePurchaseItemsMutation = {
     items: Array<{
       guid: string;
       condition: string;
+      language: Types.CardLanguage;
       offerPrice: number;
       referencePrice: number | null;
       quantity: number;
@@ -255,6 +259,7 @@ export type SetPurchaseItemSellPriceMutation = {
     referencePrice: number | null;
     sellPrice: number | null;
     condition: string;
+    language: Types.CardLanguage;
     quantity: number;
   };
 };
@@ -273,6 +278,7 @@ export type FinalizePurchaseMutation = {
     items: Array<{
       guid: string;
       condition: string;
+      language: Types.CardLanguage;
       offerPrice: number;
       sellPrice: number | null;
       quantity: number;
@@ -338,6 +344,12 @@ export type DeleteSellerMutationVariables = Types.Exact<{
 }>;
 
 export type DeleteSellerMutation = { deleteSeller: boolean };
+
+export type ExportPurchasesQueryVariables = Types.Exact<{
+  findPurchasesArgs: Types.FindPurchasesArgs;
+}>;
+
+export type ExportPurchasesQuery = { exportPurchases: { success: boolean } };
 
 export const PurchasesDocument = {
   kind: 'Document',
@@ -458,6 +470,10 @@ export const PurchasesDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',
@@ -698,6 +714,10 @@ export const PurchaseDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'offerPrice' },
                       },
                       {
@@ -902,6 +922,10 @@ export const CreatePurchaseDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       {
                         kind: 'Field',
@@ -1187,6 +1211,10 @@ export const UpdatePurchaseItemsDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'offerPrice' },
                       },
                       {
@@ -1411,6 +1439,7 @@ export const SetPurchaseItemSellPriceDocument = {
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'sellPrice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'condition' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
               ],
             },
@@ -1479,6 +1508,10 @@ export const FinalizePurchaseDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       {
                         kind: 'Field',
@@ -1772,4 +1805,58 @@ export const DeleteSellerDocument = {
 } as unknown as DocumentNode<
   DeleteSellerMutation,
   DeleteSellerMutationVariables
+>;
+export const ExportPurchasesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'ExportPurchases' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'findPurchasesArgs' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'FindPurchasesArgs' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'exportPurchases' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'findPurchasesArgs' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'findPurchasesArgs' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ExportPurchasesQuery,
+  ExportPurchasesQueryVariables
 >;

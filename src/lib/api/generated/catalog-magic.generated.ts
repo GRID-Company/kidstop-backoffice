@@ -11,6 +11,7 @@ export type MagicCardInternalListQuery = {
     data: Array<{
       guid: string;
       name: string;
+      language: Types.CardLanguage;
       edition: string | null;
       collectorNumber: string | null;
       isFoil: boolean;
@@ -21,6 +22,7 @@ export type MagicCardInternalListQuery = {
       inventoryCards: Array<{
         guid: string;
         condition: string;
+        language: string;
         stock: number;
         purchasePrice: number | null;
         sellPrice: number | null;
@@ -37,6 +39,7 @@ export type MagicCardInternalDetailQuery = {
   magicCardInternalDetail: {
     guid: string;
     name: string;
+    language: Types.CardLanguage;
     edition: string | null;
     collectorNumber: string | null;
     isFoil: boolean;
@@ -47,6 +50,7 @@ export type MagicCardInternalDetailQuery = {
     inventoryCards: Array<{
       guid: string;
       condition: string;
+      language: string;
       stock: number;
       purchasePrice: number | null;
       sellPrice: number | null;
@@ -82,6 +86,7 @@ export type MagicCardWithMetricsQuery = {
     priceBuy: number | null;
     variantsMetrics: Array<{
       condition: string;
+      language: string;
       stock: number;
       lastSellDate: unknown | null;
       avgDaysInInventory: number | null;
@@ -96,6 +101,8 @@ export type MagicBatchCardSearchQueryVariables = Types.Exact<{
 
 export type MagicBatchCardSearchQuery = {
   magicBatchCardSearch: {
+    successfulCount: number;
+    totalCount: number;
     results: Array<{
       originalLine: string;
       parsedQuantity: number | null;
@@ -106,6 +113,7 @@ export type MagicBatchCardSearchQuery = {
       bestMatch: {
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         edition: string | null;
         collectorNumber: string | null;
         imageUri: string | null;
@@ -117,6 +125,7 @@ export type MagicBatchCardSearchQuery = {
           priceBuy: number | null;
           variantsMetrics: Array<{
             condition: string;
+            language: string;
             stock: number;
             lastSellDate: unknown | null;
             avgDaysInInventory: number | null;
@@ -127,6 +136,7 @@ export type MagicBatchCardSearchQuery = {
       relatedCards: Array<{
         guid: string;
         name: string;
+        language: Types.CardLanguage;
         edition: string | null;
         collectorNumber: string | null;
         imageUri: string | null;
@@ -190,6 +200,10 @@ export const MagicCardInternalListDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'edition' },
                       },
                       {
@@ -229,6 +243,10 @@ export const MagicCardInternalListDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',
@@ -301,6 +319,7 @@ export const MagicCardInternalDetailDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'language' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'edition' } },
                 {
                   kind: 'Field',
@@ -321,6 +340,10 @@ export const MagicCardInternalDetailDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {
@@ -446,6 +469,10 @@ export const MagicCardWithMetricsDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'condition' },
                       },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'language' },
+                      },
                       { kind: 'Field', name: { kind: 'Name', value: 'stock' } },
                       {
                         kind: 'Field',
@@ -519,6 +546,11 @@ export const MagicBatchCardSearchDocument = {
               selections: [
                 {
                   kind: 'Field',
+                  name: { kind: 'Name', value: 'successfulCount' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'totalCount' } },
+                {
+                  kind: 'Field',
                   name: { kind: 'Name', value: 'results' },
                   selectionSet: {
                     kind: 'SelectionSet',
@@ -556,6 +588,10 @@ export const MagicBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',
@@ -601,6 +637,13 @@ export const MagicBatchCardSearchDocument = {
                                           name: {
                                             kind: 'Name',
                                             value: 'condition',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'language',
                                           },
                                         },
                                         {
@@ -664,6 +707,10 @@ export const MagicBatchCardSearchDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                             {
                               kind: 'Field',

@@ -4,14 +4,21 @@ import { ICardVariant, IPokemonCard, IMagicCard } from '../../domain/types';
 import { CardPriceFormData } from '../forms/card-price.form.schema';
 
 type PokemonCardInternalItem = NonNullable<
-  NonNullable<PokemonCardInternalListQuery['pokemonCardInternalList']['data']>[number]
+  NonNullable<
+    PokemonCardInternalListQuery['pokemonCardInternalList']['data']
+  >[number]
 >;
 
 type MagicCardInternalItem = NonNullable<
-  NonNullable<MagicCardInternalListQuery['magicCardInternalList']['data']>[number]
+  NonNullable<
+    MagicCardInternalListQuery['magicCardInternalList']['data']
+  >[number]
 >;
 
-export function toUpdateCardPricePayload(data: CardPriceFormData, variantId: string) {
+export function toUpdateCardPricePayload(
+  data: CardPriceFormData,
+  variantId: string
+) {
   return {
     updateCardPriceInput: {
       variantId,
@@ -22,7 +29,9 @@ export function toUpdateCardPricePayload(data: CardPriceFormData, variantId: str
   };
 }
 
-export function toCardPriceFormDefaults(variant: ICardVariant): CardPriceFormData {
+export function toCardPriceFormDefaults(
+  variant: ICardVariant
+): CardPriceFormData {
   return {
     condition: variant.condition,
     buyPrice: variant.buyPrice,
@@ -34,6 +43,7 @@ export function toPokemonCard(item: PokemonCardInternalItem): IPokemonCard {
   return {
     guid: item.guid,
     name: item.name,
+    language: item.language ?? null,
     cardNumber: item.cardNumber ?? null,
     setName: item.setName ?? null,
     setCode: item.setCode ?? null,
@@ -63,6 +73,7 @@ export function toMagicCard(item: MagicCardInternalItem): IMagicCard {
   return {
     guid: item.guid,
     name: item.name,
+    language: item.language ?? null,
     edition: item.edition ?? null,
     collectorNumber: item.collectorNumber ?? null,
     isFoil: item.isFoil,

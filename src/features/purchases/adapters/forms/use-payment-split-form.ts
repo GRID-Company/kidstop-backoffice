@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { paymentFormSchema } from './payment-form.schema';
 
 const paymentSplitSchema = z.object({
-  payments: z.array(paymentFormSchema).min(1, 'Debe agregar al menos un método de pago'),
+  payments: z
+    .array(paymentFormSchema)
+    .min(1, 'Debe agregar al menos un método de pago'),
 });
 
 export type PaymentSplitFormData = z.infer<typeof paymentSplitSchema>;

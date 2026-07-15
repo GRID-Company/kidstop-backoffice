@@ -11,7 +11,6 @@ const KidstopButton = extendVariants(Button, {
   },
   defaultVariants: {
     variant: 'borderedWhite',
-    size: 'md',
   },
 });
 export default KidstopButton;

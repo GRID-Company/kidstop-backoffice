@@ -12,19 +12,16 @@ interface UserCardProps {
 
 export default function UserCard({ user, onPress }: UserCardProps) {
   return (
-    <KidstopCard
-      isPressable={!!onPress}
-      onPress={() => onPress?.(user.guid)}
-    >
-      <CardBody className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <p className="text-lg font-semibold">{user.name ?? 'Sin nombre'}</p>
+    <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(user.guid)}>
+      <CardBody className='flex flex-col gap-3'>
+        <div className='flex items-center justify-between'>
+          <p className='text-lg font-semibold'>{user.name ?? 'Sin nombre'}</p>
           <UserStatusBadge active={user.active} />
         </div>
 
-        <p className="text-content-tertiary text-sm">{user.emailAddress}</p>
+        <p className='text-content-tertiary text-sm'>{user.emailAddress}</p>
 
-        <div className="flex items-center justify-between">
+        <div className='flex items-center justify-between'>
           <UserRoleBadge role={user.role as UserRole} />
         </div>
       </CardBody>

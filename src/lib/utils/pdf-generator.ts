@@ -10,6 +10,10 @@ export interface PickingListItem {
   setName: string;
   setCode: string;
   condition: string;
+  language: string;
+  cardNumber: string | null;
+  variant: string | null;
+  isFoil: boolean | null;
   quantity: number;
   unitPrice: number;
 }
@@ -34,11 +38,18 @@ const GRID_COLS = 5;
 const CARD_GAP = 3;
 const CARD_WIDTH = (CONTENT_WIDTH - CARD_GAP * (GRID_COLS - 1)) / GRID_COLS;
 const IMAGE_HEIGHT = CARD_WIDTH * 1.3;
-const CARD_TEXT_HEIGHT = 20;
+const CARD_TEXT_HEIGHT = 26;
 const CARD_CELL_HEIGHT = IMAGE_HEIGHT + CARD_TEXT_HEIGHT + CARD_GAP;
 
 const HEADER_BAND_HEIGHT = 18;
 const CHECKBOX_SIZE = 3;
+
+const BADGE_FONT_SIZE = 4.5;
+const BADGE_PADDING = 2;
+const BADGE_HEIGHT = 3;
+const BADGE_VERTICAL_OFFSET = 2.2;
+const BADGE_BORDER_RADIUS = 0.5;
+const BADGE_SPACING = 1.5;
 
 type RGB = [number, number, number];
 
@@ -46,6 +57,14 @@ const TCG_COLORS: Record<string, { accent: RGB; accentLight: RGB }> = {
   POKEMON: { accent: [229, 50, 35], accentLight: [254, 236, 235] },
   MAGIC: { accent: [232, 93, 38], accentLight: [254, 240, 233] },
 };
+
+const BADGE_COLORS = {
+  LANGUAGE: { bg: [220, 220, 220] as RGB, text: [80, 80, 80] as RGB },
+  CARD_NUMBER: { bg: [240, 240, 240] as RGB, text: [100, 100, 100] as RGB },
+  VARIANT: { bg: [250, 240, 220] as RGB, text: [150, 100, 50] as RGB },
+  CONDITION: { bg: [230, 245, 255] as RGB, text: [50, 100, 150] as RGB },
+  FOIL: { bg: [255, 215, 0] as RGB, text: [120, 80, 0] as RGB },
+} as const;
 
 function getTcgColors(tcgType: string) {
   return TCG_COLORS[tcgType] ?? TCG_COLORS.POKEMON;
@@ -71,7 +90,10 @@ async function loadImageAsBase64(url: string): Promise<string | null> {
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         const ctx = canvas.getContext('2d');
-        if (!ctx) { resolve(null); return; }
+        if (!ctx) {
+          resolve(null);
+          return;
+        }
         ctx.drawImage(img, 0, 0);
         resolve(canvas.toDataURL('image/jpeg', 0.85));
       };
@@ -115,7 +137,11 @@ function drawHeaderBand(doc: jsPDF, data: PickingListData): number {
   return HEADER_BAND_HEIGHT;
 }
 
-function drawInfoSection(doc: jsPDF, data: PickingListData, startY: number): number {
+function drawInfoSection(
+  doc: jsPDF,
+  data: PickingListData,
+  startY: number
+): number {
   let y = startY + 8;
 
   doc.setFontSize(8);
@@ -160,7 +186,11 @@ function drawInfoSection(doc: jsPDF, data: PickingListData, startY: number): num
   return y;
 }
 
-function drawSummaryBar(doc: jsPDF, data: PickingListData, startY: number): number {
+function drawSummaryBar(
+  doc: jsPDF,
+  data: PickingListData,
+  startY: number
+): number {
   const colors = getTcgColors(data.tcgType);
   const y = startY + 3;
   const barH = 8;
@@ -169,7 +199,10 @@ function drawSummaryBar(doc: jsPDF, data: PickingListData, startY: number): numb
   doc.roundedRect(PAGE_MARGIN, y, CONTENT_WIDTH, barH, 1.5, 1.5, 'F');
 
   const totalItems = data.items.reduce((sum, i) => sum + i.quantity, 0);
-  const total = data.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+  const total = data.items.reduce(
+    (sum, i) => sum + i.unitPrice * i.quantity,
+    0
+  );
 
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
@@ -200,6 +233,36 @@ function drawCheckbox(doc: jsPDF, x: number, y: number, accent: RGB): void {
   doc.setLineWidth(0.2);
 }
 
+function drawBadge(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  text: string,
+  bgColor: RGB,
+  textColor: RGB
+): number {
+  doc.setFontSize(BADGE_FONT_SIZE);
+  doc.setFont('helvetica', 'bold');
+  const textWidth = doc.getTextWidth(text);
+  const badgeWidth = textWidth + BADGE_PADDING;
+
+  doc.setFillColor(...bgColor);
+  doc.roundedRect(
+    x,
+    y - BADGE_VERTICAL_OFFSET,
+    badgeWidth,
+    BADGE_HEIGHT,
+    BADGE_BORDER_RADIUS,
+    BADGE_BORDER_RADIUS,
+    'F'
+  );
+
+  doc.setTextColor(...textColor);
+  doc.text(text, x + 1, y);
+
+  return badgeWidth + BADGE_SPACING;
+}
+
 function drawCardCell(
   doc: jsPDF,
   x: number,
@@ -210,7 +273,15 @@ function drawCardCell(
 ): void {
   doc.setDrawColor(220, 220, 220);
   doc.setFillColor(252, 252, 252);
-  doc.roundedRect(x, y, CARD_WIDTH, IMAGE_HEIGHT + CARD_TEXT_HEIGHT, 1.5, 1.5, 'FD');
+  doc.roundedRect(
+    x,
+    y,
+    CARD_WIDTH,
+    IMAGE_HEIGHT + CARD_TEXT_HEIGHT,
+    1.5,
+    1.5,
+    'FD'
+  );
 
   if (imageData) {
     try {
@@ -232,22 +303,89 @@ function drawCardCell(
 
   const textX = x + 2.5;
   const textW = CARD_WIDTH - 5;
-  const textTop = y + IMAGE_HEIGHT + 3.5;
-  const textBottom = y + IMAGE_HEIGHT + CARD_TEXT_HEIGHT - 2;
+  let textY = y + IMAGE_HEIGHT + 3;
 
-  doc.setFontSize(6.5);
+  doc.setFontSize(6);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 30, 30);
   const nameLines: string[] = doc.splitTextToSize(item.cardName, textW);
-  doc.text(nameLines.slice(0, 2).join('\n'), textX, textTop);
+  doc.text(nameLines.slice(0, 2).join('\n'), textX, textY);
+  textY += nameLines.length > 1 ? 5 : 3.5;
 
-  const midY = textTop + (nameLines.length > 1 ? 6 : 4);
-  doc.setFontSize(5.5);
+  doc.setFontSize(5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(110, 110, 110);
-  doc.text(`${item.setName} (${item.setCode})`, textX, midY);
-  doc.text(item.condition, textX, midY + 3);
+  const setLines: string[] = doc.splitTextToSize(
+    `${item.setName} (${item.setCode})`,
+    textW
+  );
+  doc.text(setLines.slice(0, 2).join('\n'), textX, textY);
+  textY += setLines.length > 1 ? 4.5 : 3;
 
+  let badgeX = textX;
+  const badgeY = textY;
+
+  if (item.language) {
+    badgeX += drawBadge(
+      doc,
+      badgeX,
+      badgeY,
+      item.language,
+      BADGE_COLORS.LANGUAGE.bg,
+      BADGE_COLORS.LANGUAGE.text
+    );
+  }
+
+  if (item.cardNumber) {
+    badgeX += drawBadge(
+      doc,
+      badgeX,
+      badgeY,
+      `${item.cardNumber}`,
+      BADGE_COLORS.CARD_NUMBER.bg,
+      BADGE_COLORS.CARD_NUMBER.text
+    );
+  }
+
+  if (item.variant) {
+    badgeX += drawBadge(
+      doc,
+      badgeX,
+      badgeY,
+      item.variant,
+      BADGE_COLORS.VARIANT.bg,
+      BADGE_COLORS.VARIANT.text
+    );
+  }
+
+  if (item.language || item.cardNumber || item.variant) {
+    textY += 3.5;
+  }
+
+  badgeX = textX;
+  const conditionBadgeY = textY;
+
+  badgeX += drawBadge(
+    doc,
+    badgeX,
+    conditionBadgeY,
+    item.condition,
+    BADGE_COLORS.CONDITION.bg,
+    BADGE_COLORS.CONDITION.text
+  );
+
+  if (item.isFoil) {
+    drawBadge(
+      doc,
+      badgeX,
+      conditionBadgeY,
+      'Foil',
+      BADGE_COLORS.FOIL.bg,
+      BADGE_COLORS.FOIL.text
+    );
+  }
+
+  const textBottom = y + IMAGE_HEIGHT + CARD_TEXT_HEIGHT - 2;
   drawCheckbox(doc, textX, textBottom - 2.5, accent);
 
   doc.setFontSize(7);
@@ -255,9 +393,14 @@ function drawCardCell(
   doc.setTextColor(...accent);
   doc.text(`×${item.quantity}`, textX + CHECKBOX_SIZE + 1.5, textBottom);
   doc.setTextColor(30, 30, 30);
-  doc.text(formatCurrency(item.unitPrice * item.quantity), x + CARD_WIDTH - 2.5, textBottom, {
-    align: 'right',
-  });
+  doc.text(
+    formatCurrency(item.unitPrice * item.quantity),
+    x + CARD_WIDTH - 2.5,
+    textBottom,
+    {
+      align: 'right',
+    }
+  );
 }
 
 function drawImagePlaceholder(doc: jsPDF, x: number, y: number): void {
@@ -265,7 +408,9 @@ function drawImagePlaceholder(doc: jsPDF, x: number, y: number): void {
   doc.rect(x + 2, y + 2, CARD_WIDTH - 4, IMAGE_HEIGHT - 4, 'F');
   doc.setFontSize(6);
   doc.setTextColor(180, 180, 180);
-  doc.text('Sin imagen', x + CARD_WIDTH / 2, y + IMAGE_HEIGHT / 2, { align: 'center' });
+  doc.text('Sin imagen', x + CARD_WIDTH / 2, y + IMAGE_HEIGHT / 2, {
+    align: 'center',
+  });
 }
 
 function drawFooter(doc: jsPDF, accent: RGB): void {
@@ -300,9 +445,13 @@ function drawFooter(doc: jsPDF, accent: RGB): void {
   }
 }
 
-export async function generatePickingListPdf(data: PickingListData): Promise<void> {
+export async function generatePickingListPdf(
+  data: PickingListData
+): Promise<void> {
   const imagePromises = data.items.map((item) =>
-    item.cardImageUrl ? loadImageAsBase64(item.cardImageUrl) : Promise.resolve(null)
+    item.cardImageUrl
+      ? loadImageAsBase64(item.cardImageUrl)
+      : Promise.resolve(null)
   );
   const images = await Promise.all(imagePromises);
 

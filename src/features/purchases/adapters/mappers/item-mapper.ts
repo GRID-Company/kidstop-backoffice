@@ -22,7 +22,7 @@ export const mapFormItemToPurchaseItem = (
 });
 
 export const mapFormItemsToNewPurchasePayload = (items: IPurchaseItem[]) =>
-  items.map(item => ({
+  items.map((item) => ({
     cardGuid: item.cardGuid,
     cardName: item.cardName,
     cardImageUrl: item.cardImageUrl,

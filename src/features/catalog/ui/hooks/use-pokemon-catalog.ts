@@ -18,8 +18,15 @@ export function usePokemonCatalog(skip = false) {
     variantsDocument: PokemonCardVariantsDocument,
     genresDocument: PokemonCardGenresDocument,
     getVarsFunction: getPokemonCatalogVars,
-    mapCardFunction: toPokemonCard,
-    mapCollectionFunction: (c: any) => ({ guid: c.guid, name: c.name, code: c.code ?? null }) as IPokemonCollection,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mapCardFunction: toPokemonCard as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mapCollectionFunction: (c: any) =>
+      ({
+        guid: c.guid,
+        name: c.name,
+        code: c.code ?? null,
+      }) as IPokemonCollection,
     skip,
   });
 

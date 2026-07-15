@@ -5,15 +5,18 @@ export async function GET(request: NextRequest) {
   const url = searchParams.get('url');
 
   if (!url) {
-    return NextResponse.json({ error: 'URL parameter is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'URL parameter is required' },
+      { status: 400 }
+    );
   }
 
   try {
     const response = await fetch(url, {
       headers: {
-        'Accept': 'image/webp,image/*,*/*;q=0.8',
+        Accept: 'image/webp,image/*,*/*;q=0.8',
         'User-Agent': 'Mozilla/5.0 (compatible; ImageProxy/1.0)',
-        'Referer': new URL(url).origin,
+        Referer: new URL(url).origin,
       },
     });
 
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
         'Access-Control-Allow-Origin': '*',
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to proxy image' },
       { status: 500 }

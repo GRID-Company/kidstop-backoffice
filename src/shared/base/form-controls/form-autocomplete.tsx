@@ -1,11 +1,6 @@
 'use client';
 import { type Key, type ReactNode, useEffect, useState } from 'react';
-import {
-  type Control,
-  Controller,
-  FieldValues,
-  type RegisterOptions,
-} from 'react-hook-form';
+import { Controller, FieldValues } from 'react-hook-form';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { ISelectOption } from '../heorui-overrides/select';
 import { AutocompleteProps } from '@heroui/react';
@@ -21,21 +16,25 @@ function BaseFormAutocomplete({
 }: {
   items: ISelectOption[];
   invalid: boolean;
-  field: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  field: any; // React Hook Form field type
   onSelectIcon?: ReactNode;
 } & Partial<AutocompleteProps>) {
   const [fieldState, setFieldState] = useState({
     items: [] as ISelectOption[],
     selectedKey: '',
     inputValue: '',
-    indexedItems: {} as any,
+    indexedItems: {} as Record<string, ISelectOption>,
   });
 
   useEffect(() => {
-    const indexed: any = items.reduce((acc: any, item: any) => {
-      acc[item.value] = item;
-      return acc;
-    }, {});
+    const indexed: Record<string, ISelectOption> = items.reduce(
+      (acc: Record<string, ISelectOption>, item: ISelectOption) => {
+        acc[item.value] = item;
+        return acc;
+      },
+      {}
+    );
     setFieldState((prev) => ({
       ...prev,
       items,
@@ -57,6 +56,7 @@ function BaseFormAutocomplete({
   const handleSelection = (value: Key) => {
     if (value !== null && value !== fieldState.selectedKey) {
       field.onChange(value);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setFieldState((prev: any) => ({
         ...prev,
         selectedKey: value as string,
@@ -110,8 +110,9 @@ function BaseFormAutocomplete({
   );
 }
 
-interface AutocompleteFormProps<T extends FieldValues>
-  extends Partial<AutocompleteProps> {
+interface AutocompleteFormProps<
+  T extends FieldValues,
+> extends Partial<AutocompleteProps> {
   items: ISelectOption[];
   controlProps: ControlWithFormProps<T>;
   onSelectIcon?: ReactNode;

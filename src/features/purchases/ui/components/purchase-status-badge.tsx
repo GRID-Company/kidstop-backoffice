@@ -18,13 +18,11 @@ interface PurchaseStatusBadgeProps {
   status: PurchaseStatus;
 }
 
-export default function PurchaseStatusBadge({ status }: PurchaseStatusBadgeProps) {
+export default function PurchaseStatusBadge({
+  status,
+}: PurchaseStatusBadgeProps) {
   return (
-    <Chip
-      size="sm"
-      variant="flat"
-      color={STATUS_COLOR_MAP[status]}
-    >
+    <Chip size='sm' variant='flat' color={STATUS_COLOR_MAP[status]}>
       {PURCHASE_STATUS_LABELS[status]}
     </Chip>
   );

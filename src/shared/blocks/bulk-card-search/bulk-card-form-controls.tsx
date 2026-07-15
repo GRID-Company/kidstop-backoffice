@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_OPTIONS } from '@/lib/types/card.types';
-import { calculateOfferPrice } from '@/features/purchases/domain/price.utils';
+import { calculateOfferPrice } from '@/lib/utils/price.utils';
 import { BulkCardFormControlsProps } from './types';
+import { CardLanguage } from '@/lib/api/schema-types';
+import { LanguageSelector } from '@/shared/components/language-selector';
 
 export default function BulkCardFormControls({
   variant,
@@ -15,9 +17,13 @@ export default function BulkCardFormControls({
 }: BulkCardFormControlsProps) {
   const { control, setValue, watch } = useFormContext();
 
-  const priceLabel = variant === 'purchases' ? 'Precio por carta' : 'Precio de venta';
-  const priceName = variant === 'purchases' ? `cards.${index}.offerPrice` : `cards.${index}.publicPrice`;
-  
+  const priceLabel =
+    variant === 'purchases' ? 'Precio por carta' : 'Precio de venta';
+  const priceName =
+    variant === 'purchases'
+      ? `cards.${index}.offerPrice`
+      : `cards.${index}.publicPrice`;
+
   const currentPrice = watch(priceName);
 
   useEffect(() => {
@@ -25,29 +31,50 @@ export default function BulkCardFormControls({
       variant === 'purchases' &&
       selectedCard?.referencePrice &&
       selectedCard.referencePrice > 0 &&
-      (currentPrice === undefined || currentPrice === null || currentPrice === 0)
+      (currentPrice === undefined ||
+        currentPrice === null ||
+        currentPrice === 0)
     ) {
       const offerPrice = calculateOfferPrice(selectedCard.referencePrice);
       setValue(priceName, offerPrice, { shouldValidate: true });
     }
-  }, [variant, selectedCard?.guid, selectedCard?.referencePrice, priceName, setValue]);
+  }, [
+    variant,
+    selectedCard?.guid,
+    selectedCard?.referencePrice,
+    priceName,
+    setValue,
+  ]);
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className='grid grid-cols-4 gap-2'>
       <SelectForm
         controlProps={{
           name: `cards.${index}.condition`,
           control,
         }}
-        label="Condición"
-        size="sm"
-        variant="bordered"
+        label='Condición'
+        size='sm'
+        variant='bordered'
         classNames={{
           trigger: 'border-[1px] bg-white',
           label: 'text-xs',
         }}
-        aria-label="Condición de la carta"
+        aria-label='Condición de la carta'
         items={CARD_CONDITION_OPTIONS}
+      />
+
+      <Controller
+        name={`cards.${index}.language`}
+        control={control}
+        render={({ field }) => (
+          <LanguageSelector
+            value={field.value as CardLanguage}
+            onChange={field.onChange}
+            currentLanguage={selectedCard?.language as CardLanguage}
+            size='sm'
+          />
+        )}
       />
 
       <InputForm
@@ -55,17 +82,17 @@ export default function BulkCardFormControls({
           name: `cards.${index}.quantity`,
           control,
         }}
-        type="number"
-        size="sm"
-        variant="bordered"
-        label="Cantidad"
+        type='number'
+        size='sm'
+        variant='bordered'
+        label='Cantidad'
         min={1}
         classNames={{
           inputWrapper: 'border-[1px] bg-white',
           input: 'text-center',
           label: 'text-xs',
         }}
-        aria-label="Cantidad de cartas"
+        aria-label='Cantidad de cartas'
       />
 
       <InputForm
@@ -73,13 +100,13 @@ export default function BulkCardFormControls({
           name: priceName,
           control,
         }}
-        type="number"
-        size="sm"
-        variant="bordered"
+        type='number'
+        size='sm'
+        variant='bordered'
         label={priceLabel}
         min={0}
         step={0.01}
-        startContent={<span className="text-xs text-default-400">$</span>}
+        startContent={<span className='text-default-400 text-xs'>$</span>}
         classNames={{
           inputWrapper: 'border-[1px] bg-white',
           input: 'text-right',

@@ -6,15 +6,21 @@ import { Icon } from '@iconify/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
-import SelectForm from '@/shared/base/form-controls/select-form';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import { useAvailableConditions } from '@/shared/hooks/use-available-conditions';
-import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
+import {
+  AdaptedPurchaseItem,
+  AdaptedSaleItem,
+  ItemVariant,
+} from '@/shared/utils/item-adapters';
+import { StockValidation } from '@/shared/types/stock.types';
 
 type ItemCardData = AdaptedPurchaseItem | AdaptedSaleItem;
 
@@ -25,6 +31,7 @@ interface ItemCardProps {
   isReadOnly?: boolean;
   variant?: ItemVariant;
   allItems?: ItemCardData[];
+  stockValidation?: StockValidation;
 }
 
 function PriceMetric({
@@ -42,11 +49,13 @@ function PriceMetric({
   const displayValue = formatCurrencyWithPrivacy(value, isPrivacyMode);
 
   return (
-    <div className="flex items-center gap-1.5">
-      <Icon icon={icon} width={14} className="text-default-400" />
-      <div className="flex flex-col">
-        <span className="text-[10px] text-default-400">{label}</span>
-        <span className={`text-xs font-medium ${isHighlighted ? 'text-accent' : 'text-default-700'}`}>
+    <div className='flex items-center gap-1.5'>
+      <Icon icon={icon} width={14} className='text-default-400' />
+      <div className='flex flex-col'>
+        <span className='text-default-400 text-[10px]'>{label}</span>
+        <span
+          className={`text-xs font-medium ${isHighlighted ? 'text-accent' : 'text-default-700'}`}
+        >
           {displayValue}
         </span>
       </div>
@@ -68,25 +77,37 @@ export default function ItemCard({
   onRemove,
   isReadOnly = false,
   variant = 'purchase',
-  allItems = [],
+  allItems: _allItems = [],
+  stockValidation,
 }: ItemCardProps) {
   const { control } = useFormContext();
-  const { isPrivacyMode } = usePrivacyModeStore();
+  const { isPrivacyMode: _isPrivacyMode } = usePrivacyModeStore();
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   const quantity = useWatch({
     control,
     name: `cards.${index}.quantity`,
   });
 
-  const offerPrice = variant === 'purchase' ? useWatch({
+  const offerPriceWatch = useWatch({
     control,
     name: `cards.${index}.offerPrice`,
-  }) : undefined;
+  });
+
+  const offerPrice = variant === 'purchase' ? offerPriceWatch : undefined;
 
   const subtotal = useMemo(() => {
     if (variant === 'purchase' && isPurchaseItem(item)) {
       const qty = typeof quantity === 'number' ? quantity : item.quantity;
-      const price = typeof offerPrice === 'number' ? offerPrice : item.offerPrice;
+      const price =
+        typeof offerPrice === 'number' ? offerPrice : item.offerPrice;
       return qty * price;
     } else if (variant === 'sale' && isSaleItem(item)) {
       const qty = typeof quantity === 'number' ? quantity : item.quantity;
@@ -103,144 +124,241 @@ export default function ItemCard({
     return false;
   }, [item, variant]);
 
-  const { usedConditions, availableConditionOptions } = useAvailableConditions(item, allItems);
-
   const displaySubtotal = formatCurrency(subtotal);
 
   return (
-    <KidstopCard className="w-full border-default-200">
-      <div className="relative flex flex-col gap-3 p-3 xl:p-4">
+    <KidstopCard className='border-default-200 w-full'>
+      <div className='relative flex flex-col gap-3 p-3 xl:p-4'>
         {!isReadOnly && onRemove && (
-          <div className="absolute right-2 top-2">
-            <Tooltip content="Eliminar item" color="danger">
+          <div className='absolute top-2 right-2'>
+            <Tooltip content='Eliminar item' color='danger'>
               <Button
                 isIconOnly
-                size="sm"
-                variant="light"
-                color="danger"
+                size='sm'
+                variant='light'
+                color='danger'
                 onPress={() => onRemove(item.guid)}
                 aria-label={`Eliminar ${item.cardName}`}
               >
-                <Icon icon="lucide:trash-2" width={16} />
+                <Icon icon='lucide:trash-2' width={16} />
               </Button>
             </Tooltip>
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className='flex gap-3'>
           <CardImage
             src={item.cardImageUrl}
             alt={item.cardName}
             tcgType={item.tcgType}
-            containerClassName="relative h-[120px] w-[87px] rounded-md overflow-hidden bg-default-100 flex-shrink-0"
-            className="object-contain"
+            containerClassName='relative h-[120px] w-[87px] rounded-md overflow-hidden bg-default-100 flex-shrink-0'
+            className='object-contain'
             fill
-            sizes="87px"
+            sizes='87px'
+            enablePreview
+            onImageClick={() =>
+              openPreview(item.cardImageUrl, item.cardName, item.tcgType)
+            }
           />
 
-          <div className="flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-0.5">
-              <h4 className="text-sm font-semibold leading-tight text-default-900">
+          <div className='flex flex-1 flex-col gap-2'>
+            <div className='flex flex-col gap-0.5'>
+              <h4 className='text-default-900 text-sm leading-tight font-semibold'>
                 {item.cardName}
               </h4>
-              
-              {item.tcgType === 'POKEMON' && (item.cardNumber || item.rarity || item.type || item.hp || item.variant || item.stage) && (
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {item.cardNumber && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      {item.cardNumber}
-                    </Chip>
-                  )}
-                  {item.rarity && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      {item.rarity}
-                    </Chip>
-                  )}
-                  {item.type && (
-                    <div className="flex items-center gap-0.5">
-                      <PokemonTypeIcon type={item.type} size="sm" />
-                      <span className="text-[10px] text-default-600">{item.type}</span>
-                    </div>
-                  )}
-                  {item.hp && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      {item.hp} HP
-                    </Chip>
-                  )}
-                  {item.variant && !item.variant.toLowerCase().includes('normal') && (
-                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
-                      {item.variant}
-                    </Chip>
-                  )}
-                  {item.stage && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      {item.stage}
-                    </Chip>
-                  )}
-                </div>
-              )}
-              
-              {item.tcgType === 'MAGIC' && (item.collectorNumber || item.rarity || item.isFoil) && (
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {item.collectorNumber && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      #{item.collectorNumber}
-                    </Chip>
-                  )}
-                  {item.rarity && (
-                    <Chip size="sm" variant="flat" className="h-4 px-1.5 text-[10px]">
-                      {item.rarity}
-                    </Chip>
-                  )}
-                  {item.isFoil && (
-                    <Chip size="sm" variant="flat" color="secondary" className="h-4 px-1.5 text-[10px]">
-                      FOIL
-                    </Chip>
-                  )}
-                </div>
-              )}
-              
-              <p className="text-xs text-default-500">
+
+              {item.tcgType === 'POKEMON' &&
+                (item.language ||
+                  item.cardNumber ||
+                  item.rarity ||
+                  item.type ||
+                  item.hp ||
+                  item.variant ||
+                  item.stage) && (
+                  <div className='flex flex-wrap items-center gap-1.5'>
+                    {item.language && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='primary'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {LANGUAGE_LABELS[item.language]}
+                      </Chip>
+                    )}
+                    {item.condition && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='default'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {CARD_CONDITION_SHORT_LABELS[item.condition]}
+                      </Chip>
+                    )}
+                    {item.cardNumber && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {item.cardNumber}
+                      </Chip>
+                    )}
+                    {item.rarity && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {item.rarity}
+                      </Chip>
+                    )}
+                    {item.type && (
+                      <div className='flex items-center gap-0.5'>
+                        <PokemonTypeIcon type={item.type} size='sm' />
+                        <span className='text-default-600 text-[10px]'>
+                          {item.type}
+                        </span>
+                      </div>
+                    )}
+                    {item.hp && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {item.hp} HP
+                      </Chip>
+                    )}
+                    {item.variant &&
+                      !item.variant.toLowerCase().includes('normal') && (
+                        <Chip
+                          size='sm'
+                          variant='flat'
+                          color='secondary'
+                          className='h-4 px-1.5 text-[10px]'
+                        >
+                          {item.variant}
+                        </Chip>
+                      )}
+                    {item.stage && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {item.stage}
+                      </Chip>
+                    )}
+                  </div>
+                )}
+
+              {item.tcgType === 'MAGIC' &&
+                (item.language ||
+                  item.collectorNumber ||
+                  item.rarity ||
+                  item.isFoil) && (
+                  <div className='flex flex-wrap items-center gap-1.5'>
+                    {item.language && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='primary'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {LANGUAGE_LABELS[item.language]}
+                      </Chip>
+                    )}
+                    {item.condition && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='default'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {CARD_CONDITION_SHORT_LABELS[item.condition]}
+                      </Chip>
+                    )}
+                    {item.collectorNumber && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        #{item.collectorNumber}
+                      </Chip>
+                    )}
+                    {item.rarity && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        {item.rarity}
+                      </Chip>
+                    )}
+                    {item.isFoil && (
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        color='secondary'
+                        className='h-4 px-1.5 text-[10px]'
+                      >
+                        FOIL
+                      </Chip>
+                    )}
+                  </div>
+                )}
+
+              <p className='text-default-500 text-xs'>
                 {item.setName} · {item.setCode}
               </p>
             </div>
 
             {variant === 'purchase' && isPurchaseItem(item) && (
-              <div className="flex flex-wrap gap-3">
+              <div className='flex flex-wrap gap-3'>
                 {item.referencePrice && item.referencePrice > 0 && (
                   <PriceMetric
-                    label="Ref. al agregar"
+                    label='Ref. al agregar'
                     value={item.referencePrice}
-                    icon="lucide:tag"
+                    icon='lucide:tag'
                   />
                 )}
-                
-                {item.currentReferencePrice && item.currentReferencePrice > 0 && (
-                  <div className="relative">
-                    <PriceMetric
-                      label="Ref. actual"
-                      value={item.currentReferencePrice}
-                      icon="lucide:trending-up"
-                      isHighlighted={priceChanged}
-                    />
-                    {priceChanged && (
-                      <div className="absolute -right-1 -top-1">
-                        <div className="h-2 w-2 rounded-full bg-warning animate-pulse" />
-                      </div>
-                    )}
-                  </div>
-                )}
+
+                {item.currentReferencePrice &&
+                  item.currentReferencePrice > 0 && (
+                    <div className='relative'>
+                      <PriceMetric
+                        label='Ref. actual'
+                        value={item.currentReferencePrice}
+                        icon='lucide:trending-up'
+                        isHighlighted={priceChanged}
+                      />
+                      {priceChanged && (
+                        <div className='absolute -top-1 -right-1'>
+                          <div className='bg-warning h-2 w-2 animate-pulse rounded-full' />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                 {item.metrics?.currentStock !== undefined && (
-                  <div className="flex items-center gap-1.5">
+                  <div className='flex items-center gap-1.5'>
                     <Icon
-                      icon="lucide:package"
+                      icon='lucide:package'
                       width={14}
-                      className={item.metrics.currentStock > 0 ? 'text-success' : 'text-danger'}
+                      className={
+                        item.metrics.currentStock > 0
+                          ? 'text-success'
+                          : 'text-danger'
+                      }
                     />
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-default-400">Stock</span>
-                      <span className="text-xs font-medium text-default-700">
+                    <div className='flex flex-col'>
+                      <span className='text-default-400 text-[10px]'>
+                        Stock
+                      </span>
+                      <span className='text-default-700 text-xs font-medium'>
                         {item.metrics.currentStock}
                       </span>
                     </div>
@@ -248,74 +366,84 @@ export default function ItemCard({
                 )}
               </div>
             )}
+
+            {variant === 'sale' &&
+              stockValidation &&
+              !stockValidation.hasStock && (
+                <div className='mt-2'>
+                  <Chip size='sm' color='danger' variant='flat'>
+                    <div className='flex items-center gap-1'>
+                      <Icon icon='lucide:alert-triangle' width={12} />
+                      <span className='text-[10px]'>
+                        Stock insuficiente (disponible:{' '}
+                        {stockValidation.available})
+                      </span>
+                    </div>
+                  </Chip>
+                </div>
+              )}
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-default-200 pt-3">
+        <div className='border-default-200 flex flex-col gap-2 border-t pt-3'>
           {isReadOnly ? (
-            <div className="grid grid-cols-4 gap-3">
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-default-500">Condición</span>
-                <span className="text-sm font-medium">
+            <div className='grid grid-cols-4 gap-3'>
+              <div className='flex flex-col gap-1'>
+                <span className='text-default-500 text-xs'>Condición</span>
+                <span className='text-sm font-medium'>
                   {CARD_CONDITION_SHORT_LABELS[item.condition]}
                 </span>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-default-500">Cantidad</span>
-                <span className="text-sm font-medium">{item.quantity}</span>
+              <div className='flex flex-col gap-1'>
+                <span className='text-default-500 text-xs'>Cantidad</span>
+                <span className='text-sm font-medium'>{item.quantity}</span>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-default-500">
+              <div className='flex flex-col gap-1'>
+                <span className='text-default-500 text-xs'>
                   {variant === 'purchase' ? 'Precio por carta' : 'Precio'}
                 </span>
-                <span className="text-sm font-medium">
+                <span className='text-sm font-medium'>
                   {formatCurrency(
-                    variant === 'purchase' && isPurchaseItem(item) ? item.offerPrice : isSaleItem(item) ? item.price : 0
+                    variant === 'purchase' && isPurchaseItem(item)
+                      ? item.offerPrice
+                      : isSaleItem(item)
+                        ? item.price
+                        : 0
                   )}
                 </span>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-default-500">Subtotal</span>
-                <span className="text-sm font-semibold text-accent">
+              <div className='flex flex-col gap-1'>
+                <span className='text-default-500 text-xs'>Subtotal</span>
+                <span className='text-accent text-sm font-semibold'>
                   {displaySubtotal}
                 </span>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-              <SelectForm
-                controlProps={{
-                  name: `cards.${index}.condition`,
-                  control,
-                }}
-                label="Condición"
-                size="sm"
-                variant="bordered"
-                classNames={{
-                  trigger: 'border-[1px] bg-white',
-                  label: 'text-xs',
-                }}
-                aria-label="Condición de la carta"
-                items={availableConditionOptions}
-                disabledKeys={Array.from(usedConditions)}
-              />
+            <div className='grid grid-cols-1 gap-3 sm:grid-cols-4'>
+              <div className='flex flex-col gap-1'>
+                <span className='text-default-500 text-xs'>Condición</span>
+                <span className='text-sm font-medium'>
+                  {CARD_CONDITION_SHORT_LABELS[item.condition]}
+                </span>
+              </div>
 
               <InputForm
                 controlProps={{
                   name: `cards.${index}.quantity`,
                   control,
                 }}
-                type="number"
-                size="sm"
-                variant="bordered"
-                label="Cantidad"
+                type='number'
+                size='sm'
+                variant='bordered'
+                label='Cantidad'
                 min={variant === 'sale' ? 0 : 1}
                 classNames={{
                   inputWrapper: 'border-[1px] bg-white',
                   input: 'text-center',
                   label: 'text-xs',
                 }}
-                aria-label="Cantidad de cartas"
+                aria-label='Cantidad de cartas'
               />
 
               {variant === 'purchase' && (
@@ -324,25 +452,27 @@ export default function ItemCard({
                     name: `cards.${index}.offerPrice`,
                     control,
                   }}
-                  type="number"
-                  size="sm"
-                  variant="bordered"
-                  label="Precio por carta"
+                  type='number'
+                  size='sm'
+                  variant='bordered'
+                  label='Precio por carta'
                   min={0}
                   step={0.01}
-                  startContent={<span className="text-xs text-default-400">$</span>}
+                  startContent={
+                    <span className='text-default-400 text-xs'>$</span>
+                  }
                   classNames={{
                     inputWrapper: 'border-[1px] bg-white',
                     input: 'text-right',
                     label: 'text-xs',
                   }}
-                  aria-label="Precio por carta"
+                  aria-label='Precio por carta'
                 />
               )}
 
-              <div className="flex flex-col justify-end gap-1">
-                <span className="text-xs text-default-500">Subtotal</span>
-                <span className="text-lg font-semibold text-accent">
+              <div className='flex flex-col justify-end gap-1'>
+                <span className='text-default-500 text-xs'>Subtotal</span>
+                <span className='text-accent text-lg font-semibold'>
                   {displaySubtotal}
                 </span>
               </div>
@@ -350,6 +480,13 @@ export default function ItemCard({
           )}
         </div>
       </div>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopCard>
   );
 }

@@ -1,5 +1,6 @@
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type { CardCondition };
 
@@ -33,7 +34,7 @@ export interface ISeller {
   updatedDate?: string;
 }
 
-export interface IPurchaseItem {
+export interface IPurchaseItem extends Record<string, unknown> {
   guid: string;
   cardGuid: string;
   cardName: string;
@@ -46,7 +47,11 @@ export interface IPurchaseItem {
   type?: string | null;
   hp?: string | null;
   stage?: string | null;
+  rarity?: string | null;
+  isFoil?: boolean | null;
+  collectorNumber?: string | null;
   condition: CardCondition;
+  language: CardLanguage;
   quantity: number;
   offerPrice: number;
   referencePrice?: number;
@@ -60,7 +65,7 @@ export interface IPaymentDetail {
   amount: number;
 }
 
-export interface IPurchase {
+export interface IPurchase extends Record<string, unknown> {
   guid: string;
   reference: string;
   status: PurchaseStatus;
@@ -93,6 +98,13 @@ export interface ICardSearchResult {
   rarity: string;
   imageUrl: string;
   tcgType: TCGType;
+  language: CardLanguage;
+  variant?: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
+  isFoil?: boolean | null;
+  collectorNumber?: string | null;
   metrics: ICardSearchMetrics;
 }
 

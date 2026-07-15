@@ -1,9 +1,16 @@
 import { z } from 'zod';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { CARD_CONDITIONS } from '../../domain/constants';
-import { PURCHASE_STATUS, PAYMENT_METHOD } from '../../domain/types';
+import { PAYMENT_METHOD } from '../../domain/types';
 
-const cardConditionValues = Object.values(CARD_CONDITIONS) as [string, ...string[]];
-const paymentMethodValues = Object.values(PAYMENT_METHOD) as [string, ...string[]];
+const cardConditionValues = Object.values(CARD_CONDITIONS) as [
+  string,
+  ...string[],
+];
+const paymentMethodValues = Object.values(PAYMENT_METHOD) as [
+  string,
+  ...string[],
+];
 
 const purchaseItemSchema = z.object({
   cardGuid: z.string().min(1, 'La carta es obligatoria'),
@@ -14,26 +21,25 @@ const purchaseItemSchema = z.object({
   condition: z.enum(cardConditionValues, {
     message: 'La condición es obligatoria',
   }),
+  language: z.nativeEnum(CardLanguage),
   quantity: z.coerce
     .number()
     .int()
-    .refine(val => val === 0 || val >= 1, {
+    .refine((val) => val === 0 || val >= 1, {
       message: 'La cantidad debe ser al menos 1',
     }),
-  offerPrice: z.coerce
-    .number()
-    .refine(val => val === 0 || val >= 0, {
-      message: 'El precio de compra debe ser mayor o igual a 0',
-    }),
+  offerPrice: z.coerce.number().refine((val) => val === 0 || val > 0, {
+    message: 'El precio de compra debe ser mayor a 0',
+  }),
   referencePrice: z.coerce
     .number()
-    .refine(val => val === 0 || val >= 0, {
+    .refine((val) => val === 0 || val >= 0, {
       message: 'El precio debe ser mayor o igual a 0',
     })
     .optional(),
   sellPrice: z.coerce
     .number()
-    .refine(val => val === 0 || val >= 0, {
+    .refine((val) => val === 0 || val >= 0, {
       message: 'El precio debe ser mayor o igual a 0',
     })
     .optional(),
@@ -43,11 +49,9 @@ const paymentDetailSchema = z.object({
   method: z.enum(paymentMethodValues, {
     message: 'El método de pago es obligatorio',
   }),
-  amount: z.coerce
-    .number()
-    .refine(val => val === 0 || val >= 0.01, {
-      message: 'El monto debe ser mayor a 0',
-    }),
+  amount: z.coerce.number().refine((val) => val === 0 || val >= 0.01, {
+    message: 'El monto debe ser mayor a 0',
+  }),
 });
 
 export const purchaseFormSchema = z.object({

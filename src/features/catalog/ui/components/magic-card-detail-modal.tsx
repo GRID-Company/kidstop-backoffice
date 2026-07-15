@@ -11,27 +11,42 @@ import {
   Button,
   Chip,
   Divider,
-  Input,
-  Select,
-  SelectItem,
+  Tabs,
+  Tab,
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
+import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Icon } from '@iconify/react';
 import { useQuery } from '@apollo/client/react';
-
-import InputForm from '@/shared/base/form-controls/input-form';
 import FoilChip from '@/shared/components/foil-chip';
-import { IMagicCard } from '../../domain/types';
-import { CARD_CONDITION_LABELS, CARD_CONDITION_SHORT_LABELS, CARD_CONDITIONS, CARD_SEARCH_LIMIT } from '../../domain/constants';
+import { IMagicCard, CardCondition } from '../../domain/types';
+import {
+  CARD_CONDITION_LABELS,
+  CARD_CONDITION_SHORT_LABELS,
+  CARD_CONDITIONS,
+  CARD_SEARCH_LIMIT,
+} from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
-import { useCardDetailModal, InventoryCard } from '../hooks/use-card-detail-modal';
-import { MagicCardWithMetricsDocument, MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
-import { BulkOperationType } from '@/lib/api/schema-types';
-import { BULK_ADJUSTMENT_OPTIONS } from '@/features/inventory-cards/domain/constants';
+import {
+  useCardDetailModal,
+  InventoryCard,
+} from '../hooks/use-card-detail-modal';
+import {
+  MagicCardWithMetricsDocument,
+  MagicCardInternalListDocument,
+} from '@/lib/api/generated/catalog-magic.generated';
+import { CardLanguage } from '@/lib/api/schema-types';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
-import ConditionSelector from '@/shared/blocks/condition-selector';
+import { LanguageSelector } from '@/shared/components/language-selector';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
+import StockAdjustmentTab from './card-detail-tabs/stock-adjustment-tab';
+import PriceEditTab from './card-detail-tabs/price-edit-tab';
+import MovementsHistoryTab from './card-detail-tabs/movements-history-tab';
+import PriceHistoryTab from './card-detail-tabs/price-history-tab';
+import VariantInfoTab from './card-detail-tabs/variant-info-tab';
 
 interface MagicCardDetailModalProps {
   card: IMagicCard | null;
@@ -47,26 +62,32 @@ export default function MagicCardDetailModal({
   const [selectedCard, setSelectedCard] = useState<IMagicCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
   const prevIsOpenRef = useRef(isOpen);
-  
+
   useEffect(() => {
     const wasOpen = prevIsOpenRef.current;
     prevIsOpenRef.current = isOpen;
-    
+
     if (isOpen && !wasOpen) {
       setSelectedCard(card);
       setItemSearch('');
     }
   }, [isOpen, card]);
 
-  const { detail, loading: detailLoading, refetch } = useMagicCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
+  const {
+    detail,
+    loading: _detailLoading,
+    refetch,
+  } = useMagicCardDetail(isOpen ? (selectedCard?.guid ?? null) : null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const {
     selectedVariant,
-    stockAdjustment,
-    setStockAdjustment,
-    movementType,
-    setMovementType,
+    selectedLanguage,
+    availableVariants,
+    handleLanguageChange,
+    stockControl,
+    stockFormState,
+    stockWatch,
     handleVariantSelect,
     handlePriceSubmit,
     executeStockAdjust,
@@ -77,36 +98,44 @@ export default function MagicCardDetailModal({
     adjustLoading,
     cardName,
   } = useCardDetailModal({
-    detail,
-    card: selectedCard,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    detail: detail as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    card: selectedCard as any,
     tcgType: 'MAGIC',
     onRefetch: refetch,
   });
 
+  const [selectedTab, setSelectedTab] = useState('info');
 
   const handleStockAdjustClick = useCallback(() => {
-    if (stockAdjustment === 0) return;
+    const formValues = stockWatch();
+    if (isStockAdjustmentDisabled(formValues.quantity, formValues.movementType))
+      return;
     setIsConfirmModalOpen(true);
-  }, [stockAdjustment]);
+  }, [stockWatch]);
 
   const handleConfirmAdjustment = useCallback(async () => {
     await executeStockAdjust();
     setIsConfirmModalOpen(false);
   }, [executeStockAdjust]);
 
-  const { data: searchData, loading: searchLoading } = useQuery(MagicCardInternalListDocument, {
-    variables: {
-      findMagicCardsPublicArgs: {
-        skip: 0,
-        limit: CARD_SEARCH_LIMIT,
-        search: itemSearch.trim() || undefined,
-        sort: { column: 'releaseDate', order: 'DESC' },
-        filters: {},
+  const { data: searchData, loading: searchLoading } = useQuery(
+    MagicCardInternalListDocument,
+    {
+      variables: {
+        findMagicCardsPublicArgs: {
+          skip: 0,
+          limit: CARD_SEARCH_LIMIT,
+          search: itemSearch.trim() || undefined,
+          sort: { column: 'releaseDate', order: 'DESC' },
+          filters: {},
+        },
       },
-    },
-    skip: !!selectedCard || itemSearch.trim().length < 2,
-    fetchPolicy: 'network-only',
-  });
+      skip: !!selectedCard || itemSearch.trim().length < 2,
+      fetchPolicy: 'network-only',
+    }
+  );
 
   const searchResults = useMemo<IMagicCard[]>(() => {
     const raw = searchData?.magicCardInternalList?.data;
@@ -129,15 +158,19 @@ export default function MagicCardDetailModal({
   const imageUri = detail?.imageUri ?? selectedCard?.imageUri;
   const name = detail?.name ?? selectedCard?.name;
   const edition = detail?.edition ?? selectedCard?.edition;
-  const collectorNumber = detail?.collectorNumber ?? selectedCard?.collectorNumber;
+  const collectorNumber =
+    detail?.collectorNumber ?? selectedCard?.collectorNumber;
   const rarity = detail?.rarity ?? selectedCard?.rarity;
   const isFoil = detail?.isFoil ?? selectedCard?.isFoil;
   const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
-  const variants = detail?.inventoryCards ?? selectedCard?.variants ?? [];
+  const _variants = detail?.inventoryCards ?? selectedCard?.variants ?? [];
 
-  const variantMetrics = metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
-    (v) => v?.condition === selectedVariant?.condition
-  );
+  const variantMetrics =
+    metricsData?.magicCardWithMetrics?.variantsMetrics?.find(
+      (v) =>
+        v?.condition === selectedVariant?.condition &&
+        v?.language === selectedVariant?.language
+    );
 
   const totalWishlistCount = useMemo(() => {
     if (!metricsData?.magicCardWithMetrics?.variantsMetrics) return 0;
@@ -149,377 +182,389 @@ export default function MagicCardDetailModal({
 
   return (
     <>
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
-      <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{selectedCard ? name : 'Ajuste de inventario'}</span>
-          <div className="flex items-center gap-2 text-sm font-normal text-default-500">
-            {selectedCard ? (
-              <>
-                {edition && <span>{edition}</span>}
-                {collectorNumber && (
+      <KidstopDrawer
+        isOpen={isOpen}
+        onClose={onClose}
+        size='4xl'
+        data-testid='magic-card-detail-modal'
+      >
+        <DrawerContent>
+          <DrawerHeader className='flex flex-col gap-2'>
+            <span className='text-accent text-lg font-semibold'>
+              {selectedCard ? name : 'Ajuste de inventario'}
+            </span>
+            <div className='flex items-center gap-2'>
+              <span className='text-default-500 text-sm font-normal'>
+                {selectedCard ? (
                   <>
-                    <span>·</span>
-                    <span>#{collectorNumber}</span>
+                    {edition && <span>{edition}</span>}
+                    {collectorNumber && (
+                      <>
+                        <span>·</span>
+                        <span>#{collectorNumber}</span>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <span>Buscar carta por nombre, edición o código</span>
+                )}
+              </span>
+              {selectedCard && selectedVariant && (
+                <>
+                  <Chip size='sm' variant='flat' color='primary'>
+                    {LANGUAGE_LABELS[selectedLanguage]}
+                  </Chip>
+                  <Chip size='sm' variant='flat' color='secondary'>
+                    {
+                      CARD_CONDITION_LABELS[
+                        selectedVariant.condition as CardCondition
+                      ]
+                    }
+                  </Chip>
+                </>
+              )}
+            </div>
+          </DrawerHeader>
+
+          <DrawerBody className='flex flex-col gap-6'>
+            {!selectedCard && (
+              <CardSearch
+                searchValue={itemSearch}
+                onSearchChange={setItemSearch}
+                results={searchResults}
+                loading={searchLoading}
+                onCardSelect={handleCardSelect}
+                placeholder='Buscar carta por nombre, edición o código...'
+                renderCard={(result) => (
+                  <>
+                    <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>
+                      {result.imageUri ? (
+                        <img
+                          src={result.imageUri}
+                          alt={result.name}
+                          className='absolute inset-0 h-full w-full object-contain'
+                        />
+                      ) : (
+                        <Image
+                          src={magicCardPlaceholder}
+                          alt='Card placeholder'
+                          fill
+                          sizes='32px'
+                          className='object-contain'
+                        />
+                      )}
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <p className='truncate text-sm font-medium'>
+                        {result.name}
+                      </p>
+                      <p className='text-default-500 truncate text-xs'>
+                        {result.edition} · #{result.collectorNumber}
+                      </p>
+                    </div>
+                    <Chip
+                      size='sm'
+                      variant='flat'
+                      color={result.totalStock > 0 ? 'success' : 'default'}
+                    >
+                      {result.totalStock}
+                    </Chip>
                   </>
                 )}
-              </>
-            ) : (
-              <span>Buscar carta por nombre, edición o código</span>
+              />
             )}
-          </div>
-        </DrawerHeader>
 
-        <DrawerBody className="flex flex-col gap-6">
-          {!selectedCard && (
-            <CardSearch
-              searchValue={itemSearch}
-              onSearchChange={setItemSearch}
-              results={searchResults}
-              loading={searchLoading}
-              onCardSelect={handleCardSelect}
-              placeholder="Buscar carta por nombre, edición o código..."
-              renderCard={(result) => (
-                <>
-                  <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-default-100">
-                    {result.imageUri ? (
+            {selectedCard && (
+              <>
+                <div className='flex gap-6'>
+                  <div className='bg-default-100 relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg'>
+                    {imageUri ? (
                       <img
-                        src={result.imageUri}
-                        alt={result.name}
-                        className="absolute inset-0 h-full w-full object-contain"
+                        src={imageUri}
+                        alt={name}
+                        className='absolute inset-0 h-full w-full object-contain p-1'
                       />
                     ) : (
                       <Image
                         src={magicCardPlaceholder}
-                        alt="Card placeholder"
+                        alt='Magic card placeholder'
                         fill
-                        sizes="32px"
-                        className="object-contain"
+                        sizes='160px'
+                        className='object-contain p-1'
                       />
                     )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{result.name}</p>
-                    <p className="truncate text-xs text-default-500">
-                      {result.edition} · #{result.collectorNumber}
-                    </p>
+
+                  <div className='flex flex-col gap-2'>
+                    <div className='flex items-center gap-2'>
+                      <Chip
+                        size='sm'
+                        variant='flat'
+                        classNames={{
+                          base: 'bg-accent/10',
+                          content: 'text-accent font-medium',
+                        }}
+                      >
+                        Magic
+                      </Chip>
+                      {rarity && (
+                        <Chip size='sm' variant='flat'>
+                          {rarity}
+                        </Chip>
+                      )}
+                      {isFoil && <FoilChip label='Foil' variant='subtle' />}
+                    </div>
+
+                    <div className='mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm'>
+                      {edition && (
+                        <>
+                          <span className='text-default-500'>Edición</span>
+                          <span className='font-medium'>{edition}</span>
+                        </>
+                      )}
+
+                      {collectorNumber && (
+                        <>
+                          <span className='text-default-500'>Número</span>
+                          <span className='font-medium'>
+                            #{collectorNumber}
+                          </span>
+                        </>
+                      )}
+
+                      {(detail?.language || selectedCard?.language) && (
+                        <>
+                          <span className='text-default-500'>Idioma</span>
+                          <span className='font-medium'>
+                            {
+                              LANGUAGE_LABELS[
+                                (detail?.language ?? selectedCard?.language) ||
+                                  CardLanguage.English
+                              ]
+                            }
+                          </span>
+                        </>
+                      )}
+
+                      <span className='text-default-500'>Stock total</span>
+                      <span className='font-medium'>{totalStock}</span>
+                    </div>
                   </div>
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    color={result.totalStock > 0 ? 'success' : 'default'}
-                  >
-                    {result.totalStock}
-                  </Chip>
-                </>
-              )}
-            />
-          )}
+                </div>
 
-          {selectedCard && (
-          <>
-          <div className="flex gap-6">
-            <div className="relative aspect-3/4 w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
-              {imageUri ? (
-                <img
-                  src={imageUri}
-                  alt={name}
-                  className="absolute inset-0 h-full w-full object-contain p-1"
-                />
-              ) : (
-                <Image
-                  src={magicCardPlaceholder}
-                  alt="Magic card placeholder"
-                  fill
-                  sizes="160px"
-                  className="object-contain p-1"
-                />
-              )}
-            </div>
+                <Divider />
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  classNames={{
-                    base: 'bg-accent/10',
-                    content: 'text-accent font-medium',
-                  }}
-                >
-                  Magic
-                </Chip>
-                {rarity && (
-                  <Chip size="sm" variant="flat">
-                    {rarity}
-                  </Chip>
-                )}
-                {isFoil && (
-                  <FoilChip label="Foil" variant="subtle" />
-                )}
-              </div>
-
-              <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-                {edition && (
-                  <>
-                    <span className="text-default-500">Edición</span>
-                    <span className="font-medium">{edition}</span>
-                  </>
-                )}
-
-                {collectorNumber && (
-                  <>
-                    <span className="text-default-500">Número</span>
-                    <span className="font-medium">#{collectorNumber}</span>
-                  </>
-                )}
-
-                <span className="text-default-500">Stock total</span>
-                <span className="font-medium">{totalStock}</span>
-              </div>
-            </div>
-          </div>
-
-          <Divider />
-
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-semibold">Variantes por condición</h4>
-            <div className="flex flex-wrap gap-2">
-              {Object.values(CARD_CONDITIONS).map((condition) => {
-                const existing = variants.find((v) => v.condition === condition);
-                const variant: InventoryCard = existing ?? {
-                  guid: `${card?.guid}-${condition}`,
-                  isNew: true,
-                  condition,
-                  stock: 0,
-                  purchasePrice: null,
-                  sellPrice: null,
-                };
-                const isSelected = selectedVariant?.condition === condition;
-                return (
-                  <Button
-                    key={condition}
-                    size="sm"
-                    variant={isSelected ? 'solid' : 'bordered'}
-                    color="default"
-                    className={isSelected ? 'border-none text-white' : ''}
-                    style={
-                      isSelected ? { backgroundColor: 'var(--color-accent)' } : undefined
+                <div className='flex flex-col gap-3'>
+                  <h4 className='text-sm font-semibold'>Idioma y condición</h4>
+                  <LanguageSelector
+                    value={selectedLanguage}
+                    onChange={handleLanguageChange}
+                    currentLanguage={
+                      detail?.language ?? selectedCard?.language ?? undefined
                     }
-                    onPress={() => handleVariantSelect(variant)}
-                  >
-                    {CARD_CONDITION_SHORT_LABELS[condition as keyof typeof CARD_CONDITION_SHORT_LABELS]} ({variant.stock})
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
+                    size='sm'
+                  />
+                </div>
 
-          {selectedVariant && (
-            <>
-              <Divider />
-
-              <div className="flex flex-col gap-3">
-                <h4 className="text-sm font-semibold">
-                  Detalle — {CARD_CONDITION_LABELS[selectedVariant.condition as keyof typeof CARD_CONDITION_LABELS]}
-                </h4>
-
-                <div className="grid grid-cols-3 gap-4 rounded-lg bg-default-50 p-4 text-sm">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Stock</span>
-                    <span className="text-lg font-bold">{selectedVariant.stock}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Precio compra</span>
-                    <span className="text-lg font-bold">
-                      ${(selectedVariant.purchasePrice ?? 0).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Precio venta</span>
-                    <span className="text-lg font-bold text-accent">
-                      ${(selectedVariant.sellPrice ?? 0).toFixed(2)}
-                    </span>
+                <div className='flex flex-col gap-3'>
+                  <h4 className='text-sm font-semibold'>
+                    Variantes por condición
+                  </h4>
+                  <div className='flex flex-wrap gap-2'>
+                    {Object.values(CARD_CONDITIONS).map((condition) => {
+                      const existing = availableVariants.find(
+                        (v: InventoryCard) => v.condition === condition
+                      );
+                      const variant: InventoryCard = existing ?? {
+                        cardGuid: selectedCard?.guid ?? '',
+                        inventoryItemGuid: undefined,
+                        isNew: true,
+                        condition,
+                        language: selectedLanguage,
+                        stock: 0,
+                        purchasePrice: null,
+                        sellPrice: null,
+                      };
+                      const isSelected =
+                        selectedVariant?.condition === condition;
+                      return (
+                        <Button
+                          key={condition}
+                          size='sm'
+                          variant={isSelected ? 'solid' : 'bordered'}
+                          color='default'
+                          className={isSelected ? 'border-none text-white' : ''}
+                          style={
+                            isSelected
+                              ? { backgroundColor: 'var(--color-accent)' }
+                              : undefined
+                          }
+                          onPress={() => handleVariantSelect(variant)}
+                          data-testid={`variant-button-${condition.toLowerCase().replace(/_/g, '-')}`}
+                        >
+                          {
+                            CARD_CONDITION_SHORT_LABELS[
+                              condition as keyof typeof CARD_CONDITION_SHORT_LABELS
+                            ]
+                          }{' '}
+                          ({variant.stock})
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {variantMetrics && (
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-default-500">Última venta</span>
-                      <span className="font-medium">
-                        {variantMetrics.lastSellDate
-                          ? new Date(variantMetrics.lastSellDate as number).toLocaleDateString()
-                          : 'N/A'}
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-default-500">Días en inventario</span>
-                      <span className="font-medium">
-                        {variantMetrics.avgDaysInInventory ?? 0} días
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-default-500">En wishlist</span>
-                      <span className="font-medium">{variantMetrics.wishlistCount ?? 0}</span>
-                    </div>
-                  </div>
+                {selectedVariant && (
+                  <>
+                    <Divider />
+
+                    <Tabs
+                      aria-label='Opciones de gestión de carta'
+                      fullWidth
+                      color='default'
+                      selectedKey={selectedTab}
+                      onSelectionChange={(key) => setSelectedTab(key as string)}
+                      classNames={{
+                        tabList: 'w-full',
+                        tab: 'text-accent',
+                        cursor: 'bg-accent',
+                        tabContent: 'group-data-[selected=true]:text-white',
+                      }}
+                    >
+                      <Tab key='info' title='Información'>
+                        <VariantInfoTab
+                          stock={selectedVariant.stock}
+                          purchasePrice={selectedVariant.purchasePrice}
+                          sellPrice={selectedVariant.sellPrice}
+                          marketPrices={
+                            metricsData?.magicCardWithMetrics
+                              ? {
+                                  priceRetail:
+                                    metricsData.magicCardWithMetrics
+                                      .priceRetail,
+                                  priceBuy:
+                                    metricsData.magicCardWithMetrics.priceBuy,
+                                }
+                              : undefined
+                          }
+                          wishlistMetrics={{
+                            total: totalWishlistCount,
+                            variant: variantMetrics?.wishlistCount ?? 0,
+                          }}
+                          additionalMetrics={
+                            variantMetrics
+                              ? {
+                                  lastSellDate: variantMetrics.lastSellDate
+                                    ? new Date(
+                                        variantMetrics.lastSellDate as
+                                          | string
+                                          | number
+                                      ).getTime()
+                                    : null,
+                                  avgDaysInInventory:
+                                    variantMetrics.avgDaysInInventory,
+                                }
+                              : undefined
+                          }
+                        />
+                      </Tab>
+
+                      <Tab key='stock' title='Ajustar stock'>
+                        <StockAdjustmentTab control={stockControl} />
+                      </Tab>
+
+                      <Tab key='price' title='Editar precio de venta'>
+                        <form
+                          onSubmit={(...args) => {
+                            void handleSubmit(handlePriceSubmit)(...args);
+                          }}
+                        >
+                          <PriceEditTab
+                            control={control}
+                            formState={formState}
+                          />
+                        </form>
+                      </Tab>
+
+                      {selectedVariant.inventoryItemGuid && (
+                        <>
+                          <Tab key='movements' title='Movimientos'>
+                            <MovementsHistoryTab
+                              inventoryItemGuid={
+                                selectedVariant.inventoryItemGuid
+                              }
+                              tcgType='MAGIC'
+                            />
+                          </Tab>
+
+                          <Tab key='price-history' title='Historial de precios'>
+                            <PriceHistoryTab
+                              inventoryItemGuid={
+                                selectedVariant.inventoryItemGuid
+                              }
+                            />
+                          </Tab>
+                        </>
+                      )}
+                    </Tabs>
+                  </>
                 )}
-              </div>
+              </>
+            )}
+          </DrawerBody>
 
-              {metricsData?.magicCardWithMetrics && (
-                <>
-                  <Divider />
-                  <div className="flex flex-col gap-3">
-                    <h4 className="text-sm font-semibold">Precios de mercado (MXN)</h4>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Precio retail</span>
-                        <span className="font-bold text-green-600">
-                          {metricsData.magicCardWithMetrics.priceRetail
-                            ? `$${metricsData.magicCardWithMetrics.priceRetail.toFixed(2)}`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Precio compra</span>
-                        <span className="font-bold text-blue-600">
-                          {metricsData.magicCardWithMetrics.priceBuy
-                            ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Precio referencia</span>
-                        <span className="font-bold text-accent">
-                          {metricsData.magicCardWithMetrics.priceBuy
-                            ? `$${metricsData.magicCardWithMetrics.priceBuy.toFixed(2)}`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">Total en wishlist</span>
-                        <span className="font-bold text-purple-600">
-                          {totalWishlistCount}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-default-500">En wishlist (variante)</span>
-                        <span className="font-bold text-purple-600">
-                          {variantMetrics?.wishlistCount ?? 0}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
+          <DrawerFooter className='flex justify-end gap-4'>
+            <Button
+              variant='light'
+              onPress={onClose}
+              className='text-accent'
+              data-testid='close-modal-button'
+            >
+              Cerrar
+            </Button>
 
-              <Divider />
-
-              <div className="flex flex-col gap-4">
-                <h4 className="text-sm font-semibold">Ajustar stock</h4>
-                <Select
-                  label="Tipo de operación"
-                  placeholder="Selecciona el tipo de operación"
-                  selectedKeys={[movementType]}
-                  onSelectionChange={(keys) => {
-                    const selected = Array.from(keys)[0] as BulkOperationType;
-                    setMovementType(selected);
-                  }}
-                  size="sm"
-                >
-                  {BULK_ADJUSTMENT_OPTIONS.map((option) => (
-                    <SelectItem key={option.key} description={option.description}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="number"
-                    size="sm"
-                    label="Cantidad"
-                    value={String(stockAdjustment)}
-                    onValueChange={(val) => setStockAdjustment(parseInt(val, 10) || 0)}
-                    classNames={{ inputWrapper: 'border-[1px] bg-white' }}
-                  />
-                  <Button
-                    size="sm"
-                    isDisabled={stockAdjustment === 0}
-                    onPress={handleStockAdjustClick}
-                    startContent={<Icon icon="lucide:package-plus" />}
-                    className="text-white"
-                    style={{ backgroundColor: 'var(--color-accent)' }}
-                  >
-                    Aplicar
-                  </Button>
-                </div>
-              </div>
-
-              <Divider />
-
-              <form
-                onSubmit={(...args) => {
-                  void handleSubmit(handlePriceSubmit)(...args);
-                }}
-                className="flex flex-col gap-4"
+            {selectedTab === 'stock' && (
+              <KidstopButton
+                variant='accent'
+                onPress={handleStockAdjustClick}
+                isLoading={adjustLoading}
+                isDisabled={!stockFormState.isValid || !stockFormState.isDirty}
+                startContent={<Icon icon='lucide:package-plus' />}
+                data-testid='save-stock-adjustment-button'
               >
-                <h4 className="text-sm font-semibold">Editar precios</h4>
+                Aplicar ajuste
+              </KidstopButton>
+            )}
 
-                <div className="grid grid-cols-2 gap-4">
-                  <InputForm
-                    label="Precio de compra"
-                    type="number"
-                    controlProps={{ control, name: 'buyPrice' }}
-                  />
-                  <InputForm
-                    label="Precio de venta"
-                    type="number"
-                    controlProps={{ control, name: 'sellPrice' }}
-                  />
-                </div>
+            {selectedTab === 'price' && (
+              <KidstopButton
+                variant='accent'
+                onPress={() => void handleSubmit(handlePriceSubmit)()}
+                isLoading={updatingPrice}
+                startContent={<Icon icon='lucide:save' />}
+                data-testid='save-price-button'
+              >
+                Guardar precios
+              </KidstopButton>
+            )}
+          </DrawerFooter>
+        </DrawerContent>
+      </KidstopDrawer>
 
-                <Button
-                  type="submit"
-                  size="sm"
-                  isDisabled={!formState.isDirty || !formState.isValid}
-                  isLoading={updatingPrice}
-                  startContent={<Icon icon="lucide:save" />}
-                  className="text-white"
-                  style={{ backgroundColor: 'var(--color-accent)' }}
-                >
-                  Guardar precios
-                </Button>
-              </form>
-            </>
-          )}
-          </>
-          )}
-        </DrawerBody>
-
-        <DrawerFooter className="flex justify-end">
-          <Button variant="light" onPress={onClose} className="text-accent">
-            Cerrar
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </KidstopDrawer>
-
-    {selectedVariant && (
-      <InventoryAdjustmentConfirmationModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={handleConfirmAdjustment}
-        loading={adjustLoading}
-        cardName={cardName ?? name}
-        condition={selectedVariant.condition}
-        operationType={movementType}
-        quantity={stockAdjustment}
-        currentStock={selectedVariant.stock}
-      />
-    )}
-  </>
+      {selectedVariant && (
+        <InventoryAdjustmentConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirmAdjustment}
+          loading={adjustLoading}
+          cardName={cardName ?? name ?? ''}
+          condition={selectedVariant.condition}
+          language={selectedVariant.language}
+          operationType={stockWatch('movementType')}
+          quantity={stockWatch('quantity')}
+          currentStock={selectedVariant.stock}
+        />
+      )}
+    </>
   );
 }

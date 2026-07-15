@@ -4,6 +4,7 @@ import { TCGType } from '@/lib/types/tcg.types';
 import {
   BulkLoadInventoryInput,
   BulkOperationType,
+  CardLanguage,
 } from '@/lib/api/schema-types';
 
 export function mapBulkSearchToInventoryInput(
@@ -18,6 +19,7 @@ export function mapBulkSearchToInventoryInput(
       cardGuid: cardForm.selectedCardGuid,
       tcg: tcgType,
       condition: cardForm.condition,
+      language: cardForm.language as CardLanguage,
       quantity: cardForm.quantity,
       purchasePrice: 0,
       sellPrice: cardForm.publicPrice,

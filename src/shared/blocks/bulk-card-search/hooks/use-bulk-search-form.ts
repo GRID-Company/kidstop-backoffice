@@ -2,6 +2,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
 import {
   bulkSearchFormSchemaPurchases,
   bulkSearchFormSchemaInventory,
@@ -11,9 +12,14 @@ import {
   BulkCardFormDataInventory,
 } from '../schemas';
 import { BulkSearchVariant, BulkCardResult } from '../types';
-import { DEFAULT_OFFER_PERCENTAGE } from '../constants';
+import {
+  calculateOfferPrice,
+  calculatePublicPrice,
+} from '@/lib/utils/price.utils';
 
-type BulkSearchFormData = BulkSearchFormDataPurchases | BulkSearchFormDataInventory;
+type BulkSearchFormData =
+  | BulkSearchFormDataPurchases
+  | BulkSearchFormDataInventory;
 type BulkCardFormData = BulkCardFormDataPurchases | BulkCardFormDataInventory;
 
 interface UseBulkSearchFormReturn {
@@ -30,7 +36,9 @@ export function useBulkSearchForm(
   variant: BulkSearchVariant
 ): UseBulkSearchFormReturn {
   const schema =
-    variant === 'purchases' ? bulkSearchFormSchemaPurchases : bulkSearchFormSchemaInventory;
+    variant === 'purchases'
+      ? bulkSearchFormSchemaPurchases
+      : bulkSearchFormSchemaInventory;
 
   const form = useForm<BulkSearchFormData>({
     resolver: zodResolver(schema),
@@ -54,23 +62,27 @@ export function useBulkSearchForm(
       const quantity = result.parsedQuantity ?? 1;
 
       if (variant === 'purchases') {
-        const referencePrice = selectedCard.referencePrice || selectedCard.sellPrice || 0;
-        const offerPrice = referencePrice > 0 
-          ? Math.floor(referencePrice * DEFAULT_OFFER_PERCENTAGE) 
-          : 0;
-        
+        const referencePrice =
+          selectedCard.referencePrice || selectedCard.sellPrice || 0;
+        const offerPrice =
+          referencePrice > 0 ? calculateOfferPrice(referencePrice) : 0;
+
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
+          language: selectedCard.language || DEFAULT_CARD_LANGUAGE,
           quantity,
           offerPrice,
         } as BulkCardFormDataPurchases);
       } else {
-        const defaultPublicPrice = selectedCard.sellPrice || 0;
-        
+        const referencePrice = selectedCard.sellPrice || 0;
+        const defaultPublicPrice =
+          referencePrice > 0 ? calculatePublicPrice(referencePrice) : 0;
+
         append({
           selectedCardGuid: selectedCard.guid,
           condition: CARD_CONDITIONS.NEAR_MINT,
+          language: selectedCard.language || DEFAULT_CARD_LANGUAGE,
           quantity,
           publicPrice: defaultPublicPrice,
         } as BulkCardFormDataInventory);

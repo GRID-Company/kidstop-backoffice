@@ -8,13 +8,13 @@ La Carpeta Digital es una aplicación web **orientada al cliente** que permite n
 
 **Diferencias clave con el backoffice:**
 
-| Aspecto | Backoffice | Carpeta Digital |
-|---------|-----------|-----------------|
-| Audiencia | Staff interno | Clientes finales |
-| TCG | Selector en sidebar | Determinado por dominio |
-| Roles | Admin, Recepción, Comprador | Público, Cliente, VIP, Kiosk |
-| Layout | Sidebar + contenido admin | Navegación tipo e-commerce |
-| Autenticación | Obligatoria | Opcional (público puede navegar) |
+| Aspecto       | Backoffice                  | Carpeta Digital                  |
+| ------------- | --------------------------- | -------------------------------- |
+| Audiencia     | Staff interno               | Clientes finales                 |
+| TCG           | Selector en sidebar         | Determinado por dominio          |
+| Roles         | Admin, Recepción, Comprador | Público, Cliente, VIP, Kiosk     |
+| Layout        | Sidebar + contenido admin   | Navegación tipo e-commerce       |
+| Autenticación | Obligatoria                 | Opcional (público puede navegar) |
 
 ## Stack Tecnológico
 
@@ -147,81 +147,81 @@ kidstop-carpeta-digital/
 
 ### Copiar tal cual
 
-| Archivo origen (backoffice) | Destino (carpeta digital) |
-|-----------------------------|---------------------------|
-| `tsconfig.json` | `tsconfig.json` |
-| `hero.ts` | `hero.ts` |
-| `postcss.config.mjs` | `postcss.config.mjs` |
-| `eslint.config.mjs` | `eslint.config.mjs` |
-| `.prettierrc` | `.prettierrc` |
-| `.prettierignore` | `.prettierignore` |
-| `.gitignore` | `.gitignore` |
-| `codegen.ts` | `codegen.ts` |
-| `src/lib/utils/format-currency.ts` | `src/lib/utils/format-currency.ts` |
-| `src/lib/utils/format-date.ts` | `src/lib/utils/format-date.ts` |
-| `src/lib/utils/create-storage.util.ts` | `src/lib/utils/create-storage.util.ts` |
-| `src/lib/utils/use-responsive-client.ts` | `src/lib/utils/use-responsive-client.ts` |
-| `src/lib/types/tcg.types.ts` | `src/lib/types/tcg.types.ts` |
-| `src/lib/types/card.types.ts` | `src/lib/types/card.types.ts` |
-| `src/lib/types/inventory.types.ts` | `src/lib/types/inventory.types.ts` |
-| `src/lib/consts/tcg-options.ts` | `src/lib/consts/tcg-options.ts` |
-| `src/lib/consts/tcg-themes.ts` | `src/lib/consts/tcg-themes.ts` |
-| `src/lib/consts/error-messages.ts` | `src/lib/consts/error-messages.ts` |
-| `src/lib/store/auth.ts` | `src/lib/store/auth.ts` |
-| `src/lib/auth/use-auth-cookie.ts` | `src/lib/auth/use-auth-cookie.ts` |
-| `src/lib/auth/use-process-logout.ts` | `src/lib/auth/use-process-logout.ts` |
+| Archivo origen (backoffice)                | Destino (carpeta digital)                  |
+| ------------------------------------------ | ------------------------------------------ |
+| `tsconfig.json`                            | `tsconfig.json`                            |
+| `hero.ts`                                  | `hero.ts`                                  |
+| `postcss.config.mjs`                       | `postcss.config.mjs`                       |
+| `eslint.config.mjs`                        | `eslint.config.mjs`                        |
+| `.prettierrc`                              | `.prettierrc`                              |
+| `.prettierignore`                          | `.prettierignore`                          |
+| `.gitignore`                               | `.gitignore`                               |
+| `codegen.ts`                               | `codegen.ts`                               |
+| `src/lib/utils/format-currency.ts`         | `src/lib/utils/format-currency.ts`         |
+| `src/lib/utils/format-date.ts`             | `src/lib/utils/format-date.ts`             |
+| `src/lib/utils/create-storage.util.ts`     | `src/lib/utils/create-storage.util.ts`     |
+| `src/lib/utils/use-responsive-client.ts`   | `src/lib/utils/use-responsive-client.ts`   |
+| `src/lib/types/tcg.types.ts`               | `src/lib/types/tcg.types.ts`               |
+| `src/lib/types/card.types.ts`              | `src/lib/types/card.types.ts`              |
+| `src/lib/types/inventory.types.ts`         | `src/lib/types/inventory.types.ts`         |
+| `src/lib/consts/tcg-options.ts`            | `src/lib/consts/tcg-options.ts`            |
+| `src/lib/consts/tcg-themes.ts`             | `src/lib/consts/tcg-themes.ts`             |
+| `src/lib/consts/error-messages.ts`         | `src/lib/consts/error-messages.ts`         |
+| `src/lib/store/auth.ts`                    | `src/lib/store/auth.ts`                    |
+| `src/lib/auth/use-auth-cookie.ts`          | `src/lib/auth/use-auth-cookie.ts`          |
+| `src/lib/auth/use-process-logout.ts`       | `src/lib/auth/use-process-logout.ts`       |
 | `src/shared/providers/apollo-provider.tsx` | `src/shared/providers/apollo-provider.tsx` |
 
 ### Copiar y adaptar
 
-| Archivo | Cambios necesarios |
-|---------|-------------------|
-| `package.json` | Renombrar a `kidstop-carpeta-digital`, eliminar deps no necesarias (jspdf, dnd-kit), agregar Google Maps |
-| `next.config.ts` | Mantener `remotePatterns` de imágenes, cambiar redirect `/` → catálogo |
-| `src/lib/auth/user-roles.ts` | Cambiar roles: `PUBLIC`, `CUSTOMER`, `VIP`, `KIOSK` |
-| `src/lib/auth/use-process-login.ts` | Cambiar redirect post-login (→ catálogo en vez de `/usuarios`) |
-| `src/proxy.ts` | Rutas públicas: catálogo, most-wanted. Protegidas: carrito, checkout, perfil, pedidos, wishlist. Restricciones Kiosk |
-| `src/shared/providers/providers.tsx` | Recibir TCG del dominio en vez de `role` del backoffice |
-| `src/app/globals.css` | Adaptar temas para UI de cliente |
-| `src/app/layout.tsx` | Adaptar metadata y providers |
-| `src/lib/api/graphql/login.gql` | Adaptar si el login de cliente usa mutation diferente |
+| Archivo                              | Cambios necesarios                                                                                                   |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `package.json`                       | Renombrar a `kidstop-carpeta-digital`, eliminar deps no necesarias (jspdf, dnd-kit), agregar Google Maps             |
+| `next.config.ts`                     | Mantener `remotePatterns` de imágenes, cambiar redirect `/` → catálogo                                               |
+| `src/lib/auth/user-roles.ts`         | Cambiar roles: `PUBLIC`, `CUSTOMER`, `VIP`, `KIOSK`                                                                  |
+| `src/lib/auth/use-process-login.ts`  | Cambiar redirect post-login (→ catálogo en vez de `/usuarios`)                                                       |
+| `src/proxy.ts`                       | Rutas públicas: catálogo, most-wanted. Protegidas: carrito, checkout, perfil, pedidos, wishlist. Restricciones Kiosk |
+| `src/shared/providers/providers.tsx` | Recibir TCG del dominio en vez de `role` del backoffice                                                              |
+| `src/app/globals.css`                | Adaptar temas para UI de cliente                                                                                     |
+| `src/app/layout.tsx`                 | Adaptar metadata y providers                                                                                         |
+| `src/lib/api/graphql/login.gql`      | Adaptar si el login de cliente usa mutation diferente                                                                |
 
 ### No copiar
 
-| Archivo/Carpeta | Razón |
-|-----------------|-------|
-| `src/features/windows/` | Feature del template base, no relacionado |
-| `src/features/purchases/` | Solo backoffice |
-| `src/features/sales/` | Solo backoffice (gestión interna de pedidos) |
-| `src/features/users/` | Solo backoffice (gestión de staff) |
-| `src/features/most-wanted/` (config) | Solo backoffice (la página pública se crea nueva) |
-| `src/features/settings/` | Solo backoffice |
-| `src/features/clickup/` | Herramienta interna |
-| `src/lib/store/selected-tcg.ts` | TCG se determina por dominio |
-| `src/lib/store/privacy-mode.ts` | Solo backoffice |
-| `src/lib/utils/pdf-*.ts` | Solo backoffice |
-| `src/lib/utils/use-paginated-datatable.ts` | Patrón de admin |
-| `src/lib/consts/navigation-routes.ts` | Rutas completamente diferentes |
-| `src/shared/blocks/entities-page/` | Patrón de admin |
-| `src/shared/blocks/data-table/` | Patrón de admin |
-| `src/shared/layouts/` | Layout de admin (sidebar) |
-| `scripts/clickup/` | Herramienta interna |
-| `scripts/amplify/` | Evaluar si se usa el mismo deploy |
+| Archivo/Carpeta                            | Razón                                             |
+| ------------------------------------------ | ------------------------------------------------- |
+| `src/features/windows/`                    | Feature del template base, no relacionado         |
+| `src/features/purchases/`                  | Solo backoffice                                   |
+| `src/features/sales/`                      | Solo backoffice (gestión interna de pedidos)      |
+| `src/features/users/`                      | Solo backoffice (gestión de staff)                |
+| `src/features/most-wanted/` (config)       | Solo backoffice (la página pública se crea nueva) |
+| `src/features/settings/`                   | Solo backoffice                                   |
+| `src/features/clickup/`                    | Herramienta interna                               |
+| `src/lib/store/selected-tcg.ts`            | TCG se determina por dominio                      |
+| `src/lib/store/privacy-mode.ts`            | Solo backoffice                                   |
+| `src/lib/utils/pdf-*.ts`                   | Solo backoffice                                   |
+| `src/lib/utils/use-paginated-datatable.ts` | Patrón de admin                                   |
+| `src/lib/consts/navigation-routes.ts`      | Rutas completamente diferentes                    |
+| `src/shared/blocks/entities-page/`         | Patrón de admin                                   |
+| `src/shared/blocks/data-table/`            | Patrón de admin                                   |
+| `src/shared/layouts/`                      | Layout de admin (sidebar)                         |
+| `scripts/clickup/`                         | Herramienta interna                               |
+| `scripts/amplify/`                         | Evaluar si se usa el mismo deploy                 |
 
 ### Crear desde cero
 
-| Archivo/Carpeta | Descripción |
-|-----------------|-------------|
-| `src/app/` (completo) | Estructura de rutas de cliente |
-| `src/shared/layouts/` | Header, footer, navegación de cliente |
-| `src/features/auth/` | Login, registro, recuperar contraseña (UI de cliente) |
-| `src/features/catalog/` | Navegación, búsqueda, filtros, detalle de carta |
-| `src/features/cart/` | Carrito, checkout, validación de stock, geofencing |
-| `src/features/wishlist/` | Lista de deseos |
-| `src/features/orders/` | Historial de pedidos del cliente |
-| `src/features/profile/` | Perfil de usuario |
-| `src/lib/store/cart.ts` | Store del carrito (Zustand) |
-| `src/lib/consts/navigation-routes.ts` | Rutas de la carpeta digital |
+| Archivo/Carpeta                       | Descripción                                           |
+| ------------------------------------- | ----------------------------------------------------- |
+| `src/app/` (completo)                 | Estructura de rutas de cliente                        |
+| `src/shared/layouts/`                 | Header, footer, navegación de cliente                 |
+| `src/features/auth/`                  | Login, registro, recuperar contraseña (UI de cliente) |
+| `src/features/catalog/`               | Navegación, búsqueda, filtros, detalle de carta       |
+| `src/features/cart/`                  | Carrito, checkout, validación de stock, geofencing    |
+| `src/features/wishlist/`              | Lista de deseos                                       |
+| `src/features/orders/`                | Historial de pedidos del cliente                      |
+| `src/features/profile/`               | Perfil de usuario                                     |
+| `src/lib/store/cart.ts`               | Store del carrito (Zustand)                           |
+| `src/lib/consts/navigation-routes.ts` | Rutas de la carpeta digital                           |
 
 ## Features y Responsabilidades
 
@@ -280,14 +280,14 @@ Perfil del usuario autenticado.
 
 ## Roles y Permisos
 
-| Capacidad | Público | Cliente | VIP | Kiosk |
-|-----------|---------|---------|-----|-------|
-| Navegar catálogo | ✅ | ✅ | ✅ | ✅ |
-| Wishlist | ❌ | ✅ | ✅ | ❌ |
-| Crear pedido (carrito/checkout) | ❌ | ✅ | ✅ | ✅ |
-| Confirmar pedido | ❌ | ✅ (en tienda) | ✅ (remoto) | ✅ (en tienda) |
-| Perfil (ver/editar) | ❌ | ✅ | ✅ | ❌ |
-| Historial de pedidos | ❌ | ✅ | ✅ | ❌ |
+| Capacidad                       | Público | Cliente        | VIP         | Kiosk          |
+| ------------------------------- | ------- | -------------- | ----------- | -------------- |
+| Navegar catálogo                | ✅      | ✅             | ✅          | ✅             |
+| Wishlist                        | ❌      | ✅             | ✅          | ❌             |
+| Crear pedido (carrito/checkout) | ❌      | ✅             | ✅          | ✅             |
+| Confirmar pedido                | ❌      | ✅ (en tienda) | ✅ (remoto) | ✅ (en tienda) |
+| Perfil (ver/editar)             | ❌      | ✅             | ✅          | ❌             |
+| Historial de pedidos            | ❌      | ✅             | ✅          | ❌             |
 
 ## Consideraciones de Arquitectura
 

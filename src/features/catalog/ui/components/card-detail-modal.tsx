@@ -18,6 +18,8 @@ import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { ICard, ICardVariant } from '../../domain/types';
 import {
   CARD_CONDITION_LABELS,
@@ -48,6 +50,14 @@ export default function CardDetailModal({
   const [isSyncing, setIsSyncing] = useState(false);
 
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   useEffect(() => {
     if (card && card.variants.length > 0) {
@@ -88,42 +98,59 @@ export default function CardDetailModal({
   const totalStock = card.variants.reduce((sum, v) => sum + v.stock, 0);
 
   return (
-    <KidstopDrawer isOpen={isOpen} onClose={onClose} size="xl">
+    <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
       <DrawerContent>
-        <DrawerHeader className="flex flex-col gap-1">
-          <span className="text-lg font-semibold text-accent">{card.name}</span>
-          <span className="text-sm font-normal text-default-500">
+        <DrawerHeader className='flex flex-col gap-1'>
+          <span className='text-accent text-lg font-semibold'>{card.name}</span>
+          <span className='text-default-500 text-sm font-normal'>
             {card.setName} · {card.setCode} · #{card.number}
           </span>
         </DrawerHeader>
 
-        <DrawerBody className="flex flex-col gap-6">
-          <div className="flex gap-6">
-            <div className="relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-lg bg-default-100">
+        <DrawerBody className='flex flex-col gap-6'>
+          <div className='flex gap-6'>
+            <div
+              className='bg-default-100 relative aspect-[3/4] w-40 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
+              onClick={() =>
+                openPreview(card.imageUrl, card.name, card.tcgType)
+              }
+              role='button'
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  openPreview(card.imageUrl, card.name, card.tcgType);
+                }
+              }}
+              aria-label={`Ver ${card.name} en tamaño completo`}
+            >
               {card.imageUrl ? (
                 <Image
                   src={card.imageUrl}
                   alt={card.name}
                   fill
-                  sizes="160px"
-                  className="object-contain p-1"
+                  sizes='160px'
+                  className='object-contain p-1'
                 />
               ) : (
                 <Image
-                  src={card.tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder}
-                  alt="Card placeholder"
+                  src={
+                    card.tcgType === 'MAGIC'
+                      ? magicCardPlaceholder
+                      : pokemonCardPlaceholder
+                  }
+                  alt='Card placeholder'
                   fill
-                  sizes="160px"
-                  className="object-contain p-1"
+                  sizes='160px'
+                  className='object-contain p-1'
                 />
               )}
             </div>
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center gap-2'>
                 <Chip
-                  size="sm"
-                  variant="flat"
+                  size='sm'
+                  variant='flat'
                   classNames={{
                     base: 'bg-accent/10',
                     content: 'text-accent font-medium',
@@ -131,40 +158,40 @@ export default function CardDetailModal({
                 >
                   {card.tcgType}
                 </Chip>
-                <Chip size="sm" variant="flat">
+                <Chip size='sm' variant='flat'>
                   {card.rarity}
                 </Chip>
               </div>
 
-              <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-                <span className="text-default-500">Set</span>
-                <span className="font-medium">{card.setName}</span>
+              <div className='mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm'>
+                <span className='text-default-500'>Set</span>
+                <span className='font-medium'>{card.setName}</span>
 
-                <span className="text-default-500">Código</span>
-                <span className="font-medium">{card.setCode}</span>
+                <span className='text-default-500'>Código</span>
+                <span className='font-medium'>{card.setCode}</span>
 
-                <span className="text-default-500">Número</span>
-                <span className="font-medium">#{card.number}</span>
+                <span className='text-default-500'>Número</span>
+                <span className='font-medium'>#{card.number}</span>
 
-                <span className="text-default-500">Stock total</span>
-                <span className="font-medium">{totalStock}</span>
+                <span className='text-default-500'>Stock total</span>
+                <span className='font-medium'>{totalStock}</span>
               </div>
             </div>
           </div>
 
           <Divider />
 
-          <div className="flex flex-col gap-3">
-            <h4 className="text-sm font-semibold">Variantes</h4>
-            <div className="flex flex-wrap gap-2">
+          <div className='flex flex-col gap-3'>
+            <h4 className='text-sm font-semibold'>Variantes</h4>
+            <div className='flex flex-wrap gap-2'>
               {card.variants.map((variant) => (
                 <Button
                   key={variant.id}
-                  size="sm"
+                  size='sm'
                   variant={
                     selectedVariant?.id === variant.id ? 'solid' : 'bordered'
                   }
-                  color="default"
+                  color='default'
                   className={
                     selectedVariant?.id === variant.id
                       ? 'border-none text-white'
@@ -177,7 +204,8 @@ export default function CardDetailModal({
                   }
                   onPress={() => handleVariantSelect(variant)}
                 >
-                  {CARD_CONDITION_SHORT_LABELS[variant.condition]} ({variant.stock})
+                  {CARD_CONDITION_SHORT_LABELS[variant.condition]} (
+                  {variant.stock})
                 </Button>
               ))}
             </div>
@@ -187,28 +215,28 @@ export default function CardDetailModal({
             <>
               <Divider />
 
-              <div className="flex flex-col gap-3">
-                <h4 className="text-sm font-semibold">
+              <div className='flex flex-col gap-3'>
+                <h4 className='text-sm font-semibold'>
                   Detalle de variante —{' '}
                   {CARD_CONDITION_LABELS[selectedVariant.condition]}
                 </h4>
 
-                <div className="grid grid-cols-3 gap-4 rounded-lg bg-default-50 p-4 text-sm">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Stock</span>
-                    <span className="text-lg font-bold">
+                <div className='bg-default-50 grid grid-cols-3 gap-4 rounded-lg p-4 text-sm'>
+                  <div className='flex flex-col items-center gap-1'>
+                    <span className='text-default-500'>Stock</span>
+                    <span className='text-lg font-bold'>
                       {selectedVariant.stock}
                     </span>
                   </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Precio compra</span>
-                    <span className="text-lg font-bold">
+                  <div className='flex flex-col items-center gap-1'>
+                    <span className='text-default-500'>Precio compra</span>
+                    <span className='text-lg font-bold'>
                       ${selectedVariant.buyPrice.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-default-500">Precio venta</span>
-                    <span className="text-lg font-bold text-accent">
+                  <div className='flex flex-col items-center gap-1'>
+                    <span className='text-default-500'>Precio venta</span>
+                    <span className='text-accent text-lg font-bold'>
                       ${selectedVariant.sellPrice.toFixed(2)}
                     </span>
                   </div>
@@ -221,29 +249,31 @@ export default function CardDetailModal({
                 onSubmit={(...args) => {
                   void handleSubmit(handlePriceSubmit)(...args);
                 }}
-                className="flex flex-col gap-4"
+                className='flex flex-col gap-4'
               >
-                <h4 className="text-sm font-semibold">Editar precio de venta</h4>
+                <h4 className='text-sm font-semibold'>
+                  Editar precio de venta
+                </h4>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className='grid grid-cols-2 gap-4'>
                   <InputForm
-                    label="Precio de compra"
-                    type="number"
+                    label='Precio de compra'
+                    type='number'
                     controlProps={{ control, name: 'buyPrice' }}
                   />
                   <InputForm
-                    label="Precio de venta"
-                    type="number"
+                    label='Precio de venta'
+                    type='number'
                     controlProps={{ control, name: 'sellPrice' }}
                   />
                 </div>
 
                 <Button
-                  type="submit"
-                  size="sm"
+                  type='submit'
+                  size='sm'
                   isDisabled={!formState.isDirty || !formState.isValid}
-                  startContent={<Icon icon="lucide:save" />}
-                  className="text-white"
+                  startContent={<Icon icon='lucide:save' />}
+                  className='text-white'
                   style={{ backgroundColor: 'var(--color-accent)' }}
                 >
                   Guardar precios
@@ -253,22 +283,29 @@ export default function CardDetailModal({
           )}
         </DrawerBody>
 
-        <DrawerFooter className="flex justify-between">
+        <DrawerFooter className='flex justify-between'>
           <Button
-            variant="bordered"
-            size="sm"
+            variant='bordered'
+            size='sm'
             isLoading={isSyncing}
-            startContent={<Icon icon="lucide:refresh-cw" />}
+            startContent={<Icon icon='lucide:refresh-cw' />}
             onPress={() => void handleSync()}
-            className="border-accent text-accent"
+            className='border-accent text-accent'
           >
             Sincronizar con proveedor
           </Button>
-          <Button variant="light" onPress={onClose} className="text-accent">
+          <Button variant='light' onPress={onClose} className='text-accent'>
             Cerrar
           </Button>
         </DrawerFooter>
       </DrawerContent>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopDrawer>
   );
 }

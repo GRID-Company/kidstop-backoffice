@@ -1,5 +1,6 @@
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardCondition } from '@/lib/types/card.types';
+import { CardLanguage } from '@/lib/api/schema-types';
 
 export type { CardCondition };
 
@@ -47,10 +48,11 @@ export interface IMagicCardSummary {
   isFoil: boolean;
 }
 
-export interface ISaleItem {
+export interface ISaleItem extends Record<string, unknown> {
   guid: string;
   tcg: TCGType;
   condition: CardCondition;
+  language: CardLanguage;
   quantity: number;
   price: number;
   pokemonCardSummary: IPokemonCardSummary | null;
@@ -64,7 +66,7 @@ export interface ISaleCustomer {
   phone: string | null;
 }
 
-export interface ISale {
+export interface ISale extends Record<string, unknown> {
   guid: string;
   saleCode: SaleCode;
   status: SaleStatus;

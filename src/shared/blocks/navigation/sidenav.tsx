@@ -37,7 +37,11 @@ export default function Sidenav() {
                     as={NextLink}
                     isBlock
                     className='flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-300'
-                    style={isActive ? { background: 'var(--tcg-sidebar-active)' } : undefined}
+                    style={
+                      isActive
+                        ? { background: 'var(--tcg-sidebar-active)' }
+                        : undefined
+                    }
                   >
                     <Icon
                       icon={`${option.icon}`}

@@ -10,7 +10,10 @@ export default memo(function TcgSegmentedSelector() {
   const setTCG = useSelectedTCGStore((state) => state.setTCG);
 
   return (
-    <div className='flex w-full gap-2 rounded-xl bg-neutral-subtle p-1'>
+    <div
+      className='bg-neutral-subtle flex w-full gap-2 rounded-xl p-1'
+      data-testid='tcg-selector'
+    >
       {TCG_OPTIONS.map((option) => {
         const isActive = selectedTCG === option.key;
         return (
@@ -18,13 +21,17 @@ export default memo(function TcgSegmentedSelector() {
             key={option.key}
             type='button'
             onClick={() => setTCG(option.key)}
+            data-testid={`tcg-option-${option.key.toLowerCase()}`}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 ${
               isActive
-                ? 'bg-white text-accent shadow-sm'
+                ? 'text-accent bg-white shadow-sm'
                 : 'text-content-tertiary hover:text-content-primary'
             }`}
           >
-            <Icon icon={option.icon} className={`text-lg ${isActive ? 'text-accent' : ''}`} />
+            <Icon
+              icon={option.icon}
+              className={`text-lg ${isActive ? 'text-accent' : ''}`}
+            />
             <span>{option.label}</span>
           </button>
         );

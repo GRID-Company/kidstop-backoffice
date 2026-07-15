@@ -93,11 +93,16 @@ query PokemonCardVariants {
 **Description:** Get paginated list of Pokemon cards for public display
 
 ```graphql
-query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
-  pokemonCardPublicList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+query PokemonCardPublicList(
+  $findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!
+) {
+  pokemonCardPublicList(
+    findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs
+  ) {
     data {
       guid
       name
+      language
       variant
       setName
       setCode
@@ -145,6 +150,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
 - Card fields:
   - `guid`: Unique card identifier (string)
   - `name`: Card name (string)
+  - `language`: Card language (`CardLanguage` enum)
   - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (string, nullable)
   - `setName`: Collection/set name (string, nullable)
   - `setCode`: Collection/set code (string, nullable)
@@ -173,11 +179,16 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
 **Description:** Get filtered and searched list of Pokemon cards
 
 ```graphql
-query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
-  pokemonCardPublicList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+query PokemonCardPublicList(
+  $findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!
+) {
+  pokemonCardPublicList(
+    findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs
+  ) {
     data {
       guid
       name
+      language
       variant
       setName
       setCode
@@ -211,6 +222,7 @@ query PokemonCardPublicList($findPokemonCardsPublicArgs: FindPokemonCardsPublicA
     "skip": 0,
     "limit": 10,
     "search": "charizard",
+    "prioritizeSearch": true,
     "sort": {
       "column": "name",
       "order": "ASC"
@@ -245,6 +257,9 @@ All filters are optional. Combine them to narrow down results:
 - `condition` (enum): Card condition - "NEAR_MINT" | "LIGHTLY_PLAYED" | "MODERATELY_PLAYED" | "HEAVILY_PLAYED" | "DAMAGED"
 - `stockStatus` (enum): Stock availability - "AVAILABLE" | "UNAVAILABLE"
 - `search` (string): Text search in card names (not in filters object, top-level parameter)
+- `prioritizeSearch` (boolean, optional): Defaults to `false`. When `true` and a search term is provided, results are sorted by relevance first instead of the default stock/collection/genre priority ordering
+  - Use `true` when the user is actively searching for a specific card (e.g., "Pikachu V-UNION") and expects the most relevant match at the top
+  - Use `false` (or omit) for browsing/catalog views where stock availability and collection grouping matter more than search precision
 
 ---
 
@@ -253,6 +268,7 @@ All filters are optional. Combine them to narrow down results:
 Before using filters, you can query the API to get valid values for each filter type:
 
 **Collection GUIDs (for `set` filter):**
+
 ```graphql
 query PokemonCardCollections {
   pokemonCardCollections {
@@ -264,6 +280,7 @@ query PokemonCardCollections {
 ```
 
 **Rarities (for `rarity` filter):**
+
 ```graphql
 query PokemonCardRarities {
   pokemonCardRarities
@@ -271,6 +288,7 @@ query PokemonCardRarities {
 ```
 
 **Variants (for `variant` filter):**
+
 ```graphql
 query PokemonCardVariants {
   pokemonCardVariants
@@ -278,6 +296,7 @@ query PokemonCardVariants {
 ```
 
 **Genres (for `genre` filter):**
+
 ```graphql
 query PokemonCardGenres {
   pokemonCardGenres
@@ -285,6 +304,7 @@ query PokemonCardGenres {
 ```
 
 **Example Workflow:**
+
 1. Fetch collections to populate a collection dropdown
 2. User selects a collection, use its `guid` as the `set` filter value
 3. Optionally combine with other filters (rarity, price range, etc.)
@@ -297,20 +317,22 @@ query PokemonCardGenres {
 
 **Available Sort Columns:**
 
-| Column | Description | Data Type | Example Use Case |
-|--------|-------------|-----------|------------------|
-| `name` | Card name (alphabetical) | string | Sort cards A-Z or Z-A |
-| `sellPrice` | Minimum sell price across all conditions | number | Find cheapest/most expensive cards |
-| `releaseDate` | Collection release date | date | Sort by newest/oldest releases |
-| `cardNumber` | Card number in set | string | Sort by set order |
-| `setName` | Collection/set name | string | Group by collection alphabetically |
-| `setCode` | Collection/set code | string | Sort by set code |
+| Column        | Description                              | Data Type | Example Use Case                   |
+| ------------- | ---------------------------------------- | --------- | ---------------------------------- |
+| `name`        | Card name (alphabetical)                 | string    | Sort cards A-Z or Z-A              |
+| `sellPrice`   | Minimum sell price across all conditions | number    | Find cheapest/most expensive cards |
+| `releaseDate` | Collection release date                  | date      | Sort by newest/oldest releases     |
+| `cardNumber`  | Card number in set                       | string    | Sort by set order                  |
+| `setName`     | Collection/set name                      | string    | Group by collection alphabetically |
+| `setCode`     | Collection/set code                      | string    | Sort by set code                   |
 
 **Sort Order Values:**
+
 - `ASC` - Ascending order (A-Z, 0-9, oldest-newest, false-true)
 - `DESC` - Descending order (Z-A, 9-0, newest-oldest, true-false)
 
 **Important Notes:**
+
 - **Priority-Based Sorting:** The API uses a multi-level priority system that ensures optimal card discovery:
   1. **Stock Availability** - Cards with stock always appear before cards without stock
   2. **Collection Priority** - Normal collections appear before foreign language collections (Chinese, Japanese, Korean)
@@ -337,10 +359,7 @@ query PokemonCardsByPriceLowToHigh {
     findPokemonCardsPublicArgs: {
       skip: 0
       limit: 20
-      sort: {
-        column: "sellPrice"
-        order: "ASC"
-      }
+      sort: { column: "sellPrice", order: "ASC" }
     }
   ) {
     data {
@@ -366,10 +385,7 @@ query PokemonCardsByPriceHighToLow {
     findPokemonCardsPublicArgs: {
       skip: 0
       limit: 20
-      sort: {
-        column: "sellPrice"
-        order: "DESC"
-      }
+      sort: { column: "sellPrice", order: "DESC" }
     }
   ) {
     data {
@@ -395,10 +411,7 @@ query PokemonCardsByName {
     findPokemonCardsPublicArgs: {
       skip: 0
       limit: 20
-      sort: {
-        column: "name"
-        order: "ASC"
-      }
+      sort: { column: "name", order: "ASC" }
     }
   ) {
     data {
@@ -423,19 +436,11 @@ query PokemonCardsFilteredAndSorted {
     findPokemonCardsPublicArgs: {
       skip: 0
       limit: 20
-      sort: {
-        column: "sellPrice"
-        order: "ASC"
-      }
+      sort: { column: "sellPrice", order: "ASC" }
       filters: {
         stockStatus: "AVAILABLE"
         condition: "NEAR_MINT"
-        sellPrice: {
-          range: {
-            from: 50
-            to: 500
-          }
-        }
+        sellPrice: { range: { from: 50, to: 500 } }
       }
     }
   ) {
@@ -610,11 +615,11 @@ const PokemonCardListAdvanced: React.FC = () => {
 
   const buildFilters = () => {
     const filterObj: any = {};
-    
+
     if (filters.rarity) filterObj.rarity = filters.rarity;
     if (filters.condition) filterObj.condition = filters.condition;
     if (filters.stockStatus) filterObj.stockStatus = filters.stockStatus;
-    
+
     if (filters.priceFrom || filters.priceTo) {
       filterObj.sellPrice = {
         range: {
@@ -623,7 +628,7 @@ const PokemonCardListAdvanced: React.FC = () => {
         },
       };
     }
-    
+
     return Object.keys(filterObj).length > 0 ? filterObj : undefined;
   };
 
@@ -731,6 +736,7 @@ query PokemonCardPublicDetail($guid: String!) {
   pokemonCardPublicDetail(guid: $guid) {
     guid
     name
+    language
     variant
     setGuid
     setName
@@ -769,6 +775,7 @@ query PokemonCardPublicDetail($guid: String!) {
 **Response Fields:**
 
 - All basic card info plus:
+  - `language`: Card language (`CardLanguage` enum)
   - `variant`: Card variant (e.g., "Normal", "Reverse Holo")
   - `setGuid`: UUID of the card's collection/set (nullable)
   - `cardNumber`: Number in set
@@ -798,11 +805,16 @@ Authorization: Bearer {{auth_token}}
 ```
 
 ```graphql
-query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
-  pokemonCardInternalList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
+query PokemonCardInternalList(
+  $findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!
+) {
+  pokemonCardInternalList(
+    findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs
+  ) {
     data {
       guid
       name
+      language
       variant
       setName
       setCode
@@ -897,6 +909,7 @@ query PokemonTopSoldCards {
   pokemonTopSoldCards {
     guid
     name
+    language
     variant
     setName
     setCode
@@ -925,6 +938,7 @@ query PokemonTopSoldCards {
 
 - `guid`: Unique card identifier
 - `name`: Card name
+- `language`: Card language (`CardLanguage` enum)
 - `variant`: Card variant (e.g., "Normal", "Reverse Holo") (nullable)
 - `setName`: Collection/set name (nullable)
 - `setCode`: Collection/set code (nullable)
@@ -1169,7 +1183,7 @@ const SearchableCardList: React.FC = () => {
 
   const fetchFilteredCards = async () => {
     const filters: any = {};
-    
+
     if (selectedCollection) filters.set = selectedCollection;
     if (selectedRarity) filters.rarity = selectedRarity;
     if (condition) filters.condition = condition;
@@ -1259,6 +1273,8 @@ const SearchableCardList: React.FC = () => {
 ```graphql
 query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
   pokemonBatchCardSearch(input: $input) {
+    successfulCount
+    totalCount
     results {
       originalLine
       parsedQuantity
@@ -1368,11 +1384,13 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 ```
 
 **Examples:**
+
 - `3 Mega Charizard Y ex ASC 22`
 - `2 Iono PAL 185`
 - `2 Fire Energy MEE 2`
 
 **Special Lines (Ignored):**
+
 - Section headers: `Pokémon:`, `Trainer:`, `Energy:`
 - Empty lines
 
@@ -1381,18 +1399,21 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
 - `searchText` (required): Multiline text in Limitless format
 - `withCardsMetrics` (optional, boolean, default: false): Include card metrics for all cards
   - ⚠️ **Performance Note:** Increases response time due to external API calls for bestMatch only
-  - When `true`: 
+  - When `true`:
     - `bestMatch.cardMetrics` includes **full metrics + external prices** from PriceCharting
     - `relatedCards[].cardMetrics` includes **variant metrics only** (stock, wishlist, etc.) but prices are `null`
   - When `false` or omitted: `cardMetrics` field is null for all cards (fastest response)
 
 **Response Fields:**
 
-- `originalLine`: The original input line
-- `parsedName`: Extracted card name
-- `parsedSet`: Extracted set code
-- `parsedNumber`: Extracted card number
-- `bestMatch`: The top matching card with full inventory details
+- `successfulCount`: Number of cards successfully matched (cards with bestMatch and no error)
+- `totalCount`: Total number of cards detected (parsed lines, excluding empty lines and headers)
+- `results`: Array of search results for each parsed line
+  - `originalLine`: The original input line
+  - `parsedName`: Extracted card name
+  - `parsedSet`: Extracted set code
+  - `parsedNumber`: Extracted card number
+  - `bestMatch`: The top matching card with full inventory details
   - `cardMetrics` (nullable): Full card metrics including external prices (when `withCardsMetrics: true`)
     - `variantsMetrics`: Stock, wishlist count, last sell date, avg days in inventory per condition
     - `ungradedPrice`: PriceCharting loose price
@@ -1420,6 +1441,8 @@ import { gql, useMutation } from '@apollo/client';
 const BATCH_SEARCH_POKEMON = gql`
   query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
     pokemonBatchCardSearch(input: $input) {
+      successfulCount
+      totalCount
       results {
         originalLine
         parsedQuantity
@@ -1452,14 +1475,21 @@ const BatchSearchComponent = () => {
     });
   };
 
+  const searchResult = data?.pokemonBatchCardSearch;
+
   return (
     <div>
-      <textarea 
+      <textarea
         placeholder="Paste your Limitless decklist here..."
         onPaste={(e) => handlePaste(e.clipboardData.getData('text'))}
       />
       {loading && <p>Searching...</p>}
-      {data?.pokemonBatchCardSearch.results.map((result, idx) => (
+      {searchResult && (
+        <div className="search-summary">
+          <p>Found {searchResult.successfulCount} of {searchResult.totalCount} cards</p>
+        </div>
+      )}
+      {searchResult?.results.map((result, idx) => (
         <div key={idx}>
           <h4>{result.parsedName}</h4>
           {result.bestMatch ? (

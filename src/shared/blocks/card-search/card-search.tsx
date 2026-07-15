@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Input, Spinner, Chip } from '@heroui/react';
+import { Input, Spinner } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
 interface CardSearchProps<T extends { guid: string }> {
@@ -29,37 +29,39 @@ export default function CardSearch<T extends { guid: string }>({
   const hasMinLength = trimmedSearch.length >= minSearchLength;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className='flex flex-col gap-4'>
       <Input
         placeholder={placeholder}
         value={searchValue}
         onValueChange={onSearchChange}
-        startContent={<Icon icon="lucide:search" className="text-default-400" />}
+        startContent={
+          <Icon icon='lucide:search' className='text-default-400' />
+        }
         isClearable
         onClear={() => onSearchChange('')}
         autoFocus
       />
 
       {loading && (
-        <div className="flex justify-center py-4">
-          <Spinner size="sm" />
+        <div className='flex justify-center py-4'>
+          <Spinner size='sm' />
         </div>
       )}
 
       {!loading && hasMinLength && results.length === 0 && (
-        <p className="text-center text-sm text-default-400">
+        <p className='text-default-400 text-center text-sm'>
           No se encontraron cartas en el catálogo
         </p>
       )}
 
       {results.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className='flex flex-col gap-2'>
           {results.map((result) => (
             <button
               key={result.guid}
-              type="button"
+              type='button'
               onClick={() => onCardSelect(result)}
-              className="flex items-center gap-3 rounded-lg border border-default-200 p-3 text-left transition hover:bg-default-50"
+              className='border-default-200 hover:bg-default-50 flex items-center gap-3 rounded-lg border p-3 text-left transition'
             >
               {renderCard(result)}
             </button>
@@ -68,7 +70,7 @@ export default function CardSearch<T extends { guid: string }>({
       )}
 
       {!hasMinLength && (
-        <p className="text-center text-sm text-default-400">
+        <p className='text-default-400 text-center text-sm'>
           Escribe al menos {minSearchLength} caracteres para buscar
         </p>
       )}

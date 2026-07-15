@@ -2,11 +2,21 @@
 
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { Icon } from '@iconify/react';
-import { FormProvider, useForm, useFieldArray, useWatch } from 'react-hook-form';
+import {
+  FormProvider,
+  useForm,
+  useFieldArray,
+  useWatch,
+} from 'react-hook-form';
 import { Accordion, AccordionItem } from '@heroui/react';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import ItemCard from './item-card';
-import { AdaptedPurchaseItem, AdaptedSaleItem, ItemVariant } from '@/shared/utils/item-adapters';
+import {
+  AdaptedPurchaseItem,
+  AdaptedSaleItem,
+  ItemVariant,
+} from '@/shared/types/item.types';
+import { StockValidation } from '@/shared/types/stock.types';
 
 type AdaptedItem = AdaptedPurchaseItem | AdaptedSaleItem;
 
@@ -19,6 +29,7 @@ interface ItemsListProps {
   variant?: ItemVariant;
   totalLabel?: string;
   emptyMessage?: string;
+  stockValidationMap?: Map<string, StockValidation>;
 }
 
 export default function ItemsList({
@@ -30,19 +41,21 @@ export default function ItemsList({
   variant = 'purchase',
   totalLabel = 'Total',
   emptyMessage = 'No hay items',
+  stockValidationMap,
 }: ItemsListProps) {
-
   const form = useForm({
     defaultValues: {
       cards: items.map((item: AdaptedItem) => ({
         condition: item.condition,
         quantity: item.quantity,
-        ...(variant === 'purchase' && 'offerPrice' in item ? { offerPrice: (item as AdaptedPurchaseItem).offerPrice } : {}),
+        ...(variant === 'purchase' && 'offerPrice' in item
+          ? { offerPrice: (item as AdaptedPurchaseItem).offerPrice }
+          : {}),
       })),
     },
   });
 
-  const { fields } = useFieldArray({
+  const { fields: _fields } = useFieldArray({
     control: form.control,
     name: 'cards',
   });
@@ -50,7 +63,9 @@ export default function ItemsList({
   const watchedCards = useWatch({
     control: form.control,
     name: 'cards',
-  }) as Array<{ condition: string; quantity: number; offerPrice?: number }> | undefined;
+  }) as
+    | Array<{ condition: string; quantity: number; offerPrice?: number }>
+    | undefined;
 
   const prevWatchedCardsRef = useRef<typeof watchedCards>(undefined);
 
@@ -59,7 +74,9 @@ export default function ItemsList({
       cards: items.map((item: AdaptedItem) => ({
         condition: item.condition,
         quantity: item.quantity,
-        ...(variant === 'purchase' && 'offerPrice' in item ? { offerPrice: (item as AdaptedPurchaseItem).offerPrice } : {}),
+        ...(variant === 'purchase' && 'offerPrice' in item
+          ? { offerPrice: (item as AdaptedPurchaseItem).offerPrice }
+          : {}),
       })),
     });
     prevWatchedCardsRef.current = watchedCards;
@@ -84,7 +101,11 @@ export default function ItemsList({
       if (cardData.quantity !== prevCardData.quantity) {
         changes.quantity = cardData.quantity;
       }
-      if (variant === 'purchase' && 'offerPrice' in cardData && 'offerPrice' in prevCardData) {
+      if (
+        variant === 'purchase' &&
+        'offerPrice' in cardData &&
+        'offerPrice' in prevCardData
+      ) {
         if (cardData.offerPrice !== prevCardData.offerPrice) {
           changes.offerPrice = cardData.offerPrice;
         }
@@ -103,45 +124,46 @@ export default function ItemsList({
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-default-400">
-        <Icon icon="lucide:package-open" width={40} className="mb-2" />
-        <span className="text-sm">{emptyMessage}</span>
+      <div className='text-default-400 flex flex-col items-center justify-center py-12'>
+        <Icon icon='lucide:package-open' width={40} className='mb-2' />
+        <span className='text-sm'>{emptyMessage}</span>
       </div>
     );
   }
 
   return (
     <FormProvider {...form}>
-      <div className="flex flex-col gap-3">
+      <div className='flex flex-col gap-3'>
         <Accordion
-          className="w-full"
+          className='w-full'
           selectedKeys={isExpanded ? ['items'] : []}
           onSelectionChange={(keys) => {
             setIsExpanded(Array.from(keys).includes('items'));
           }}
         >
           <AccordionItem
-            key="items"
-            aria-label="Items"
+            key='items'
+            aria-label='Items'
             title={
-              <div className="flex items-center justify-between w-full pr-2">
-                <span className="text-sm font-medium text-default-700">
+              <div className='flex w-full items-center justify-between pr-2'>
+                <span className='text-default-700 text-sm font-medium'>
                   {items.length} {items.length === 1 ? 'carta' : 'cartas'}
                 </span>
                 {!isExpanded && (
-                  <span className="text-sm font-semibold text-accent">
+                  <span className='text-accent text-sm font-semibold'>
                     {formatCurrency(total)}
                   </span>
                 )}
               </div>
             }
             classNames={{
-              trigger: 'py-2 px-3 hover:bg-default-100 rounded-lg transition-colors cursor-pointer',
+              trigger:
+                'py-2 px-3 hover:bg-default-100 rounded-lg transition-colors cursor-pointer',
               content: 'pt-2',
               indicator: 'text-default-400',
             }}
           >
-            <div className="flex flex-col gap-3">
+            <div className='flex flex-col gap-3'>
               {items.map((item: AdaptedItem, index: number) => (
                 <ItemCard
                   key={item.guid}
@@ -151,16 +173,17 @@ export default function ItemsList({
                   isReadOnly={isReadOnly}
                   variant={variant}
                   allItems={items}
+                  stockValidation={stockValidationMap?.get(item.guid)}
                 />
               ))}
             </div>
           </AccordionItem>
         </Accordion>
 
-        <div className="flex justify-end border-t border-default-200 pt-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-default-500">{totalLabel}:</span>
-            <span className="text-lg font-bold text-accent">
+        <div className='border-default-200 flex justify-end border-t pt-3'>
+          <div className='flex items-center gap-2'>
+            <span className='text-default-500 text-sm'>{totalLabel}:</span>
+            <span className='text-accent text-lg font-bold'>
               {formatCurrency(total)}
             </span>
           </div>

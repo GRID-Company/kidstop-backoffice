@@ -26,9 +26,7 @@ export default function SendReadyEmailButton({
   const handleSend = useCallback(async () => {
     setIsSending(true);
     try {
-      toast.success(
-        `Email enviado a ${customerEmail ?? sale.saleCode}`
-      );
+      toast.success(`Email enviado a ${customerEmail ?? sale.saleCode}`);
     } catch {
       toast.error('Error al enviar el email de notificación');
     } finally {
@@ -39,11 +37,11 @@ export default function SendReadyEmailButton({
   if (!isVisible) return null;
 
   return (
-    <Tooltip content="Enviar email de listo para recolección al cliente">
+    <Tooltip content='Enviar email de listo para recolección al cliente'>
       <Button
-        variant="bordered"
-        className="border-accent text-accent"
-        startContent={<Icon icon="lucide:mail" width={18} />}
+        variant='bordered'
+        className='border-accent text-accent'
+        startContent={<Icon icon='lucide:mail' width={18} />}
         isLoading={isSending}
         onPress={() => void handleSend()}
       >

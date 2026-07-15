@@ -7,7 +7,10 @@ interface UserRoleBadgeProps {
   className?: string;
 }
 
-const ROLE_COLOR_MAP: Record<UserRole, 'primary' | 'secondary' | 'warning' | 'success'> = {
+const ROLE_COLOR_MAP: Record<
+  UserRole,
+  'primary' | 'secondary' | 'warning' | 'success'
+> = {
   [USER_ROLES.ADMIN]: 'primary',
   [USER_ROLES.RECEPTION]: 'secondary',
   [USER_ROLES.BUYER]: 'warning',
@@ -17,10 +20,11 @@ const ROLE_COLOR_MAP: Record<UserRole, 'primary' | 'secondary' | 'warning' | 'su
 export default function UserRoleBadge({ role, className }: UserRoleBadgeProps) {
   return (
     <Chip
-      size="sm"
+      size='sm'
       color={ROLE_COLOR_MAP[role] ?? 'default'}
-      variant="flat"
+      variant='flat'
       className={className}
+      data-testid='user-role'
     >
       {USER_ROLE_LABELS[role] ?? role}
     </Chip>

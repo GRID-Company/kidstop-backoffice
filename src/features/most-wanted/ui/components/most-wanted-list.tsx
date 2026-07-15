@@ -25,8 +25,14 @@ import EditCardModal from './edit-card-modal';
 interface MostWantedListProps {
   items: IMostWantedCard[];
   onReorder: (activeId: string, overId: string) => void | Promise<void>;
-  onToggleActive: (guid: string, currentActive: boolean) => void | Promise<void>;
-  onUpdateCard: (guid: string, updates: { priority?: MostWantedPriority; notes?: string; active?: boolean }) => void | Promise<void>;
+  onToggleActive: (
+    guid: string,
+    currentActive: boolean
+  ) => void | Promise<void>;
+  onUpdateCard: (
+    guid: string,
+    updates: { priority?: MostWantedPriority; notes?: string; active?: boolean }
+  ) => void | Promise<void>;
   onRemoveCard: (guid: string) => void | Promise<void>;
 }
 
@@ -51,16 +57,21 @@ export default function MostWantedList({
     }
   };
 
-  const handleSave = (id: string, updates: { priority: MostWantedPriority; notes: string }) => {
+  const handleSave = (
+    id: string,
+    updates: { priority: MostWantedPriority; notes: string }
+  ) => {
     onUpdateCard(id, updates);
   };
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 py-16 text-default-400">
-        <Icon icon="lucide:list" width={40} />
-        <p className="text-lg font-medium">No hay cartas en Most Wanted</p>
-        <p className="text-sm">Agrega cartas para comenzar a configurar la lista</p>
+      <div className='text-default-400 flex flex-col items-center justify-center gap-3 py-16'>
+        <Icon icon='lucide:list' width={40} />
+        <p className='text-lg font-medium'>No hay cartas en Most Wanted</p>
+        <p className='text-sm'>
+          Agrega cartas para comenzar a configurar la lista
+        </p>
       </div>
     );
   }
@@ -77,7 +88,7 @@ export default function MostWantedList({
           items={items.map((i) => i.guid)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex flex-col gap-2">
+          <div className='flex flex-col gap-2'>
             {items.map((item) => (
               <MostWantedCardItem
                 key={item.guid}

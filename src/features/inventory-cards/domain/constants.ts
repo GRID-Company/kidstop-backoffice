@@ -29,21 +29,28 @@ export const STOCK_STATUS_LABELS: Record<string, string> = {
   [STOCK_STATUSES.UNAVAILABLE]: 'No disponible',
 };
 
-export const STOCK_STATUS_COLORS: Record<string, 'success' | 'warning' | 'danger'> = {
+export const STOCK_STATUS_COLORS: Record<
+  string,
+  'success' | 'warning' | 'danger'
+> = {
   [STOCK_STATUSES.AVAILABLE]: 'success',
   [STOCK_STATUSES.AWAITING_PICKUP]: 'warning',
   [STOCK_STATUSES.UNAVAILABLE]: 'danger',
 };
 
-export const STOCK_STATUS_OPTIONS = Object.values(STOCK_STATUSES).map((status) => ({
-  value: status,
-  label: STOCK_STATUS_LABELS[status],
-}));
+export const STOCK_STATUS_OPTIONS = Object.values(STOCK_STATUSES).map(
+  (status) => ({
+    value: status,
+    label: STOCK_STATUS_LABELS[status],
+  })
+);
 
-export const MOVEMENT_TYPE_OPTIONS = Object.values(MOVEMENT_TYPES).map((type) => ({
-  value: type,
-  label: MOVEMENT_TYPE_LABELS[type],
-}));
+export const MOVEMENT_TYPE_OPTIONS = Object.values(MOVEMENT_TYPES).map(
+  (type) => ({
+    value: type,
+    label: MOVEMENT_TYPE_LABELS[type],
+  })
+);
 
 export const BULK_ADJUSTMENT_OPTIONS = [
   {
@@ -66,7 +73,10 @@ export const BULK_ADJUSTMENT_OPTIONS = [
   },
 ];
 
-export const MOVEMENT_TYPE_COLORS: Record<string, 'success' | 'warning' | 'primary' | 'danger'> = {
+export const MOVEMENT_TYPE_COLORS: Record<
+  string,
+  'success' | 'warning' | 'primary' | 'danger'
+> = {
   [MOVEMENT_TYPES.PURCHASE_ENTRY]: 'success',
   [MOVEMENT_TYPES.SALE_EXIT]: 'warning',
   [MOVEMENT_TYPES.MANUAL_SET]: 'primary',
@@ -96,14 +106,18 @@ export const MOVEMENT_TYPE_ICONS: Record<string, string> = {
   [MOVEMENT_TYPES.MANUAL_EXIT]: 'lucide:arrow-up-circle',
 };
 
-export function formatMovementQuantity(movement: { movementType: string; quantity: number }): {
+export function formatMovementQuantity(movement: {
+  movementType: string;
+  quantity: number;
+}): {
   text: string;
   className: string;
 } {
   const isPositive =
     movement.movementType === MOVEMENT_TYPES.PURCHASE_ENTRY ||
     movement.movementType === MOVEMENT_TYPES.MANUAL_ENTRY ||
-    (movement.movementType === MOVEMENT_TYPES.MANUAL_SET && movement.quantity > 0);
+    (movement.movementType === MOVEMENT_TYPES.MANUAL_SET &&
+      movement.quantity > 0);
   return {
     text: isPositive ? `+${movement.quantity}` : `${movement.quantity}`,
     className: isPositive ? 'text-success' : 'text-danger',

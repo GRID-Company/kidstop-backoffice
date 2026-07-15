@@ -7,7 +7,7 @@ export const getHighestQualityImage = (
   images: ImageResolution[] | null | undefined
 ): ImageResolution | null => {
   if (!images || images.length === 0) return null;
-  
+
   return images.reduce((prev, current) => {
     const prevRes = parseInt(prev.resolution.split('x')[0]);
     const currentRes = parseInt(current.resolution.split('x')[0]);

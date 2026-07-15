@@ -155,7 +155,7 @@ mutation UpdateBuyerBudget($updateBuyerBudgetInput: UpdateBuyerBudgetInput!) {
   "updateBuyerBudgetInput": {
     "buyerGuid": "BUYER_USER_GUID",
     "tcg": "POKEMON",
-    "assignedAmount": 5000.00
+    "assignedAmount": 5000.0
   }
 }
 ```

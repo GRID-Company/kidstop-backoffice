@@ -5,11 +5,12 @@ import { CreateInventoryMovementDocument } from '@/lib/api/generated/inventory.g
 import { PokemonCardInternalDetailDocument } from '@/lib/api/generated/catalog-pokemon.generated';
 import { MagicCardInternalDetailDocument } from '@/lib/api/generated/catalog-magic.generated';
 import { TCGType } from '@/lib/types/tcg.types';
-import { BulkOperationType } from '@/lib/api/schema-types';
+import { BulkOperationType, CardLanguage } from '@/lib/api/schema-types';
 
 interface AdjustStockParams {
   cardGuid: string;
   condition: string;
+  language: CardLanguage;
   quantity: number;
   notes?: string;
   tcgType: TCGType;
@@ -17,9 +18,15 @@ interface AdjustStockParams {
 }
 
 export function useAdjustInventoryStock() {
-  const [createMovement, { loading }] = useMutation(CreateInventoryMovementDocument, {
-    refetchQueries: [PokemonCardInternalDetailDocument, MagicCardInternalDetailDocument],
-  });
+  const [createMovement, { loading }] = useMutation(
+    CreateInventoryMovementDocument,
+    {
+      refetchQueries: [
+        PokemonCardInternalDetailDocument,
+        MagicCardInternalDetailDocument,
+      ],
+    }
+  );
 
   const handleAdjustStock = useCallback(
     async (params: AdjustStockParams) => {
@@ -55,6 +62,7 @@ export function useAdjustInventoryStock() {
             cardGuid: params.cardGuid,
             condition: params.condition,
             tcg: params.tcgType,
+            language: params.language,
             bulkOperationType,
             quantity: finalQuantity,
             notes: params.notes || successMessage,
