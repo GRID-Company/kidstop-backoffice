@@ -20,6 +20,8 @@ import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Icon } from '@iconify/react';
 import FoilChip from '@/shared/components/foil-chip';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import CardImagePreviewModal from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { formatReleaseDate } from '@/lib/utils/format-date';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard, CardCondition } from '../../domain/types';
@@ -66,6 +68,14 @@ export default function PokemonCardDetailModal({
   const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
   const prevIsOpenRef = useRef(isOpen);
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   useEffect(() => {
     const wasOpen = prevIsOpenRef.current;
@@ -273,7 +283,30 @@ export default function PokemonCardDetailModal({
               <>
                 <div className='flex flex-col gap-6 sm:flex-row'>
                   <div className='w-full shrink-0 sm:w-40'>
-                    <div className='bg-default-100 relative aspect-3/4 w-full overflow-hidden rounded-lg'>
+                    <div
+                      className='bg-default-100 relative aspect-3/4 w-full cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
+                      onClick={() => {
+                        const highQualityImage = getHighestQualityImage(
+                          detail?.moreImages
+                        );
+                        const displayImage =
+                          highQualityImage?.imageUrl || imageUri || null;
+                        openPreview(displayImage, name ?? '', 'POKEMON');
+                      }}
+                      role='button'
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const highQualityImage = getHighestQualityImage(
+                            detail?.moreImages
+                          );
+                          const displayImage =
+                            highQualityImage?.imageUrl || imageUri || null;
+                          openPreview(displayImage, name ?? '', 'POKEMON');
+                        }
+                      }}
+                      aria-label={`Ver ${name} en tamaño completo`}
+                    >
                       {(() => {
                         const highQualityImage = getHighestQualityImage(
                           detail?.moreImages
@@ -674,6 +707,13 @@ export default function PokemonCardDetailModal({
           currentStock={selectedVariant.stock}
         />
       )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </>
   );
 }
