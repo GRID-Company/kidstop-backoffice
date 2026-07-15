@@ -14,6 +14,8 @@ import {
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import { formatUnixDateTime } from '@/lib/utils/format-date';
 import { IInventoryMovement } from '../../domain/types';
@@ -35,6 +37,15 @@ export default function MovementDetailDrawer({
   isOpen,
   onClose,
 }: MovementDetailDrawerProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
+
   if (!item) return null;
 
   const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
@@ -53,7 +64,28 @@ export default function MovementDetailDrawer({
 
         <DrawerBody className='flex flex-col gap-6'>
           <div className='bg-default-50 flex items-center gap-4 rounded-lg p-4'>
-            <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
+            <div
+              className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+              onClick={() =>
+                openPreview(
+                  item.cardImageUrl,
+                  item.cardName,
+                  item.tcg as 'POKEMON' | 'MAGIC'
+                )
+              }
+              role='button'
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  openPreview(
+                    item.cardImageUrl,
+                    item.cardName,
+                    item.tcg as 'POKEMON' | 'MAGIC'
+                  );
+                }
+              }}
+              aria-label={`Ver ${item.cardName} en tamaño completo`}
+            >
               {item.cardImageUrl ? (
                 <img
                   src={item.cardImageUrl}
@@ -154,6 +186,13 @@ export default function MovementDetailDrawer({
           </Button>
         </DrawerFooter>
       </DrawerContent>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopDrawer>
   );
 }

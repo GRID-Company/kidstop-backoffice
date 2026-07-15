@@ -6,6 +6,8 @@ import { Icon } from '@iconify/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
@@ -80,6 +82,14 @@ export default function ItemCard({
 }: ItemCardProps) {
   const { control } = useFormContext();
   const { isPrivacyMode: _isPrivacyMode } = usePrivacyModeStore();
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   const quantity = useWatch({
     control,
@@ -145,6 +155,10 @@ export default function ItemCard({
             className='object-contain'
             fill
             sizes='87px'
+            enablePreview
+            onImageClick={() =>
+              openPreview(item.cardImageUrl, item.cardName, item.tcgType)
+            }
           />
 
           <div className='flex flex-1 flex-col gap-2'>
@@ -466,6 +480,13 @@ export default function ItemCard({
           )}
         </div>
       </div>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopCard>
   );
 }

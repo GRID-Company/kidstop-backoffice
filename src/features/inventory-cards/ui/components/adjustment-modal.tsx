@@ -19,6 +19,8 @@ import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import InputForm from '@/shared/base/form-controls/input-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
@@ -73,6 +75,14 @@ export default function AdjustmentModal({
   const [itemSearch, setItemSearch] = useState('');
   const [selectedCard, setSelectedCard] = useState<CatalogCard | null>(null);
   const [_selectedCondition, setSelectedCondition] = useState<string>('');
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   useEffect(() => {
     if (isOpen) {
@@ -333,7 +343,28 @@ export default function AdjustmentModal({
           ) : selectedCard ? (
             <div className='flex flex-col gap-4'>
               <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
-                <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
+                <div
+                  className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+                  onClick={() =>
+                    openPreview(
+                      selectedCard.imageUri ?? null,
+                      selectedCard.name,
+                      selectedTCG as 'POKEMON' | 'MAGIC'
+                    )
+                  }
+                  role='button'
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      openPreview(
+                        selectedCard.imageUri ?? null,
+                        selectedCard.name,
+                        selectedTCG as 'POKEMON' | 'MAGIC'
+                      );
+                    }
+                  }}
+                  aria-label={`Ver ${selectedCard.name} en tamaño completo`}
+                >
                   {selectedCard.imageUri ? (
                     <img
                       src={selectedCard.imageUri}
@@ -419,7 +450,28 @@ export default function AdjustmentModal({
           ) : resolvedItem ? (
             <>
               <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
-                <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
+                <div
+                  className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+                  onClick={() =>
+                    openPreview(
+                      resolvedItem.imageUrl,
+                      resolvedItem.name,
+                      resolvedItem.tcg as 'POKEMON' | 'MAGIC'
+                    )
+                  }
+                  role='button'
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      openPreview(
+                        resolvedItem.imageUrl,
+                        resolvedItem.name,
+                        resolvedItem.tcg as 'POKEMON' | 'MAGIC'
+                      );
+                    }
+                  }}
+                  aria-label={`Ver ${resolvedItem.name} en tamaño completo`}
+                >
                   {resolvedItem.imageUrl ? (
                     <img
                       src={resolvedItem.imageUrl}
@@ -571,6 +623,13 @@ export default function AdjustmentModal({
           )}
         </DrawerFooter>
       </DrawerContent>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopDrawer>
   );
 }

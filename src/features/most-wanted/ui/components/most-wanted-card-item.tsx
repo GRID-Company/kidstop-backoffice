@@ -4,6 +4,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Chip, Switch, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { IMostWantedCard } from '../../domain/types';
 import { MOST_WANTED_PRIORITY_LABELS } from '../../domain/constants';
 
@@ -37,6 +39,14 @@ export default function MostWantedCardItem({
     transition,
     isDragging,
   } = useSortable({ id: item.guid });
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -72,7 +82,28 @@ export default function MostWantedCardItem({
         <Icon icon='lucide:grip-vertical' width={20} />
       </button>
 
-      <div className='bg-default-100 relative h-12 w-9 shrink-0 overflow-hidden rounded'>
+      <div
+        className='bg-default-100 relative h-12 w-9 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
+        onClick={() =>
+          openPreview(
+            cardImage,
+            cardName,
+            item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
+          )
+        }
+        role='button'
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            openPreview(
+              cardImage,
+              cardName,
+              item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
+            );
+          }
+        }}
+        aria-label={`Ver ${cardName} en tamaño completo`}
+      >
         {cardImage ? (
           <img
             src={cardImage}
@@ -142,6 +173,13 @@ export default function MostWantedCardItem({
           </Button>
         </Tooltip>
       </div>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }

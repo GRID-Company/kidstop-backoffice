@@ -4,6 +4,8 @@ import { RadioGroup, Radio, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { BulkCardRelatedSelectorProps } from './types';
 import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
@@ -14,6 +16,15 @@ export default function BulkCardRelatedSelector({
   onSelect,
   tcgType,
 }: BulkCardRelatedSelectorProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
+
   if (relatedCards.length === 0) {
     return null;
   }
@@ -41,7 +52,30 @@ export default function BulkCardRelatedSelector({
             }}
           >
             <div className='flex items-center gap-2'>
-              <div className='bg-default-100 relative h-[60px] w-[43px] shrink-0 overflow-hidden rounded-md'>
+              <div
+                className='bg-default-100 relative h-[60px] w-[43px] shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openPreview(
+                    card.imageUri ?? null,
+                    card.name,
+                    tcgType as 'POKEMON' | 'MAGIC'
+                  );
+                }}
+                role='button'
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.stopPropagation();
+                    openPreview(
+                      card.imageUri ?? null,
+                      card.name,
+                      tcgType as 'POKEMON' | 'MAGIC'
+                    );
+                  }
+                }}
+                aria-label={`Ver ${card.name} en tamaño completo`}
+              >
                 {card.imageUri ? (
                   <img
                     src={card.imageUri}
@@ -104,6 +138,13 @@ export default function BulkCardRelatedSelector({
           </Radio>
         ))}
       </RadioGroup>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }

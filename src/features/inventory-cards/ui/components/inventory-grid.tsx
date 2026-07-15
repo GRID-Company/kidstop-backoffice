@@ -1,8 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   Pagination,
   Skeleton,
@@ -16,6 +13,9 @@ import {
 } from '@heroui/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { IInventoryItem } from '../../domain/types';
@@ -61,32 +61,36 @@ function formatDays(days: number | null): string {
   return `${days.toFixed(1)}d`;
 }
 
-function renderCell(item: IInventoryItem, columnKey: string) {
+function renderCell(
+  item: IInventoryItem,
+  columnKey: string,
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void
+) {
   switch (columnKey) {
     case 'name':
       return (
         <div className='flex items-center gap-3'>
-          <div className='bg-default-100 relative h-28 w-20 flex-shrink-0 overflow-hidden rounded'>
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                className='absolute inset-0 h-full w-full object-contain'
-              />
-            ) : (
-              <Image
-                src={
-                  item.tcg === 'MAGIC'
-                    ? magicCardPlaceholder
-                    : pokemonCardPlaceholder
-                }
-                alt='Card placeholder'
-                fill
-                sizes='80px'
-                className='object-contain'
-              />
-            )}
-          </div>
+          <CardImage
+            src={item.imageUrl}
+            alt={item.name}
+            tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+            containerClassName='relative h-28 w-20 flex-shrink-0 overflow-hidden rounded bg-default-100'
+            className='object-contain'
+            fill
+            sizes='80px'
+            enablePreview
+            onImageClick={() =>
+              openPreview(
+                item.imageUrl,
+                item.name,
+                item.tcg as 'POKEMON' | 'MAGIC'
+              )
+            }
+          />
           <div className='min-w-0'>
             <p className='truncate text-sm font-medium'>{item.name}</p>
             <p className='text-default-400 truncate text-xs'>
@@ -146,34 +150,36 @@ function renderCell(item: IInventoryItem, columnKey: string) {
 function InventoryMobileCard({
   item,
   onPress,
+  openPreview,
 }: {
   item: IInventoryItem;
   onPress?: (item: IInventoryItem) => void;
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void;
 }) {
   return (
     <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
       <CardBody className='flex flex-row gap-3 !p-4'>
-        <div className='bg-default-100 relative h-32 w-24 flex-shrink-0 overflow-hidden rounded'>
-          {item.imageUrl ? (
-            <img
-              src={item.imageUrl}
-              alt={item.name}
-              className='absolute inset-0 h-full w-full object-contain'
-            />
-          ) : (
-            <Image
-              src={
-                item.tcg === 'MAGIC'
-                  ? magicCardPlaceholder
-                  : pokemonCardPlaceholder
-              }
-              alt='Card placeholder'
-              fill
-              sizes='96px'
-              className='object-contain'
-            />
-          )}
-        </div>
+        <CardImage
+          src={item.imageUrl}
+          alt={item.name}
+          tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+          containerClassName='relative h-32 w-24 shrink-0 overflow-hidden rounded bg-default-100'
+          className='object-contain'
+          fill
+          sizes='96px'
+          enablePreview
+          onImageClick={() =>
+            openPreview(
+              item.imageUrl,
+              item.name,
+              item.tcg as 'POKEMON' | 'MAGIC'
+            )
+          }
+        />
 
         <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <div className='flex items-start justify-between gap-2'>
@@ -218,6 +224,14 @@ export default function InventoryGrid({
   onSortChange,
   onItemPress,
 }: InventoryGridProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
   if (isLoading) {
     return (
       <div className='flex flex-col gap-3'>
@@ -268,7 +282,7 @@ export default function InventoryGrid({
               >
                 {COLUMNS.map((col) => (
                   <TableCell key={col.key} className='text-center'>
-                    {renderCell(item, col.key)}
+                    {renderCell(item, col.key, openPreview)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -283,6 +297,7 @@ export default function InventoryGrid({
             key={item.guid}
             item={item}
             onPress={onItemPress}
+            openPreview={openPreview}
           />
         ))}
       </div>
@@ -301,6 +316,13 @@ export default function InventoryGrid({
           />
         </div>
       )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import BulkCardRelatedSelector from './bulk-card-related-selector';
 import BulkCardFormControls from './bulk-card-form-controls';
@@ -46,6 +48,14 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
   ) {
     const { setValue, control } = useFormContext();
     const [isExpanded, setIsExpanded] = useState(false);
+    const {
+      isOpen: isPreviewOpen,
+      imageUrl: previewImageUrl,
+      alt: previewAlt,
+      tcgType: previewTcgType,
+      openPreview,
+      closePreview,
+    } = useCardImagePreview();
 
     const selectedCardGuid = useWatch({
       control,
@@ -210,7 +220,30 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
             aria-label={displayCard.name}
             title={
               <div className='flex items-center gap-3 py-1'>
-                <div className='bg-default-100 relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md'>
+                <div
+                  className='bg-default-100 relative h-[90px] w-[65px] shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPreview(
+                      displayCard.imageUri ?? null,
+                      displayCard.name,
+                      tcgType as 'POKEMON' | 'MAGIC'
+                    );
+                  }}
+                  role='button'
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.stopPropagation();
+                      openPreview(
+                        displayCard.imageUri ?? null,
+                        displayCard.name,
+                        tcgType as 'POKEMON' | 'MAGIC'
+                      );
+                    }
+                  }}
+                  aria-label={`Ver ${displayCard.name} en tamaño completo`}
+                >
                   {displayCard.imageUri ? (
                     <img
                       src={displayCard.imageUri}
@@ -404,6 +437,13 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
             </div>
           </AccordionItem>
         </Accordion>
+        <CardImagePreviewModal
+          isOpen={isPreviewOpen}
+          onClose={closePreview}
+          imageUrl={previewImageUrl}
+          alt={previewAlt}
+          tcgType={previewTcgType}
+        />
       </KidstopCard>
     );
   }

@@ -18,6 +18,8 @@ import { Icon } from '@iconify/react';
 import { SubmitHandler } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { ICard, ICardVariant } from '../../domain/types';
 import {
   CARD_CONDITION_LABELS,
@@ -48,6 +50,14 @@ export default function CardDetailModal({
   const [isSyncing, setIsSyncing] = useState(false);
 
   const { control, handleSubmit, formState, reset } = useCardPriceForm();
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   useEffect(() => {
     if (card && card.variants.length > 0) {
@@ -99,7 +109,20 @@ export default function CardDetailModal({
 
         <DrawerBody className='flex flex-col gap-6'>
           <div className='flex gap-6'>
-            <div className='bg-default-100 relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-lg'>
+            <div
+              className='bg-default-100 relative aspect-[3/4] w-40 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
+              onClick={() =>
+                openPreview(card.imageUrl, card.name, card.tcgType)
+              }
+              role='button'
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  openPreview(card.imageUrl, card.name, card.tcgType);
+                }
+              }}
+              aria-label={`Ver ${card.name} en tamaño completo`}
+            >
               {card.imageUrl ? (
                 <Image
                   src={card.imageUrl}
@@ -276,6 +299,13 @@ export default function CardDetailModal({
           </Button>
         </DrawerFooter>
       </DrawerContent>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </KidstopDrawer>
   );
 }

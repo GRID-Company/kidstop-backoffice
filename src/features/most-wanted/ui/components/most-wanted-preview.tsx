@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import { TCGType } from '@/lib/types/tcg.types';
 import { TCG_OPTIONS } from '@/lib/consts/tcg-options';
@@ -80,10 +82,16 @@ function PreviewCardItem({
   item,
   rank,
   index,
+  openPreview,
 }: {
   item: IMostWantedCard;
   rank: number;
   index: number;
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void;
 }) {
   const badge = PRIORITY_BADGE[item.priority] ?? PRIORITY_BADGE.LOW;
   const cardData = item.pokemonCardSummary || item.magicCardSummary;
@@ -122,13 +130,32 @@ function PreviewCardItem({
       </span>
 
       <motion.div
-        className='relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-lg border-2 border-amber-900/25 bg-amber-100/50 shadow-md'
+        className='relative aspect-[3/4] w-24 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 border-amber-900/25 bg-amber-100/50 shadow-md transition-opacity hover:opacity-80'
         animate={{ y: [0, -3, 0] }}
         transition={{
           duration: 3 + index * 0.4,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
+        onClick={() =>
+          openPreview(
+            cardImage,
+            cardName,
+            item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
+          )
+        }
+        role='button'
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            openPreview(
+              cardImage,
+              cardName,
+              item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
+            );
+          }
+        }}
+        aria-label={`Ver ${cardName} en tamaño completo`}
       >
         {cardImage ? (
           <img
@@ -182,6 +209,14 @@ export default function MostWantedPreview({
   items,
   selectedTCG,
 }: MostWantedPreviewProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
   const activeItems = items.filter((item) => item.active);
   const tcgOption = TCG_OPTIONS.find((o) => o.key === selectedTCG);
 
@@ -271,6 +306,7 @@ export default function MostWantedPreview({
                   item={item}
                   rank={index + 1}
                   index={index}
+                  openPreview={openPreview}
                 />
               ))}
             </AnimatePresence>
@@ -306,6 +342,13 @@ export default function MostWantedPreview({
       <p className='text-default-400 text-center text-[10px]'>
         Simulación de cómo se verá en la pantalla pública de 55&quot;
       </p>
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }

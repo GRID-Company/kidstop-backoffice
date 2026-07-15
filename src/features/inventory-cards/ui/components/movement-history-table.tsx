@@ -18,6 +18,8 @@ import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { formatUnixDateTime } from '@/lib/utils/format-date';
 import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { IInventoryMovement } from '../../domain/types';
@@ -51,7 +53,15 @@ const COLUMNS = [
   { key: 'reference', label: 'Referencia', allowsSorting: true },
 ];
 
-function renderCell(item: IInventoryMovement, columnKey: string) {
+function renderCell(
+  item: IInventoryMovement,
+  columnKey: string,
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void
+) {
   switch (columnKey) {
     case 'createdDate':
       return (
@@ -68,6 +78,14 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
             tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
             containerClassName='relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100'
             className='object-contain'
+            enablePreview
+            onImageClick={() =>
+              openPreview(
+                item.cardImageUrl,
+                item.cardName,
+                item.tcg as 'POKEMON' | 'MAGIC'
+              )
+            }
           />
           <div className='min-w-0'>
             <p className='truncate text-sm font-medium'>{item.cardName}</p>
@@ -127,9 +145,15 @@ function renderCell(item: IInventoryMovement, columnKey: string) {
 function MovementMobileCardComponent({
   item,
   onPress,
+  openPreview,
 }: {
   item: IInventoryMovement;
   onPress?: (item: IInventoryMovement) => void;
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void;
 }) {
   const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
 
@@ -142,6 +166,14 @@ function MovementMobileCardComponent({
           tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
           containerClassName='relative h-14 w-10 shrink-0 overflow-hidden rounded bg-default-100'
           className='object-contain'
+          enablePreview
+          onImageClick={() =>
+            openPreview(
+              item.cardImageUrl,
+              item.cardName,
+              item.tcg as 'POKEMON' | 'MAGIC'
+            )
+          }
         />
 
         <div className='flex min-w-0 flex-1 flex-col gap-1'>
@@ -204,6 +236,14 @@ export default function MovementHistoryTable({
   onSortChange,
   onMovementPress,
 }: MovementHistoryTableProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
   if (isLoading) {
     return (
       <div className='flex flex-col gap-3'>
@@ -259,7 +299,7 @@ export default function MovementHistoryTable({
               <TableRow key={item.guid}>
                 {COLUMNS.map((col) => (
                   <TableCell key={col.key} className='text-center'>
-                    {renderCell(item, col.key)}
+                    {renderCell(item, col.key, openPreview)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -274,6 +314,7 @@ export default function MovementHistoryTable({
             key={item.guid}
             item={item}
             onPress={onMovementPress}
+            openPreview={openPreview}
           />
         ))}
       </div>
@@ -292,6 +333,13 @@ export default function MovementHistoryTable({
           />
         </div>
       )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }
