@@ -138,7 +138,10 @@ export default function VariantInfoTab({
                   {marketPrices.ungradedPrice !== null &&
                   marketPrices.ungradedPrice !== undefined
                     ? `$${marketPrices.ungradedPrice.toFixed(2)}`
-                    : 'N/A'}
+                    : marketPrices.priceRetail !== null &&
+                        marketPrices.priceRetail !== undefined
+                      ? `$${marketPrices.priceRetail.toFixed(2)}`
+                      : 'N/A'}
                 </div>
               </div>
               {priceDiff !== null && (
