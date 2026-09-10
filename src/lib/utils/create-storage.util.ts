@@ -1,6 +1,8 @@
 import { createJSONStorage } from 'zustand/middleware';
 
-export default function createStorage() {
+type StorageType = 'local' | 'session';
+
+export default function createStorage(type: StorageType = 'local') {
   return createJSONStorage(() => {
     if (typeof window === 'undefined') {
       return {
@@ -9,6 +11,6 @@ export default function createStorage() {
         removeItem: () => {},
       };
     }
-    return localStorage;
+    return type === 'session' ? sessionStorage : localStorage;
   });
 }

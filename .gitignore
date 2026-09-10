@@ -38,6 +38,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cypress
+cypress/reports/
+cypress/screenshots/
+cypress/videos/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -46,3 +51,6 @@ next-env.d.ts
 /reports
 # Devin local sync manifest (do not commit)
 .sync-grid-devin-managed
+package-lock.json
+
+/.temp

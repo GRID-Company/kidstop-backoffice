@@ -1,0 +1,44 @@
+query Users($findUsersArgs: FindUsersArgs!) {
+  users(findUsersArgs: $findUsersArgs) {
+    data {
+      guid
+      name
+      emailAddress
+      role
+      active
+      signedUp
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
+
+mutation CreateUser($createUserInput: CreateUserInput!) {
+  createUser(createUserInput: $createUserInput) {
+    guid
+    name
+    emailAddress
+    phone
+    role
+    active
+  }
+}
+
+mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+  updateUser(updateUserInput: $updateUserInput) {
+    message
+  }
+}
+
+mutation DeleteUser($guid: String!) {
+  deleteUser(guid: $guid) {
+    message
+  }
+}
+
+query ResendEmailInvite($guid: String!) {
+  resendEmailInvite(guid: $guid) {
+    message
+  }
+}

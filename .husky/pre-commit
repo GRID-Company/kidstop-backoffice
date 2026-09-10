@@ -1,0 +1,26 @@
+#!/bin/sh
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "main" ]; then
+  echo "❌ No puedes hacer commit directo a main"
+  exit 1
+fi
+
+echo "🔍 Running pre-commit validations..."
+
+echo "\n📝 Running ESLint..."
+npm run lint
+
+echo "\n🎨 Checking code formatting..."
+npm run format:check
+
+echo "\n🔧 Type checking..."
+npx tsc --noEmit
+
+echo "\n🔎 Checking for console.log in staged files..."
+if git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' | xargs grep -n 'console\.log' 2>/dev/null; then
+  echo "⚠️  Warning: console.log encontrado en archivos staged"
+  echo "Considera removerlos antes del commit"
+fi
+
+echo "\n✅ All validations passed!"

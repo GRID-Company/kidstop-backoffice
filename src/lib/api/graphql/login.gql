@@ -3,7 +3,7 @@ mutation Login($loginUserInput: LoginUserInput!) {
     access_token
     credentials_expired_token
     user {
-      activated
+      active
       emailAddress
       guid
       name

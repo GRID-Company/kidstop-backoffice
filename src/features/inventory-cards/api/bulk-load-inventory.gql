@@ -1,0 +1,8 @@
+mutation BulkLoadInventory($input: BulkLoadInventoryInput!) {
+  bulkLoadInventory(input: $input) {
+    success
+    createdCount
+    updatedCount
+    errors
+  }
+}

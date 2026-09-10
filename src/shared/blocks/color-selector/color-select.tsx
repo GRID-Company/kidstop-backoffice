@@ -1,11 +1,11 @@
 import { SelectItem, SelectProps } from '@heroui/react';
 import { ColorItem, ColorKey, ColorOptions } from '@/lib/types/inventory.types';
 import ColorPresenter from './color-presenter';
-import CanalviSelect from '@/shared/base/heorui-overrides/select';
+import KidstopSelect from '@/shared/base/heorui-overrides/select';
 
 export default function ColorSelect({ ...selectProps }: Partial<SelectProps>) {
   return (
-    <CanalviSelect
+    <KidstopSelect
       {...selectProps}
       items={ColorOptions}
       renderValue={(selected) => {
@@ -24,6 +24,6 @@ export default function ColorSelect({ ...selectProps }: Partial<SelectProps>) {
           <ColorPresenter color={(color as ColorItem).value} />
         </SelectItem>
       )}
-    </CanalviSelect>
+    </KidstopSelect>
   );
 }

@@ -1,0 +1,5 @@
+mutation UserFinishSignUp($userFinishSignupInput: UserFinishSignupInput!) {
+  userFinishSignUp(userFinishSignupInput: $userFinishSignupInput) {
+    success
+  }
+}

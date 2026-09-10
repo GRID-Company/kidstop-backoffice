@@ -2,8 +2,9 @@ import { Controller, FieldValues } from 'react-hook-form';
 import { RadioGroup, RadioGroupProps } from '@heroui/react';
 import { ControlWithFormProps } from '@/lib/types/controller.types';
 
-interface RadioFormProps<T extends FieldValues>
-  extends Partial<RadioGroupProps> {
+interface RadioFormProps<
+  T extends FieldValues,
+> extends Partial<RadioGroupProps> {
   controlProps: ControlWithFormProps<T>;
 }
 

@@ -7,6 +7,7 @@ Plan detallado para implementar todos los módulos del backoffice de Kidstop sig
 **Proyecto:** Kidstop Singles Platform (KSP) - Backoffice para gestión de cartas singles de Pokémon TCG y Magic: The Gathering.
 
 **Stack Actual:**
+
 - Next.js 16 + React 19 + TypeScript 5
 - Apollo Client + GraphQL Codegen
 - HeroUI + Tailwind CSS 4
@@ -14,6 +15,7 @@ Plan detallado para implementar todos los módulos del backoffice de Kidstop sig
 - Arquitectura Feature-First (adapters/domain/ui)
 
 **Estructura Existente:**
+
 ```
 src/features/
 ├── inventory/    # Ejemplo de referencia
@@ -24,15 +26,18 @@ src/features/
 ## Módulos del Backoffice a Implementar
 
 ### 1. **Autenticación y Seguridad** ✅ (Parcialmente implementado)
+
 **Estado:** Ya existe `features/login/` con autenticación básica y store de auth.
 
 **Pendiente:**
+
 - Recuperación de contraseña vía email
 - Cambio de contraseña desde perfil
 - Validación de políticas de contraseña
 - Expiración de sesión configurable
 
 **Implementación:**
+
 ```
 features/auth/
 ├── adapters/
@@ -59,15 +64,18 @@ features/auth/
 ---
 
 ### 2. **Usuarios y Roles**
+
 **Objetivo:** Gestión de usuarios internos del backoffice con roles (Admin/Recepción/Comprador).
 
 **Funcionalidades:**
+
 - CRUD de usuarios
 - Asignación de roles
 - Activar/Desactivar usuarios
 - Listado con búsqueda y filtros
 
 **Implementación:**
+
 ```
 features/users/
 ├── adapters/
@@ -94,14 +102,17 @@ features/users/
 ```
 
 **Rutas:**
+
 - `/usuarios` - Listado de usuarios
 
 ---
 
 ### 3. **Selector de Contexto TCG**
+
 **Objetivo:** Dropdown global para seleccionar Pokémon/Magic que filtre todo el backoffice.
 
 **Implementación:**
+
 ```
 lib/store/
 └── tcg-context.ts (Zustand store: selectedTCG, setTCG)
@@ -112,6 +123,7 @@ shared/layouts/
 ```
 
 **Integración:**
+
 - Todos los módulos deben filtrar por `selectedTCG`
 - Persistir en localStorage
 - Validar que no se mezclen datos entre TCGs
@@ -119,9 +131,11 @@ shared/layouts/
 ---
 
 ### 4. **Catálogo de Cartas**
+
 **Objetivo:** Búsqueda, consulta y gestión de cartas singles con respaldo interno y precios públicos.
 
 **Funcionalidades:**
+
 - Listado de cartas filtrado por TCG
 - Búsqueda por nombre, set, identificador
 - Detalle de carta con variantes
@@ -129,6 +143,7 @@ shared/layouts/
 - Sincronización con proveedores externos (Price Charting/Card Kingdom)
 
 **Implementación:**
+
 ```
 features/catalog/
 ├── adapters/
@@ -157,16 +172,19 @@ features/catalog/
 ```
 
 **Rutas:**
+
 - `/catalogo` - Listado de cartas
 
 ---
 
 ### 5. **Compras (Buylist/Negociación)**
+
 **Objetivo:** Gestión completa del flujo de compra de cartas singles con estados, cotización WhatsApp y control de presupuesto.
 
 **Estados:** Draft → Cotizado → Esperando precio → Finalizado / Rechazado
 
 **Funcionalidades:**
+
 - Búsqueda de cartas con métricas (última venta, tiempo en inventario, wishlist)
 - Lista de compra con condición por carta
 - Registro de vendedor
@@ -178,6 +196,7 @@ features/catalog/
 - Ajuste de precio público antes de finalizar
 
 **Implementación:**
+
 ```
 features/purchases/
 ├── adapters/
@@ -216,6 +235,7 @@ features/purchases/
 ```
 
 **Rutas:**
+
 - `/compras` - Listado de compras
 - `/compras/nueva` - Nueva compra
 - `/compras/[id]` - Detalle de compra
@@ -223,9 +243,11 @@ features/purchases/
 ---
 
 ### 6. **Inventario y Movimientos**
+
 **Objetivo:** Control de stock de cartas singles con trazabilidad de movimientos.
 
 **Funcionalidades:**
+
 - Inventario por Carta + Variante + Condición
 - Estados de stock (Disponible, Esperando recolección, No disponible)
 - Registro de movimientos (Entrada por compra, Salida por venta, Ajuste manual)
@@ -234,6 +256,7 @@ features/purchases/
 - Métricas: última venta, tiempo promedio en inventario
 
 **Implementación:**
+
 ```
 features/inventory-cards/
 ├── adapters/
@@ -263,17 +286,20 @@ features/inventory-cards/
 ```
 
 **Rutas:**
+
 - `/inventario-cartas` - Stock de cartas
 - `/inventario-cartas/movimientos` - Historial de movimientos
 
 ---
 
 ### 7. **Ventas (Pedidos desde Carpeta Digital)**
+
 **Objetivo:** Gestión de pedidos originados en la Carpeta Digital para surtido en mostrador.
 
 **Estados:** Nuevo/Recibido → En surtido → Listo para recolección → Completado / Cancelado
 
 **Funcionalidades:**
+
 - Listado de pedidos con filtros
 - Detalle de pedido con items
 - Generación de PDF (picking list)
@@ -283,6 +309,7 @@ features/inventory-cards/
 - Integración con Shopify (código como custom item)
 
 **Implementación:**
+
 ```
 features/sales/
 ├── adapters/
@@ -313,15 +340,18 @@ features/sales/
 ```
 
 **Rutas:**
+
 - `/ventas` - Listado de pedidos/ventas
 - `/ventas/[id]` - Detalle de venta
 
 ---
 
 ### 8. **Clientes**
+
 **Objetivo:** Gestión de clientes con clasificación VIP, bloqueos y validación de ubicación.
 
 **Funcionalidades:**
+
 - Listado de clientes con búsqueda
 - Clasificación: Cliente / Cliente VIP
 - Bloqueo por pedidos no concretados (configurable)
@@ -329,6 +359,7 @@ features/sales/
 - Gestión de datos de contacto
 
 **Implementación:**
+
 ```
 features/customers/
 ├── adapters/
@@ -359,15 +390,18 @@ features/customers/
 ```
 
 **Rutas:**
+
 - `/clientes` - Listado de clientes
 - `/clientes/[id]` - Detalle de cliente
 
 ---
 
 ### 9. **Most Wanted (Configuración)**
+
 **Objetivo:** Configurar las cartas mostradas en las páginas públicas Most Wanted por TCG.
 
 **Funcionalidades:**
+
 - Agregar/quitar cartas a Most Wanted
 - Ordenar prioridad
 - Activar/desactivar cartas
@@ -375,6 +409,7 @@ features/customers/
 - Separación por TCG
 
 **Implementación:**
+
 ```
 features/most-wanted/
 ├── adapters/
@@ -401,14 +436,17 @@ features/most-wanted/
 ```
 
 **Rutas:**
+
 - `/most-wanted` - Configuración Most Wanted
 
 ---
 
 ### 10. **Configuración Global**
+
 **Objetivo:** Configuraciones del sistema (umbrales, geofence, horarios, etc.).
 
 **Funcionalidades:**
+
 - Configuración de geofence (Google Maps)
 - Umbral de bloqueo por pedidos no concretados
 - Presupuestos por comprador
@@ -416,6 +454,7 @@ features/most-wanted/
 - Horarios de operación
 
 **Implementación:**
+
 ```
 features/settings/
 ├── adapters/
@@ -440,6 +479,7 @@ features/settings/
 ```
 
 **Rutas:**
+
 - `/configuracion` - Configuración global
 
 ---
@@ -447,6 +487,7 @@ features/settings/
 ## Componentes Compartidos a Crear
 
 ### `shared/base/`
+
 - `tcg-selector.tsx` - Selector de contexto TCG
 - `status-badge.tsx` - Badge genérico de estados
 - `metric-card.tsx` - Card para mostrar métricas
@@ -455,6 +496,7 @@ features/settings/
 - `pdf-generator-button.tsx` - Botón de generación PDF
 
 ### `shared/blocks/`
+
 - `card-search-block.tsx` - Bloque de búsqueda de cartas con filtros
 - `payment-split-block.tsx` - Bloque para dividir pagos
 - `metrics-dashboard.tsx` - Dashboard de métricas operativas
@@ -475,23 +517,28 @@ lib/store/
 ## Integraciones Externas
 
 ### 1. **Proveedores de Catálogo/Precios**
+
 - Price Charting (Pokémon)
 - Card Kingdom (Magic)
 - Implementar en `lib/api/integrations/catalog-providers.ts`
 
 ### 2. **Google Maps API**
+
 - Geolocalización y geofencing
 - Implementar en `lib/api/integrations/google-maps.ts`
 
 ### 3. **Email Transaccional**
+
 - Notificaciones (pedido listo, restock, recuperación contraseña)
 - Implementar en `lib/api/integrations/email.ts`
 
 ### 4. **WhatsApp**
+
 - Envío de cotizaciones con hipervínculo
 - Implementar en `lib/api/integrations/whatsapp.ts`
 
 ### 5. **PDF Generation**
+
 - Picking lists
 - Implementar en `lib/utils/pdf-generator.ts`
 
@@ -500,23 +547,27 @@ lib/store/
 ## Orden de Implementación Recomendado
 
 ### **Fase 1: Fundamentos** (Semanas 1-2)
+
 1. Selector de contexto TCG (store + UI)
 2. Completar autenticación (recuperación contraseña)
 3. Usuarios y roles (CRUD completo)
 4. Configuración global (settings básicos)
 
 ### **Fase 2: Catálogo e Inventario** (Semanas 3-4)
+
 5. Catálogo de cartas (búsqueda, detalle, precios)
 6. Inventario y movimientos (stock, trazabilidad)
 7. Integración con proveedores de catálogo
 
 ### **Fase 3: Compras** (Semanas 5-6)
+
 8. Compras - Flujo completo (Draft → Finalizado)
 9. Búsqueda con métricas operativas
 10. Modo privacidad
 11. Integración WhatsApp
 
 ### **Fase 4: Ventas y Clientes** (Semanas 7-8)
+
 12. Clientes (gestión, VIP, bloqueos)
 13. Ventas (pedidos, surtido, completar)
 14. Integración Google Maps (geofencing)
@@ -524,6 +575,7 @@ lib/store/
 16. Emails transaccionales
 
 ### **Fase 5: Configuración y Extras** (Semana 9)
+
 17. Most Wanted (configuración backoffice)
 18. Ajustes finales de configuración
 19. Testing integral
@@ -533,31 +585,37 @@ lib/store/
 ## Consideraciones Técnicas
 
 ### **GraphQL Schema**
+
 - Definir todos los tipos, queries y mutations en el backend
 - Ejecutar `npm run codegen` después de cada cambio en `.gql`
 
 ### **Permisos por Rol**
+
 - Implementar middleware de permisos en cada query/mutation
 - Validar en UI y en backend
 - Usar matriz de permisos del documento
 
 ### **Separación por TCG**
+
 - Todos los queries deben filtrar por `tcgType`
 - Validar que no se mezclen datos entre Pokémon y Magic
 - Persistir contexto seleccionado en localStorage
 
 ### **Responsive**
+
 - Validar en móvil, tablet y desktop
 - Usar breakpoints de Tailwind
 - Componentes HeroUI son responsive por defecto
 
 ### **Performance**
+
 - Implementar paginación en todos los listados
 - Usar `skip` en queries cuando no hay contexto
 - Lazy loading de componentes pesados
 - Cache de Apollo Client
 
 ### **Testing**
+
 - Unit tests para domain logic
 - Integration tests para flujos críticos
 - E2E para flujos completos (compra, venta)
@@ -567,6 +625,7 @@ lib/store/
 ## Archivos de Configuración a Actualizar
 
 ### `.env`
+
 ```env
 # Proveedores de catálogo
 PRICE_CHARTING_API_KEY=
@@ -593,6 +652,7 @@ UNCOMPLETED_ORDERS_THRESHOLD=3
 ```
 
 ### `codegen.ts`
+
 - Agregar todos los nuevos archivos `.gql` al preset
 
 ---

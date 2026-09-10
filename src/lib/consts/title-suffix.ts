@@ -1,1 +1,1 @@
-export const TITLE_SUFFIX = '| GRID Template';
+export const TITLE_SUFFIX = '| Kidstop Backoffice';

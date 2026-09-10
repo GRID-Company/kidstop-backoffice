@@ -10,7 +10,7 @@ export type LoginMutation = {
     access_token: string | null;
     credentials_expired_token: string | null;
     user: {
-      activated: boolean;
+      active: boolean;
       emailAddress: string;
       guid: string;
       name: string | null;
@@ -77,7 +77,7 @@ export const LoginDocument = {
                     selections: [
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'activated' },
+                        name: { kind: 'Name', value: 'active' },
                       },
                       {
                         kind: 'Field',

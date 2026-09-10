@@ -61,6 +61,7 @@ npm run clickup:setup
 ```
 
 Este comando creará:
+
 - Lista de tareas en ClickUp
 - Custom fields necesarios
 - Guardará el `CLICKUP_LIST_ID` en tu configuración
@@ -169,12 +170,14 @@ GITHUB_REPO_NAME=my-frontend-project
 ## Variables por Parte
 
 ### Parte 1: Template Base
+
 ```bash
 PROJECT_NAME=my-project
 NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://api.example.com/graphql
 ```
 
 ### Parte 2: ClickUp
+
 ```bash
 CLICKUP_API_KEY=pk_...
 CLICKUP_WORKSPACE_ID=12345678
@@ -182,6 +185,7 @@ CLICKUP_ENABLED=true
 ```
 
 ### Parte 3: GitHub Actions
+
 ```bash
 AWS_ACCESS_KEY_ID=AKIA...
 AWS_SECRET_ACCESS_KEY=...
@@ -190,6 +194,7 @@ GITHUB_TOKEN=ghp_...
 ```
 
 ### Parte 4: Comunicación
+
 ```bash
 SENDGRID_API_KEY=SG....
 DEV_EMAILS=dev@example.com
@@ -207,19 +212,19 @@ Para configurar secrets en GitHub:
 
 ### Secrets Requeridos
 
-| Secret Name | Descripción | Ejemplo |
-|-------------|-------------|---------|
-| `CLICKUP_API_KEY` | API Key de ClickUp | `pk_123...` |
-| `CLICKUP_WORKSPACE_ID` | ID del workspace | `12345678` |
-| `SENDGRID_API_KEY` | API Key de SendGrid | `SG.123...` |
-| `AWS_ACCESS_KEY_ID` | AWS Access Key | `AKIA...` |
-| `AWS_SECRET_ACCESS_KEY` | AWS Secret Key | `wJalr...` |
-| `AWS_REGION` | Región de AWS | `us-east-2` |
-| `AMPLIFY_APP_ID` | ID de app Amplify | `d123...` |
-| `AMPLIFY_DOMAIN` | Dominio de Amplify | `app.amplifyapp.com` |
-| `DEV_EMAILS` | Emails developers | `dev@example.com` |
-| `CLIENT_EMAILS` | Emails clientes | `client@example.com` |
-| `GITHUB_TOKEN` | Token de GitHub | `ghp_...` |
+| Secret Name             | Descripción         | Ejemplo              |
+| ----------------------- | ------------------- | -------------------- |
+| `CLICKUP_API_KEY`       | API Key de ClickUp  | `pk_123...`          |
+| `CLICKUP_WORKSPACE_ID`  | ID del workspace    | `12345678`           |
+| `SENDGRID_API_KEY`      | API Key de SendGrid | `SG.123...`          |
+| `AWS_ACCESS_KEY_ID`     | AWS Access Key      | `AKIA...`            |
+| `AWS_SECRET_ACCESS_KEY` | AWS Secret Key      | `wJalr...`           |
+| `AWS_REGION`            | Región de AWS       | `us-east-2`          |
+| `AMPLIFY_APP_ID`        | ID de app Amplify   | `d123...`            |
+| `AMPLIFY_DOMAIN`        | Dominio de Amplify  | `app.amplifyapp.com` |
+| `DEV_EMAILS`            | Emails developers   | `dev@example.com`    |
+| `CLIENT_EMAILS`         | Emails clientes     | `client@example.com` |
+| `GITHUB_TOKEN`          | Token de GitHub     | `ghp_...`            |
 
 ## Validar Configuración
 
@@ -230,6 +235,7 @@ Ejecutar script de validación:
 ```
 
 Este script verificará:
+
 - ✅ Variables requeridas presentes
 - ✅ Formato correcto
 - ✅ Conexión a APIs
@@ -240,6 +246,7 @@ Este script verificará:
 ### Error: "CLICKUP_API_KEY is invalid"
 
 **Solución**:
+
 1. Verificar que el token no tenga espacios
 2. Regenerar token en ClickUp
 3. Verificar que el token tenga permisos correctos
@@ -247,6 +254,7 @@ Este script verificará:
 ### Error: "AWS credentials are invalid"
 
 **Solución**:
+
 1. Verificar Access Key ID y Secret Access Key
 2. Verificar que el usuario IAM tenga permisos de Amplify
 3. Verificar que las credenciales no hayan expirado
@@ -254,6 +262,7 @@ Este script verificará:
 ### Error: "SendGrid authentication failed"
 
 **Solución**:
+
 1. Verificar que la API key sea válida
 2. Verificar que el email del remitente esté verificado
 3. Verificar que la API key tenga permisos de Mail Send
@@ -261,6 +270,7 @@ Este script verificará:
 ### Error: "GitHub token unauthorized"
 
 **Solución**:
+
 1. Verificar que el token tenga scopes `repo` y `workflow`
 2. Verificar que el token no haya expirado
 3. Regenerar token si es necesario
@@ -268,6 +278,7 @@ Este script verificará:
 ### Variables de Entorno no se Cargan
 
 **Solución**:
+
 1. Verificar que el archivo `.env` exista en la raíz
 2. Reiniciar el servidor de desarrollo
 3. Verificar que las variables empiecen con `NEXT_PUBLIC_` para uso en cliente
@@ -297,18 +308,21 @@ Si una key se compromete:
 ## Ambientes
 
 ### Development
+
 ```bash
 PROJECT_ENV=development
 NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://dev.api.com/graphql
 ```
 
 ### Staging
+
 ```bash
 PROJECT_ENV=staging
 NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://staging.api.com/graphql
 ```
 
 ### Production
+
 ```bash
 PROJECT_ENV=production
 NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://api.com/graphql

@@ -20,7 +20,7 @@ export interface ISelectOption {
   label: string;
 }
 
-const CanalviSelect = ({ ...selectProps }: Partial<SelectProps>) => {
+const KidstopSelect = ({ ...selectProps }: Partial<SelectProps>) => {
   const { items, selectionMode, selectedKeys, classNames } = selectProps;
   return (
     <BaseSelect
@@ -59,4 +59,4 @@ const CanalviSelect = ({ ...selectProps }: Partial<SelectProps>) => {
   );
 };
 
-export default CanalviSelect;
+export default KidstopSelect;

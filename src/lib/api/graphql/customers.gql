@@ -1,0 +1,63 @@
+query Customers($findUsersArgs: FindUsersArgs!) {
+  users(findUsersArgs: $findUsersArgs) {
+    data {
+      guid
+      name
+      emailAddress
+      phone
+      role
+      clientStatus
+      active
+      createdDate
+    }
+    count
+  }
+}
+
+query Customer($guid: String!) {
+  user(guid: $guid) {
+    guid
+    name
+    emailAddress
+    phone
+    role
+    clientStatus
+    active
+    createdDate
+    updatedDate
+    signedUp
+  }
+}
+
+mutation CreateCustomer($createUserInput: CreateUserInput!) {
+  createUser(createUserInput: $createUserInput) {
+    guid
+    name
+    emailAddress
+    phone
+    clientStatus
+    active
+  }
+}
+
+mutation UpdateCustomer($updateUserInput: UpdateUserInput!) {
+  updateUser(updateUserInput: $updateUserInput) {
+    message
+  }
+}
+
+mutation SetClientStatus($setClientStatusInput: SetClientStatusInput!) {
+  setClientStatus(setClientStatusInput: $setClientStatusInput) {
+    message
+  }
+}
+
+query ClientDetails($clientGuid: String!) {
+  clientDetails(clientGuid: $clientGuid) {
+    orderCount
+    totalOrdersAmount
+    completedOrdersAmount
+    unreachableCancellations
+    lastOrderDate
+  }
+}

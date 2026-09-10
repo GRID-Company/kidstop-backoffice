@@ -1,0 +1,345 @@
+'use client';
+
+import React, { memo } from 'react';
+import {
+  Chip,
+  Pagination,
+  SortDescriptor,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  CardBody,
+  Skeleton,
+} from '@heroui/react';
+import { Icon } from '@iconify/react';
+import { KidstopTable } from '@/shared/base/heorui-overrides/table';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { formatUnixDateTime } from '@/lib/utils/format-date';
+import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { IInventoryMovement } from '../../domain/types';
+import {
+  MOVEMENT_TYPE_LABELS,
+  MOVEMENT_TYPE_COLORS,
+  MOVEMENT_TYPE_ICONS,
+  formatMovementQuantity,
+} from '../../domain/constants';
+
+interface MovementHistoryTableProps {
+  items: IInventoryMovement[];
+  totalItems: number;
+  page: number;
+  totalPages: number;
+  sortDescriptor?: SortDescriptor;
+  isLoading?: boolean;
+  onPageChange: (page: number) => void;
+  onSortChange: (descriptor: SortDescriptor) => void;
+  onMovementPress?: (item: IInventoryMovement) => void;
+}
+
+const COLUMNS = [
+  { key: 'createdDate', label: 'Fecha', allowsSorting: true },
+  { key: 'cardName', label: 'Carta', allowsSorting: true },
+  { key: 'condition', label: 'Condición', allowsSorting: true },
+  { key: 'language', label: 'Idioma', allowsSorting: true },
+  { key: 'movementType', label: 'Tipo', allowsSorting: true },
+  { key: 'quantity', label: 'Cantidad', allowsSorting: true },
+  { key: 'userName', label: 'Usuario', allowsSorting: true },
+  { key: 'reference', label: 'Referencia', allowsSorting: true },
+];
+
+function renderCell(
+  item: IInventoryMovement,
+  columnKey: string,
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void
+) {
+  switch (columnKey) {
+    case 'createdDate':
+      return (
+        <span className='text-default-500 text-sm'>
+          {formatUnixDateTime(item.createdDate)}
+        </span>
+      );
+    case 'cardName':
+      return (
+        <div className='flex items-center gap-3'>
+          <CardImage
+            src={item.cardImageUrl}
+            alt={item.cardName}
+            tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+            containerClassName='relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100'
+            className='object-contain'
+            enablePreview
+            onImageClick={() =>
+              openPreview(
+                item.cardImageUrl,
+                item.cardName,
+                item.tcg as 'POKEMON' | 'MAGIC'
+              )
+            }
+          />
+          <div className='min-w-0'>
+            <p className='truncate text-sm font-medium'>{item.cardName}</p>
+            <p className='text-default-400 truncate text-xs'>
+              {item.setName} ({item.setCode}) · {item.cardNumber}
+            </p>
+          </div>
+        </div>
+      );
+    case 'condition':
+      return (
+        <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-xs'>
+          {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
+        </span>
+      );
+    case 'language':
+      return (
+        <span className='text-sm'>
+          {LANGUAGE_LABELS[item.language] ?? item.language}
+        </span>
+      );
+    case 'movementType':
+      return (
+        <Chip
+          size='sm'
+          variant='flat'
+          color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
+          startContent={
+            <Icon
+              icon={MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'}
+              className='ml-1 text-sm'
+            />
+          }
+        >
+          {MOVEMENT_TYPE_LABELS[item.movementType] ?? item.movementType}
+        </Chip>
+      );
+    case 'quantity': {
+      const { text, className } = formatMovementQuantity(item);
+      return (
+        <span className={`text-sm font-semibold ${className}`}>{text}</span>
+      );
+    }
+    case 'userName':
+      return <span className='text-sm'>{item.userName}</span>;
+    case 'reference':
+      return (
+        <span className='text-default-500 text-sm'>
+          {item.reference ?? '—'}
+        </span>
+      );
+    default:
+      return null;
+  }
+}
+
+function MovementMobileCardComponent({
+  item,
+  onPress,
+  openPreview,
+}: {
+  item: IInventoryMovement;
+  onPress?: (item: IInventoryMovement) => void;
+  openPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void;
+}) {
+  const { text: qtyText, className: qtyClass } = formatMovementQuantity(item);
+
+  return (
+    <KidstopCard isPressable={!!onPress} onPress={() => onPress?.(item)}>
+      <CardBody className='flex flex-row gap-3 p-4!'>
+        <CardImage
+          src={item.cardImageUrl}
+          alt={item.cardName}
+          tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+          containerClassName='relative h-14 w-10 shrink-0 overflow-hidden rounded bg-default-100'
+          className='object-contain'
+          enablePreview
+          onImageClick={() =>
+            openPreview(
+              item.cardImageUrl,
+              item.cardName,
+              item.tcg as 'POKEMON' | 'MAGIC'
+            )
+          }
+        />
+
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+          <div className='flex items-start justify-between gap-2'>
+            <p className='truncate text-sm font-semibold'>{item.cardName}</p>
+            <span className={`shrink-0 text-sm font-bold ${qtyClass}`}>
+              {qtyText}
+            </span>
+          </div>
+
+          <p className='text-default-500 truncate text-xs'>
+            {item.setName} ({item.setCode}) · {item.cardNumber}
+          </p>
+
+          <div className='flex flex-wrap items-center gap-2'>
+            <span className='bg-default-100 text-default-600 rounded-full px-2 py-0.5 text-[10px]'>
+              {CARD_CONDITION_SHORT_LABELS[item.condition] ?? item.condition}
+            </span>
+            <span className='text-default-500 text-[10px]'>
+              {LANGUAGE_LABELS[item.language]}
+            </span>
+            <Chip
+              size='sm'
+              variant='flat'
+              color={MOVEMENT_TYPE_COLORS[item.movementType] ?? 'default'}
+              startContent={
+                <Icon
+                  icon={
+                    MOVEMENT_TYPE_ICONS[item.movementType] ?? 'lucide:circle'
+                  }
+                  className='ml-1 text-xs'
+                />
+              }
+            >
+              {MOVEMENT_TYPE_LABELS[item.movementType] ?? item.movementType}
+            </Chip>
+          </div>
+
+          <div className='text-default-400 flex items-center gap-3 text-[11px]'>
+            <span>{formatUnixDateTime(item.createdDate)}</span>
+            <span>{item.userName}</span>
+            {item.reference && <span>{item.reference}</span>}
+          </div>
+        </div>
+      </CardBody>
+    </KidstopCard>
+  );
+}
+
+const MovementMobileCard = memo(MovementMobileCardComponent);
+
+export default function MovementHistoryTable({
+  items,
+  totalItems,
+  page,
+  totalPages,
+  sortDescriptor,
+  isLoading = false,
+  onPageChange,
+  onSortChange,
+  onMovementPress,
+}: MovementHistoryTableProps) {
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
+  if (isLoading) {
+    return (
+      <div className='flex flex-col gap-3'>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className='h-14 w-full rounded-lg' />
+        ))}
+      </div>
+    );
+  }
+
+  if (totalItems === 0) {
+    return (
+      <div className='text-default-400 flex flex-col items-center justify-center py-16'>
+        <span className='text-5xl'>📋</span>
+        <p className='mt-4 text-lg font-medium'>
+          No se encontraron movimientos
+        </p>
+        <p className='text-sm'>Intenta ajustar los filtros de búsqueda</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className='flex flex-col gap-6'>
+      <div className='hidden lg:block'>
+        <KidstopTable
+          aria-label='Historial de movimientos'
+          sortDescriptor={sortDescriptor}
+          onSortChange={onSortChange}
+          onRowAction={
+            onMovementPress
+              ? (key: React.Key) => {
+                  const item = items.find((i) => i.guid === String(key));
+                  if (item) onMovementPress(item);
+                }
+              : undefined
+          }
+          className={onMovementPress ? '[&_tr]:cursor-pointer' : ''}
+        >
+          <TableHeader columns={COLUMNS}>
+            {(column) => (
+              <TableColumn
+                key={column.key}
+                allowsSorting={column.allowsSorting}
+                className='text-center'
+              >
+                {column.label}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={items}>
+            {(item) => (
+              <TableRow key={item.guid}>
+                {COLUMNS.map((col) => (
+                  <TableCell key={col.key} className='text-center'>
+                    {renderCell(item, col.key, openPreview)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )}
+          </TableBody>
+        </KidstopTable>
+      </div>
+
+      <div className='flex flex-col gap-3 lg:hidden'>
+        {items.map((item) => (
+          <MovementMobileCard
+            key={item.guid}
+            item={item}
+            onPress={onMovementPress}
+            openPreview={openPreview}
+          />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className='flex items-center justify-between'>
+          <p className='text-default-400 text-xs'>
+            Mostrando {items.length} de {totalItems}
+          </p>
+          <Pagination
+            total={totalPages}
+            page={page}
+            onChange={onPageChange}
+            showControls
+            size='sm'
+          />
+        </div>
+      )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
+    </div>
+  );
+}

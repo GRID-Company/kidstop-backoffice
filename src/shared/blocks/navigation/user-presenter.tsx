@@ -1,16 +1,59 @@
+'use client';
+
 import { useAuthStore } from '@/lib/store/auth';
+import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
+import { TCG_THEMES } from '@/lib/consts/tcg-themes';
 import UserSkeleton from '@/shared/base/skeletons/user-skeleton';
 import { Icon } from '@iconify/react';
+import { useLogout } from '@/lib/auth/use-process-logout';
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+} from '@heroui/react';
 
 export default function UserPresenter() {
   const user = useAuthStore((state) => state.user);
+  const { logout } = useLogout();
+  const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
+  const tcgColor = TCG_THEMES[selectedTCG].accent;
 
   if (!user) return <UserSkeleton />;
 
   return (
-    <div className='flex items-center gap-2'>
-      <Icon icon='solar:user-circle-linear' className='text-xl text-white' />
-      <p className='text-white'>{user?.name}</p>
-    </div>
+    <Dropdown placement='bottom-end' data-testid='user-menu'>
+      <DropdownTrigger>
+        <Button
+          variant='light'
+          className='flex items-center gap-2 px-2 py-1'
+          data-testid='user-menu-button'
+          startContent={
+            <Icon
+              icon='solar:user-circle-linear'
+              className='text-content-primary text-xl'
+            />
+          }
+        >
+          <span className='text-content-primary' data-testid='user-name'>
+            {user?.name}
+          </span>
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label='Opciones de usuario'>
+        <DropdownItem
+          key='logout'
+          data-testid='logout-button'
+          startContent={<Icon icon='humbleicons:logout' />}
+          onPress={() => {
+            void logout();
+          }}
+          className='text-danger'
+        >
+          <span style={{ color: tcgColor }}>Cerrar sesión</span>
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
   );
 }

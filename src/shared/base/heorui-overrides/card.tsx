@@ -1,6 +1,6 @@
 import { extendVariants, Card } from '@heroui/react';
 
-const CanalviCard = extendVariants(Card, {
+const KidstopCard = extendVariants(Card, {
   variants: {
     variant: {
       default: {
@@ -15,4 +15,4 @@ const CanalviCard = extendVariants(Card, {
     shadow: 'sm',
   },
 });
-export default CanalviCard;
+export default KidstopCard;

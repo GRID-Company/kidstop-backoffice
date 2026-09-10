@@ -1,0 +1,37 @@
+{
+  "admin": {
+    "email": "contacto@topdev.mx",
+    "password": "@Test123",
+    "role": "ADMIN",
+    "name": "Admin Test"
+  },
+  "reception": {
+    "email": "reception@kidstop.test",
+    "password": "Reception123!",
+    "role": "RECEPTION",
+    "name": "Reception Test"
+  },
+  "buyer": {
+    "email": "buyer@kidstop.test",
+    "password": "Buyer123!",
+    "role": "BUYER",
+    "name": "Buyer Test"
+  },
+  "newUsers": {
+    "buyer1": {
+      "name": "Carlos Pérez",
+      "email": "carlos.perez@test.com",
+      "role": "BUYER"
+    },
+    "reception1": {
+      "name": "María García",
+      "email": "maria.garcia@test.com",
+      "role": "RECEPTION"
+    },
+    "testUser": {
+      "name": "Test User",
+      "email": "test.user@test.com",
+      "role": "BUYER"
+    }
+  }
+}

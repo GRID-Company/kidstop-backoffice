@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/lib/store/auth';
-import { UserRole } from './user-roles';
 import { useAuthCookie } from './use-auth-cookie';
 import { LoginOutput } from '../api/schema-types';
 import { ERROR_MESSAGES } from '../consts/error-messages';
@@ -10,13 +9,13 @@ export const useProcessLogin = () => {
   const setSession = useAuthStore((state) => state.setSession);
   const { setTokenCookie } = useAuthCookie();
 
-  const processLogin = (data: LoginOutput | null) => {
+  const processLogin = async (data: LoginOutput | null) => {
     if (!data?.user) throw new Error(ERROR_MESSAGES.LOGIN_INVALID_RESPONSE);
     if (!data?.access_token) throw new Error(ERROR_MESSAGES.LOGIN_TOKEN_ERROR);
 
     setSession({ user: data.user, token: data.access_token });
-    setTokenCookie(data.access_token, data.user.role);
-    router.push('/inventario');
+    await setTokenCookie(data.access_token, data.user.role);
+    router.push('/catalogo');
   };
 
   return { processLogin };

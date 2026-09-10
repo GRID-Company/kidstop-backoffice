@@ -1,7 +1,7 @@
 import { Controller, FieldValues } from 'react-hook-form';
 import { SelectProps } from '@heroui/react';
 import { ControlWithFormProps } from '@/lib/types/controller.types';
-import CanalviSelect from '../heorui-overrides/select';
+import KidstopSelect from '../heorui-overrides/select';
 
 interface SelectFormProps<T extends FieldValues> extends Partial<SelectProps> {
   controlProps: ControlWithFormProps<T>;
@@ -15,7 +15,7 @@ export default function SelectForm<T extends FieldValues>({
     <Controller
       {...controlProps}
       render={({ field, fieldState: { invalid } }) => (
-        <CanalviSelect
+        <KidstopSelect
           isInvalid={invalid}
           {...selectProps}
           {...field}

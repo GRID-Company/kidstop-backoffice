@@ -3,14 +3,13 @@ import {
   AutocompleteItem,
   Autocomplete,
 } from '@heroui/react';
-import { type ISelectOption } from './select';
 
 export interface IAutocompleteOption {
   value: string;
   label: string;
 }
 
-export default function CanalviAutocomplete({
+export default function KidstopAutocomplete({
   ...autocompleteProps
 }: {} & Partial<AutocompleteProps>) {
   return (
@@ -29,8 +28,9 @@ export default function CanalviAutocomplete({
       allowsCustomValue={true}
       {...autocompleteProps}
     >
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {(item: any) => (
-        <AutocompleteItem key={item.value}>
+        <AutocompleteItem key={item.value} textValue={item.label}>
           <div className='max-w-full truncate'>
             <span className='line-clamp-2 block overflow-hidden text-ellipsis whitespace-normal'>
               {item.label}
