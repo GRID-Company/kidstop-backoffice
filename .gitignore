@@ -44,3 +44,5 @@ next-env.d.ts
 
 # reports
 /reports
+# Devin local sync manifest (do not commit)
+.sync-grid-devin-managed
