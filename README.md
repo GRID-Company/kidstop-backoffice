@@ -165,3 +165,14 @@ npm run dev
 ## Licencia
 
 Privado — GRID Company / Kidstop
+
+## Devin MCP setup (codebase-memory-mcp)
+
+This repo uses the `codebase-memory-mcp` knowledge-graph MCP server. Its config file `.devin/mcp_config.json` is machine-local and gitignored — regenerate it after cloning with:
+
+```bash
+.devin/scripts/setup-mcp-config.sh
+```
+
+Requires the `codebase-memory-mcp` binary in `PATH`.
+
