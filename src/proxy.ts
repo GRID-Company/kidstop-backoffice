@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const PUBLIC_PAGES = ['/login', '/nueva-contrasena', '/recuperar-contrasena'];
-const PROTECTED_PREFIXES = ['/usuarios', '/clientes'];
+const PROTECTED_PREFIXES = ['/usuarios', '/clientes', '/escaneo-cartas'];
 
 const ROLE_ROUTES: Record<string, string[]> = {
   BUYER: [

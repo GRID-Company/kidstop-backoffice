@@ -36,6 +36,11 @@ export const LANGUAGE_LABELS: Record<CardLanguage, string> = {
   [CardLanguage.Korean]: 'Korean',
   [CardLanguage.Chinese]: 'Chinese',
   [CardLanguage.Japanese]: 'Japanese',
+  [CardLanguage.French]: 'French',
+  [CardLanguage.German]: 'German',
+  [CardLanguage.Italian]: 'Italian',
+  [CardLanguage.Portuguese]: 'Portuguese',
+  [CardLanguage.Russian]: 'Russian',
 };
 
 /**
