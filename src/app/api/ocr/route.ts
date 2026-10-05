@@ -20,6 +20,13 @@ function normalizePrivateKey(raw: string): string {
   try {
     createPrivateKey(normalized);
   } catch {
+    console.error('[OCR] Invalid private key shape', {
+      length: raw.length,
+      head: raw.slice(0, 32),
+      tail: raw.slice(-32),
+      hasBeginMarker: key.includes('BEGIN PRIVATE KEY'),
+      realNewlines: (normalized.match(/\n/g) ?? []).length,
+    });
     throw new Error(
       'GOOGLE_CLOUD_PRIVATE_KEY is not a valid PEM. Store the base64 of the key file instead (e.g. `base64 -i key.pem`).'
     );
