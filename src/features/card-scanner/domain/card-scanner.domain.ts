@@ -564,6 +564,21 @@ export function validateCardAlignment(
       ),
   };
 
+  const EDGE_MARGIN = 0.02;
+  const touchesFrameEdge =
+    cardBoundingBox.x <= EDGE_MARGIN ||
+    cardBoundingBox.y <= EDGE_MARGIN ||
+    cardBoundingBox.x + cardBoundingBox.width >= 1 - EDGE_MARGIN ||
+    cardBoundingBox.y + cardBoundingBox.height >= 1 - EDGE_MARGIN;
+
+  if (touchesFrameEdge) {
+    return {
+      aligned: false,
+      coverage: 0,
+      reason: 'Contour touches frame edge',
+    };
+  }
+
   const guideWithTolerance = {
     x: effectiveGuideRegion.x - tolerance,
     y: effectiveGuideRegion.y - tolerance,

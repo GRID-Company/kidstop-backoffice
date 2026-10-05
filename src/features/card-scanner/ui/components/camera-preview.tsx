@@ -6,7 +6,6 @@ interface CameraPreviewProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   cvReady: boolean;
   cardDetected?: boolean;
-  showGrid?: boolean;
   torchControl?: ReactNode;
 }
 
@@ -15,12 +14,11 @@ export const CameraPreview = ({
   canvasRef,
   cvReady,
   cardDetected = false,
-  showGrid = true,
   torchControl,
 }: CameraPreviewProps) => {
   return (
     <div
-      className='relative aspect-3/4 w-full overflow-hidden rounded-lg border-4 border-emerald-500 bg-black'
+      className='border-accent relative aspect-3/4 w-full overflow-hidden rounded-lg border-4 bg-black'
       role='region'
       aria-label='Vista previa de la cámara para escaneo de cartas'
     >
@@ -39,9 +37,7 @@ export const CameraPreview = ({
         aria-label='Procesamiento de imagen de carta con detección de bordes'
       />
 
-      {cvReady && (
-        <CardPositioningGuide cardDetected={cardDetected} showGrid={showGrid} />
-      )}
+      {cvReady && <CardPositioningGuide cardDetected={cardDetected} />}
 
       {torchControl && (
         <div className='absolute top-4 right-4 z-10'>{torchControl}</div>

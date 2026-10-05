@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
-import { Button, Chip } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import toast from 'react-hot-toast';
 
@@ -33,7 +33,7 @@ import {
   CardScannerSource,
 } from '@/lib/store/card-scanner';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
-import { TCG_OPTIONS } from '@/lib/consts/tcg-options';
+import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 
 interface ScannerPanelProps {
   source: CardScannerSource;
@@ -48,7 +48,6 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const selectedGame: TCGGame =
     selectedTCG === TCG_TYPES.POKEMON ? 'pokemon' : 'magic';
-  const tcgOption = TCG_OPTIONS.find((option) => option.key === selectedTCG);
 
   const [autoCapture, setAutoCapture] = useState(true);
   const [hapticEnabled, setHapticEnabled] = useState(false);
@@ -197,6 +196,59 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     status === 'extracting-text' ||
     status === 'searching';
 
+  const reloadAction = (
+    <Button
+      size='sm'
+      variant='flat'
+      color='danger'
+      onPress={() => window.location.reload()}
+    >
+      Recargar
+    </Button>
+  );
+
+  const statusBanner =
+    permissionState === 'denied'
+      ? {
+          variant: 'error' as const,
+          title: 'Permiso de cámara denegado',
+          message:
+            'Permite el acceso a la cámara en la configuración del navegador para este sitio.',
+          action: reloadAction,
+        }
+      : cameraError
+        ? {
+            variant: 'error' as const,
+            title: 'Error de cámara',
+            message: cameraError,
+          }
+        : cvError
+          ? {
+              variant: 'error' as const,
+              title: 'Error de OpenCV',
+              message: cvError,
+              action: reloadAction,
+            }
+          : !cvReady
+            ? {
+                variant: 'info' as const,
+                title: 'Cargando OpenCV.js…',
+                message:
+                  'Esto puede tardar 10-20 segundos en la primera carga.',
+              }
+            : isInitializing && !isStreaming
+              ? {
+                  variant: 'info' as const,
+                  message: 'Iniciando cámara…',
+                }
+              : pipelineError
+                ? {
+                    variant: 'error' as const,
+                    title: 'Error de procesamiento',
+                    message: pipelineError,
+                  }
+                : null;
+
   return (
     <>
       <Script
@@ -211,90 +263,15 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
       />
 
       <div className='flex flex-col gap-4'>
-        <div className='flex items-center justify-between'>
-          <Chip
-            size='sm'
-            variant='flat'
-            className='text-content-primary'
-            startContent={
-              tcgOption && (
-                <Icon icon={tcgOption.icon} className='text-accent text-sm' />
-              )
-            }
-          >
-            {tcgOption?.label ?? selectedTCG}
-          </Chip>
-          <span className='text-content-tertiary text-xs'>
-            {source === 'purchase'
-              ? 'Escanear para compra'
-              : 'Escáner de cartas'}
-          </span>
-        </div>
+        <TcgSegmentedSelector />
 
-        {!cvReady && !cvError && (
-          <ScanStatusBanner variant='info' title='Cargando OpenCV.js...'>
-            Esto puede tardar 10-20 segundos en la primera carga.
-          </ScanStatusBanner>
-        )}
-
-        {cvError && (
+        {statusBanner && (
           <ScanStatusBanner
-            variant='error'
-            title='Error de OpenCV'
-            action={
-              <Button
-                size='sm'
-                variant='flat'
-                color='danger'
-                onPress={() => window.location.reload()}
-              >
-                Recargar
-              </Button>
-            }
+            variant={statusBanner.variant}
+            title={statusBanner.title}
+            action={statusBanner.action}
           >
-            {cvError}
-          </ScanStatusBanner>
-        )}
-
-        {cameraError && (
-          <ScanStatusBanner variant='error' title='Error de cámara'>
-            {cameraError}
-          </ScanStatusBanner>
-        )}
-
-        {pipelineError && (
-          <ScanStatusBanner variant='error' title='Error de procesamiento'>
-            {pipelineError}
-          </ScanStatusBanner>
-        )}
-
-        {qualityFeedback.length > 0 && (
-          <ScanStatusBanner variant='info' title='Feedback de calidad'>
-            <ul className='space-y-1'>
-              {qualityFeedback.map((feedback, index) => (
-                <li key={index}>{feedback}</li>
-              ))}
-            </ul>
-          </ScanStatusBanner>
-        )}
-
-        {permissionState === 'denied' && (
-          <ScanStatusBanner
-            variant='error'
-            title='Permiso de cámara denegado'
-            action={
-              <Button
-                size='sm'
-                variant='flat'
-                color='danger'
-                onPress={() => window.location.reload()}
-              >
-                Recargar
-              </Button>
-            }
-          >
-            Permite el acceso a la cámara en la configuración del navegador para
-            este sitio.
+            {statusBanner.message}
           </ScanStatusBanner>
         )}
 
@@ -309,11 +286,16 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
           </Button>
         )}
 
-        {isInitializing && !isStreaming && (
-          <ScanStatusBanner variant='info'>
-            Iniciando cámara...
-          </ScanStatusBanner>
-        )}
+        {process.env.NODE_ENV === 'development' &&
+          qualityFeedback.length > 0 && (
+            <ScanStatusBanner variant='info' title='Feedback de calidad'>
+              <ul className='space-y-1'>
+                {qualityFeedback.map((feedback, index) => (
+                  <li key={index}>{feedback}</li>
+                ))}
+              </ul>
+            </ScanStatusBanner>
+          )}
 
         {status === 'results' && scannedData && (
           <ScannerResults
@@ -336,7 +318,6 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
             canvasRef={canvasRef}
             cvReady={cvReady}
             cardDetected={cardDetected}
-            showGrid={true}
             torchControl={
               <TorchControl
                 supported={torchSupported}

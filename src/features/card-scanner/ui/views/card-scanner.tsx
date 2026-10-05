@@ -411,7 +411,6 @@ export const CardScannerView = () => {
                 canvasRef={canvasRef}
                 cvReady={cvReady}
                 cardDetected={cardDetected}
-                showGrid={true}
                 torchControl={
                   <TorchControl
                     supported={torchSupported}

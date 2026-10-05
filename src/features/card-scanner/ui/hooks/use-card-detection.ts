@@ -202,21 +202,30 @@ export const useCardDetection = (
         }
 
         if (shouldDrawContour && cornersToUse.length === 8) {
-          const contourPoints = cv.matFromArray(
-            4,
-            1,
-            cv.CV_32SC2,
-            cornersToUse
-          );
-          const contours = new cv.MatVector();
-          contours.push_back(contourPoints);
-
           const isStable = stableFramesRef.current >= REQUIRED_STABLE_FRAMES;
-          const color = isStable
-            ? new cv.Scalar(0, 255, 0, 255)
-            : new cv.Scalar(255, 255, 0, 255);
 
-          cv.drawContours(output, contours, 0, color, 4, cv.LINE_8);
+          if (isStable) {
+            const contourPoints = cv.matFromArray(
+              4,
+              1,
+              cv.CV_32SC2,
+              cornersToUse
+            );
+            const contours = new cv.MatVector();
+            contours.push_back(contourPoints);
+
+            cv.drawContours(
+              output,
+              contours,
+              0,
+              new cv.Scalar(0, 255, 0, 255),
+              4,
+              cv.LINE_8
+            );
+
+            contourPoints.delete();
+            contours.delete();
+          }
 
           if (isStable) {
             latestCornersRef.current = cornersToUse;
@@ -231,9 +240,6 @@ export const useCardDetection = (
               setCardDetected(false);
             }
           }
-
-          contourPoints.delete();
-          contours.delete();
         } else {
           latestCornersRef.current = null;
           if (mountedRef.current) {

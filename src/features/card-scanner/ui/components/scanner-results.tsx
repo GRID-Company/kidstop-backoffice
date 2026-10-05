@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { Button, Chip, Tab, Tabs } from '@heroui/react';
+import { Button, Chip, Skeleton, Tab, Tabs } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import {
   ICardCandidate,
@@ -30,6 +30,8 @@ const USE_CARD_LABELS: Record<CardScannerSource, string> = {
   fab: 'Usar esta carta',
 };
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export const ScannerResults = ({
   scannedData,
   game,
@@ -44,14 +46,14 @@ export const ScannerResults = ({
     searchError,
     validationErrors,
     searchFeedback,
-    canSearch,
     performSearch,
-    clearResults,
   } = useCardSearch(game, scannedData);
 
   useEffect(() => {
-    clearResults();
-  }, [scannedData, clearResults]);
+    performSearch();
+  }, [performSearch]);
+
+  const hasCandidates = !!searchResults && searchResults.candidates.length > 0;
 
   return (
     <div className='flex flex-col gap-4'>
@@ -73,113 +75,63 @@ export const ScannerResults = ({
         )}
       </div>
 
-      <Tabs aria-label='Datos del escaneo' variant='underlined' size='sm'>
-        <Tab key='editor' title='Datos extraídos'>
-          <ScanFieldsEditor
-            extractedData={scannedData.extractedData}
-            confidence={scannedData.confidence}
-            onSave={onSave}
-            onCancel={onReset}
-          />
-        </Tab>
-        <Tab key='raw' title='OCR'>
-          <ScanOcrText scannedData={scannedData} />
-        </Tab>
-      </Tabs>
-
-      {searchFeedback.length > 0 && (
-        <ScanStatusBanner variant='info' title='Criterios de búsqueda'>
-          <ul className='space-y-1'>
-            {searchFeedback.map((feedback, index) => (
-              <li key={index}>{feedback}</li>
-            ))}
-          </ul>
-        </ScanStatusBanner>
-      )}
-
-      {validationErrors.length > 0 && (
-        <ScanStatusBanner variant='error' title='Errores de validación'>
-          <ul className='space-y-1'>
-            {validationErrors.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </ScanStatusBanner>
-      )}
-
-      {searchError && !validationErrors.length && (
-        <ScanStatusBanner variant='warning'>{searchError}</ScanStatusBanner>
-      )}
-
-      {searchResults?.aiResolved && (
+      {isSearching && (
         <div className='border-divider rounded-lg border bg-white p-4'>
-          <div className='mb-3 flex items-center justify-between'>
-            <h4 className='text-content-primary text-sm font-semibold'>
-              Interpretación
-            </h4>
-            {searchResults.resolvedByAI && (
-              <Chip
-                size='sm'
-                variant='flat'
-                color='secondary'
-                startContent={<Icon icon='lucide:sparkles' width={12} />}
-              >
-                Resuelto por IA
-              </Chip>
-            )}
+          <div className='mb-3 flex items-center gap-2'>
+            <Icon
+              icon='lucide:loader-circle'
+              className='text-accent animate-spin'
+              width={16}
+            />
+            <span className='text-content-primary text-sm font-medium'>
+              Buscando en el catálogo…
+            </span>
           </div>
-          <div className='flex flex-col gap-1 text-sm'>
-            {(searchResults.aiResolved.nameEs ||
-              searchResults.aiResolved.name) && (
-              <div className='flex justify-between gap-2'>
-                <span className='text-content-tertiary'>Nombre</span>
-                <span className='text-content-primary text-right font-medium'>
-                  {searchResults.aiResolved.nameEs ??
-                    searchResults.aiResolved.name}
-                  {searchResults.aiResolved.nameEs &&
-                    searchResults.aiResolved.name &&
-                    searchResults.aiResolved.nameEs !==
-                      searchResults.aiResolved.name &&
-                    ` (${searchResults.aiResolved.name})`}
-                </span>
+          <div className='flex flex-col gap-2'>
+            {[0, 1, 2].map((row) => (
+              <div key={row} className='flex items-center gap-3'>
+                <Skeleton className='h-16 w-12 shrink-0 rounded' />
+                <div className='flex flex-1 flex-col gap-2'>
+                  <Skeleton className='h-3 w-3/5 rounded' />
+                  <Skeleton className='h-3 w-2/5 rounded' />
+                </div>
               </div>
-            )}
-            {(searchResults.aiResolved.setNameEs ||
-              searchResults.aiResolved.setName) && (
-              <div className='flex justify-between gap-2'>
-                <span className='text-content-tertiary'>Set</span>
-                <span className='text-content-primary text-right font-medium'>
-                  {searchResults.aiResolved.setNameEs ??
-                    searchResults.aiResolved.setName}
-                  {searchResults.aiResolved.setCode &&
-                    ` (${searchResults.aiResolved.setCode})`}
-                </span>
-              </div>
-            )}
-            {searchResults.aiResolved.cardNumber && (
-              <div className='flex justify-between'>
-                <span className='text-content-tertiary'>Número</span>
-                <span className='text-content-primary font-medium'>
-                  #{searchResults.aiResolved.cardNumber}
-                </span>
-              </div>
-            )}
-            {searchResults.aiResolved.detectedLanguage && (
-              <div className='flex justify-between'>
-                <span className='text-content-tertiary'>Idioma detectado</span>
-                <span className='text-content-primary font-medium uppercase'>
-                  {searchResults.aiResolved.detectedLanguage}
-                </span>
-              </div>
-            )}
+            ))}
           </div>
         </div>
       )}
 
-      {searchResults && searchResults.candidates.length > 0 && (
+      {!isSearching && (searchError || validationErrors.length > 0) && (
+        <ScanStatusBanner
+          variant={validationErrors.length ? 'error' : 'warning'}
+          title={validationErrors.length ? 'Datos insuficientes' : undefined}
+          action={
+            <Button
+              size='sm'
+              variant='flat'
+              onPress={performSearch}
+              startContent={<Icon icon='lucide:rotate-cw' width={14} />}
+            >
+              Reintentar
+            </Button>
+          }
+        >
+          {validationErrors.length > 0 ? (
+            <ul className='space-y-1'>
+              {validationErrors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          ) : (
+            searchError
+          )}
+        </ScanStatusBanner>
+      )}
+
+      {hasCandidates && (
         <div className='border-divider rounded-lg border bg-white p-4'>
           <h4 className='text-content-primary mb-3 text-sm font-semibold'>
-            Candidatos encontrados ({searchResults.candidates.length})
+            Coincidencias ({searchResults.candidates.length})
           </h4>
           <div className='flex flex-col gap-2'>
             {searchResults.candidates.map((candidate) => (
@@ -247,24 +199,110 @@ export const ScannerResults = ({
         </div>
       )}
 
+      {searchResults?.aiResolved && (
+        <div className='border-divider rounded-lg border bg-white p-4'>
+          <div className='mb-3 flex items-center justify-between'>
+            <h4 className='text-content-primary text-sm font-semibold'>
+              Interpretación
+            </h4>
+            {searchResults.resolvedByAI && (
+              <Chip
+                size='sm'
+                variant='flat'
+                color='secondary'
+                startContent={<Icon icon='lucide:sparkles' width={12} />}
+              >
+                Resuelto por IA
+              </Chip>
+            )}
+          </div>
+          <div className='flex flex-col gap-1 text-sm'>
+            {(searchResults.aiResolved.nameEs ||
+              searchResults.aiResolved.name) && (
+              <div className='flex justify-between gap-2'>
+                <span className='text-content-tertiary'>Nombre</span>
+                <span className='text-content-primary text-right font-medium'>
+                  {searchResults.aiResolved.nameEs ??
+                    searchResults.aiResolved.name}
+                  {searchResults.aiResolved.nameEs &&
+                    searchResults.aiResolved.name &&
+                    searchResults.aiResolved.nameEs !==
+                      searchResults.aiResolved.name &&
+                    ` (${searchResults.aiResolved.name})`}
+                </span>
+              </div>
+            )}
+            {(searchResults.aiResolved.setNameEs ||
+              searchResults.aiResolved.setName) && (
+              <div className='flex justify-between gap-2'>
+                <span className='text-content-tertiary'>Set</span>
+                <span className='text-content-primary text-right font-medium'>
+                  {searchResults.aiResolved.setNameEs ??
+                    searchResults.aiResolved.setName}
+                  {searchResults.aiResolved.setCode &&
+                    ` (${searchResults.aiResolved.setCode})`}
+                </span>
+              </div>
+            )}
+            {searchResults.aiResolved.cardNumber && (
+              <div className='flex justify-between'>
+                <span className='text-content-tertiary'>Número</span>
+                <span className='text-content-primary font-medium'>
+                  #{searchResults.aiResolved.cardNumber}
+                </span>
+              </div>
+            )}
+            {searchResults.aiResolved.detectedLanguage && (
+              <div className='flex justify-between'>
+                <span className='text-content-tertiary'>Idioma detectado</span>
+                <span className='text-content-primary font-medium uppercase'>
+                  {searchResults.aiResolved.detectedLanguage}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isDev && (
+        <div className='border-divider rounded-lg border border-dashed p-3'>
+          <p className='text-content-tertiary mb-2 text-xs font-semibold tracking-wide uppercase'>
+            Debug
+          </p>
+          <Tabs aria-label='Datos del escaneo' variant='underlined' size='sm'>
+            <Tab key='editor' title='Datos extraídos'>
+              <ScanFieldsEditor
+                extractedData={scannedData.extractedData}
+                confidence={scannedData.confidence}
+                onSave={onSave}
+                onCancel={onReset}
+              />
+            </Tab>
+            <Tab key='raw' title='OCR'>
+              <ScanOcrText scannedData={scannedData} />
+            </Tab>
+          </Tabs>
+
+          {searchFeedback.length > 0 && (
+            <div className='mt-3'>
+              <ScanStatusBanner variant='info' title='Criterios de búsqueda'>
+                <ul className='space-y-1'>
+                  {searchFeedback.map((feedback, index) => (
+                    <li key={index}>{feedback}</li>
+                  ))}
+                </ul>
+              </ScanStatusBanner>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className='border-divider flex gap-3 border-t pt-4'>
-        <Button
-          size='lg'
-          onPress={performSearch}
-          isDisabled={!canSearch || isSearching}
-          isLoading={isSearching}
-          className='bg-accent flex-1 font-semibold text-white'
-          startContent={
-            !isSearching && <Icon icon='lucide:search' width={18} />
-          }
-        >
-          {isSearching ? 'Buscando...' : 'Buscar en catálogo'}
-        </Button>
         <Button
           variant='flat'
           size='lg'
           onPress={onReset}
-          className='text-content-primary font-semibold'
+          className='text-content-primary flex-1 font-semibold'
           startContent={<Icon icon='lucide:camera' width={16} />}
         >
           Nueva captura

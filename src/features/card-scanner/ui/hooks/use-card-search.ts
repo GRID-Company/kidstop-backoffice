@@ -42,7 +42,7 @@ export const useCardSearch = (
   const canSearch = hasMinimumSearchCriteria(extractedData) || hasImage;
   const searchFeedback = getSearchCriteriaFeedback(extractedData, hasImage);
 
-  const performSearch = async () => {
+  const performSearch = useCallback(async () => {
     setIsSearching(true);
     setSearchError(null);
     setValidationErrors([]);
@@ -89,7 +89,7 @@ export const useCardSearch = (
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [client, extractedData, game, normalizedImageUrl, setIconImageUrl]);
 
   const clearResults = useCallback(() => {
     setSearchResults(null);

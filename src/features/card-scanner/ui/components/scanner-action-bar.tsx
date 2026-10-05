@@ -51,22 +51,18 @@ export const ScannerActionBar = ({
         <Button
           size='lg'
           onPress={onCapture}
-          isDisabled={disabled || autoCapture || isProcessing}
+          isDisabled={disabled || isProcessing}
           isLoading={isProcessing}
           className='bg-accent flex-1 font-semibold text-white'
           startContent={
             !isProcessing && <Icon icon='lucide:camera' width={18} />
           }
-          aria-label={
-            autoCapture
-              ? 'Modo automático activado'
-              : 'Capturar carta manualmente'
-          }
+          aria-label='Capturar carta manualmente'
         >
           {isProcessing
             ? 'Procesando...'
             : autoCapture
-              ? 'Automático activo'
+              ? 'Capturar ahora'
               : 'Capturar carta'}
         </Button>
         <Button
