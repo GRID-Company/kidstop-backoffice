@@ -41,6 +41,7 @@ docker compose -f /srv/dev-stack/docker-compose.yaml ps
 ```
 
 Look for:
+
 - Containers stuck in `Restarting` loop
 - Unhealthy or exited containers
 - Missing containers
@@ -76,6 +77,7 @@ curl -s https://dev.topdev.mx/<prefix>/graphql \
 ## 6. Fix the root cause
 
 Typical causes:
+
 - TypeORM schema sync failure (`TYPEORM_SYNC=true` with conflicting data)
 - Missing or unhealthy Redis dependency
 - New image not pulled / container using stale image

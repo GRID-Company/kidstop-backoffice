@@ -1,7 +1,7 @@
 ---
 name: backend_deploy-to-develop
 description: Create or reuse a feature branch, commit and push the intended changes, open and merge a pull request into develop, update local develop, and clean up the feature branch.
-argument-hint: "[feature-branch]"
+argument-hint: '[feature-branch]'
 triggers:
   - user
 allowed-tools:

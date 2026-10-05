@@ -19,6 +19,7 @@ Always start by creating a dedicated git worktree so the feature is developed in
 Derive a short kebab-case feature name from the module (e.g. `service-orders`).
 
 // turbo
+
 ```bash
 git fetch origin
 FEATURE="<module-kebab-name>"                     # e.g. service-orders
@@ -35,6 +36,7 @@ echo "Worktree created at $WORKTREE on branch $BRANCH"
 > Esto coloca el worktree como un **directorio hermano** (sibling) en el mismo nivel que el repo principal, NO dentro de él.
 >
 > Ejemplo concreto:
+>
 > - Repo principal: `/ruta/al/proyecto/<repo>/`
 > - Worktree creado: `/ruta/al/proyecto/<repo>-${FEATURE}/` ← mismo nivel, hermano
 >
@@ -96,6 +98,7 @@ Create `api-guides/{Module}API.md` documenting all queries, mutations, TypeScrip
 ## 6. Stage and commit all changes
 
 // turbo
+
 ```bash
 git add -A
 git commit -m "feat(${FEATURE}): implement module, API collection and integration guide"
@@ -159,6 +162,7 @@ https://github.com/<owner>/<repo>/pull/<number>
 Once el PR está creado, eliminar el worktree local. La rama sigue viva en origin para el PR.
 
 // turbo
+
 ```bash
 git worktree remove "$WORKTREE" --force
 echo "Worktree $WORKTREE removed"
@@ -166,6 +170,7 @@ echo "Worktree $WORKTREE removed"
 
 > La rama `feature/${FEATURE}` **no se elimina localmente** hasta que el PR sea mergeado.
 > Cuando sea mergeado, ejecutar desde el repo principal:
+>
 > ```bash
 > git branch -d "$BRANCH"
 > ```

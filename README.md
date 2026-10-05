@@ -175,4 +175,3 @@ This repo uses the `codebase-memory-mcp` knowledge-graph MCP server. Its config 
 ```
 
 Requires the `codebase-memory-mcp` binary in `PATH`.
-

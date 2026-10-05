@@ -59,11 +59,13 @@ A short bulleted list (3–6 items) that conveys:
 Header: `### {Entity} (inherits from BaseEntity)`
 
 List every field as:
+
 ```
 - fieldName: type (required|nullable, unique?) — description. Include format/examples when relevant.
 ```
 
 Always include:
+
 - The auto-generated ID field with its exact format and example values
 - The status enum field with its default value
 - All date fields with their nullable/required rules
@@ -72,8 +74,10 @@ Always include:
 - JSONB fields with their type reference
 
 **Example:**
+
 ```markdown
 ### ServiceOrder (inherits from BaseEntity)
+
 - serviceId: string (required, unique, auto-generated) — human-readable ID, format `SRV-{YYYY}{6-digit-zero-padded}` (e.g. `SRV-2026000001`). Counter resets every year.
 - status: ServiceStatus enum (required, default PENDING)
 - name: string (required) — service order name/title.
@@ -95,16 +99,17 @@ Document inline with a fenced block:
 
 ```markdown
 ### Address type (JSONB)
+
 \`\`\`
 {
-  street: string (required)
-  postalCode: string (required)
-  suburb: string (required)
-  exteriorNumber: string (required)
-  interiorNumber: string (optional)
-  city: string (required)
-  state: string (required)
-  alias: string (optional)
+street: string (required)
+postalCode: string (required)
+suburb: string (required)
+exteriorNumber: string (required)
+interiorNumber: string (optional)
+city: string (required)
+state: string (required)
+alias: string (optional)
 }
 \`\`\`
 ```
@@ -113,12 +118,13 @@ Document inline with a fenced block:
 
 ```markdown
 ### {Entity}Status enum
+
 \`\`\`
 enum {Entity}Status {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
+PENDING
+IN_PROGRESS
+COMPLETED
+CANCELLED
 }
 \`\`\`
 ```
@@ -175,7 +181,8 @@ One sub-section per query/mutation. Order: list query → detail query → creat
 
 ```markdown
 ### {operationName} ({Query|Mutation})
-- **Access**: All authenticated roles  (or specific roles)
+
+- **Access**: All authenticated roles (or specific roles)
 - **Parameters**:
   - paramName: Type! — description
   - paramName: Type (optional) — description
@@ -185,8 +192,8 @@ One sub-section per query/mutation. Order: list query → detail query → creat
   - List all entity fields available
   - Nested relations with their fields listed
 - **Returns**: (mutations only)
-  - Created {Entity} with all relations  — for create
-  - GenericOutput with success message    — for update/delete/lifecycle
+  - Created {Entity} with all relations — for create
+  - GenericOutput with success message — for update/delete/lifecycle
 - **Business rules**:
   - Bullet list of rules specific to this operation
   - Always include: entity-not-found (NotFoundException), FK checks (NotFoundException), validation errors (BadRequestException)
@@ -195,10 +202,12 @@ One sub-section per query/mutation. Order: list query → detail query → creat
 #### Queries — additional fields to document
 
 For the **list query**, always document:
+
 - `search` fields (which columns it matches)
 - `sort` fields (all allowed column names, note joined columns like `clientName`)
 
 For the **detail query**, always note:
+
 - `createdBy` and `updatedBy` are available (from BaseEntity)
 
 #### Mutations — return type rule
@@ -216,6 +225,7 @@ If the new module affects existing entities, document it here:
 ## Modifications to Existing Entities
 
 ### {ExistingEntity}
+
 - {Field name}: {what changes and why}
 - Note: no schema changes required if only a soft reference is added (e.g. workId referencing a human-readable ID).
 ```

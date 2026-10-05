@@ -381,68 +381,73 @@ export const CardScannerView = () => {
             </div>
           )}
 
-          {status === 'results' && scannedData ? (
+          {status === 'results' && scannedData && (
             <ScanResultsView
               scannedData={scannedData}
               game={selectedGame}
               onSave={handleSaveEdits}
               onReset={handleReset}
             />
-          ) : (
-            <div className='grid gap-8 lg:grid-cols-2'>
-              <div className='flex flex-col'>
-                <h2 className='mb-4 text-xl font-semibold text-white'>
-                  Cámara en Vivo
-                </h2>
-                {isInitializing && !isStreaming && (
-                  <div className='mb-4 rounded-lg bg-blue-900/50 p-4 text-blue-200'>
-                    Iniciando cámara...
-                  </div>
-                )}
-                <CameraPreview
-                  videoRef={videoRef}
-                  canvasRef={canvasRef}
-                  cvReady={cvReady}
-                  cardDetected={cardDetected}
-                  showGrid={true}
-                  torchControl={
-                    <TorchControl
-                      supported={torchSupported}
-                      enabled={torchEnabled}
-                      onToggle={toggleTorch}
-                      disabled={!isStreaming}
-                    />
-                  }
-                />
-
-                {cvReady && debugInfo && (
-                  <div className='mt-2 rounded bg-black/70 p-2 font-mono text-xs text-white'>
-                    {debugInfo}
-                  </div>
-                )}
-                <ScannerControls
-                  onCapture={handleCapture}
-                  onReset={handleReset}
-                  disabled={!cvReady || !isStreaming || !latestCorners.current}
-                  loading={
-                    status === 'processing-image' ||
-                    status === 'extracting-text'
-                  }
-                  autoCapture={autoCapture}
-                />
-              </div>
-
-              <div className='flex flex-col'>
-                <h2 className='mb-4 text-xl font-semibold text-white'>
-                  Carta Escaneada
-                </h2>
-                <CardResult resultCanvasRef={resultCanvasRef} />
-                <ExtractedText
-                  scannedData={status === 'camera-ready' ? null : scannedData}
-                />
-              </div>
-            </div>
           )}
+
+          <div
+            className={
+              status === 'results' && scannedData
+                ? 'hidden'
+                : 'grid gap-8 lg:grid-cols-2'
+            }
+          >
+            <div className='flex flex-col'>
+              <h2 className='mb-4 text-xl font-semibold text-white'>
+                Cámara en Vivo
+              </h2>
+              {isInitializing && !isStreaming && (
+                <div className='mb-4 rounded-lg bg-blue-900/50 p-4 text-blue-200'>
+                  Iniciando cámara...
+                </div>
+              )}
+              <CameraPreview
+                videoRef={videoRef}
+                canvasRef={canvasRef}
+                cvReady={cvReady}
+                cardDetected={cardDetected}
+                showGrid={true}
+                torchControl={
+                  <TorchControl
+                    supported={torchSupported}
+                    enabled={torchEnabled}
+                    onToggle={toggleTorch}
+                    disabled={!isStreaming}
+                  />
+                }
+              />
+
+              {cvReady && debugInfo && (
+                <div className='mt-2 rounded bg-black/70 p-2 font-mono text-xs text-white'>
+                  {debugInfo}
+                </div>
+              )}
+              <ScannerControls
+                onCapture={handleCapture}
+                onReset={handleReset}
+                disabled={!cvReady || !isStreaming || !latestCorners.current}
+                loading={
+                  status === 'processing-image' || status === 'extracting-text'
+                }
+                autoCapture={autoCapture}
+              />
+            </div>
+
+            <div className='flex flex-col'>
+              <h2 className='mb-4 text-xl font-semibold text-white'>
+                Carta Escaneada
+              </h2>
+              <CardResult resultCanvasRef={resultCanvasRef} />
+              <ExtractedText
+                scannedData={status === 'camera-ready' ? null : scannedData}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

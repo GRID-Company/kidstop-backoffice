@@ -34,16 +34,16 @@ Every `.yml` file follows this structure:
 
 ```yaml
 info:
-  name: operation-name-kebab-case   # matches filename (without .yml)
+  name: operation-name-kebab-case # matches filename (without .yml)
   type: graphql
-  seq: 1                            # order in Bruno sidebar
+  seq: 1 # order in Bruno sidebar
 
 graphql:
   method: POST
-  url: "{{base_url}}"
+  url: '{{base_url}}'
   headers:
     - name: Authorization
-      value: "Bearer {{auth_token}}"
+      value: 'Bearer {{auth_token}}'
   body:
     query: |-
       # GraphQL operation here
@@ -71,10 +71,10 @@ info:
 
 graphql:
   method: POST
-  url: "{{base_url}}"
+  url: '{{base_url}}'
   headers:
     - name: Authorization
-      value: "Bearer {{auth_token}}"
+      value: 'Bearer {{auth_token}}'
   body:
     query: |-
       query {Entities}($find{Entities}Args: Find{Entities}Args!) {
@@ -122,20 +122,20 @@ settings:
 Same query as the base list, add `"filters"` to variables:
 
 ```yaml
-    variables: |-
-      {
-        "find{Entities}Args": {
-          "limit": 10,
-          "skip": 0,
-          "sort": {
-            "column": "createdDate",
-            "order": "DESC"
-          },
-          "filters": {
-            "status": "PENDING"
-          }
-        }
+variables: |-
+  {
+    "find{Entities}Args": {
+      "limit": 10,
+      "skip": 0,
+      "sort": {
+        "column": "createdDate",
+        "order": "DESC"
+      },
+      "filters": {
+        "status": "PENDING"
       }
+    }
+  }
 ```
 
 You can trim the returned fields to only what's relevant for filtered views.
@@ -147,18 +147,18 @@ You can trim the returned fields to only what's relevant for filtered views.
 Add `"search"` to variables; no `"filters"` needed:
 
 ```yaml
-    variables: |-
-      {
-        "find{Entities}Args": {
-          "limit": 10,
-          "skip": 0,
-          "sort": {
-            "column": "createdDate",
-            "order": "DESC"
-          },
-          "search": "keyword"
-        }
-      }
+variables: |-
+  {
+    "find{Entities}Args": {
+      "limit": 10,
+      "skip": 0,
+      "sort": {
+        "column": "createdDate",
+        "order": "DESC"
+      },
+      "search": "keyword"
+    }
+  }
 ```
 
 ---
@@ -168,40 +168,40 @@ Add `"search"` to variables; no `"filters"` needed:
 Return the full object including nested relations and `createdBy`/`updatedBy` from `BaseEntity`:
 
 ```yaml
-  body:
-    query: |-
-      query {Entity}($guid: UUID!) {
-        {entity}(guid: $guid) {
+body:
+  query: |-
+    query {Entity}($guid: UUID!) {
+      {entity}(guid: $guid) {
+        guid
+        # ... all fields
+        client {
           guid
-          # ... all fields
-          client {
-            guid
+          name
+          contact {
             name
-            contact {
-              name
-              phone
-              emailAddress
-            }
-          }
-          agent {
-            guid
-            name
+            phone
             emailAddress
           }
-          createdBy {
-            name
-          }
-          updatedBy {
-            name
-          }
-          createdDate
-          updatedDate
         }
+        agent {
+          guid
+          name
+          emailAddress
+        }
+        createdBy {
+          name
+        }
+        updatedBy {
+          name
+        }
+        createdDate
+        updatedDate
       }
-    variables: |-
-      {
-        "guid": "00000000-0000-0000-0000-000000000000"
-      }
+    }
+  variables: |-
+    {
+      "guid": "00000000-0000-0000-0000-000000000000"
+    }
 ```
 
 ---
@@ -211,31 +211,31 @@ Return the full object including nested relations and `createdBy`/`updatedBy` fr
 Returns the created entity (not `GenericOutput`):
 
 ```yaml
-  body:
-    query: |-
-      mutation Create{Entity}($input: Create{Entity}Input!) {
-        create{Entity}(input: $input) {
-          guid
-          # ... key fields to confirm creation
-          createdDate
+body:
+  query: |-
+    mutation Create{Entity}($input: Create{Entity}Input!) {
+      create{Entity}(input: $input) {
+        guid
+        # ... key fields to confirm creation
+        createdDate
+      }
+    }
+  variables: |-
+    {
+      "input": {
+        "name": "Example Name",
+        "clientGuid": "00000000-0000-0000-0000-000000000000",
+        "agentGuid": "00000000-0000-0000-0000-000000000000",
+        "clientAddress": {
+          "street": "Av. Insurgentes Sur",
+          "postalCode": "03100",
+          "suburb": "Del Valle",
+          "exteriorNumber": "1500",
+          "city": "Ciudad de México",
+          "state": "CDMX"
         }
       }
-    variables: |-
-      {
-        "input": {
-          "name": "Example Name",
-          "clientGuid": "00000000-0000-0000-0000-000000000000",
-          "agentGuid": "00000000-0000-0000-0000-000000000000",
-          "clientAddress": {
-            "street": "Av. Insurgentes Sur",
-            "postalCode": "03100",
-            "suburb": "Del Valle",
-            "exteriorNumber": "1500",
-            "city": "Ciudad de México",
-            "state": "CDMX"
-          }
-        }
-      }
+    }
 ```
 
 Use realistic placeholder values in Spanish/Mexican context (street names, city, state, etc.).
@@ -247,21 +247,21 @@ Use realistic placeholder values in Spanish/Mexican context (street names, city,
 Returns `GenericOutput` (`{ success, message }`). Only include the fields being changed; all update fields are optional except `guid`:
 
 ```yaml
-  body:
-    query: |-
-      mutation Update{Entity}($input: Update{Entity}Input!) {
-        update{Entity}(input: $input) {
-          success
-          message
-        }
+body:
+  query: |-
+    mutation Update{Entity}($input: Update{Entity}Input!) {
+      update{Entity}(input: $input) {
+        success
+        message
       }
-    variables: |-
-      {
-        "input": {
-          "guid": "00000000-0000-0000-0000-000000000000",
-          "name": "Updated Name"
-        }
+    }
+  variables: |-
+    {
+      "input": {
+        "guid": "00000000-0000-0000-0000-000000000000",
+        "name": "Updated Name"
       }
+    }
 ```
 
 ---
@@ -271,18 +271,18 @@ Returns `GenericOutput` (`{ success, message }`). Only include the fields being 
 Used for `start`, `complete`, `cancel`, `delete`, or any action that takes only a `guid`:
 
 ```yaml
-  body:
-    query: |-
-      mutation {Action}{Entity}($guid: UUID!) {
-        {action}{Entity}(guid: $guid) {
-          success
-          message
-        }
+body:
+  query: |-
+    mutation {Action}{Entity}($guid: UUID!) {
+      {action}{Entity}(guid: $guid) {
+        success
+        message
       }
-    variables: |-
-      {
-        "guid": "00000000-0000-0000-0000-000000000000"
-      }
+    }
+  variables: |-
+    {
+      "guid": "00000000-0000-0000-0000-000000000000"
+    }
 ```
 
 Create one file per lifecycle action (e.g. `start-service-order.yml`, `complete-service-order.yml`, `cancel-service-order.yml`).
@@ -291,28 +291,28 @@ Create one file per lifecycle action (e.g. `start-service-order.yml`, `complete-
 
 ## Naming Conventions
 
-| Concept | Convention | Example |
-|---|---|---|
-| Folder | `kebab-case`, plural | `service-orders/` |
-| Filename | `verb-entity.yml` | `create-service-order.yml` |
-| `info.name` | same as filename (no `.yml`) | `create-service-order` |
-| GQL operation name | `PascalCase` | `CreateServiceOrder` |
-| GQL resolver field | `camelCase` | `createServiceOrder` |
-| GQL args variable | `$find{Entities}Args` | `$findServiceOrdersArgs` |
-| GQL input variable | `$input` | `$input` |
+| Concept            | Convention                   | Example                    |
+| ------------------ | ---------------------------- | -------------------------- |
+| Folder             | `kebab-case`, plural         | `service-orders/`          |
+| Filename           | `verb-entity.yml`            | `create-service-order.yml` |
+| `info.name`        | same as filename (no `.yml`) | `create-service-order`     |
+| GQL operation name | `PascalCase`                 | `CreateServiceOrder`       |
+| GQL resolver field | `camelCase`                  | `createServiceOrder`       |
+| GQL args variable  | `$find{Entities}Args`        | `$findServiceOrdersArgs`   |
+| GQL input variable | `$input`                     | `$input`                   |
 
 ---
 
 ## Typical seq Order for a Full CRUD Module
 
-| seq | File | Notes |
-|---|---|---|
-| 1 | `get-{entities}.yml` | Base list |
-| 2 | `get-{entities}-with-filters.yml` | List + status/date filters |
-| 3 | `get-{entities}-with-search.yml` | List + text search |
-| 4 | `get-{entity}-detail.yml` | Full detail |
-| 5 | `create-{entity}.yml` | Basic create |
-| 6+ | extra create variants (e.g. with period) | Optional |
-| 7 | `update-{entity}.yml` | Partial update |
-| 8+ | lifecycle mutations | start, complete, cancel… |
-| last | `delete-{entity}.yml` | Soft delete |
+| seq  | File                                     | Notes                      |
+| ---- | ---------------------------------------- | -------------------------- |
+| 1    | `get-{entities}.yml`                     | Base list                  |
+| 2    | `get-{entities}-with-filters.yml`        | List + status/date filters |
+| 3    | `get-{entities}-with-search.yml`         | List + text search         |
+| 4    | `get-{entity}-detail.yml`                | Full detail                |
+| 5    | `create-{entity}.yml`                    | Basic create               |
+| 6+   | extra create variants (e.g. with period) | Optional                   |
+| 7    | `update-{entity}.yml`                    | Partial update             |
+| 8+   | lifecycle mutations                      | start, complete, cancel…   |
+| last | `delete-{entity}.yml`                    | Soft delete                |

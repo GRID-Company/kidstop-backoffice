@@ -47,29 +47,29 @@ nestjs-api/src/
 **File:** `shared/data/types/{module}/{myEnum}.model.ts`
 
 ```typescript
-import { registerEnumType } from "@nestjs/graphql";
+import { registerEnumType } from '@nestjs/graphql';
 
 export enum MyStatus {
-  PENDING = "PENDING",
-  COMPLETED = "COMPLETED",
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
 }
 
 registerEnumType(MyStatus, {
-  name: "MyStatus",
-  description: "Status of a ...",
+  name: 'MyStatus',
+  description: 'Status of a ...',
 });
 ```
 
 **File:** `shared/data/types/{module}/index.ts`
 
 ```typescript
-export { MyStatus } from "./myStatus.model";
+export { MyStatus } from './myStatus.model';
 ```
 
 **Then add to:** `shared/data/types/index.ts`
 
 ```typescript
-export { MyStatus } from "./{module}";
+export { MyStatus } from './{module}';
 ```
 
 ---
@@ -80,57 +80,56 @@ export { MyStatus } from "./{module}";
 
 Every entity **must extend `BaseEntity`** from `src/shared/data/entities/baseEntity`. `BaseEntity` automatically provides:
 
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `number` | Auto-increment PK (not exposed via GraphQL) |
-| `guid` | `UUID` | Public identifier, indexed, `@Field()` |
-| `createdDate` | `Date` | `GraphQLTimestamp` |
-| `updatedDate` | `Date` | `GraphQLTimestamp` |
-| `createdBy` | `User` | Nullable relation |
-| `updatedBy` | `User` | Nullable relation |
-| `deletedDate` | `Date` | Set on soft-delete |
+| Field         | Type     | Notes                                       |
+| ------------- | -------- | ------------------------------------------- |
+| `id`          | `number` | Auto-increment PK (not exposed via GraphQL) |
+| `guid`        | `UUID`   | Public identifier, indexed, `@Field()`      |
+| `createdDate` | `Date`   | `GraphQLTimestamp`                          |
+| `updatedDate` | `Date`   | `GraphQLTimestamp`                          |
+| `createdBy`   | `User`   | Nullable relation                           |
+| `updatedBy`   | `User`   | Nullable relation                           |
+| `deletedDate` | `Date`   | Set on soft-delete                          |
 
 The class carries **both** `@Entity()` (TypeORM) and `@ObjectType()` (GraphQL) decorators.
 
 ```typescript
-import { ObjectType, Field, Float } from "@nestjs/graphql";
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
-import { IsNotEmpty, IsEnum } from "class-validator";
-import { BaseEntity } from "../baseEntity";
-import { User } from "../users/user.entity";
-import { Client } from "../clients/client.entity";
-import { MyStatus } from "../../types/{module}/myStatus.model";
-import { AddressOutput } from "../../types/users/address.model";
+import { ObjectType, Field, Float } from '@nestjs/graphql';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { IsNotEmpty, IsEnum } from 'class-validator';
+import { BaseEntity } from '../baseEntity';
+import { User } from '../users/user.entity';
+import { Client } from '../clients/client.entity';
+import { MyStatus } from '../../types/{module}/myStatus.model';
+import { AddressOutput } from '../../types/users/address.model';
 
 @Entity()
 @ObjectType()
 export class MyEntity extends BaseEntity {
-
   getLocalizedName?(): string {
-    return 'Mi Entidad';         // used in NotFoundException messages
+    return 'Mi Entidad'; // used in NotFoundException messages
   }
 
   @Field()
   @IsNotEmpty()
-  @Column("text", { unique: true })
+  @Column('text', { unique: true })
   humanReadableId: string;
 
   @Field(() => MyStatus)
   @IsEnum(MyStatus)
-  @Column({ type: "enum", enum: MyStatus, default: MyStatus.PENDING })
+  @Column({ type: 'enum', enum: MyStatus, default: MyStatus.PENDING })
   status: MyStatus;
 
   @Field()
   @IsNotEmpty()
-  @Column("text")
+  @Column('text')
   name: string;
 
   @Field()
-  @Column("date")
+  @Column('date')
   dueDate: Date;
 
   @Field(() => Float)
-  @Column("float")
+  @Column('float')
   budget: number;
 
   @Field({ nullable: true })
@@ -148,7 +147,7 @@ export class MyEntity extends BaseEntity {
 
   // JSONB column (e.g. address)
   @Field(() => AddressOutput)
-  @Column("jsonb")
+  @Column('jsonb')
   clientAddress: AddressOutput;
 }
 ```
@@ -156,7 +155,7 @@ export class MyEntity extends BaseEntity {
 **Then add to:** `shared/data/entities/index.ts`
 
 ```typescript
-export { MyEntity } from "./{module}/myEntity.entity";
+export { MyEntity } from './{module}/myEntity.entity';
 ```
 
 ---
@@ -168,10 +167,15 @@ export { MyEntity } from "./{module}/myEntity.entity";
 **File:** `modules/{module}/view/dto/input/create{Entity}.input.ts`
 
 ```typescript
-import { InputType, Field, Float } from "@nestjs/graphql";
-import { IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
-import { AddressInput } from "src/shared/data/types/users/address.model";
+import { InputType, Field, Float } from '@nestjs/graphql';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { AddressInput } from 'src/shared/data/types/users/address.model';
 
 @InputType()
 export class CreateMyEntityInput {
@@ -188,7 +192,7 @@ export class CreateMyEntityInput {
   @Field()
   @IsNotEmpty()
   @IsString()
-  clientGuid: string;      // always pass guid, never id
+  clientGuid: string; // always pass guid, never id
 
   @Field(() => AddressInput)
   @ValidateNested()
@@ -204,11 +208,17 @@ export class CreateMyEntityInput {
 All fields optional except `guid`. Include `status` if status transitions via `updateX`.
 
 ```typescript
-import { InputType, Field, Float } from "@nestjs/graphql";
-import { IsOptional, IsNumber, IsString, ValidateNested, IsEnum } from "class-validator";
-import { Type } from "class-transformer";
-import { AddressInput } from "src/shared/data/types/users/address.model";
-import { MyStatus } from "src/shared/data/types/{module}/myStatus.model";
+import { InputType, Field, Float } from '@nestjs/graphql';
+import {
+  IsOptional,
+  IsNumber,
+  IsString,
+  ValidateNested,
+  IsEnum,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { AddressInput } from 'src/shared/data/types/users/address.model';
+import { MyStatus } from 'src/shared/data/types/{module}/myStatus.model';
 
 @InputType()
 export class UpdateMyEntityInput {
@@ -251,10 +261,10 @@ export class UpdateMyEntityInput {
 Uses `FindGenericsWithNoPublicFiltersInput` (filters field is not exposed publicly in GraphQL schema).
 
 ```typescript
-import { Field, InputType } from "@nestjs/graphql";
-import { IsOptional, IsEnum, IsString } from "class-validator";
-import { FindGenericsWithNoPublicFiltersInput } from "src/shared/presentation/dto/input/findGenerics.input";
-import { MyStatus } from "src/shared/data/types/{module}/myStatus.model";
+import { Field, InputType } from '@nestjs/graphql';
+import { IsOptional, IsEnum, IsString } from 'class-validator';
+import { FindGenericsWithNoPublicFiltersInput } from 'src/shared/presentation/dto/input/findGenerics.input';
+import { MyStatus } from 'src/shared/data/types/{module}/myStatus.model';
 
 @InputType()
 class FindMyEntitiesFilter {
@@ -278,7 +288,9 @@ class FindMyEntitiesFilter {
 }
 
 @InputType()
-export class FindMyEntitiesArgs extends FindGenericsWithNoPublicFiltersInput(FindMyEntitiesFilter) {
+export class FindMyEntitiesArgs extends FindGenericsWithNoPublicFiltersInput(
+  FindMyEntitiesFilter
+) {
   @Field(() => FindMyEntitiesFilter, { nullable: true })
   @IsOptional()
   filters?: FindMyEntitiesFilter;
@@ -292,9 +304,9 @@ export class FindMyEntitiesArgs extends FindGenericsWithNoPublicFiltersInput(Fin
 **File:** `modules/{module}/view/dto/output/paginated{Entities}.output.ts`
 
 ```typescript
-import { ObjectType } from "@nestjs/graphql";
-import { MyEntity } from "src/shared/data/entities/{module}/myEntity.entity";
-import { PaginatedList } from "src/shared/presentation/dto/output/paginated-list.output";
+import { ObjectType } from '@nestjs/graphql';
+import { MyEntity } from 'src/shared/data/entities/{module}/myEntity.entity';
+import { PaginatedList } from 'src/shared/presentation/dto/output/paginated-list.output';
 
 @ObjectType()
 export class PaginatedMyEntities extends PaginatedList(MyEntity) {}
@@ -475,10 +487,10 @@ async delete(guid: UUID): Promise<GenericOutput> {
 **File:** `modules/{module}/view/{module}.resolver.ts`
 
 ```typescript
-import { Resolver, Query, Mutation, Args } from "@nestjs/graphql";
-import { UseGuards } from "@nestjs/common";
-import { UUID } from "crypto";
-import { JwtAuthGuard } from "../../auth/domain/guards/jwtAuth.guard";
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { UUID } from 'crypto';
+import { JwtAuthGuard } from '../../auth/domain/guards/jwtAuth.guard';
 // For role restriction, also import:
 // import { HasRoles } from "../../auth/domain/guards/hasRoles.decorator";
 // import { RolesGuard } from "../../auth/domain/guards/roles.guard";
@@ -491,37 +503,38 @@ export class MyEntitiesResolver {
   // ── Authenticated only (no role restriction) ──
   @Query(() => PaginatedMyEntities)
   @UseGuards(JwtAuthGuard)
-  async myEntities(@Args("findMyEntitiesArgs") args: FindMyEntitiesArgs) {
+  async myEntities(@Args('findMyEntitiesArgs') args: FindMyEntitiesArgs) {
     return this.myEntitiesService.findAll(args);
   }
 
   @Query(() => MyEntity)
   @UseGuards(JwtAuthGuard)
-  async myEntity(@Args("guid") guid: UUID) {
+  async myEntity(@Args('guid') guid: UUID) {
     return this.myEntitiesService.findOne(guid);
   }
 
   @Mutation(() => MyEntity)
   @UseGuards(JwtAuthGuard)
-  async createMyEntity(@Args("input") input: CreateMyEntityInput) {
+  async createMyEntity(@Args('input') input: CreateMyEntityInput) {
     return this.myEntitiesService.create(input);
   }
 
   @Mutation(() => GenericOutput)
   @UseGuards(JwtAuthGuard)
-  async updateMyEntity(@Args("input") input: UpdateMyEntityInput) {
+  async updateMyEntity(@Args('input') input: UpdateMyEntityInput) {
     return this.myEntitiesService.update(input);
   }
 
   @Mutation(() => GenericOutput)
   @UseGuards(JwtAuthGuard)
-  async deleteMyEntity(@Args("guid") guid: UUID) {
+  async deleteMyEntity(@Args('guid') guid: UUID) {
     return this.myEntitiesService.delete(guid);
   }
 }
 ```
 
 **With role restriction:**
+
 ```typescript
 @HasRoles(UserRole.ADMIN, UserRole.COMMERCIAL)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -534,27 +547,25 @@ export class MyEntitiesResolver {
 **File:** `modules/{module}/{module}.module.ts`
 
 ```typescript
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { MyEntitiesService } from "./domain/myEntities.service";
-import { MyEntitiesResolver } from "./view/myEntities.resolver";
-import { MyEntity } from "src/shared/data/entities/{module}/myEntity.entity";
-import { Client } from "src/shared/data/entities/clients/client.entity";
-import { User } from "src/shared/data/entities/users/user.entity";
-import { RepositoryFactory } from "src/shared/data/repositories/baseRepository/baseRepository";
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MyEntitiesService } from './domain/myEntities.service';
+import { MyEntitiesResolver } from './view/myEntities.resolver';
+import { MyEntity } from 'src/shared/data/entities/{module}/myEntity.entity';
+import { Client } from 'src/shared/data/entities/clients/client.entity';
+import { User } from 'src/shared/data/entities/users/user.entity';
+import { RepositoryFactory } from 'src/shared/data/repositories/baseRepository/baseRepository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([MyEntity, Client, User])
-  ],
+  imports: [TypeOrmModule.forFeature([MyEntity, Client, User])],
   providers: [
-    RepositoryFactory(MyEntity),   // one per entity registered above
+    RepositoryFactory(MyEntity), // one per entity registered above
     RepositoryFactory(Client),
     RepositoryFactory(User),
     MyEntitiesResolver,
     MyEntitiesService,
   ],
-  exports: [MyEntitiesService],    // export only if other modules need it
+  exports: [MyEntitiesService], // export only if other modules need it
 })
 export class MyEntitiesModule {}
 ```
@@ -568,7 +579,7 @@ export class MyEntitiesModule {}
 **File:** `src/app.module.ts`
 
 ```typescript
-import { MyEntitiesModule } from "./modules/{module}/myEntities.module";
+import { MyEntitiesModule } from './modules/{module}/myEntities.module';
 
 @Module({
   imports: [
@@ -583,36 +594,36 @@ export class AppModule {}
 
 ## Shared Utilities Quick Reference
 
-| Utility | Path |
-|---|---|
-| `BaseEntity` | `src/shared/data/entities/baseEntity.ts` |
-| `AddressInput` / `AddressOutput` | `src/shared/data/types/users/address.model.ts` |
-| `GenericOutput` | `src/shared/presentation/dto/output/generic.output.ts` |
-| `PaginatedList<T>` | `src/shared/presentation/dto/output/paginated-list.output.ts` |
-| `FindGenericsWithNoPublicFiltersInput` | `src/shared/presentation/dto/input/findGenerics.input.ts` |
-| `FindGenericsInput` | `src/shared/presentation/dto/input/findGenerics.input.ts` |
-| `IBaseRepository<T>` | `src/shared/data/repositories/baseRepository/baseRepository.ts` |
-| `RepositoryFactory` | `src/shared/data/repositories/baseRepository/baseRepository.ts` |
-| `RepositoryCustomQueryService` | `src/shared/services/foundation/repositoryCustomQuery.service.ts` |
-| `JwtAuthGuard` | `src/modules/auth/domain/guards/jwtAuth.guard.ts` |
-| `RolesGuard` | `src/modules/auth/domain/guards/roles.guard.ts` |
-| `HasRoles` | `src/modules/auth/domain/guards/hasRoles.decorator.ts` |
-| `UserRole` | `src/shared/data/types/users/userRole.model.ts` |
-| `SortType` | `src/shared/presentation/dto/input/findGenerics.input.ts` |
+| Utility                                | Path                                                              |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `BaseEntity`                           | `src/shared/data/entities/baseEntity.ts`                          |
+| `AddressInput` / `AddressOutput`       | `src/shared/data/types/users/address.model.ts`                    |
+| `GenericOutput`                        | `src/shared/presentation/dto/output/generic.output.ts`            |
+| `PaginatedList<T>`                     | `src/shared/presentation/dto/output/paginated-list.output.ts`     |
+| `FindGenericsWithNoPublicFiltersInput` | `src/shared/presentation/dto/input/findGenerics.input.ts`         |
+| `FindGenericsInput`                    | `src/shared/presentation/dto/input/findGenerics.input.ts`         |
+| `IBaseRepository<T>`                   | `src/shared/data/repositories/baseRepository/baseRepository.ts`   |
+| `RepositoryFactory`                    | `src/shared/data/repositories/baseRepository/baseRepository.ts`   |
+| `RepositoryCustomQueryService`         | `src/shared/services/foundation/repositoryCustomQuery.service.ts` |
+| `JwtAuthGuard`                         | `src/modules/auth/domain/guards/jwtAuth.guard.ts`                 |
+| `RolesGuard`                           | `src/modules/auth/domain/guards/roles.guard.ts`                   |
+| `HasRoles`                             | `src/modules/auth/domain/guards/hasRoles.decorator.ts`            |
+| `UserRole`                             | `src/shared/data/types/users/userRole.model.ts`                   |
+| `SortType`                             | `src/shared/presentation/dto/input/findGenerics.input.ts`         |
 
 ---
 
 ## `IBaseRepository` Method Cheatsheet
 
-| Method | Description |
-|---|---|
-| `createOne(data)` | Instantiates entity, stamps `createdById`/`updatedById` from CLS |
-| `saveOne(entity)` | Saves (insert or update), stamps `updatedById` |
-| `saveMany(entities)` | Bulk save |
-| `getOne(options)` | `findOne` with optional relations (handles soft-delete exclusion automatically) |
-| `getOneOrFail(options)` | Same as `getOne` but throws `NotFoundException` if not found |
-| `getOneBy(where)` | Simple `findOneBy` |
-| `findMany(options)` | `find` with optional relations |
-| `updateBy(where, partial)` | `UPDATE … SET` via criteria, stamps `updatedById` |
-| `softDeleteWithId(id)` | Sets `deletedDate` (soft delete) — always use numeric `id`, not `guid` |
-| `createQuery(alias)` | Returns a raw `SelectQueryBuilder` for custom queries |
+| Method                     | Description                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------- |
+| `createOne(data)`          | Instantiates entity, stamps `createdById`/`updatedById` from CLS                |
+| `saveOne(entity)`          | Saves (insert or update), stamps `updatedById`                                  |
+| `saveMany(entities)`       | Bulk save                                                                       |
+| `getOne(options)`          | `findOne` with optional relations (handles soft-delete exclusion automatically) |
+| `getOneOrFail(options)`    | Same as `getOne` but throws `NotFoundException` if not found                    |
+| `getOneBy(where)`          | Simple `findOneBy`                                                              |
+| `findMany(options)`        | `find` with optional relations                                                  |
+| `updateBy(where, partial)` | `UPDATE … SET` via criteria, stamps `updatedById`                               |
+| `softDeleteWithId(id)`     | Sets `deletedDate` (soft delete) — always use numeric `id`, not `guid`          |
+| `createQuery(alias)`       | Returns a raw `SelectQueryBuilder` for custom queries                           |

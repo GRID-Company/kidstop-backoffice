@@ -315,7 +315,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
           </ScanStatusBanner>
         )}
 
-        {status === 'results' && scannedData ? (
+        {status === 'results' && scannedData && (
           <ScannerResults
             scannedData={scannedData}
             game={selectedGame}
@@ -324,33 +324,37 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
             onReset={handleReset}
             onUseCandidate={handleUseCandidate}
           />
-        ) : (
-          <>
-            <CameraPreview
-              videoRef={videoRef}
-              canvasRef={canvasRef}
-              cvReady={cvReady}
-              cardDetected={cardDetected}
-              showGrid={true}
-              torchControl={
-                <TorchControl
-                  supported={torchSupported}
-                  enabled={torchEnabled}
-                  onToggle={toggleTorch}
-                  disabled={!isStreaming}
-                />
-              }
-            />
-            <ScannerActionBar
-              status={status}
-              autoCapture={autoCapture}
-              onAutoCaptureChange={setAutoCapture}
-              onCapture={handleCapture}
-              onReset={handleReset}
-              disabled={!cvReady || !isStreaming || !latestCorners.current}
-            />
-          </>
         )}
+
+        <div
+          className={
+            status === 'results' && scannedData ? 'hidden' : 'contents'
+          }
+        >
+          <CameraPreview
+            videoRef={videoRef}
+            canvasRef={canvasRef}
+            cvReady={cvReady}
+            cardDetected={cardDetected}
+            showGrid={true}
+            torchControl={
+              <TorchControl
+                supported={torchSupported}
+                enabled={torchEnabled}
+                onToggle={toggleTorch}
+                disabled={!isStreaming}
+              />
+            }
+          />
+          <ScannerActionBar
+            status={status}
+            autoCapture={autoCapture}
+            onAutoCaptureChange={setAutoCapture}
+            onCapture={handleCapture}
+            onReset={handleReset}
+            disabled={!cvReady || !isStreaming || !latestCorners.current}
+          />
+        </div>
 
         {process.env.NODE_ENV === 'development' &&
           cvReady &&

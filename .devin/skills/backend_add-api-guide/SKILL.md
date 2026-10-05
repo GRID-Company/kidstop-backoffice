@@ -56,7 +56,7 @@ Always include a ToC with anchor links to every query and mutation, plus the str
   - (lifecycle mutations if any)
 - [Types & Data Structures](#types--data-structures)
 - [Search & Filtering](#search--filtering)
-- [Status Lifecycle](#status-lifecycle)   ← only if module has statuses
+- [Status Lifecycle](#status-lifecycle) ← only if module has statuses
 ```
 
 ---
@@ -75,6 +75,7 @@ For each query, provide:
 6. **Response Example** — realistic JSON with Mexican context values
 
 **GraphQL schema block template:**
+
 ```graphql
 query {Entities}($find{Entities}Args: Find{Entities}Args!) {
   {entities}(find{Entities}Args: $find{Entities}Args) {
@@ -93,6 +94,7 @@ query {Entities}($find{Entities}Args: Find{Entities}Args!) {
 ```
 
 **TypeScript Interface template:**
+
 ```typescript
 interface Find{Entities}Args {
   limit: number;
@@ -143,6 +145,7 @@ For each mutation, provide:
   ```
 
 #### Input interface template (create):
+
 ```typescript
 interface Create{Entity}Input {
   requiredField: string;       // Required
@@ -156,6 +159,7 @@ interface Create{Entity}Input {
 ```
 
 #### Input interface template (update):
+
 ```typescript
 interface Update{Entity}Input {
   guid: string;               // Required
@@ -172,6 +176,7 @@ interface Update{Entity}Input {
 #### Business Rules block
 
 Always document:
+
 - Auto-generated fields (format + logic)
 - Default values on creation
 - Validation rules (date ranges, required-when conditions)
@@ -230,6 +235,7 @@ List **every field** the `search` parameter matches against, with the ILIKE note
 
 ```markdown
 The `search` parameter searches in (case-insensitive, `ILIKE`):
+
 - **Field A** (`columnName`) — e.g., "SRV-2026"
 - **Field B** (`name`)
 - **Client name** (`client.name`)
@@ -248,13 +254,13 @@ Show 2 filter examples in JSON.
 
 Provide a Markdown table:
 
-| Column | Description |
-|---|---|
-| `fieldName` | What it sorts by |
-| `clientName` | Client name (joined column) |
-| `agentName` | Agent name (joined column) |
-| `createdDate` | Creation date |
-| `updatedDate` | Last update date |
+| Column        | Description                 |
+| ------------- | --------------------------- |
+| `fieldName`   | What it sorts by            |
+| `clientName`  | Client name (joined column) |
+| `agentName`   | Agent name (joined column)  |
+| `createdDate` | Creation date               |
+| `updatedDate` | Last update date            |
 
 > Note: `clientName` and `agentName` are **joined columns** — they sort on the related table, not a local column.
 
@@ -283,10 +289,10 @@ Short bullet for each status value.
 
 #### Dedicated vs. Generic Transitions table (if module has lifecycle mutations)
 
-| Transition | Dedicated Mutation | Also via `update{Entity}` |
-|---|---|---|
-| `A → B` | `startX` | ✅ |
-| `B → COMPLETED` | `completeX` | ✅ |
+| Transition      | Dedicated Mutation | Also via `update{Entity}` |
+| --------------- | ------------------ | ------------------------- |
+| `A → B`         | `startX`           | ✅                        |
+| `B → COMPLETED` | `completeX`        | ✅                        |
 
 ---
 
@@ -294,17 +300,18 @@ Short bullet for each status value.
 
 Document **every distinct error** the API can return, with its HTTP-style code and message text:
 
-| Error | Message | Code |
-|---|---|---|
-| Entity not found | `"Orden de servicio no encontrada."` | `NOT_FOUND` |
-| Client not found | `"Cliente no encontrado."` | `NOT_FOUND` |
-| Agent not found | `"Agente no encontrado."` | `NOT_FOUND` |
-| Invalid transition | `"Transición de estado inválida: X → Y."` | `BAD_REQUEST` |
-| Terminal state | `"No se puede cancelar una orden en estado COMPLETED."` | `BAD_REQUEST` |
-| Period validation | `"periodEndDate debe ser posterior a periodStartDate."` | `BAD_REQUEST` |
-| Unauthorized | `"Unauthorized"` | `UNAUTHENTICATED` |
+| Error              | Message                                                 | Code              |
+| ------------------ | ------------------------------------------------------- | ----------------- |
+| Entity not found   | `"Orden de servicio no encontrada."`                    | `NOT_FOUND`       |
+| Client not found   | `"Cliente no encontrado."`                              | `NOT_FOUND`       |
+| Agent not found    | `"Agente no encontrado."`                               | `NOT_FOUND`       |
+| Invalid transition | `"Transición de estado inválida: X → Y."`               | `BAD_REQUEST`     |
+| Terminal state     | `"No se puede cancelar una orden en estado COMPLETED."` | `BAD_REQUEST`     |
+| Period validation  | `"periodEndDate debe ser posterior a periodStartDate."` | `BAD_REQUEST`     |
+| Unauthorized       | `"Unauthorized"`                                        | `UNAUTHENTICATED` |
 
 Format each as a fenced JSON block:
+
 ```json
 {
   "errors": [
