@@ -49,7 +49,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
   const selectedGame: TCGGame =
     selectedTCG === TCG_TYPES.POKEMON ? 'pokemon' : 'magic';
 
-  const [autoCapture, setAutoCapture] = useState(true);
+  const [autoCapture, setAutoCapture] = useState(false);
   const [hapticEnabled, setHapticEnabled] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);

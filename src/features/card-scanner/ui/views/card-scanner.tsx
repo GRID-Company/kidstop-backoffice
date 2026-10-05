@@ -26,7 +26,7 @@ import toast from 'react-hot-toast';
 export const CardScannerView = () => {
   const [isClient, setIsClient] = useState(false);
   const [selectedGame, setSelectedGame] = useState<TCGGame>('pokemon');
-  const [autoCapture, setAutoCapture] = useState(true);
+  const [autoCapture, setAutoCapture] = useState(false);
   const [hapticEnabled, setHapticEnabled] = useState(true);
   const [hapticSupported, setHapticSupported] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
