@@ -3,6 +3,8 @@
 import { PropsWithChildren } from 'react';
 import Topbar from '../blocks/navigation/topbar';
 import Sidenav from '../blocks/navigation/sidenav';
+import CardScannerFab from '../base/buttons/card-scanner-fab';
+import { CardScannerDrawer } from '@/features/card-scanner/ui/components/card-scanner-drawer';
 import { useTcgTheme } from '@/lib/hooks/use-tcg-theme';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
@@ -20,6 +22,9 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           {children}
         </div>
       </div>
+
+      <CardScannerFab />
+      <CardScannerDrawer />
     </div>
   );
 }

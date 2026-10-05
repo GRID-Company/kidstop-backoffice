@@ -211,11 +211,9 @@ export const useCameraStream = (
   useEffect(() => {
     mountedRef.current = true;
 
-    if (hasInitializedRef.current) return;
-
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-    if (!isIOS) {
+    if (!isIOS && !hasInitializedRef.current) {
       startCamera();
       hasInitializedRef.current = true;
     }
