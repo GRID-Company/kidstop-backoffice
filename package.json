@@ -8,6 +8,7 @@
     "dev:https": "node server.mjs",
     "dev:ngrok": "ngrok http 3000 --log=stdout",
     "prod": "next dev -p 3120",
+    "prebuild": "node scripts/write-server-env.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
