@@ -13,8 +13,9 @@ const googleVisionEnvSchema = z.object({
     .min(1, 'GOOGLE_CLOUD_PRIVATE_KEY is required')
     .refine(
       (key) =>
-        key.includes('BEGIN PRIVATE KEY') && key.includes('END PRIVATE KEY'),
-      'GOOGLE_CLOUD_PRIVATE_KEY must be a valid private key'
+        key.includes('BEGIN PRIVATE KEY') ||
+        /^[A-Za-z0-9+/=\s]+$/.test(key.trim().replace(/^["']+|["']+$/g, '')),
+      'GOOGLE_CLOUD_PRIVATE_KEY must be a PEM private key or base64-encoded PEM'
     ),
 });
 

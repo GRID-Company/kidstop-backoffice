@@ -1,20 +1,41 @@
+import { createPrivateKey } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { ImageAnnotatorClient } from '@google-cloud/vision';
 import { validateGoogleVisionConfig } from '@/lib/config/google-vision.config';
 
 let visionClient: ImageAnnotatorClient | null = null;
 
+function normalizePrivateKey(raw: string): string {
+  let key = raw.trim().replace(/^["']+|["']+$/g, '');
+
+  if (!key.includes('BEGIN PRIVATE KEY')) {
+    key = Buffer.from(key, 'base64').toString('utf8').trim();
+  }
+
+  const normalized = key
+    .replace(/\r\n/g, '\n')
+    .replace(/\\\\n/g, '\\n')
+    .replace(/\\n/g, '\n');
+
+  try {
+    createPrivateKey(normalized);
+  } catch {
+    throw new Error(
+      'GOOGLE_CLOUD_PRIVATE_KEY is not a valid PEM. Store the base64 of the key file instead (e.g. `base64 -i key.pem`).'
+    );
+  }
+
+  return normalized;
+}
+
 function getVisionClient(): ImageAnnotatorClient {
   if (!visionClient) {
     const config = validateGoogleVisionConfig();
-    const privateKey = config.GOOGLE_CLOUD_PRIVATE_KEY.trim()
-      .replace(/^["']+|["']+$/g, '')
-      .replace(/\\n/g, '\n');
 
     visionClient = new ImageAnnotatorClient({
       credentials: {
         client_email: config.GOOGLE_CLOUD_CLIENT_EMAIL,
-        private_key: privateKey,
+        private_key: normalizePrivateKey(config.GOOGLE_CLOUD_PRIVATE_KEY),
       },
       projectId: config.GOOGLE_CLOUD_PROJECT_ID,
     });
