@@ -11,6 +11,7 @@ import {
 import { CardScannerSource } from '@/lib/store/card-scanner';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { useCardSearch } from '../hooks/use-card-search';
+import { ScanEmptyState } from './scan-empty-state';
 import { ScanFieldsEditor } from './scan-fields-editor';
 import { ScanOcrText } from './scan-ocr-text';
 import { ScanStatusBanner } from './scan-status-banner';
@@ -101,32 +102,28 @@ export const ScannerResults = ({
         </div>
       )}
 
-      {!isSearching && (searchError || validationErrors.length > 0) && (
-        <ScanStatusBanner
-          variant={validationErrors.length ? 'error' : 'warning'}
-          title={validationErrors.length ? 'Datos insuficientes' : undefined}
-          action={
-            <Button
-              size='sm'
-              variant='flat'
-              onPress={performSearch}
-              startContent={<Icon icon='lucide:rotate-cw' width={14} />}
-            >
-              Reintentar
-            </Button>
-          }
-        >
-          {validationErrors.length > 0 ? (
-            <ul className='space-y-1'>
-              {validationErrors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          ) : (
-            searchError
-          )}
-        </ScanStatusBanner>
-      )}
+      {!isSearching &&
+        (searchError || validationErrors.length > 0) &&
+        (validationErrors.length > 0 ||
+        searchError === 'No se encontraron resultados' ? (
+          <ScanEmptyState
+            title='No encontramos esta carta'
+            tips={[
+              'Usa un fondo liso y oscuro detrás de la carta',
+              'Evita reflejos y luz directa sobre la carta',
+              'Acércate hasta que la carta llene el recuadro',
+              'Limpia el lente de la cámara',
+            ]}
+            onRescan={onReset}
+          />
+        ) : (
+          <ScanEmptyState
+            title='No pudimos buscar en el catálogo'
+            message={searchError ?? undefined}
+            onRescan={onReset}
+            onRetry={performSearch}
+          />
+        ))}
 
       {hasCandidates && (
         <div className='border-divider rounded-lg border bg-white p-4'>

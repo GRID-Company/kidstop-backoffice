@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 
 import { useCameraStream } from '../hooks/use-camera-stream';
 import { useOpenCV } from '../hooks/use-opencv';
+import { getFriendlyPipelineError } from '../../domain/card-scanner.domain';
 import { useCardDetection } from '../hooks/use-card-detection';
 import { useCardScannerPipeline } from '../hooks/use-card-scanner-pipeline';
 import { CameraPreview } from './camera-preview';
@@ -245,7 +246,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
                 ? {
                     variant: 'error' as const,
                     title: 'Error de procesamiento',
-                    message: pipelineError,
+                    message: getFriendlyPipelineError(pipelineError),
                   }
                 : null;
 

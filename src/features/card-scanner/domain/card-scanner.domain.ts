@@ -627,3 +627,16 @@ export function validateCardAlignment(
     coverage,
   };
 }
+
+export function getFriendlyPipelineError(message: string): string {
+  if (message.startsWith('Calidad de captura insuficiente')) {
+    return 'La foto no salió clara. Busca mejor luz y un fondo liso, e inténtalo de nuevo.';
+  }
+  if (message.startsWith('Calidad de OCR insuficiente')) {
+    return 'No se pudo leer el texto de la carta. Acércate más y evita los reflejos.';
+  }
+  if (message.startsWith('Vision API error')) {
+    return 'No pudimos analizar la imagen. Revisa tu conexión e inténtalo de nuevo.';
+  }
+  return message;
+}
