@@ -33,12 +33,7 @@ export const ScanResultsView = ({
     canSearch,
     performSearch,
     clearResults,
-  } = useCardSearch(
-    game,
-    scannedData.extractedData,
-    scannedData.confidence,
-    scannedData.rawOcr
-  );
+  } = useCardSearch(game, scannedData);
 
   useEffect(() => {
     clearResults();
@@ -153,14 +148,14 @@ export const ScanResultsView = ({
             </p>
             {searchResults.candidates.length > 0 && (
               <div className='mt-3 space-y-2'>
-                {searchResults.candidates.map((candidate, index) => (
+                {searchResults.candidates.map((candidate) => (
                   <div
-                    key={index}
+                    key={candidate.guid}
                     className='rounded bg-green-900/50 p-2 text-sm text-green-50'
                   >
-                    <div className='font-medium'>{candidate.name}</div>
-                    <div className='text-xs text-green-200'>
-                      Confianza: {(candidate.confidence * 100).toFixed(0)}%
+                    <div className='font-medium'>
+                      {candidate.name}
+                      {candidate.isBestMatch && ' ⭐'}
                     </div>
                     {candidate.setName && (
                       <div className='text-xs text-green-300'>

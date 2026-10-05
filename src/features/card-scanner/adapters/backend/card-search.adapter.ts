@@ -1,113 +1,123 @@
+import type { ApolloClient } from '@apollo/client';
+import type { CardScanSearchInput } from '@/lib/api/schema-types';
+import {
+  MagicCardScanSearchDocument,
+  PokemonCardScanSearchDocument,
+} from '@/lib/api/generated/card-scan-search.generated';
 import {
   IExtractedCardData,
-  IScanConfidence,
-  TCGGame,
-  ICardSearchRequest,
   ICardSearchResponse,
-  IRegionalOcrResult,
+  TCGGame,
 } from '../../domain/types';
+import { cardScanSearchInputSchema } from '../schemas/card-search.schema';
 import {
-  cardSearchRequestSchema,
-  CardSearchRequestSchema,
-} from '../schemas/card-search.schema';
+  mapMagicScanResultFromApi,
+  mapPokemonScanResultFromApi,
+} from '../mappers/card-scan.mapper';
+import { mockCardSearchResponse } from './card-search.mock';
 import { logger } from '../../domain/logger';
 
-export function buildCardSearchRequest(
-  game: TCGGame,
-  extractedData: IExtractedCardData,
-  confidence: IScanConfidence,
-  rawOcr: IRegionalOcrResult
-): ICardSearchRequest {
-  const request: ICardSearchRequest = {
-    schemaVersion: '1.0',
-    game: (game === 'pokemon' || game === 'magic' ? game : 'unknown') as
-      | TCGGame
-      | 'unknown',
-    scan: {
-      capturedAt: new Date().toISOString(),
-      orientation: 'portrait',
-      layout: null,
-      captureQuality: confidence.captureQuality,
-      ocrQuality: confidence.ocrQuality,
-      extractionQuality: confidence.extractionQuality,
-    },
-    fields: extractedData,
-    rawOcr: {
-      fullText: rawOcr.fullText,
-      regions: Object.fromEntries(
-        Object.entries(rawOcr.regions).map(([key, value]) => [
-          key,
-          {
-            text: value.text,
-            averageConfidence: value.averageConfidence,
-          },
-        ])
-      ),
-    },
-  };
+const EMPTY_SCAN_RESPONSE: ICardSearchResponse = {
+  resolvedByAI: false,
+  bestMatch: null,
+  candidates: [],
+  aiResolved: null,
+  error: null,
+};
 
-  return request;
+export function buildCardScanSearchInput(
+  extractedData: IExtractedCardData,
+  originalImage: File | null,
+  setIcon: File | null
+): CardScanSearchInput {
+  return {
+    name: extractedData.name.normalizedValue ?? extractedData.name.value,
+    cardNumber:
+      extractedData.collectorNumber.normalizedValue ??
+      extractedData.collectorNumber.value,
+    setCode:
+      extractedData.setCode.normalizedValue ?? extractedData.setCode.value,
+    originalImage,
+    setIcon,
+    withCardsMetrics: true,
+  };
 }
 
-export function validateCardSearchRequest(
-  request: ICardSearchRequest
-):
-  | { valid: true; data: ICardSearchRequest }
-  | { valid: false; errors: string[] } {
-  try {
-    const validated: CardSearchRequestSchema =
-      cardSearchRequestSchema.parse(request);
-    return { valid: true, data: validated as ICardSearchRequest };
-  } catch (error) {
-    if (error instanceof Error && 'issues' in error) {
-      const zodError = error as {
-        issues: Array<{ path: Array<string | number>; message: string }>;
-      };
-      const errors = zodError.issues.map(
-        (e) => `${e.path.join('.')}: ${e.message}`
-      );
-      return { valid: false, errors };
-    }
-    return { valid: false, errors: ['Validation error'] };
+export function validateCardScanSearchInput(
+  input: CardScanSearchInput
+): { valid: true } | { valid: false; errors: string[] } {
+  const result = cardScanSearchInputSchema.safeParse(input);
+
+  if (result.success) {
+    return { valid: true };
   }
+
+  return {
+    valid: false,
+    errors: result.error.issues.map(
+      (issue) => `${issue.path.join('.')}: ${issue.message}`
+    ),
+  };
+}
+
+async function searchCardInBackendMock(
+  game: TCGGame
+): Promise<ICardSearchResponse> {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return mockCardSearchResponse(game);
+}
+
+function isCardScanOperationUnavailable(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes('Cannot query field') && message.includes('CardScanSearch')
+  );
 }
 
 export async function searchCardInBackend(
-  request: ICardSearchRequest
-): Promise<ICardSearchResponse> {
-  logger.debug('🔍 Buscando carta en backend:', request);
-
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  const mockResponse: ICardSearchResponse = {
-    candidates: [],
-  };
-
-  return mockResponse;
-}
-
-export function prepareCardSearchPayload(
+  client: ApolloClient,
   game: TCGGame,
-  extractedData: IExtractedCardData,
-  confidence: IScanConfidence,
-  rawOcr: IRegionalOcrResult
-):
-  | { valid: true; payload: ICardSearchRequest }
-  | { valid: false; errors: string[] } {
-  const request = buildCardSearchRequest(
-    game,
-    extractedData,
-    confidence,
-    rawOcr
-  );
+  input: CardScanSearchInput
+): Promise<ICardSearchResponse> {
+  logger.debug('🔍 Buscando carta en backend:', { game, input });
 
-  const validation = validateCardSearchRequest(request);
-
-  if (!validation.valid) {
-    return { valid: false, errors: validation.errors };
+  if (process.env.NEXT_PUBLIC_CARD_SCAN_USE_MOCK === 'true') {
+    return searchCardInBackendMock(game);
   }
 
-  return { valid: true, payload: validation.data };
+  try {
+    if (game === 'magic') {
+      const { data } = await client.query({
+        query: MagicCardScanSearchDocument,
+        variables: { input },
+        fetchPolicy: 'no-cache',
+      });
+
+      if (!data?.magicCardScanSearch) {
+        return EMPTY_SCAN_RESPONSE;
+      }
+
+      return mapMagicScanResultFromApi(data.magicCardScanSearch);
+    }
+
+    const { data } = await client.query({
+      query: PokemonCardScanSearchDocument,
+      variables: { input },
+      fetchPolicy: 'no-cache',
+    });
+
+    if (!data?.pokemonCardScanSearch) {
+      return EMPTY_SCAN_RESPONSE;
+    }
+
+    return mapPokemonScanResultFromApi(data.pokemonCardScanSearch);
+  } catch (error) {
+    if (isCardScanOperationUnavailable(error)) {
+      logger.warn('⚠️ cardScanSearch no disponible en el backend, usando mock');
+      return searchCardInBackendMock(game);
+    }
+    throw error;
+  }
 }
 
 export function hasMinimumSearchCriteria(
@@ -121,7 +131,8 @@ export function hasMinimumSearchCriteria(
 }
 
 export function getSearchCriteriaFeedback(
-  extractedData: IExtractedCardData
+  extractedData: IExtractedCardData,
+  hasImage: boolean
 ): string[] {
   const feedback: string[] = [];
 
@@ -143,9 +154,9 @@ export function getSearchCriteriaFeedback(
     );
   }
 
-  if (!hasMinimumSearchCriteria(extractedData)) {
+  if (!hasMinimumSearchCriteria(extractedData) && !hasImage) {
     feedback.push(
-      '❌ Criterios insuficientes. Necesitas al menos: Nombre O (Número + Set).'
+      '❌ Criterios insuficientes. Necesitas al menos: Nombre O (Número + Set) o una imagen.'
     );
   }
 

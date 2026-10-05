@@ -76,6 +76,7 @@ export function mapOCRResultToCardData(
   return {
     imageDataUrl,
     normalizedImageUrl: imageDataUrl,
+    setIconImageUrl: null,
     extractedData: createEmptyExtractedCardData(),
     confidence,
     rawOcr,

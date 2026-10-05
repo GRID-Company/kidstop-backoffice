@@ -24,6 +24,7 @@ import {
 } from '../../domain/normalization.domain';
 import {
   createCompositeOcrImage,
+  extractRegion,
   matToDataURL,
 } from '../../domain/region-extraction.domain';
 import { extractTextWithVisionRegional } from '../../adapters/ocr/google-vision';
@@ -98,6 +99,18 @@ export const useCardScannerPipeline = (game: TCGGame) => {
         throw new Error(`No region config found for game: ${game}`);
       }
 
+      const setSymbolRegion = regionConfig.regions.find(
+        (region) => region.id === 'setSymbol'
+      );
+      let setIconImageUrl: string | null = null;
+      if (setSymbolRegion) {
+        const setIconMat = extractRegion(normalizedMat, setSymbolRegion, cv);
+        if (!setIconMat.empty()) {
+          setIconImageUrl = matToDataURL(setIconMat, cv);
+        }
+        setIconMat.delete();
+      }
+
       const compositeResult = createCompositeOcrImage(
         normalizedMat,
         regionConfig.regions,
@@ -166,6 +179,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
       const cardData: IScannedCardData = {
         imageDataUrl: compositeImageUrl,
         normalizedImageUrl,
+        setIconImageUrl,
         extractedData,
         confidence,
         rawOcr: regionalOcr,

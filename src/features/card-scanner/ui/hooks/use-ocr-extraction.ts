@@ -58,6 +58,7 @@ export const useOCRExtraction = () => {
       const cardData: IScannedCardData = {
         imageDataUrl,
         normalizedImageUrl: imageDataUrl,
+        setIconImageUrl: null,
         extractedData: createEmptyExtractedCardData(),
         confidence,
         rawOcr,

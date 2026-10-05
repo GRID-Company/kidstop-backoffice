@@ -110,3 +110,15 @@ export function retry<T>(
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export async function dataUrlToFile(
+  dataUrl: string,
+  filename: string
+): Promise<File> {
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+  const mimeType = blob.type || 'image/png';
+  const extension = mimeType.split('/')[1] ?? 'png';
+
+  return new File([blob], `${filename}.${extension}`, { type: mimeType });
+}

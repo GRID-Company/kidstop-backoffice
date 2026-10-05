@@ -1,3 +1,5 @@
+import type { CardLanguage } from '@/lib/api/schema-types';
+
 export interface IPoint {
   x: number;
   y: number;
@@ -370,43 +372,42 @@ export interface IScanConfidence {
   overall: number;
 }
 
-export interface ICardSearchRequest {
-  schemaVersion: '1.0';
-  game: TCGGame | 'unknown';
-  scan: {
-    capturedAt: string;
-    orientation: CardOrientation;
-    layout: CardLayout | null;
-    captureQuality: number;
-    ocrQuality: number;
-    extractionQuality: number;
-  };
-  fields: IExtractedCardData;
-  rawOcr: {
-    fullText: string;
-    regions: Record<
-      string,
-      {
-        text: string;
-        averageConfidence: number | null;
-      }
-    >;
-  };
+export interface ICardScanAiResolved {
+  name: string | null;
+  nameEs: string | null;
+  cardNumber: string | null;
+  setCode: string | null;
+  setName: string | null;
+  setNameEs: string | null;
+  cardText: string | null;
+  cardTextEs: string | null;
+  detectedLanguage: string | null;
 }
 
 export interface ICardCandidate {
-  id: string;
+  guid: string;
   game: TCGGame;
   name: string;
   setName: string | null;
+  setCode: string | null;
   collectorNumber: string | null;
   imageUrl: string | null;
-  confidence: number;
-  matchedBy: string[];
+  language: CardLanguage;
+  isFoil: boolean;
+  variant: string | null;
+  sellPrice: number | null;
+  referencePrice: number | null;
+  totalStock: number;
+  availableStock: boolean;
+  isBestMatch: boolean;
 }
 
 export interface ICardSearchResponse {
+  resolvedByAI: boolean;
+  bestMatch: ICardCandidate | null;
   candidates: ICardCandidate[];
+  aiResolved: ICardScanAiResolved | null;
+  error: string | null;
 }
 
 export interface IScannerMetrics {
@@ -434,6 +435,7 @@ export type ScannerStatus =
 export interface IScannedCardData {
   imageDataUrl: string;
   normalizedImageUrl: string;
+  setIconImageUrl: string | null;
   extractedData: IExtractedCardData;
   confidence: IScanConfidence;
   rawOcr: IRegionalOcrResult;

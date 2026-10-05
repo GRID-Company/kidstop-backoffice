@@ -1,14 +1,15 @@
 import { useState, useCallback } from 'react';
+import { useApolloClient } from '@apollo/client/react';
 import {
-  IExtractedCardData,
-  IScanConfidence,
   TCGGame,
   ICardSearchResponse,
-  IRegionalOcrResult,
+  IScannedCardData,
 } from '../../domain/types';
+import { dataUrlToFile } from '../../domain/utils.domain';
 import {
-  prepareCardSearchPayload,
+  buildCardScanSearchInput,
   searchCardInBackend,
+  validateCardScanSearchInput,
   hasMinimumSearchCriteria,
   getSearchCriteriaFeedback,
 } from '../../adapters/backend/card-search.adapter';
@@ -27,18 +28,19 @@ interface UseCardSearchResult {
 
 export const useCardSearch = (
   game: TCGGame,
-  extractedData: IExtractedCardData,
-  confidence: IScanConfidence,
-  rawOcr: IRegionalOcrResult
+  scannedData: IScannedCardData
 ): UseCardSearchResult => {
+  const client = useApolloClient();
   const [searchResults, setSearchResults] =
     useState<ICardSearchResponse | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const canSearch = hasMinimumSearchCriteria(extractedData);
-  const searchFeedback = getSearchCriteriaFeedback(extractedData);
+  const { extractedData, normalizedImageUrl, setIconImageUrl } = scannedData;
+  const hasImage = Boolean(normalizedImageUrl);
+  const canSearch = hasMinimumSearchCriteria(extractedData) || hasImage;
+  const searchFeedback = getSearchCriteriaFeedback(extractedData, hasImage);
 
   const performSearch = async () => {
     setIsSearching(true);
@@ -47,26 +49,36 @@ export const useCardSearch = (
     setSearchResults(null);
 
     try {
-      const payload = prepareCardSearchPayload(
-        game,
+      const originalImage = normalizedImageUrl
+        ? await dataUrlToFile(normalizedImageUrl, 'card-scan')
+        : null;
+      const setIcon = setIconImageUrl
+        ? await dataUrlToFile(setIconImageUrl, 'set-icon')
+        : null;
+
+      const input = buildCardScanSearchInput(
         extractedData,
-        confidence,
-        rawOcr
+        originalImage,
+        setIcon
       );
 
-      if (!payload.valid) {
-        setValidationErrors(payload.errors);
+      const validation = validateCardScanSearchInput(input);
+
+      if (!validation.valid) {
+        setValidationErrors(validation.errors);
         setSearchError('Datos inválidos para búsqueda');
         return;
       }
 
-      logger.debug('📦 Payload validado:', payload.payload);
+      logger.debug('📦 Input validado:', input);
 
-      const results = await searchCardInBackend(payload.payload);
+      const results = await searchCardInBackend(client, game, input);
 
       setSearchResults(results);
 
-      if (results.candidates.length === 0) {
+      if (results.error) {
+        setSearchError(results.error);
+      } else if (results.candidates.length === 0) {
         setSearchError('No se encontraron resultados');
       }
     } catch (error) {
