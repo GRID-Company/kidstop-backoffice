@@ -4,9 +4,23 @@ Sistema completo de escaneo y extracción de datos de cartas TCG usando OpenCV.j
 
 ## 🚀 Acceso
 
-**Ruta local**: http://localhost:3000/escaneo-cartas
+### UI de producción (Drawer + FAB)
 
-**Acceso desde iPhone en red local**: http://192.168.100.9:3000/escaneo-cartas
+El scanner de producción vive en un **Drawer global** accesible desde cualquier página autenticada:
+
+- **FAB**: botón flotante `CardScannerFab` (esquina inferior derecha) montado en `AuthenticatedLayout`, visible para todos los roles.
+- **Flujos**: botón "Escanear" en `/compras/nueva` (sección "Agregar cartas").
+- **Estado global**: `useCardScannerStore` (`src/lib/store/card-scanner.ts`) controla `isOpen` y `source` (`'fab' | 'purchase' | 'catalog'`), que determina el CTA del candidato seleccionado.
+- **Componentes producción** (`ui/components/`): `card-scanner-drawer.tsx` (shell), `scanner-panel.tsx` (orquestador de captura), `scanner-action-bar.tsx`, `scanner-results.tsx`, `scan-fields-editor.tsx`, `scan-field-row.tsx`, `scan-ocr-text.tsx`, `scan-status-banner.tsx`. Tema claro alineado al design system; el TCG se toma de `useSelectedTCGStore`.
+- **Reutilizados del POC sin cambios**: `camera-preview`, `card-positioning-guide`, `torch-control` y todos los hooks (`use-camera-stream`, `use-opencv`, `use-card-detection`, `use-card-scanner-pipeline`, `use-card-search`).
+
+### POC congelado (referencia)
+
+La primera iteración queda **intacta** como referencia y demo:
+
+- **Ruta local**: http://localhost:3000/escaneo-cartas (standalone, sin layout autenticado)
+- **Acceso desde iPhone en red local**: http://192.168.100.9:3000/escaneo-cartas
+- **Vista**: `ui/views/card-scanner.tsx` + componentes originales (tema oscuro) — no modificar.
 
 ## 📱 Uso
 
@@ -104,10 +118,11 @@ Sistema completo de escaneo y extracción de datos de cartas TCG usando OpenCV.j
 
 ### Búsqueda en Catálogo
 
-- ✅ Construcción automática de payload de búsqueda
-- ✅ Validación con Zod schemas
-- ✅ Criterios de búsqueda por nombre, set, número
-- ✅ Mock de resultados (pendiente integración backend)
+- ✅ Integración real: `pokemonCardScanSearch` / `magicCardScanSearch` (Gemini + catálogo)
+- ✅ Imagen normalizada como `originalImage` (Upload) + `setIcon` (crop región `setSymbol`)
+- ✅ Criterios de búsqueda por nombre, set, número (imagen como fallback)
+- ✅ `bestMatch` + `relatedCards` con precio/stock; `aiResolved` con traducciones ES
+- ✅ Fallback a mock: `NEXT_PUBLIC_CARD_SCAN_USE_MOCK=true` u operación ausente del schema
 
 ### Visualización y Debug
 
@@ -151,11 +166,13 @@ card-scanner/
 │   │   ├── tesseract-worker.ts          # Worker Tesseract (legacy, no usado)
 │   │   └── google-vision.ts             # Adaptador Google Cloud Vision API
 │   ├── mappers/
-│   │   └── card-data.mapper.ts          # Mapper OCR → ScannedCardData (legacy)
+│   │   ├── card-data.mapper.ts          # Mapper OCR → ScannedCardData (legacy)
+│   │   └── card-scan.mapper.ts          # Mapper respuesta API → dominio
 │   ├── backend/
-│   │   └── card-search.adapter.ts       # Payload y mock de búsqueda en catálogo
+│   │   ├── card-search.adapter.ts       # CardScanSearchInput + queries reales con fallback a mock
+│   │   └── card-search.mock.ts          # bestMatch/related/aiResolved mock
 │   └── schemas/
-│       └── card-search.schema.ts        # Schemas Zod de búsqueda
+│       └── card-search.schema.ts        # Schema Zod de CardScanSearchInput
 │
 └── ui/                                  # Capa de presentación
     ├── components/
@@ -360,10 +377,11 @@ Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
 ### Integración Backend
 
 - [x] Búsqueda automática en catálogo por nombre
+- [x] Integración real `pokemonCardScanSearch`/`magicCardScanSearch`: `src/lib/api/graphql/card-scan-search.gql` + [card-scan-api-guide.md](../../../docs/api-guides/card-scan-api-guide.md)
+- [x] Pipeline candidato → compra ("Usar en compra" agrega el item con defaults NM/idioma/qty 1/precio de referencia)
 - [ ] Mutation GraphQL para guardar cartas escaneadas
 - [ ] Asociar con inventario existente
-- [ ] Sincronizar con store global de TCG (`src/lib/store/selected-tcg.ts`)
-- [ ] Endpoint real de búsqueda (reemplazar mock)
+- [x] Sincronizar con store global de TCG (`src/lib/store/selected-tcg.ts`)
 
 ### Features Avanzadas
 
@@ -425,10 +443,10 @@ Ver [ENVIRONMENT_SETUP.md](../../../docs/ENVIRONMENT_SETUP.md) para más detalle
 
 ## 📊 Estado del Feature
 
-- **Versión**: 2.0 (Pipeline completo)
-- **Estado**: 🔵 POC Avanzado
-- **Última actualización**: 2026-09-03
-- **Próximo milestone**: Integración con backend real
+- **Versión**: 2.3 (Pipeline completo + UI producción + integración real `cardScanSearch`)
+- **Estado**: 🔵 POC congelado en `/escaneo-cartas` + � Producción integrada a `pokemonCardScanSearch`/`magicCardScanSearch` (mock detrás de `NEXT_PUBLIC_CARD_SCAN_USE_MOCK`)
+- **Última actualización**: 2026-10-01
+- **Próximo milestone**: Probar en dev → ajuste de regiones `setSymbol` si el backend requiere crops distintos
 
 ---
 

@@ -25,6 +25,28 @@ query MagicCardCollections {
   magicCardCollections {
     guid
     name
+    code
+    releaseDate
+    cardCount
+    languages
+    editionIconUri
+  }
+}
+```
+
+**Arguments:**
+
+- `search` (string, optional): Case-insensitive partial match on collection set code or name
+
+```graphql
+query MagicCardCollections {
+  magicCardCollections(search: "blb") {
+    guid
+    name
+    code
+    releaseDate
+    cardCount
+    languages
     editionIconUri
   }
 }
@@ -34,6 +56,10 @@ query MagicCardCollections {
 
 - `guid`: Unique identifier for the collection/edition
 - `name`: Display name of the edition
+- `code`: Scryfall set code (e.g. `por`, `5ed`) — nullable until Scryfall metadata is synced
+- `releaseDate`: Set release date in `YYYY-MM-DD` format (nullable)
+- `cardCount`: Printed card count of the set (nullable)
+- `languages`: Languages the set is available in (nullable, not populated yet)
 - `editionIconUri`: URL for the edition icon image (nullable)
 
 ---
@@ -110,7 +136,7 @@ query MagicCardPublicList(
   - `language`: Card language (`CardLanguage` enum)
   - `sellPrice`: Current sell price
   - `availableStock`: Whether stock is available (boolean)
-  - `imageUri`: Card image URL
+  - `imageUri`: Card image URL — optimized resolution resolved from `moreImages` (`thumb` → `grid` → `display` → `large`), falling back to the full-size PNG when no smaller resolution is available
 
 ---
 
@@ -156,7 +182,8 @@ query MagicCardPublicList(
     "filters": {
       "stockStatus": "AVAILABLE",
       "condition": "NEAR_MINT",
-      "isFoil": true
+      "isFoil": true,
+      "language": "ENGLISH"
     }
   }
 }
@@ -167,6 +194,7 @@ query MagicCardPublicList(
 - `edition`: Edition/Collection GUID
 - `rarity`: Card rarity string
 - `isFoil`: Boolean filter for foil cards
+- `language`: Inventory language — returns cards that have an inventory item in that language. Values: `ENGLISH`, `SPANISH`, `FRENCH`, `GERMAN`, `ITALIAN`, `PORTUGUESE`, `JAPANESE`, `KOREAN`, `RUSSIAN`, `CHINESE`
 - `sellPrice`: Numeric range filter with `min` and `max`
 - `condition`: Card condition enum
   - `NEAR_MINT`
@@ -653,6 +681,18 @@ query MagicCardPublicDetail($guid: UUID!) {
       sellPrice
     }
     imageUri
+    cardType
+    description
+    moreImages {
+      resolution
+      imageUrl
+    }
+    manaValue
+    colors
+    keywords
+    layout
+    artist
+    legalities
   }
 }
 ```
@@ -668,11 +708,21 @@ query MagicCardPublicDetail($guid: UUID!) {
 **Response Fields:**
 
 - All basic card info plus:
-  - `rarity`: Card rarity
+  - `rarity`: Card rarity (`common`, `uncommon`, `rare`, `mythic`, `special`, `bonus`)
   - `inventoryCards`: Array of inventory items with different conditions
     - `condition`: Card condition
     - `stock`: Available quantity
     - `sellPrice`: Sell price for this condition
+  - `cardType`: Scryfall type line (e.g. `Legendary Creature — Dragon`)
+  - `description`: Oracle rules text
+  - `imageUri`: Card image URL — detail views resolve a larger resolution from `moreImages` (`display` → `large`), falling back to the full-size PNG
+  - `moreImages`: All image resolutions from Scryfall (`small`, `normal`, `large`, `png`, `art_crop`, `border_crop`, `thumb`, `grid`, `display`, `art`, `crop`)
+  - `manaValue`: Converted mana cost (cmc)
+  - `colors`: Card colors (`W`, `U`, `B`, `R`, `G`)
+  - `keywords`: Keyword abilities (e.g. `Flying`, `Trample`)
+  - `layout`: Card layout (`normal`, `transform`, `modal_dfc`, `adventure`, …)
+  - `artist`: Illustrator name
+  - `legalities`: Format legality map (e.g. `{ "commander": "legal", "modern": "legal", … }`)
 
 ---
 
@@ -715,6 +765,7 @@ query MagicCardInternalList(
       cardMetrics {
         variantsMetrics {
           condition
+          language
           stock
           lastSellDate
           avgDaysInInventory
@@ -754,6 +805,7 @@ query MagicCardInternalList(
 - `cardMetrics` (nullable): Card metrics data (only populated when `withCardsMetrics: true`)
   - `variantsMetrics`: Array of inventory condition variants with metrics
     - `condition`: Card condition
+    - `language`: Card language
     - `stock`: Current stock quantity
     - `lastSellDate`: Date of last sale (nullable)
     - `avgDaysInInventory`: Average days in inventory (nullable)
@@ -851,7 +903,7 @@ query MagicTopSoldCards {
 - `rarity`: Card rarity (nullable)
 - `isFoil`: Whether the card is foil
 - `language`: Card language (`CardLanguage` enum)
-- `imageUri`: Card image URL (nullable)
+- `imageUri`: Card image URL (nullable) — optimized resolution resolved from `moreImages` (`thumb` → `grid` → `display` → `large`), falling back to the full-size PNG when no smaller resolution is available
 - `sellPrice`: Lowest current sell price across all conditions (nullable)
 - `availableStock`: Whether any stock is currently available (boolean)
 - `totalStock`: Total units in stock across all conditions
@@ -884,6 +936,7 @@ query MagicCardWithMetrics($guid: UUID!) {
   magicCardWithMetrics(guid: $guid) {
     variantsMetrics {
       condition
+      language
       stock
       lastSellDate
       avgDaysInInventory
@@ -907,6 +960,7 @@ query MagicCardWithMetrics($guid: UUID!) {
 
 - `variantsMetrics`: Array of inventory condition variants with metrics
   - `condition`: Card condition (NEAR_MINT, LIGHTLY_PLAYED, MODERATELY_PLAYED, HEAVILY_PLAYED, DAMAGED)
+  - `language`: Card language (e.g., ENGLISH, SPANISH, JAPANESE)
   - `stock`: Current stock quantity for this condition
   - `lastSellDate`: Date of last sale for this condition (nullable)
   - `avgDaysInInventory`: Average days items spend in inventory for this condition (nullable)
@@ -1147,6 +1201,7 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory
@@ -1176,6 +1231,7 @@ query MagicBatchCardSearch($input: BatchSearchMagicCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory
@@ -1342,6 +1398,122 @@ const BatchSearchComponent = () => {
   );
 };
 ```
+
+### 12. Scan Search Card
+
+**Query:** `magicCardScanSearch`
+**Type:** Internal (requires authentication)
+**Roles:** ADMIN, BUYER, RECEPTION
+**Description:** Search a single Magic card by partial data and/or card images (scan). If the catalog search returns no results, it falls back to Gemini AI to resolve the card data — including cards in Japanese or other languages — and re-applies the catalog search.
+
+```graphql
+query MagicCardScanSearch($input: CardScanSearchInput!) {
+  magicCardScanSearch(input: $input) {
+    resolvedByAI
+    bestMatch {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+      cardMetrics {
+        variantsMetrics {
+          condition
+          language
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        priceRetail
+        priceBuy
+      }
+    }
+    relatedCards {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+    }
+    aiResolved {
+      name
+      cardNumber
+      setCode
+      setName
+      cardText
+      detectedLanguage
+      nameEs
+      setNameEs
+      cardTextEs
+    }
+    error
+  }
+}
+```
+
+**Variables (text-only search):**
+
+```json
+{
+  "input": {
+    "name": "Rin and Seri, Inseparable",
+    "cardNumber": "1910",
+    "setCode": "SLD",
+    "withCardsMetrics": true
+  }
+}
+```
+
+**Variables (with images — multipart request):**
+
+Images use the `Upload` scalar, so the request must be sent as `multipart/form-data` following the [GraphQL multipart request spec](https://github.com/jaydenseric/graphql-multipart-request-spec) (same as `uploadFile`):
+
+```
+operations: {"query":"query MagicCardScanSearch($input: CardScanSearchInput!) { magicCardScanSearch(input: $input) { resolvedByAI bestMatch { guid name } aiResolved { name cardNumber nameEs } error } }","variables":{"input":{"originalImage":null,"setIcon":null}}}
+map: {"0":["variables.input.originalImage"],"1":["variables.input.setIcon"]}
+0: <card image file>
+1: <set icon file>
+```
+
+**Input Parameters** (all optional, but at least one text field or image is required):
+
+- `name`: Card name (any language)
+- `cardNumber`: Collector number printed on the card
+- `text`: Card rules text (any language)
+- `setCode`: Set code
+- `originalImage` (Upload): Image of the scanned card
+- `setIcon` (Upload): Image of the set icon cropped from the scanned card
+- `aiSearchOnly` (boolean, default: `false`): Skip the catalog search entirely and return only the AI-resolved card data translated to Spanish (`aiResolved`); `bestMatch`/`relatedCards` stay empty
+- `withCardsMetrics` (boolean, default: `false`): Include card metrics — `bestMatch.cardMetrics` gets full metrics + CardKingdom prices, `relatedCards[].cardMetrics` gets variant metrics only (prices `null`). Ignored when `aiSearchOnly: true`
+
+**Response Fields:**
+
+- `resolvedByAI`: `true` when the result was resolved via the AI fallback
+- `bestMatch` / `relatedCards`: Same shapes as `magicBatchCardSearch` results
+- `aiResolved`: Card data resolved by Gemini — canonical English fields (`name`, `cardNumber`, `setCode`, `setName`, `cardText`) plus Spanish translations (`nameEs`, `setNameEs`, `cardTextEs`) and `detectedLanguage`
+- `error`: Error message if the search failed or no cards matched
+
+**Flow:**
+
+1. Catalog search with `name`/`setCode`/`cardNumber`/`text` → if results, returns immediately (`resolvedByAI: false`)
+2. If no results → Gemini resolves the card from the provided data + images (handles non-English inputs like Japanese)
+3. The AI-resolved `name`/`cardNumber`/`setCode` are re-applied to the catalog search
 
 ---
 

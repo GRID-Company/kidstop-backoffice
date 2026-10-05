@@ -26,6 +26,22 @@ query PokemonCardCollections {
     guid
     name
     code
+    setLogo
+  }
+}
+```
+
+**Arguments:**
+
+- `search` (string, optional): Case-insensitive partial match on collection set code or name
+
+```graphql
+query PokemonCardCollections {
+  pokemonCardCollections(search: "sv") {
+    guid
+    name
+    code
+    setLogo
   }
 }
 ```
@@ -35,6 +51,7 @@ query PokemonCardCollections {
 - `guid`: Unique identifier for the collection
 - `name`: Display name of the collection
 - `code`: Short code for the collection
+- `setLogo`: URL of the collection's set logo image (nullable)
 
 ---
 
@@ -232,6 +249,7 @@ query PokemonCardPublicList(
       "rarity": "Rare Holo",
       "variant": "Reverse Holo",
       "genre": "Pokemon Card",
+      "language": "ENGLISH",
       "sellPrice": {
         "range": {
           "from": 100,
@@ -253,6 +271,7 @@ All filters are optional. Combine them to narrow down results:
 - `rarity` (string): Card rarity - Filter by rarity (e.g., "Rare Holo", "Common"). Get valid values from `pokemonCardRarities` query
 - `variant` (string): Card variant - Filter by variant type (e.g., "Normal", "Reverse Holo"). Get valid values from `pokemonCardVariants` query
 - `genre` (string): Card genre - Filter by genre (defaults to "Pokemon Card" if not specified). Get valid values from `pokemonCardGenres` query
+- `language` (string): Card language - Filter by language (e.g., `"ENGLISH"`, `"SPANISH"`, `"JAPANESE"`)
 - `sellPrice` (object): Price range filter with `range.from` and `range.to` (numbers in MXN)
 - `condition` (enum): Card condition - "NEAR_MINT" | "LIGHTLY_PLAYED" | "MODERATELY_PLAYED" | "HEAVILY_PLAYED" | "DAMAGED"
 - `stockStatus` (enum): Stock availability - "AVAILABLE" | "UNAVAILABLE"
@@ -837,6 +856,7 @@ query PokemonCardInternalList(
       cardMetrics {
         variantsMetrics {
           condition
+          language
           stock
           lastSellDate
           avgDaysInInventory
@@ -881,6 +901,7 @@ query PokemonCardInternalList(
 - `cardMetrics` (nullable): Card metrics data (only populated when `withCardsMetrics: true`)
   - `variantsMetrics`: Array of inventory condition variants with metrics
     - `condition`: Card condition
+    - `language`: Card language
     - `stock`: Current stock quantity
     - `lastSellDate`: Date of last sale (nullable)
     - `avgDaysInInventory`: Average days in inventory (nullable)
@@ -984,6 +1005,7 @@ query PokemonCardWithMetrics($guid: String!) {
   pokemonCardWithMetrics(guid: $guid) {
     variantsMetrics {
       condition
+      language
       stock
       lastSellDate
       avgDaysInInventory
@@ -1008,6 +1030,7 @@ query PokemonCardWithMetrics($guid: String!) {
 
 - `variantsMetrics`: Array of inventory condition variants with metrics
   - `condition`: Card condition (NEAR_MINT, LIGHTLY_PLAYED, MODERATELY_PLAYED, HEAVILY_PLAYED, DAMAGED)
+  - `language`: Card language (e.g., ENGLISH, SPANISH, JAPANESE)
   - `stock`: Current stock quantity for this condition
   - `lastSellDate`: Date of last sale for this condition (nullable)
   - `avgDaysInInventory`: Average days items spend in inventory for this condition (nullable)
@@ -1320,6 +1343,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory
@@ -1350,6 +1374,7 @@ query PokemonBatchCardSearch($input: BatchSearchPokemonCardsInput!) {
         cardMetrics {
           variantsMetrics {
             condition
+            language
             stock
             lastSellDate
             avgDaysInInventory
@@ -1512,6 +1537,125 @@ const BatchSearchComponent = () => {
   );
 };
 ```
+
+### 14. Scan Search Card
+
+**Query:** `pokemonCardScanSearch`
+**Type:** Internal (requires authentication)
+**Roles:** ADMIN, BUYER, RECEPTION
+**Description:** Search a single Pokemon card by partial data and/or card images (scan). If the catalog search returns no results, it falls back to Gemini AI to resolve the card data — including cards in Japanese or other languages — and re-applies the catalog search.
+
+```graphql
+query PokemonCardScanSearch($input: CardScanSearchInput!) {
+  pokemonCardScanSearch(input: $input) {
+    resolvedByAI
+    bestMatch {
+      guid
+      name
+      variant
+      setName
+      setCode
+      cardNumber
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+      cardMetrics {
+        variantsMetrics {
+          condition
+          language
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
+    }
+    relatedCards {
+      guid
+      name
+      variant
+      setName
+      setCode
+      cardNumber
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+    }
+    aiResolved {
+      name
+      cardNumber
+      setCode
+      setName
+      cardText
+      detectedLanguage
+      nameEs
+      setNameEs
+      cardTextEs
+    }
+    error
+  }
+}
+```
+
+**Variables (text-only search):**
+
+```json
+{
+  "input": {
+    "name": "Mega Charizard Y ex",
+    "cardNumber": "22",
+    "setCode": "ASC",
+    "withCardsMetrics": true
+  }
+}
+```
+
+**Variables (with images — multipart request):**
+
+Images use the `Upload` scalar, so the request must be sent as `multipart/form-data` following the [GraphQL multipart request spec](https://github.com/jaydenseric/graphql-multipart-request-spec) (same as `uploadFile`):
+
+```
+operations: {"query":"query PokemonCardScanSearch($input: CardScanSearchInput!) { pokemonCardScanSearch(input: $input) { resolvedByAI bestMatch { guid name } aiResolved { name cardNumber nameEs } error } }","variables":{"input":{"originalImage":null,"setIcon":null}}}
+map: {"0":["variables.input.originalImage"],"1":["variables.input.setIcon"]}
+0: <card image file>
+1: <set icon file>
+```
+
+**Input Parameters** (all optional, but at least one text field or image is required):
+
+- `name`: Card name (any language)
+- `cardNumber`: Card number printed on the card
+- `text`: Card rules text (any language)
+- `setCode`: Set code
+- `originalImage` (Upload): Image of the scanned card
+- `setIcon` (Upload): Image of the set icon cropped from the scanned card
+- `aiSearchOnly` (boolean, default: `false`): Skip the catalog search entirely and return only the AI-resolved card data translated to Spanish (`aiResolved`); `bestMatch`/`relatedCards` stay empty
+- `withCardsMetrics` (boolean, default: `false`): Include card metrics — `bestMatch.cardMetrics` gets full metrics + PriceCharting prices, `relatedCards[].cardMetrics` gets variant metrics only (prices `null`). Ignored when `aiSearchOnly: true`
+
+**Response Fields:**
+
+- `resolvedByAI`: `true` when the result was resolved via the AI fallback
+- `bestMatch` / `relatedCards`: Same shapes as `pokemonBatchCardSearch` results
+- `aiResolved`: Card data resolved by Gemini — canonical English fields (`name`, `cardNumber`, `setCode`, `setName`, `cardText`) plus Spanish translations (`nameEs`, `setNameEs`, `cardTextEs`) and `detectedLanguage`
+- `error`: Error message if the search failed or no cards matched
+
+**Flow:**
+
+1. Catalog search with `name`/`setCode`/`cardNumber`/`text` → if results, returns immediately (`resolvedByAI: false`)
+2. If no results → Gemini resolves the card from the provided data + images (handles non-English inputs like Japanese)
+3. The AI-resolved `name`/`cardNumber`/`setCode` are re-applied to the catalog search
 
 ---
 
