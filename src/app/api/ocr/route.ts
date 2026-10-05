@@ -7,10 +7,14 @@ let visionClient: ImageAnnotatorClient | null = null;
 function getVisionClient(): ImageAnnotatorClient {
   if (!visionClient) {
     const config = validateGoogleVisionConfig();
+    const privateKey = config.GOOGLE_CLOUD_PRIVATE_KEY.trim()
+      .replace(/^["']+|["']+$/g, '')
+      .replace(/\\n/g, '\n');
+
     visionClient = new ImageAnnotatorClient({
       credentials: {
         client_email: config.GOOGLE_CLOUD_CLIENT_EMAIL,
-        private_key: config.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        private_key: privateKey,
       },
       projectId: config.GOOGLE_CLOUD_PROJECT_ID,
     });
