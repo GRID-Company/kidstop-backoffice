@@ -377,7 +377,7 @@ Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
 ### Integración Backend
 
 - [x] Búsqueda automática en catálogo por nombre
-- [x] Integración real `pokemonCardScanSearch`/`magicCardScanSearch`: `src/lib/api/graphql/card-scan-search.gql` + [card-scan-api-guide.md](../../../docs/api-guides/card-scan-api-guide.md)
+- [x] Integración real `pokemonCardScanSearch`/`magicCardScanSearch`: `src/lib/api/graphql/card-scan-search.gql` ([Pokemon](../../../docs/api-guides/Pokemon-catalog-api-guide.md) §14 / [Magic](../../../docs/api-guides/Magic-Catalog-API-Guide.md) §12)
 - [x] Pipeline candidato → compra ("Usar en compra" agrega el item con defaults NM/idioma/qty 1/precio de referencia)
 - [ ] Mutation GraphQL para guardar cartas escaneadas
 - [ ] Asociar con inventario existente

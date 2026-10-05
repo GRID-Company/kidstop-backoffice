@@ -307,7 +307,7 @@ features/{feature-name}/
 | Clientes      | `features/customers/`       | Clasificación VIP, bloqueos, validación de ubicación                                                                                                                                             | 🟡 Mock         | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#7-clientes)                     |
 | Most Wanted   | `features/most-wanted/`     | Configuración de páginas públicas por TCG con drag & drop                                                                                                                                        | 🟡 Mock         | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#9-most-wanted-página-pública)   |
 | Configuración | `features/settings/`        | Geofence, umbrales, presupuestos, límites de inventario                                                                                                                                          | 🟡 Mock         | [global-config-api-guide.md](docs/api-guides/global-config-api-guide.md)     |
-| Card Scanner  | `features/card-scanner/`    | Escaneo con Google Cloud Vision + `pokemonCardScanSearch`/`magicCardScanSearch` (Gemini + catálogo, imágenes vía Upload). POC congelado en `/escaneo-cartas`; producción vía FAB + Drawer global | 🔵 POC + � API  | [card-scan-api-guide.md](docs/api-guides/card-scan-api-guide.md)             |
+| Card Scanner  | `features/card-scanner/`    | Escaneo con Google Cloud Vision + `pokemonCardScanSearch`/`magicCardScanSearch` (Gemini + catálogo, imágenes vía Upload). POC congelado en `/escaneo-cartas`; producción vía FAB + Drawer global | 🔵 POC + API    | [Pokemon-catalog-api-guide.md](docs/api-guides/Pokemon-catalog-api-guide.md) |
 
 **Leyenda:**
 
@@ -351,7 +351,7 @@ features/{feature-name}/
 | Shopify Integration | Código de venta como custom item (flujo manual)                 | Media     | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#3-shopify)                       |
 | WhatsApp API        | Envío de cotizaciones con hipervínculo                          | Media     | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#5-whatsapp)                      |
 | Email Transaccional | Notificaciones (pedido listo, restock, recuperación contraseña) | Media     | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#4-email-transaccional)           |
-| Google Cloud Vision | OCR para escaneo de cartas (POC completado)                     | Baja      | [Scanner-POC.md](docs/Scanner-POC.md)                                         |
+| Google Cloud Vision | OCR para escaneo de cartas (POC completado)                     | Baja      | [features/card-scanner](src/features/card-scanner/README.md)                  |
 
 ### Carpeta Digital (Repo Separado)
 
@@ -458,7 +458,6 @@ Ver [ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) para detalles completos.
 | [CLICKUP_WORKFLOW.md](docs/CLICKUP_WORKFLOW.md)                                                         | Workflow de integración con ClickUp                                                                                 |
 | [CLICKUP_MIGRATION_GUIDE.md](docs/CLICKUP_MIGRATION_GUIDE.md)                                           | Guía de migración de ClickUp                                                                                        |
 | [CYPRESS_ARCHITECTURE.md](docs/CYPRESS_ARCHITECTURE.md)                                                 | Arquitectura de tests E2E con Cypress                                                                               |
-| [Scanner-POC.md](docs/Scanner-POC.md)                                                                   | Proof of Concept de escaneo de cartas con Google Cloud Vision                                                       |
 | [PERFORMANCE_OPTIMIZATION_GUIDE.md](docs/PERFORMANCE_OPTIMIZATION_GUIDE.md)                             | Guía de optimización de performance                                                                                 |
 | [LANGUAGE_SELECTOR_SPEC.md](docs/LANGUAGE_SELECTOR_SPEC.md)                                             | Especificación del selector de idioma                                                                               |
 | [api-guides/](docs/api-guides/)                                                                         | **11 guías de APIs GraphQL** (Pokemon, Magic, Purchase, Sales, Inventory, Users, Seller, Budget, Config, Bulk, CSV) |
