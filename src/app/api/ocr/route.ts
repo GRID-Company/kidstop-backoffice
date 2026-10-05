@@ -89,6 +89,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Processing failed',
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
   }
 }
