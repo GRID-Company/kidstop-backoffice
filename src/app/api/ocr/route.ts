@@ -20,6 +20,12 @@ function getVisionClient(): ImageAnnotatorClient {
 
 export async function POST(request: NextRequest) {
   try {
+    const token = request.cookies.get('jwt')?.value;
+
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const client = getVisionClient();
 
     const { image } = await request.json();

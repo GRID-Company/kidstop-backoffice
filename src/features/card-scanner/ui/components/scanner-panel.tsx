@@ -86,6 +86,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     error: pipelineError,
     qualityFeedback,
     processCard,
+    updateExtractedData,
     reset: resetPipeline,
   } = useCardScannerPipeline(selectedGame);
 
@@ -171,9 +172,10 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     toast.success('Escáner reiniciado');
   };
 
-  const handleSaveEdits = (_updatedData: IExtractedCardData) => {
+  const handleSaveEdits = (updatedData: IExtractedCardData) => {
     if (!scannedData) return;
 
+    updateExtractedData(updatedData);
     toast.success('Datos actualizados correctamente');
   };
 

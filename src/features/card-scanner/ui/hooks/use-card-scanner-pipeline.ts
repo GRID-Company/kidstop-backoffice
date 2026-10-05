@@ -6,6 +6,7 @@ import {
   IScannerMetrics,
   ScannerStatus,
   IScannedCardData,
+  IExtractedCardData,
   TCGGame,
   ICardCorners,
 } from '../../domain/types';
@@ -224,6 +225,12 @@ export const useCardScannerPipeline = (game: TCGGame) => {
     }
   };
 
+  const updateExtractedData = (updatedData: IExtractedCardData) => {
+    setScannedData((prev) =>
+      prev ? { ...prev, extractedData: updatedData } : prev
+    );
+  };
+
   const reset = () => {
     setScannedData(null);
     setMetrics(null);
@@ -239,6 +246,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
     error,
     qualityFeedback,
     processCard,
+    updateExtractedData,
     reset,
   };
 };
