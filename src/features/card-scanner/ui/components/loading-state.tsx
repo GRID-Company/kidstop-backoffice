@@ -73,36 +73,3 @@ export const LoadingState = ({ status }: LoadingStateProps) => {
     </div>
   );
 };
-
-export const StatusIndicator = ({ status }: { status: ScannerStatus }) => {
-  const { message, icon } = STATUS_MESSAGES[status];
-
-  const getStatusColor = () => {
-    switch (status) {
-      case 'error':
-        return 'text-red-400';
-      case 'results':
-        return 'text-green-400';
-      case 'card-stable':
-        return 'text-emerald-400';
-      case 'camera-ready':
-        return 'text-blue-400';
-      default:
-        return 'text-yellow-400';
-    }
-  };
-
-  return (
-    <div
-      className='flex items-center gap-2 text-sm'
-      role='status'
-      aria-live='polite'
-      aria-atomic='true'
-    >
-      <span className={`text-lg ${getStatusColor()}`} aria-hidden='true'>
-        {icon}
-      </span>
-      <span className='text-gray-300'>{message}</span>
-    </div>
-  );
-};

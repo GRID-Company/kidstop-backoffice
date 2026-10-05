@@ -54,11 +54,3 @@ export const vibrateSuccess = (): boolean => {
 export const vibrateError = (): boolean => {
   return vibrate([100, 50, 100]);
 };
-
-export const vibrateWarning = (): boolean => {
-  return vibrate(50);
-};
-
-export const stopVibration = (): boolean => {
-  return vibrate(0);
-};

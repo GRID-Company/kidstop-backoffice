@@ -262,16 +262,3 @@ export function matToDataURL(mat: OpenCVMat, cv: OpenCV): string {
 
   return canvas.toDataURL('image/png');
 }
-
-export function scaleRegionForOCR(
-  regionMat: OpenCVMat,
-  cv: OpenCV,
-  scale: number = 2
-): OpenCVMat {
-  const scaled = new cv.Mat();
-  const dsize = new cv.Size(regionMat.cols * scale, regionMat.rows * scale);
-
-  cv.resize(regionMat, scaled, dsize, 0, 0, cv.INTER_CUBIC);
-
-  return scaled;
-}

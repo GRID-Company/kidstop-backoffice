@@ -124,53 +124,8 @@ export function calculateFieldConfidence(
   return Math.max(0, Math.min(1, baseConfidence));
 }
 
-export function cleanText(text: string): string {
-  if (!text) return '';
-  return text
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/[^\w\s\-/]/gi, '');
-}
-
-export function extractNumberFromText(text: string): number | null {
-  const match = text.match(/\d+/);
-  return match ? parseInt(match[0], 10) : null;
-}
-
 export function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
-}
-
-export function removeNonAlphanumeric(text: string): string {
-  return text.replace(/[^a-zA-Z0-9\s]/g, '');
-}
-
-export function levenshteinDistance(a: string, b: string): number {
-  const matrix: number[][] = [];
-
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
-
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
-      }
-    }
-  }
-
-  return matrix[b.length][a.length];
 }
 
 export function correctCommonOCRErrors(text: string): string {

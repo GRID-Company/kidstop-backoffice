@@ -1,28 +1,6 @@
 import { ICardCorners, OpenCV, OpenCVMat } from './types';
 import { NORMALIZED_CARD_DIMENSIONS } from './constants';
 
-export function normalizeCardDimensions(
-  warpedMat: OpenCVMat,
-  cv: OpenCV
-): OpenCVMat {
-  const targetWidth = NORMALIZED_CARD_DIMENSIONS.width;
-  const targetHeight = NORMALIZED_CARD_DIMENSIONS.height;
-
-  const currentWidth = warpedMat.cols;
-  const currentHeight = warpedMat.rows;
-
-  if (currentWidth === targetWidth && currentHeight === targetHeight) {
-    return warpedMat.clone();
-  }
-
-  const normalized = new cv.Mat();
-  const dsize = new cv.Size(targetWidth, targetHeight);
-
-  cv.resize(warpedMat, normalized, dsize, 0, 0, cv.INTER_LINEAR);
-
-  return normalized;
-}
-
 export function detectOrientation(
   mat: OpenCVMat,
   _cv: OpenCV
@@ -190,27 +168,4 @@ export function calculateSharpness(mat: OpenCVMat, cv: OpenCV): number {
   stddev.delete();
 
   return Math.min(variance / 500, 1.0);
-}
-
-export function calculateBrightness(mat: OpenCVMat, cv: OpenCV): number {
-  const gray = new cv.Mat();
-
-  if (mat.channels() === 4) {
-    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
-  } else if (mat.channels() === 3) {
-    cv.cvtColor(mat, gray, cv.COLOR_RGB2GRAY);
-  } else {
-    mat.copyTo(gray);
-  }
-
-  const mean = cv.mean(gray);
-  const brightness = mean[0] / 255;
-
-  gray.delete();
-
-  const idealBrightness = 0.5;
-  const diff = Math.abs(brightness - idealBrightness);
-  const score = Math.max(0, 1 - diff * 2);
-
-  return score;
 }

@@ -441,8 +441,6 @@ export interface IScannedCardData {
   metrics?: IScannerMetrics;
 }
 
-export type HapticPattern = number | number[];
-
 export interface IHapticCapabilities {
   supported: boolean;
   vendor?: 'standard' | 'webkit';

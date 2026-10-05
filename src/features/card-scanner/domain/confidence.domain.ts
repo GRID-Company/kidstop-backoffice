@@ -175,42 +175,6 @@ export function getQualityFeedback(confidence: IScanConfidence): string[] {
   return feedback;
 }
 
-export function shouldRetryCapture(confidence: IScanConfidence): boolean {
-  return (
-    confidence.captureQuality < QUALITY_THRESHOLDS.MINIMUM_CAPTURE ||
-    confidence.ocrQuality < QUALITY_THRESHOLDS.MINIMUM_OCR ||
-    confidence.overall < QUALITY_THRESHOLDS.MINIMUM_OVERALL
-  );
-}
-
-export function estimateFieldReliability(
-  fieldConfidence: number,
-  ocrQuality: number
-): 'high' | 'medium' | 'low' {
-  const combined = (fieldConfidence + ocrQuality) / 2;
-
-  if (combined >= 0.8) return 'high';
-  if (combined >= 0.5) return 'medium';
-  return 'low';
-}
-
-export function calculateConfidenceScore(
-  captureQuality: number,
-  ocrQuality: number,
-  extractionQuality: number
-): number {
-  return Math.round(
-    (captureQuality * 0.4 + ocrQuality * 0.4 + extractionQuality * 0.2) * 100
-  );
-}
-
-export function getConfidenceEmoji(quality: number): string {
-  if (quality >= 0.8) return '🟢';
-  if (quality >= 0.6) return '🟡';
-  if (quality >= 0.4) return '🟠';
-  return '🔴';
-}
-
 export function formatConfidencePercentage(quality: number): string {
   return `${(quality * 100).toFixed(0)}%`;
 }

@@ -20,7 +20,3 @@ export const cardScanSearchInputSchema = z
       Boolean(input.originalImage),
     { message: 'Se requiere al menos un campo de texto o una imagen' }
   );
-
-export type CardScanSearchInputSchema = z.infer<
-  typeof cardScanSearchInputSchema
->;
