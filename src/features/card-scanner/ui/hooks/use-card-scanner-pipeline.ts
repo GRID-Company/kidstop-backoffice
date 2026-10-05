@@ -154,7 +154,6 @@ export const useCardScannerPipeline = (game: TCGGame) => {
 
       const parsingTime = performance.now();
       metricsData.parsingMs = parsingTime - ocrTime;
-      metricsData.backendSearchMs = 0;
 
       const extractionQuality = calculateExtractionQuality(extractedData, game);
 

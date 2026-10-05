@@ -300,7 +300,6 @@ export type OpenCV = {
 };
 
 export type TCGGame = 'pokemon' | 'magic';
-export type CardOrientation = 'portrait' | 'landscape';
 export type CardLayout = string;
 
 export interface INormalizedRegion {
@@ -416,7 +415,6 @@ export interface IScannerMetrics {
   regionExtractionMs: number;
   ocrRequestMs: number;
   parsingMs: number;
-  backendSearchMs: number;
   totalMs: number;
 }
 
@@ -448,18 +446,4 @@ export type HapticPattern = number | number[];
 export interface IHapticCapabilities {
   supported: boolean;
   vendor?: 'standard' | 'webkit';
-}
-
-export interface ITorchCapabilities {
-  supported: boolean;
-  enabled: boolean;
-}
-
-export interface ICameraStreamState {
-  isStreaming: boolean;
-  error: string | null;
-  permissionState: 'prompt' | 'granted' | 'denied';
-  isInitializing: boolean;
-  torchSupported: boolean;
-  torchEnabled: boolean;
 }

@@ -163,10 +163,8 @@ card-scanner/
 │
 ├── adapters/                            # Adaptadores externos
 │   ├── ocr/
-│   │   ├── tesseract-worker.ts          # Worker Tesseract (legacy, no usado)
 │   │   └── google-vision.ts             # Adaptador Google Cloud Vision API
 │   ├── mappers/
-│   │   ├── card-data.mapper.ts          # Mapper OCR → ScannedCardData (legacy)
 │   │   └── card-scan.mapper.ts          # Mapper respuesta API → dominio
 │   ├── backend/
 │   │   ├── card-search.adapter.ts       # CardScanSearchInput + queries reales con fallback a mock
@@ -189,7 +187,6 @@ card-scanner/
     │   ├── use-camera-stream.ts         # Gestión de getUserMedia y permisos
     │   ├── use-opencv.ts                # Inicialización de OpenCV.js
     │   ├── use-card-detection.ts        # Loop de detección de contornos
-    │   ├── use-ocr-extraction.ts        # OCR simple (legacy, no usado)
     │   ├── use-card-scanner-pipeline.ts # Pipeline completo (hook principal)
     │   └── use-card-search.ts           # Búsqueda en catálogo backend
     └── views/
@@ -415,7 +412,6 @@ Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
 
 - [OpenCV.js Docs](https://docs.opencv.org/4.x/d5/d10/tutorial_js_root.html)
 - [Google Cloud Vision API](https://cloud.google.com/vision/docs)
-- [Tesseract.js GitHub](https://github.com/naptha/tesseract.js) (legacy)
 - [Zod Documentation](https://zod.dev/)
 
 ### Proyecto
@@ -444,10 +440,8 @@ Ver [ENVIRONMENT_SETUP.md](../../../docs/ENVIRONMENT_SETUP.md) para más detalle
 ## 📊 Estado del Feature
 
 - **Versión**: 2.3 (Pipeline completo + UI producción + integración real `cardScanSearch`)
-- **Estado**: 🔵 POC congelado en `/escaneo-cartas` + � Producción integrada a `pokemonCardScanSearch`/`magicCardScanSearch` (mock detrás de `NEXT_PUBLIC_CARD_SCAN_USE_MOCK`)
+- **Estado**: 🔵 POC congelado en `/escaneo-cartas` + 🟢 Producción integrada a `pokemonCardScanSearch`/`magicCardScanSearch` (mock detrás de `NEXT_PUBLIC_CARD_SCAN_USE_MOCK`)
 - **Última actualización**: 2026-10-01
 - **Próximo milestone**: Probar en dev → ajuste de regiones `setSymbol` si el backend requiere crops distintos
 
 ---
-
-**Nota**: Este feature es un POC avanzado. El código legacy de Tesseract (`tesseract-worker.ts`, `use-ocr-extraction.ts`, `card-data.mapper.ts`) se mantiene para referencia pero no está en el flujo activo del pipeline.

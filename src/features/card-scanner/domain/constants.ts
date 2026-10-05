@@ -37,8 +37,6 @@ export const DETECTION_PARAMS: IDetectionParams = {
   maxAspectRatioLandscape: 1.82,
 } as const;
 
-export const TESSERACT_LANG = 'eng' as const;
-
 export const POKEMON_DEFAULT_REGIONS: INormalizedRegion[] = [
   {
     id: 'name',
@@ -148,49 +146,6 @@ export const EXTRACTION_WEIGHTS = {
     setCode: 0.15,
     rarity: 0.15,
   },
-} as const;
-
-export const SCANNER_CONFIG = {
-  DETECTION_THROTTLE_MS: 100,
-  MIN_STABLE_FRAMES: 2,
-  MAX_PROCESSING_TIME_MS: 30000,
-  OCR_TIMEOUT_MS: 15000,
-  RETRY_ATTEMPTS: 2,
-  RETRY_DELAY_MS: 1000,
-} as const;
-
-export const PERFORMANCE_THRESHOLDS = {
-  FAST_DETECTION_MS: 50,
-  ACCEPTABLE_DETECTION_MS: 100,
-  SLOW_DETECTION_MS: 200,
-  FAST_OCR_MS: 1000,
-  ACCEPTABLE_OCR_MS: 3000,
-  SLOW_OCR_MS: 5000,
-} as const;
-
-export const ERROR_MESSAGES = {
-  CAMERA_NOT_AVAILABLE: 'Cámara no disponible. Verifica los permisos.',
-  OPENCV_NOT_LOADED: 'OpenCV no está cargado. Recarga la página.',
-  NO_CARD_DETECTED: 'No se detectó ninguna carta. Intenta de nuevo.',
-  CAPTURE_QUALITY_LOW:
-    'Calidad de captura insuficiente. Mejora la iluminación.',
-  OCR_QUALITY_LOW: 'Texto no legible. Asegúrate de que la carta esté enfocada.',
-  OCR_TIMEOUT: 'Tiempo de espera agotado. Intenta de nuevo.',
-  PROCESSING_ERROR: 'Error al procesar la carta. Intenta de nuevo.',
-  NETWORK_ERROR: 'Error de red. Verifica tu conexión.',
-  VALIDATION_ERROR: 'Datos inválidos. Revisa los campos.',
-} as const;
-
-export const HAPTIC_PATTERNS = {
-  SUCCESS: 200,
-  ERROR: [100, 50, 100],
-  WARNING: 50,
-  STOP: 0,
-} as const;
-
-export const TORCH_CONFIG = {
-  SUPPORTED_FACING_MODES: ['environment'] as const,
-  CLEANUP_DELAY_MS: 100,
 } as const;
 
 export const QUALITY_THRESHOLDS = {
