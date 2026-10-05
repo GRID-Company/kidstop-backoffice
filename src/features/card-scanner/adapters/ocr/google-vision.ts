@@ -35,7 +35,8 @@ export async function extractTextWithVision(
         if (!response.ok) {
           const error = await response.json();
           throw new Error(
-            `Vision API error: ${error.error || response.statusText}`
+            `Vision API error: ${error.error || response.statusText}` +
+              (error.details ? ` — ${error.details}` : '')
           );
         }
 

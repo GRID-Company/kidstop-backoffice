@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
     console.error('[OCR Error]', {
       timestamp: new Date().toISOString(),
       type: error instanceof Error ? error.constructor.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
       requestId: request.headers.get('x-request-id'),
     });
 
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       error.message.includes('configuration error')
     ) {
       return NextResponse.json(
-        { error: 'Service configuration error' },
+        { error: 'Service configuration error', details: error.message },
         { status: 503 }
       );
     }
