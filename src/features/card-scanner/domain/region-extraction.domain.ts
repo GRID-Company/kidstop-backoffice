@@ -253,17 +253,12 @@ export function classifyTokensByRegion(
   };
 }
 
-export function matToDataURL(
-  mat: OpenCVMat,
-  cv: OpenCV,
-  mimeType: string = 'image/png',
-  quality?: number
-): string {
+export function matToDataURL(mat: OpenCVMat, cv: OpenCV): string {
   const canvas = document.createElement('canvas');
   canvas.width = mat.cols;
   canvas.height = mat.rows;
 
   cv.imshow(canvas, mat);
 
-  return canvas.toDataURL(mimeType, quality);
+  return canvas.toDataURL('image/png');
 }

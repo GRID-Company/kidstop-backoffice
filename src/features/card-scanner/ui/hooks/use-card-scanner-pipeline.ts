@@ -93,12 +93,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
         warpedMat.delete();
       }
 
-      const normalizedImageUrl = matToDataURL(
-        normalizedMat,
-        cv,
-        'image/jpeg',
-        0.92
-      );
+      const normalizedImageUrl = matToDataURL(normalizedMat, cv);
 
       const regionConfig = CARD_REGION_CONFIGS[`${game}-default`];
       if (!regionConfig) {
@@ -112,7 +107,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
       if (setSymbolRegion) {
         const setIconMat = extractRegion(normalizedMat, setSymbolRegion, cv);
         if (!setIconMat.empty()) {
-          setIconImageUrl = matToDataURL(setIconMat, cv, 'image/jpeg', 0.92);
+          setIconImageUrl = matToDataURL(setIconMat, cv);
         }
         setIconMat.delete();
       }
@@ -132,12 +127,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
         throw new Error('Failed to create composite OCR image');
       }
 
-      const compositeImageUrl = matToDataURL(
-        compositeMat,
-        cv,
-        'image/jpeg',
-        0.92
-      );
+      const compositeImageUrl = matToDataURL(compositeMat, cv);
 
       setStatus('extracting-text');
 
