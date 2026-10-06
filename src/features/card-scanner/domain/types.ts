@@ -35,6 +35,20 @@ export interface IDetectionResult {
   method: 'contours' | 'roi-fallback' | 'none';
 }
 
+export interface IBufferedFrame {
+  mat: OpenCVMat;
+  corners: number[];
+  width: number;
+  height: number;
+  sharpness: number;
+}
+
+export interface ICaptureFlags {
+  glare: boolean;
+  dark: boolean;
+  tooSmall: boolean;
+}
+
 export interface ICardDimensions {
   width: number;
   height: number;
@@ -95,6 +109,7 @@ export type OpenCV = {
     width: number,
     height: number
   ) => { width: number; height: number };
+  Point: new (x: number, y: number) => { x: number; y: number };
   Rect: new (
     x: number,
     y: number,
@@ -126,6 +141,13 @@ export type OpenCV = {
   ) => void;
   contourArea: (contour: OpenCVMat) => number;
   arcLength: (curve: OpenCVMat, closed: boolean) => number;
+  convexHull?: (points: OpenCVMat, hull: OpenCVMat) => void;
+  absdiff: (src1: OpenCVMat, src2: OpenCVMat, dst: OpenCVMat) => void;
+  minAreaRect?: (contour: OpenCVMat) => {
+    center: { x: number; y: number };
+    size: { width: number; height: number };
+    angle: number;
+  };
   boundingRect: (contour: OpenCVMat) => {
     x: number;
     y: number;
@@ -161,6 +183,13 @@ export type OpenCV = {
     threshold2: number
   ) => void;
   dilate: (
+    src: OpenCVMat,
+    dst: OpenCVMat,
+    kernel: OpenCVMat,
+    anchor?: { x: number; y: number },
+    iterations?: number
+  ) => void;
+  erode: (
     src: OpenCVMat,
     dst: OpenCVMat,
     kernel: OpenCVMat,
@@ -213,6 +242,7 @@ export type OpenCV = {
     dst: OpenCVMat
   ) => void;
   bitwise_or: (src1: OpenCVMat, src2: OpenCVMat, dst: OpenCVMat) => void;
+  bitwise_not: (src: OpenCVMat, dst: OpenCVMat) => void;
   resize: (
     src: OpenCVMat,
     dst: OpenCVMat,
@@ -229,6 +259,14 @@ export type OpenCV = {
   ) => void;
   Laplacian: (src: OpenCVMat, dst: OpenCVMat, ddepth: number) => void;
   meanStdDev: (src: OpenCVMat, mean: OpenCVMat, stddev: OpenCVMat) => void;
+  createCLAHE?: (
+    clipLimit?: number,
+    tileGridSize?: { width: number; height: number }
+  ) => {
+    apply: (src: OpenCVMat, dst: OpenCVMat) => void;
+    delete: () => void;
+  };
+  equalizeHist?: (src: OpenCVMat, dst: OpenCVMat) => void;
   mean: (src: OpenCVMat) => number[];
   matFromArray: (
     rows: number,
@@ -288,6 +326,7 @@ export type OpenCV = {
   THRESH_OTSU: number;
   CV_8U: number;
   CV_8UC3: number;
+  CV_8UC4: number;
   CV_32F: number;
   CV_32FC2: number;
   CV_32SC2: number;

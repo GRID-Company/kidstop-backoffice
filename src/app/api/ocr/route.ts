@@ -68,16 +68,13 @@ export async function POST(request: NextRequest) {
 
     const base64Image = image.replace(/^data:image\/\w+;base64,/, '');
 
-    console.error('🔍 Llamando a Google Vision API...');
-
-    const [result] = await client.textDetection({
+    const [result] = await client.documentTextDetection({
       image: { content: base64Image },
     });
 
-    const detections = result.textAnnotations;
+    const annotation = result.fullTextAnnotation;
 
-    if (!detections || detections.length === 0) {
-      console.error('⚠️ No se detectó texto en la imagen');
+    if (!annotation || !annotation.pages || annotation.pages.length === 0) {
       return NextResponse.json({
         text: '',
         confidence: 0,
@@ -85,18 +82,38 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const fullText = detections[0].description || '';
-    const confidence = detections[0].confidence || 0;
+    const fullText = annotation.text || '';
 
-    const words = detections.slice(1).map((word) => ({
-      text: word.description,
-      confidence: word.confidence || 0,
-      boundingBox: word.boundingPoly?.vertices,
-    }));
+    const words: Array<{
+      text: string;
+      confidence: number;
+      boundingBox: Array<{ x: number; y: number }> | undefined;
+    }> = [];
 
-    console.error(
-      `✅ Texto extraído: ${fullText.substring(0, 50)}... (${(confidence * 100).toFixed(1)}% confianza)`
-    );
+    for (const page of annotation.pages) {
+      for (const block of page.blocks ?? []) {
+        for (const paragraph of block.paragraphs ?? []) {
+          for (const word of paragraph.words ?? []) {
+            const text = (word.symbols ?? [])
+              .map((symbol) => symbol.text ?? '')
+              .join('');
+
+            if (!text.trim()) continue;
+
+            words.push({
+              text,
+              confidence: word.confidence ?? 0,
+              boundingBox: word.boundingBox?.vertices?.map((v) => ({
+                x: v.x ?? 0,
+                y: v.y ?? 0,
+              })),
+            });
+          }
+        }
+      }
+    }
+
+    const confidence = annotation.pages[0]?.confidence ?? 0;
 
     return NextResponse.json({
       text: fullText,

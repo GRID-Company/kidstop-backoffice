@@ -1,23 +1,6 @@
 import { ICardCorners, OpenCV, OpenCVMat } from './types';
 import { NORMALIZED_CARD_DIMENSIONS } from './constants';
 
-export function detectOrientation(
-  mat: OpenCVMat,
-  _cv: OpenCV
-): 0 | 90 | 180 | 270 {
-  const aspectRatio = mat.cols / mat.rows;
-
-  if (aspectRatio > 1.2) {
-    return 90;
-  }
-
-  if (aspectRatio < 0.6) {
-    return 0;
-  }
-
-  return 0;
-}
-
 /**
  * Rota una imagen a un ángulo específico
  *
@@ -115,12 +98,68 @@ export function calculateCaptureQuality(
   }
 
   const variance = stddev.data64F[0] * stddev.data64F[0];
-  const sharpnessScore = Math.min(variance / 500, 1.0);
+  const globalSharpness = Math.min(variance / 500, 1.0);
 
   gray.delete();
   laplacian.delete();
   mean.delete();
   stddev.delete();
+
+  const roiX = Math.max(
+    0,
+    Math.floor(
+      Math.min(
+        corners.topLeft.x,
+        corners.topRight.x,
+        corners.bottomRight.x,
+        corners.bottomLeft.x
+      )
+    )
+  );
+  const roiY = Math.max(
+    0,
+    Math.floor(
+      Math.min(
+        corners.topLeft.y,
+        corners.topRight.y,
+        corners.bottomRight.y,
+        corners.bottomLeft.y
+      )
+    )
+  );
+  const roiRight = Math.min(
+    mat.cols,
+    Math.ceil(
+      Math.max(
+        corners.topLeft.x,
+        corners.topRight.x,
+        corners.bottomRight.x,
+        corners.bottomLeft.x
+      )
+    )
+  );
+  const roiBottom = Math.min(
+    mat.rows,
+    Math.ceil(
+      Math.max(
+        corners.topLeft.y,
+        corners.topRight.y,
+        corners.bottomRight.y,
+        corners.bottomLeft.y
+      )
+    )
+  );
+
+  let zoneSharpness = globalSharpness;
+  if (roiRight - roiX > 24 && roiBottom - roiY > 24) {
+    const cardRoi = mat.roi(
+      new cv.Rect(roiX, roiY, roiRight - roiX, roiBottom - roiY)
+    );
+    zoneSharpness = calculateMinZoneSharpness(cardRoi, cv);
+    cardRoi.delete();
+  }
+
+  const sharpnessScore = Math.min(globalSharpness, zoneSharpness);
 
   const expectedRatio =
     NORMALIZED_CARD_DIMENSIONS.width / NORMALIZED_CARD_DIMENSIONS.height;
@@ -132,6 +171,107 @@ export function calculateCaptureQuality(
     areaScore * 0.4 + sharpnessScore * 0.4 + perspectiveScore * 0.2;
 
   return Math.max(0, Math.min(1, overallQuality));
+}
+
+export function calculateGlareRatio(mat: OpenCVMat, cv: OpenCV): number {
+  const gray = new cv.Mat();
+  const mask = new cv.Mat();
+
+  if (mat.channels() === 4) {
+    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
+  } else if (mat.channels() === 3) {
+    cv.cvtColor(mat, gray, cv.COLOR_RGB2GRAY);
+  } else {
+    mat.copyTo(gray);
+  }
+
+  cv.threshold(gray, mask, 240, 255, cv.THRESH_BINARY);
+  const mean = cv.mean(mask);
+
+  gray.delete();
+  mask.delete();
+
+  return (mean[0] ?? 0) / 255;
+}
+
+export function calculateBrightness(mat: OpenCVMat, cv: OpenCV): number {
+  const gray = new cv.Mat();
+
+  if (mat.channels() === 4) {
+    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
+  } else if (mat.channels() === 3) {
+    cv.cvtColor(mat, gray, cv.COLOR_RGB2GRAY);
+  } else {
+    mat.copyTo(gray);
+  }
+
+  const mean = cv.mean(gray);
+  gray.delete();
+
+  return (mean[0] ?? 0) / 255;
+}
+
+export function calculateMinZoneSharpness(
+  mat: OpenCVMat,
+  cv: OpenCV,
+  gridRows: number = 4,
+  gridCols: number = 3
+): number {
+  const gray = new cv.Mat();
+
+  if (mat.channels() === 4) {
+    cv.cvtColor(mat, gray, cv.COLOR_RGBA2GRAY);
+  } else if (mat.channels() === 3) {
+    cv.cvtColor(mat, gray, cv.COLOR_RGB2GRAY);
+  } else {
+    mat.copyTo(gray);
+  }
+
+  const cellWidth = Math.floor(gray.cols / gridCols);
+  const cellHeight = Math.floor(gray.rows / gridRows);
+
+  if (cellWidth <= 0 || cellHeight <= 0) {
+    gray.delete();
+    return 0;
+  }
+
+  let minSharpness = Infinity;
+
+  for (let row = 0; row < gridRows; row++) {
+    for (let col = 0; col < gridCols; col++) {
+      const cell = gray.roi(
+        new cv.Rect(
+          col * cellWidth,
+          row * cellHeight,
+          Math.min(cellWidth, gray.cols - col * cellWidth),
+          Math.min(cellHeight, gray.rows - row * cellHeight)
+        )
+      );
+
+      const laplacian = new cv.Mat();
+      const mean = new cv.Mat();
+      const stddev = new cv.Mat();
+
+      cv.Laplacian(cell, laplacian, cv.CV_64F);
+      cv.meanStdDev(laplacian, mean, stddev);
+
+      const variance =
+        stddev.data64F && stddev.data64F.length > 0
+          ? stddev.data64F[0] * stddev.data64F[0]
+          : 0;
+
+      minSharpness = Math.min(minSharpness, Math.min(variance / 500, 1.0));
+
+      cell.delete();
+      laplacian.delete();
+      mean.delete();
+      stddev.delete();
+    }
+  }
+
+  gray.delete();
+
+  return minSharpness === Infinity ? 0 : minSharpness;
 }
 
 export function calculateSharpness(mat: OpenCVMat, cv: OpenCV): number {

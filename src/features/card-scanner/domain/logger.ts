@@ -3,12 +3,14 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 export const logger = {
   debug: (message: string, ...args: unknown[]) => {
     if (isDevelopment) {
-      console.error(`[DEBUG] ${message}`, ...args);
+      // eslint-disable-next-line no-console
+      console.debug(`[DEBUG] ${message}`, ...args);
     }
   },
   info: (message: string, ...args: unknown[]) => {
     if (isDevelopment) {
-      console.error(`[INFO] ${message}`, ...args);
+      // eslint-disable-next-line no-console
+      console.info(`[INFO] ${message}`, ...args);
     }
   },
   warn: (message: string, ...args: unknown[]) => {

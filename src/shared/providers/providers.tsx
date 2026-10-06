@@ -22,7 +22,7 @@ export default function Providers({ children, role, jwt }: ProvidersProps) {
   }, [role, jwt]);
 
   return (
-    <HeroUIProvider locale='es-MX'>
+    <HeroUIProvider locale='es-MX' disableAnimation>
       <ApolloClientProvider>{children}</ApolloClientProvider>
     </HeroUIProvider>
   );

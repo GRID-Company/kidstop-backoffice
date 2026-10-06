@@ -13,6 +13,10 @@ export function calculateOcrQuality(regionalOcr: IRegionalOcrResult): number {
     hp: 0.15,
     footer: 0.35,
     setSymbol: 0.15,
+    manaCost: 0.1,
+    typeLine: 0.2,
+    footerLeft: 0.2,
+    footerRight: 0.15,
   };
 
   let totalWeight = 0;

@@ -130,10 +130,20 @@ export function normalizeWhitespace(text: string): string {
 
 export function correctCommonOCRErrors(text: string): string {
   return text
-    .replace(/\bO(\d)/g, '0$1')
-    .replace(/(\d)O\b/g, '$10')
-    .replace(/\bl(\d)/g, '1$1')
-    .replace(/(\d)l\b/g, '$11')
-    .replace(/\bI(\d)/g, '1$1')
-    .replace(/(\d)I\b/g, '$11');
+    .replace(/(\d)\s+(\d)/g, '$1$2')
+    .replace(/\b[Oo](\d)/g, '0$1')
+    .replace(/(\d)[Oo]\b/g, '$10')
+    .replace(/(\d)[Oo](\d)/g, '$10$2')
+    .replace(/\b[lI](\d)/g, '1$1')
+    .replace(/(\d)[lI]\b/g, '$11')
+    .replace(/(\d)[lI](\d)/g, '$11$2')
+    .replace(/\bS(\d)/g, '5$1')
+    .replace(/(\d)S\b/g, '$15')
+    .replace(/(\d)S(\d)/g, '$15$2')
+    .replace(/\bB(\d)/g, '8$1')
+    .replace(/(\d)B\b/g, '$18')
+    .replace(/(\d)B(\d)/g, '$18$2')
+    .replace(/\bG(\d)/g, '6$1')
+    .replace(/(\d)G\b/g, '$16')
+    .replace(/(\d)G(\d)/g, '$16$2');
 }

@@ -11,12 +11,14 @@ import {
   DETECTION_PARAMS,
   NORMALIZED_CARD_DIMENSIONS,
 } from './constants';
-import { logger } from './logger';
 
 function preprocessForContours(src: OpenCVMat, cv: OpenCV): OpenCVMat {
   const gray = new cv.Mat();
   const blurred = new cv.Mat();
   const edges = new cv.Mat();
+  const mean = new cv.Mat();
+  const stddev = new cv.Mat();
+  const kernel = cv.Mat.ones(5, 5, cv.CV_8U);
 
   if (src.channels() === 4) {
     cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
@@ -27,12 +29,64 @@ function preprocessForContours(src: OpenCVMat, cv: OpenCV): OpenCVMat {
   }
 
   cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-  cv.Canny(blurred, edges, 50, 150);
+
+  cv.meanStdDev(gray, mean, stddev);
+  const intensity = mean.data64F?.[0];
+  const lower =
+    intensity !== undefined ? Math.max(10, Math.round(0.66 * intensity)) : 50;
+  const upper =
+    intensity !== undefined ? Math.min(255, Math.round(1.33 * intensity)) : 150;
+
+  cv.Canny(blurred, edges, lower, upper);
+  const anchor = new cv.Point(-1, -1);
+  cv.dilate(edges, edges, kernel, anchor, 2);
+  cv.erode(edges, edges, kernel, anchor, 1);
 
   gray.delete();
   blurred.delete();
+  mean.delete();
+  stddev.delete();
+  kernel.delete();
 
   return edges;
+}
+
+function _snapCornersToHull(cnt: OpenCVMat, cv: OpenCV): number[] | null {
+  if (typeof cv.convexHull !== 'function') return null;
+
+  const hull = new cv.Mat();
+  const approx = new cv.Mat();
+
+  try {
+    cv.convexHull(cnt, hull);
+    const peri = cv.arcLength(hull, true);
+    cv.approxPolyDP(hull, approx, 0.1 * peri, true);
+
+    if (approx.rows === 4 && approx.data32S && approx.data32S.length >= 8) {
+      return [
+        approx.data32S[0],
+        approx.data32S[1],
+        approx.data32S[2],
+        approx.data32S[3],
+        approx.data32S[4],
+        approx.data32S[5],
+        approx.data32S[6],
+        approx.data32S[7],
+      ];
+    }
+    return null;
+  } finally {
+    hull.delete();
+    approx.delete();
+  }
+}
+
+function _quadAspectRatio(corners: number[]): number {
+  const xs = [corners[0], corners[2], corners[4], corners[6]];
+  const ys = [corners[1], corners[3], corners[5], corners[7]];
+  const w = Math.max(...xs) - Math.min(...xs);
+  const h = Math.max(...ys) - Math.min(...ys);
+  return h > 0 ? w / h : 0;
 }
 
 function detectCardContours(src: OpenCVMat, cv: OpenCV): IDetectionResult {
@@ -70,60 +124,66 @@ function detectCardContours(src: OpenCVMat, cv: OpenCV): IDetectionResult {
         ? hierarchy.data32S[i * 4 + 3] !== -1
         : false;
 
-      const peri = cv.arcLength(cnt, true);
-      const approx = new cv.Mat();
-      cv.approxPolyDP(cnt, approx, DETECTION_PARAMS.approxEpsilon * peri, true);
+      let quadCorners: number[] | null = _snapCornersToHull(cnt, cv);
 
-      let vertices = approx.rows;
-      let finalApprox = approx;
+      if (!quadCorners) {
+        const peri = cv.arcLength(cnt, true);
+        const approx = new cv.Mat();
+        cv.approxPolyDP(
+          cnt,
+          approx,
+          DETECTION_PARAMS.approxEpsilon * peri,
+          true
+        );
 
-      if (vertices >= 5 && vertices <= 20) {
-        const aggressiveApprox = new cv.Mat();
-        cv.approxPolyDP(cnt, aggressiveApprox, 0.04 * peri, true);
+        let vertices = approx.rows;
+        let finalApprox = approx;
 
-        if (aggressiveApprox.rows === 4) {
-          finalApprox = aggressiveApprox;
-          vertices = 4;
-          approx.delete();
-        } else {
-          aggressiveApprox.delete();
+        if (vertices >= 5 && vertices <= 20) {
+          const aggressiveApprox = new cv.Mat();
+          cv.approxPolyDP(cnt, aggressiveApprox, 0.04 * peri, true);
+
+          if (aggressiveApprox.rows === 4) {
+            finalApprox = aggressiveApprox;
+            vertices = 4;
+            approx.delete();
+          } else {
+            aggressiveApprox.delete();
+          }
         }
-      }
-
-      if (vertices === 4) {
-        const rect = cv.boundingRect(finalApprox);
-        const aspectRatio = rect.width / rect.height;
-
-        const isCardAspectRatio =
-          (aspectRatio >= DETECTION_PARAMS.minAspectRatioPortrait &&
-            aspectRatio <= DETECTION_PARAMS.maxAspectRatioPortrait) ||
-          (aspectRatio >= DETECTION_PARAMS.minAspectRatioLandscape &&
-            aspectRatio <= DETECTION_PARAMS.maxAspectRatioLandscape);
 
         if (
-          isCardAspectRatio &&
+          vertices === 4 &&
           finalApprox.data32S &&
           finalApprox.data32S.length >= 8
         ) {
+          quadCorners = [
+            finalApprox.data32S[0],
+            finalApprox.data32S[1],
+            finalApprox.data32S[2],
+            finalApprox.data32S[3],
+            finalApprox.data32S[4],
+            finalApprox.data32S[5],
+            finalApprox.data32S[6],
+            finalApprox.data32S[7],
+          ];
+        }
+
+        finalApprox.delete();
+      }
+
+      if (quadCorners) {
+        const aspectRatio = _quadAspectRatio(quadCorners);
+
+        if (_isCardAspectRatio(aspectRatio)) {
           candidates.push({
-            corners: [
-              finalApprox.data32S[0],
-              finalApprox.data32S[1],
-              finalApprox.data32S[2],
-              finalApprox.data32S[3],
-              finalApprox.data32S[4],
-              finalApprox.data32S[5],
-              finalApprox.data32S[6],
-              finalApprox.data32S[7],
-            ],
+            corners: quadCorners,
             area,
             aspectRatio,
             hasParent,
           });
         }
       }
-
-      finalApprox.delete();
     }
 
     candidates.sort((a, b) => {
@@ -135,9 +195,6 @@ function detectCardContours(src: OpenCVMat, cv: OpenCV): IDetectionResult {
 
     if (candidates.length > 0) {
       const best = candidates[0];
-      logger.debug(
-        `✅ Detectado! Área: ${Math.round(best.area)}, AR: ${best.aspectRatio.toFixed(2)}, HasParent: ${best.hasParent}`
-      );
       return { corners: best.corners, found: true, method: 'contours' };
     }
 
@@ -149,7 +206,10 @@ function detectCardContours(src: OpenCVMat, cv: OpenCV): IDetectionResult {
   }
 }
 
-function getROIFromGuide(frameWidth: number, frameHeight: number): number[] {
+export function getROIFromGuide(
+  frameWidth: number,
+  frameHeight: number
+): number[] {
   const TCG_CARD_RATIO = 1.4;
   const GUIDE_WIDTH_PERCENTAGE = 65;
 
@@ -187,8 +247,9 @@ function _detectBySimpleThreshold(
 ): IDetectionResult {
   const gray = new cv.Mat();
   const thresh = new cv.Mat();
-  const contours = new cv.MatVector();
-  const hierarchy = new cv.Mat();
+  const inverted = new cv.Mat();
+  const dilatedInverted = new cv.Mat();
+  const kernel = cv.Mat.ones(5, 5, cv.CV_8U);
 
   try {
     if (src.channels() === 4) {
@@ -199,10 +260,206 @@ function _detectBySimpleThreshold(
       src.copyTo(gray);
     }
 
-    cv.threshold(gray, thresh, 127, 255, cv.THRESH_BINARY);
+    cv.threshold(gray, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+
+    if (typeof cv.bitwise_not === 'function') {
+      cv.bitwise_not(thresh, inverted);
+      cv.dilate(inverted, dilatedInverted, kernel, new cv.Point(-1, -1), 2);
+    }
+
+    const frameArea = src.rows * src.cols;
+    const minArea = frameArea * 0.15;
+    const maxArea = frameArea * 0.9;
+    const masks = dilatedInverted.empty()
+      ? [thresh]
+      : [thresh, dilatedInverted];
+
+    let maxCardArea = 0;
+    let bestCorners: number[] | null = null;
+
+    for (const mask of masks) {
+      const contours = new cv.MatVector();
+      const hierarchy = new cv.Mat();
+
+      try {
+        cv.findContours(
+          mask,
+          contours,
+          hierarchy,
+          cv.RETR_EXTERNAL,
+          cv.CHAIN_APPROX_SIMPLE
+        );
+
+        for (let i = 0; i < contours.size(); i++) {
+          const cnt = contours.get(i);
+          const area = cv.contourArea(cnt);
+
+          if (area < minArea || area > maxArea || area <= maxCardArea) continue;
+
+          let corners = _snapCornersToHull(cnt, cv);
+          let aspectRatio = corners ? _quadAspectRatio(corners) : 0;
+
+          if (corners && !_isCardAspectRatio(aspectRatio)) {
+            corners = null;
+          }
+
+          if (!corners) {
+            const rect = cv.boundingRect(cnt);
+            aspectRatio = rect.width / rect.height;
+            if (_isCardAspectRatio(aspectRatio)) {
+              corners = [
+                rect.x,
+                rect.y,
+                rect.x + rect.width,
+                rect.y,
+                rect.x + rect.width,
+                rect.y + rect.height,
+                rect.x,
+                rect.y + rect.height,
+              ];
+            }
+          }
+
+          if (corners) {
+            maxCardArea = area;
+            bestCorners = corners;
+          }
+        }
+      } finally {
+        contours.delete();
+        hierarchy.delete();
+      }
+    }
+
+    if (bestCorners) {
+      return { corners: bestCorners, found: true, method: 'contours' };
+    }
+
+    return { corners: [], found: false, method: 'none' };
+  } finally {
+    gray.delete();
+    thresh.delete();
+    inverted.delete();
+    dilatedInverted.delete();
+    kernel.delete();
+  }
+}
+
+function _sampleBackgroundScalar(
+  src: OpenCVMat,
+  cv: OpenCV
+): {
+  val: number[];
+} {
+  const patch = Math.max(8, Math.round(Math.min(src.cols, src.rows) * 0.05));
+  const w = Math.min(patch, src.cols);
+  const h = Math.min(patch, src.rows);
+
+  const rects = [
+    new cv.Rect(0, 0, w, h),
+    new cv.Rect(src.cols - w, 0, w, h),
+    new cv.Rect(0, src.rows - h, w, h),
+    new cv.Rect(src.cols - w, src.rows - h, w, h),
+  ];
+
+  const channelMeans: number[][] = [[], [], [], []];
+
+  for (const rect of rects) {
+    const roi = src.roi(rect);
+    const mean = cv.mean(roi);
+    for (let c = 0; c < 4; c++) {
+      channelMeans[c].push(mean[c] ?? 0);
+    }
+    roi.delete();
+  }
+
+  const median = (values: number[]) => {
+    const sorted = [...values].sort((a, b) => a - b);
+    return Math.round((sorted[1] + sorted[2]) / 2);
+  };
+
+  const channels = src.channels();
+  const bg = channelMeans.map(median);
+
+  return new cv.Scalar(
+    bg[0],
+    bg[1],
+    bg[2],
+    channels === 4 ? 255 : (bg[3] ?? 255)
+  );
+}
+
+function _rotatedRectCorners(rect: {
+  center: { x: number; y: number };
+  size: { width: number; height: number };
+  angle: number;
+}): number[] {
+  const rad = (rect.angle * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  const hw = rect.size.width / 2;
+  const hh = rect.size.height / 2;
+
+  const local = [
+    [-hw, -hh],
+    [hw, -hh],
+    [hw, hh],
+    [-hw, hh],
+  ];
+
+  return local.flatMap(([px, py]) => [
+    rect.center.x + px * cos - py * sin,
+    rect.center.y + px * sin + py * cos,
+  ]);
+}
+
+function _isCardAspectRatio(aspectRatio: number): boolean {
+  return (
+    (aspectRatio >= DETECTION_PARAMS.minAspectRatioPortrait &&
+      aspectRatio <= DETECTION_PARAMS.maxAspectRatioPortrait) ||
+    (aspectRatio >= DETECTION_PARAMS.minAspectRatioLandscape &&
+      aspectRatio <= DETECTION_PARAMS.maxAspectRatioLandscape)
+  );
+}
+
+function _detectByColorSegmentation(
+  src: OpenCVMat,
+  cv: OpenCV
+): IDetectionResult {
+  const bgScalar = _sampleBackgroundScalar(src, cv);
+  const bg = new cv.Mat(
+    src.rows,
+    src.cols,
+    src.channels() === 4 ? cv.CV_8UC4 : cv.CV_8UC3,
+    bgScalar
+  );
+  const diff = new cv.Mat();
+  const diffGray = new cv.Mat();
+  const blurred = new cv.Mat();
+  const mask = new cv.Mat();
+  const openKernel = cv.Mat.ones(3, 3, cv.CV_8U);
+  const closeKernel = cv.Mat.ones(9, 9, cv.CV_8U);
+  const contours = new cv.MatVector();
+  const hierarchy = new cv.Mat();
+
+  try {
+    cv.absdiff(src, bg, diff);
+
+    if (diff.channels() === 4) {
+      cv.cvtColor(diff, diffGray, cv.COLOR_RGBA2GRAY);
+    } else if (diff.channels() === 3) {
+      cv.cvtColor(diff, diffGray, cv.COLOR_RGB2GRAY);
+    } else {
+      diff.copyTo(diffGray);
+    }
+
+    cv.GaussianBlur(diffGray, blurred, new cv.Size(5, 5), 0);
+    cv.threshold(blurred, mask, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+    cv.morphologyEx(mask, mask, cv.MORPH_OPEN, openKernel);
+    cv.morphologyEx(mask, mask, cv.MORPH_CLOSE, closeKernel);
 
     cv.findContours(
-      thresh,
+      mask,
       contours,
       hierarchy,
       cv.RETR_EXTERNAL,
@@ -210,58 +467,72 @@ function _detectBySimpleThreshold(
     );
 
     const frameArea = src.rows * src.cols;
-    const minArea = frameArea * 0.15;
-    const maxArea = frameArea * 0.9;
+    const minArea = frameArea * DETECTION_PARAMS.minAreaRatio;
+    const maxArea = frameArea * DETECTION_PARAMS.maxAreaRatio;
 
-    let maxCardArea = 0;
-    let bestRect: {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    } | null = null;
+    let bestArea = 0;
+    let bestCorners: number[] = [];
 
     for (let i = 0; i < contours.size(); i++) {
       const cnt = contours.get(i);
       const area = cv.contourArea(cnt);
 
-      if (area < minArea || area > maxArea) continue;
+      if (area < minArea || area > maxArea || area <= bestArea) continue;
 
-      const rect = cv.boundingRect(cnt);
-      const aspectRatio = rect.width / rect.height;
+      let corners: number[] | null = _snapCornersToHull(cnt, cv);
+      let aspectRatio: number;
 
-      const isCardAspectRatio =
-        (aspectRatio >= 0.55 && aspectRatio <= 0.85) ||
-        (aspectRatio >= 1.18 && aspectRatio <= 1.82);
+      if (corners) {
+        aspectRatio = _quadAspectRatio(corners);
+        if (!_isCardAspectRatio(aspectRatio)) {
+          corners = null;
+        }
+      }
 
-      if (isCardAspectRatio && area > maxCardArea) {
-        maxCardArea = area;
-        bestRect = rect;
+      if (!corners && typeof cv.minAreaRect === 'function') {
+        const rect = cv.minAreaRect(cnt);
+        const w = rect.size.width;
+        const h = rect.size.height;
+        aspectRatio = w > 0 && h > 0 ? Math.min(w, h) / Math.max(w, h) : 0;
+        if (_isCardAspectRatio(aspectRatio)) {
+          corners = _rotatedRectCorners(rect);
+        }
+      } else if (!corners) {
+        const rect = cv.boundingRect(cnt);
+        aspectRatio = rect.width / rect.height;
+        if (_isCardAspectRatio(aspectRatio)) {
+          corners = [
+            rect.x,
+            rect.y,
+            rect.x + rect.width,
+            rect.y,
+            rect.x + rect.width,
+            rect.y + rect.height,
+            rect.x,
+            rect.y + rect.height,
+          ];
+        }
+      }
+
+      if (corners) {
+        bestArea = area;
+        bestCorners = corners;
       }
     }
 
-    if (bestRect) {
-      const corners = [
-        bestRect.x,
-        bestRect.y,
-        bestRect.x + bestRect.width,
-        bestRect.y,
-        bestRect.x + bestRect.width,
-        bestRect.y + bestRect.height,
-        bestRect.x,
-        bestRect.y + bestRect.height,
-      ];
-
-      logger.debug(
-        `🟡 Detectado por threshold simple! Área: ${Math.round(maxCardArea)}`
-      );
-      return { corners, found: true, method: 'contours' };
+    if (bestCorners.length === 8) {
+      return { corners: bestCorners, found: true, method: 'contours' };
     }
 
     return { corners: [], found: false, method: 'none' };
   } finally {
-    gray.delete();
-    thresh.delete();
+    bg.delete();
+    diff.delete();
+    diffGray.delete();
+    blurred.delete();
+    mask.delete();
+    openKernel.delete();
+    closeKernel.delete();
     contours.delete();
     hierarchy.delete();
   }
@@ -277,9 +548,19 @@ export function detectCardContoursWithFallback(
     return edgeResult;
   }
 
-  const roiCorners = getROIFromGuide(src.cols, src.rows);
+  const colorResult = _detectByColorSegmentation(src, cv);
 
-  logger.debug(`🔄 Usando ROI de la guía como fallback`);
+  if (colorResult.found) {
+    return colorResult;
+  }
+
+  const thresholdResult = _detectBySimpleThreshold(src, cv);
+
+  if (thresholdResult.found) {
+    return thresholdResult;
+  }
+
+  const roiCorners = getROIFromGuide(src.cols, src.rows);
 
   return {
     corners: roiCorners,
@@ -310,6 +591,36 @@ export function orderCorners(corners: number[]): ICardCorners {
     topRight,
     bottomRight,
     bottomLeft,
+  };
+}
+
+export function expandCorners(
+  corners: ICardCorners,
+  factor: number
+): ICardCorners {
+  const cx =
+    (corners.topLeft.x +
+      corners.topRight.x +
+      corners.bottomRight.x +
+      corners.bottomLeft.x) /
+    4;
+  const cy =
+    (corners.topLeft.y +
+      corners.topRight.y +
+      corners.bottomRight.y +
+      corners.bottomLeft.y) /
+    4;
+
+  const scale = (p: IPoint): IPoint => ({
+    x: cx + (p.x - cx) * factor,
+    y: cy + (p.y - cy) * factor,
+  });
+
+  return {
+    topLeft: scale(corners.topLeft),
+    topRight: scale(corners.topRight),
+    bottomRight: scale(corners.bottomRight),
+    bottomLeft: scale(corners.bottomLeft),
   };
 }
 
@@ -485,15 +796,6 @@ export function validateCardAlignment(
   const effectiveGuideRegion =
     guideRegion || calculateGuideRegionForFrame(frameWidth, frameHeight);
 
-  logger.debug('🎯 Guide region:', effectiveGuideRegion);
-  logger.debug(
-    '📐 Frame:',
-    frameWidth,
-    'x',
-    frameHeight,
-    'AR:',
-    (frameWidth / frameHeight).toFixed(2)
-  );
   if (corners.length !== 8) {
     return {
       aligned: false,
@@ -579,6 +881,46 @@ export function validateCardAlignment(
     };
   }
 
+  const quadPoints = [
+    orderedCorners.topLeft,
+    orderedCorners.topRight,
+    orderedCorners.bottomRight,
+    orderedCorners.bottomLeft,
+  ];
+
+  const interiorAngle = (
+    prev: IPoint,
+    current: IPoint,
+    next: IPoint
+  ): number => {
+    const v1x = prev.x - current.x;
+    const v1y = prev.y - current.y;
+    const v2x = next.x - current.x;
+    const v2y = next.y - current.y;
+    const dot = v1x * v2x + v1y * v2y;
+    const mag = Math.hypot(v1x, v1y) * Math.hypot(v2x, v2y);
+    if (mag === 0) return 0;
+    const cos = Math.max(-1, Math.min(1, dot / mag));
+    return (Math.acos(cos) * 180) / Math.PI;
+  };
+
+  const maxSkew = quadPoints.some(
+    (_, i) =>
+      interiorAngle(
+        quadPoints[(i + 3) % 4],
+        quadPoints[i],
+        quadPoints[(i + 1) % 4]
+      ) < 55
+  );
+
+  if (maxSkew) {
+    return {
+      aligned: false,
+      coverage: 0,
+      reason: 'Extreme camera angle',
+    };
+  }
+
   const guideWithTolerance = {
     x: effectiveGuideRegion.x - tolerance,
     y: effectiveGuideRegion.y - tolerance,
@@ -629,6 +971,9 @@ export function validateCardAlignment(
 }
 
 export function getFriendlyPipelineError(message: string): string {
+  if (message.startsWith('Forma de carta no válida')) {
+    return 'No pudimos encuadrar la carta. Alinéala dentro de la guía e inténtalo de nuevo.';
+  }
   if (message.startsWith('Calidad de captura insuficiente')) {
     return 'La foto no salió clara. Busca mejor luz y un fondo liso, e inténtalo de nuevo.';
   }

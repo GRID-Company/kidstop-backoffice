@@ -72,7 +72,6 @@ export const useCameraStream = (
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => {
         track.stop();
-        console.error('🛑 Track stopped:', track.kind);
       });
 
       if (videoRef.current) {
@@ -92,36 +91,25 @@ export const useCameraStream = (
 
     stopCamera();
 
-    console.error('🔵 [startCamera] Función llamada');
     if (mountedRef.current) {
       setIsInitializing(true);
     }
-    console.error('🎥 Solicitando acceso a la cámara...');
-    console.error('📱 User Agent:', navigator.userAgent);
-    console.error('🔒 isSecureContext:', window.isSecureContext);
-    console.error('📍 Location:', window.location.href);
 
     if (!window.isSecureContext && window.location.hostname !== 'localhost') {
-      const errorMsg = 'HTTPS requerido para acceso a cámara';
-      console.error('❌', errorMsg);
       if (mountedRef.current) {
-        setError(errorMsg);
+        setError('HTTPS requerido para acceso a cámara');
         setIsInitializing(false);
       }
       return;
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      const errorMsg = 'getUserMedia no está disponible en este navegador';
-      console.error('❌', errorMsg);
       if (mountedRef.current) {
-        setError(errorMsg);
+        setError('getUserMedia no está disponible en este navegador');
         setIsInitializing(false);
       }
       return;
     }
-
-    console.error('📹 Llamando a getUserMedia con config:', CAMERA_CONFIG);
 
     navigator.mediaDevices
       .getUserMedia({
@@ -133,9 +121,6 @@ export const useCameraStream = (
           stream.getTracks().forEach((track) => track.stop());
           return;
         }
-
-        console.error('✅ Acceso a cámara concedido');
-        console.error('📊 Stream tracks:', stream.getTracks().length);
 
         streamRef.current = stream;
 
@@ -156,7 +141,6 @@ export const useCameraStream = (
               .play()
               .then(() => {
                 if (!mountedRef.current) return;
-                console.error('▶️ Video reproduciendo');
                 setIsStreaming(true);
                 setIsInitializing(false);
               })
@@ -235,7 +219,6 @@ export const useCameraStream = (
       }
 
       stopCamera();
-      console.error('🛑 Camera stream stopped on component unmount');
     };
   }, [startCamera, stopCamera]);
 

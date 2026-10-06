@@ -72,10 +72,11 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     toggleTorch,
   } = useCameraStream(videoRef);
   const {
-    latestFrame,
+    bestFrame,
     latestCorners,
     detectionMethod,
     cardDetected,
+    captureFlags,
     resetDetection,
     debugInfo,
   } = useCardDetection(videoRef, canvasRef, cvReady, cv, isStreaming);
@@ -95,7 +96,10 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
       autoCapture &&
       cardDetected &&
       status === 'camera-ready' &&
-      !scannedData
+      !scannedData &&
+      !captureFlags.glare &&
+      !captureFlags.dark &&
+      !captureFlags.tooSmall
     ) {
       stableFramesRef.current += 1;
 
@@ -107,10 +111,10 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
       stableFramesRef.current = 0;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardDetected, autoCapture, status, scannedData]);
+  }, [cardDetected, autoCapture, status, scannedData, captureFlags]);
 
   const handleCapture = async () => {
-    if (!latestFrame.current || !latestCorners.current || !cv) {
+    if (!bestFrame.current || !latestCorners.current || !cv) {
       toast.error('No se detecta ninguna carta en el recuadro');
       if (hapticEnabled) {
         vibrateError();
@@ -137,17 +141,10 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     }
 
     try {
-      const frameSize = {
-        width: videoRef.current.videoWidth,
-        height: videoRef.current.videoHeight,
-      };
-
-      await processCard(
-        latestFrame.current,
-        latestCorners.current,
-        cv,
-        frameSize
-      );
+      await processCard(bestFrame.current.mat, bestFrame.current.corners, cv, {
+        width: bestFrame.current.width,
+        height: bestFrame.current.height,
+      });
 
       if (hapticEnabled) {
         vibrateSuccess();
@@ -248,7 +245,19 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
                     title: 'Error de procesamiento',
                     message: getFriendlyPipelineError(pipelineError),
                   }
-                : null;
+                : status === 'camera-ready' &&
+                    (captureFlags.glare ||
+                      captureFlags.dark ||
+                      captureFlags.tooSmall)
+                  ? {
+                      variant: 'warning' as const,
+                      message: captureFlags.glare
+                        ? 'Hay reflejos sobre la carta. Inclínala un poco para evitarlos.'
+                        : captureFlags.dark
+                          ? 'Está muy oscuro. Busca mejor iluminación.'
+                          : 'La carta está muy lejos. Acércala a la guía.',
+                    }
+                  : null;
 
   return (
     <>

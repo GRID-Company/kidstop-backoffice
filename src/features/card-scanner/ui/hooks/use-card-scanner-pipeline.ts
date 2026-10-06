@@ -13,14 +13,16 @@ import {
 import {
   CARD_REGION_CONFIGS,
   QUALITY_THRESHOLDS,
+  QUAD_EXPAND_FACTOR,
+  QUAD_ASPECT_RANGE,
 } from '../../domain/constants';
 import {
   orderCorners,
+  expandCorners,
   warpPerspectiveNormalized,
 } from '../../domain/card-scanner.domain';
 import {
   calculateCaptureQuality,
-  detectOrientation,
   rotateCard,
 } from '../../domain/normalization.domain';
 import {
@@ -56,6 +58,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
     const metricsData: Partial<IScannerMetrics> = {};
     let normalizedMat: OpenCVMat | null = null;
     let compositeMat: OpenCVMat | null = null;
+    let warpedMat: OpenCVMat | null = null;
 
     try {
       setStatus('capturing');
@@ -64,6 +67,41 @@ export const useCardScannerPipeline = (game: TCGGame) => {
       const orderedCorners: ICardCorners = orderCorners(corners);
       const contourDetectionTime = performance.now();
       metricsData.contourDetectionMs = contourDetectionTime - startTime;
+
+      const quadWidth = Math.max(
+        Math.hypot(
+          orderedCorners.topRight.x - orderedCorners.topLeft.x,
+          orderedCorners.topRight.y - orderedCorners.topLeft.y
+        ),
+        Math.hypot(
+          orderedCorners.bottomRight.x - orderedCorners.bottomLeft.x,
+          orderedCorners.bottomRight.y - orderedCorners.bottomLeft.y
+        )
+      );
+      const quadHeight = Math.max(
+        Math.hypot(
+          orderedCorners.bottomLeft.x - orderedCorners.topLeft.x,
+          orderedCorners.bottomLeft.y - orderedCorners.topLeft.y
+        ),
+        Math.hypot(
+          orderedCorners.bottomRight.x - orderedCorners.topRight.x,
+          orderedCorners.bottomRight.y - orderedCorners.topRight.y
+        )
+      );
+
+      const measuredAspect =
+        Math.min(quadWidth, quadHeight) > 0
+          ? Math.max(quadWidth, quadHeight) / Math.min(quadWidth, quadHeight)
+          : 0;
+
+      if (
+        measuredAspect < QUAD_ASPECT_RANGE.min ||
+        measuredAspect > QUAD_ASPECT_RANGE.max
+      ) {
+        throw new Error(
+          `Forma de carta no válida (ratio ${measuredAspect.toFixed(2)}). Encuadra la carta dentro de la guía.`
+        );
+      }
 
       const captureQuality = calculateCaptureQuality(
         frameMat,
@@ -80,20 +118,27 @@ export const useCardScannerPipeline = (game: TCGGame) => {
 
       setStatus('processing-image');
 
-      const warpedMat = warpPerspectiveNormalized(frameMat, orderedCorners, cv);
+      const paddedCorners = expandCorners(orderedCorners, QUAD_EXPAND_FACTOR);
+      warpedMat = warpPerspectiveNormalized(frameMat, paddedCorners, cv);
       const perspectiveTime = performance.now();
       metricsData.perspectiveTransformMs =
         perspectiveTime - contourDetectionTime;
 
-      const orientation = detectOrientation(warpedMat, cv);
-      normalizedMat =
-        orientation !== 0 ? rotateCard(warpedMat, orientation, cv) : warpedMat;
+      const isLandscape = quadWidth / quadHeight > 1.15;
 
-      if (orientation !== 0) {
+      normalizedMat = isLandscape ? rotateCard(warpedMat, 90, cv) : warpedMat;
+
+      if (isLandscape) {
         warpedMat.delete();
+        warpedMat = null;
       }
 
-      const normalizedImageUrl = matToDataURL(normalizedMat, cv);
+      const normalizedImageUrl = matToDataURL(
+        normalizedMat,
+        cv,
+        'image/jpeg',
+        0.9
+      );
 
       const regionConfig = CARD_REGION_CONFIGS[`${game}-default`];
       if (!regionConfig) {
@@ -107,7 +152,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
       if (setSymbolRegion) {
         const setIconMat = extractRegion(normalizedMat, setSymbolRegion, cv);
         if (!setIconMat.empty()) {
-          setIconImageUrl = matToDataURL(setIconMat, cv);
+          setIconImageUrl = matToDataURL(setIconMat, cv, 'image/jpeg', 0.9);
         }
         setIconMat.delete();
       }
@@ -205,6 +250,18 @@ export const useCardScannerPipeline = (game: TCGGame) => {
 
       setError(errorMessage);
       setStatus('error');
+
+      try {
+        if (
+          warpedMat &&
+          warpedMat !== normalizedMat &&
+          !warpedMat.isDeleted()
+        ) {
+          warpedMat.delete();
+        }
+      } catch (cleanupErr) {
+        console.warn('Error limpiando warpedMat:', cleanupErr);
+      }
 
       try {
         if (normalizedMat && !normalizedMat.isDeleted()) {
