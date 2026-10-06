@@ -30,7 +30,7 @@ La primera iteración queda **intacta** como referencia y demo:
 2. **Seleccionar el juego** (Pokémon o Magic) en el selector superior
 3. **Posicionar la carta** dentro del recuadro de la cámara
 4. Cuando detecte los 4 bordes, aparecerá un **contorno verde**
-5. **Captura automática** o presionar **"📷 Capturar Carta"**
+5. Presionar **"📷 Capturar Carta"** o activar **captura automática** (off por default)
 6. El sistema procesará la carta automáticamente:
    - Corrección de perspectiva
    - Normalización y rotación
@@ -48,34 +48,47 @@ La primera iteración queda **intacta** como referencia y demo:
 
 ### Modos de Captura
 
-- **Automático**: Captura cuando detecta carta estable por 1 segundo
-- **Manual**: Presionar botón de captura cuando esté lista
+- **Manual** (default): Presionar botón de captura cuando el contorno esté verde
+- **Automático** (opt-in): Captura cuando detecta carta estable; **bloqueado** si hay flags de calidad activos (reflejos, escena oscura, carta muy lejos)
 
 ## 🎯 Funcionalidades
 
 ### Detección en Tiempo Real
 
-- ✅ Detección automática de contornos rectangulares
-- ✅ Feedback visual con contorno verde cuando detecta carta
-- ✅ Procesamiento a ~30 FPS
-- ✅ Parámetros configurables por área, precisión y umbrales Canny
+Detección en cascada sobre el ROI de la guía (crop +4% margen) a ≤640px, con mapeo de esquinas a resolución completa:
+
+1. **Canny adaptativo** — umbrales derivados de la media del frame + dilate/erode para unir bordes rotos
+2. **Segmentación por color de fondo** — mediana de parches en las 4 esquinas del crop + `absdiff` + Otsu; resuelve combos de bajo contraste (p.ej. borde amarillo Pokémon sobre fondo blanco)
+3. **Threshold Otsu dual-polarity** — escanea la máscara y su inversa (carta oscura sobre fondo claro y viceversa)
+4. **ROI de la guía** — último recurso (nunca captura)
+
+- ✅ `convexHull` + `approxPolyDP` agresivo (epsilon 0.1·perímetro) para esquinas exactas
+- ✅ **Motion gate**: diff entre frames consecutivos salta la detección si hay movimiento (menos CPU, cero capturas borrosas)
+- ✅ **EMA** en esquinas (α=0.4) + estabilidad temporal antes de habilitar captura
+- ✅ **Buffer de frames estables** (6) con sharpness Laplacian — la captura usa el frame más nítido
+- ✅ **Rechazos**: skew extremo, quads que tocan el borde del crop, cobertura fuera de rango, aspecto medido inválido
+- ✅ **Quality flags** con debounce: `glare` (reflejos), `dark` (escena oscura), `tooSmall` (carta lejos) → hints persistentes + bloqueo de auto-captura
+- ✅ Feedback visual con contorno verde (polyline sobre `drawImage` GPU — sin `cv.imshow` por frame)
 
 ### Pipeline Completo de Procesamiento
 
+- ✅ **Gate de aspecto medido** del quad antes de procesar (rechaza detecciones deformadas)
+- ✅ **Padding ~4%** al quad antes del warp — conserva margen de fondo real sin cortar bordes
 - ✅ **Corrección de perspectiva** (warp) con ordenamiento inteligente de esquinas
-- ✅ **Normalización** a dimensiones estándar TCG (350x490px, ratio 1:1.4)
-- ✅ **Rotación automática** basada en orientación detectada
+- ✅ **Normalización** a 744×1039px (JPEG q0.9); preview de 350×490px
+- ✅ **Rotación** por aspecto real del quad (landscape > 1.15 rota 90°)
 - ✅ **Extracción regional compuesta** por zonas específicas del juego
-- ✅ **Preprocesamiento avanzado** con OpenCV (escala de grises, CLAHE, bilateral filter)
-- ✅ **Métricas de calidad** de captura (sharpness, brightness, contrast)
+- ✅ **Realce por región** (CLAHE si está disponible en el build de OpenCV, si no `equalizeHist`) + upscale ×2
+- ✅ **Métricas de calidad** de captura (área, sharpness global + por zonas 4×3, perspectiva)
 
 ### OCR Regional con Google Cloud Vision
 
-- ✅ Extracción por regiones específicas (nombre, HP, número, set, rareza, etc.)
-- ✅ Imagen compuesta optimizada para Vision API
+- ✅ `documentTextDetection` (modo documento denso) — **confianza real por palabra** (`textDetection` devolvía 0 siempre y rompía el quality gate)
+- ✅ Extracción por regiones específicas (nombre, HP/manaCost, número, set, typeLine, etc.)
+- ✅ Imagen compuesta optimizada para Vision API (regiones realzadas y escaladas ×2 sobre fondo blanco)
 - ✅ Clasificación de texto por región (nombre, número, texto, metadata)
+- ✅ Quality gate de OCR ponderado por región y por juego (Pokémon y Magic tienen pesos propios)
 - ✅ Precisión ~90-95% vs Tesseract ~30-40%
-- ✅ Velocidad 1-2 segundos vs Tesseract 5-10 segundos
 
 ### Parsers Específicos por Juego
 
@@ -127,7 +140,7 @@ La primera iteración queda **intacta** como referencia y demo:
 ### Visualización y Debug
 
 - ✅ Vista de imagen normalizada
-- ✅ Tabs: Editor / OCR Raw / Debug
+- ✅ Tabs: Editor / OCR Raw / Debug (siempre visible en la vista de resultados)
 - ✅ Vista debug con imagen compuesta y texto por región
 - ✅ Copiar texto OCR al portapapeles
 - ✅ Descargar texto como .txt
@@ -148,16 +161,17 @@ Sigue la arquitectura Feature-First del proyecto con separación en tres capas:
 ```
 card-scanner/
 ├── domain/                              # Lógica de negocio
-│   ├── types.ts                         # Tipos del dominio (ScannerStatus, CaptureMetrics, etc.)
-│   ├── constants.ts                     # Constantes (dimensiones, thresholds, regiones)
-│   ├── card-scanner.domain.ts           # Detección de contornos + perspectiva
-│   ├── image-processing.domain.ts       # Preprocesamiento OpenCV
-│   ├── normalization.domain.ts          # Normalización, rotación y métricas de captura
-│   ├── region-extraction.domain.ts      # Extracción regional compuesta + clasificación OCR
-│   ├── confidence.domain.ts             # Cálculo de confianza y feedback
+│   ├── types.ts                         # Tipos del dominio (ScannerStatus, IBufferedFrame, ICaptureFlags, etc.)
+│   ├── constants.ts                     # Constantes (dimensiones, thresholds, regiones, motion/buffer)
+│   ├── card-scanner.domain.ts           # Detección en cascada + perspectiva + padding de esquinas
+│   ├── normalization.domain.ts          # Normalización, rotación, glare/brightness/sharpness por zonas
+│   ├── region-extraction.domain.ts      # Extracción regional compuesta (realce CLAHE/equalizeHist)
+│   ├── confidence.domain.ts             # Cálculo de confianza y quality gates (pesos por juego)
+│   ├── haptic-feedback.domain.ts        # Vibración háptica en eventos clave
+│   ├── logger.ts                        # Logger dev-gated (debug/info/warn/error)
 │   ├── utils.domain.ts                  # Throttle, debounce, formatters, retry
 │   └── parsers/
-│       ├── common-parser.domain.ts      # Helpers de parsing compartidos
+│       ├── common-parser.domain.ts      # Helpers de parsing + corrección de typos OCR
 │       ├── pokemon-parser.domain.ts     # Parser específico de Pokémon
 │       └── magic-parser.domain.ts       # Parser específico de Magic
 │
@@ -174,23 +188,34 @@ card-scanner/
 │
 └── ui/                                  # Capa de presentación
     ├── components/
-    │   ├── camera-preview.tsx           # Video + canvas con overlay de carga
+    │   ├── card-scanner-drawer.tsx      # Shell del Drawer global (producción)
+    │   ├── scanner-panel.tsx            # Orquestador de captura (producción)
+    │   ├── scanner-action-bar.tsx       # Botones capturar + toggle auto-capture
+    │   ├── scanner-results.tsx          # Vista de resultados + editor + debug
+    │   ├── scan-empty-state.tsx         # Estado inicial con tips por TCG
+    │   ├── scan-status-banner.tsx       # Banner de estados/errores/quality flags
+    │   ├── scan-fields-editor.tsx       # Editor de campos extraídos
+    │   ├── scan-field-row.tsx           # Campo editable individual
+    │   ├── scan-ocr-text.tsx            # Texto OCR raw
+    │   ├── scan-results-view.tsx        # Vista de resultados del POC
+    │   ├── camera-preview.tsx           # Video + canvas overlay
+    │   ├── card-positioning-guide.tsx   # Guía visual de posicionamiento
+    │   ├── torch-control.tsx            # Control de flash/linterna
     │   ├── card-result.tsx              # Canvas de imagen normalizada
     │   ├── extracted-text.tsx           # Texto OCR completo + acciones
-    │   ├── extracted-fields-editor.tsx  # Editor visual de campos extraídos
-    │   ├── editable-field.tsx           # Campo editable individual
-    │   ├── scanner-controls.tsx         # Botones capturar/reset + indicador auto
+    │   ├── extracted-fields-editor.tsx  # Editor visual (POC)
+    │   ├── editable-field.tsx           # Campo editable individual (POC)
+    │   ├── scanner-controls.tsx         # Botones capturar/reset (POC)
     │   ├── loading-state.tsx            # Overlay de estado del scanner
-    │   ├── ocr-regions-debug.tsx        # Vista debug de regiones OCR
-    │   └── scan-results-view.tsx        # Vista completa de resultados
+    │   └── ocr-regions-debug.tsx        # Vista debug de regiones OCR
     ├── hooks/
     │   ├── use-camera-stream.ts         # Gestión de getUserMedia y permisos
     │   ├── use-opencv.ts                # Inicialización de OpenCV.js
-    │   ├── use-card-detection.ts        # Loop de detección de contornos
+    │   ├── use-card-detection.ts        # Loop de detección + motion gate + frame buffer
     │   ├── use-card-scanner-pipeline.ts # Pipeline completo (hook principal)
     │   └── use-card-search.ts           # Búsqueda en catálogo backend
     └── views/
-        └── card-scanner.tsx             # Vista principal (orquestador)
+        └── card-scanner.tsx             # Vista principal del POC (/escaneo-cartas)
 ```
 
 ### Hooks Principales
@@ -258,17 +283,19 @@ card-scanner/
 
 El pipeline completo (`useCardScannerPipeline`) ejecuta:
 
-1. **Captura** → Obtiene frame del video
-2. **Warp** → Corrección de perspectiva con esquinas ordenadas
-3. **Normalización** → Redimensiona a 350x490px
-4. **Rotación** → Detecta y corrige orientación
-5. **Métricas** → Calcula sharpness, brightness, contrast
-6. **Extracción regional** → Recorta zonas específicas del juego
-7. **Imagen compuesta** → Crea imagen optimizada para Vision
-8. **OCR** → Envía a Google Cloud Vision
-9. **Clasificación** → Asigna texto a regiones
-10. **Parsing** → Extrae campos con parser del juego
-11. **Confianza** → Calcula scores y genera feedback
+1. **Captura** → Usa el frame más nítido del buffer de frames estables
+2. **Aspect gate** → Rechaza quads con aspecto medido fuera de [1.1, 1.8]
+3. **Quality gate** → `calculateCaptureQuality` (área + sharpness por zonas + perspectiva) debe superar el mínimo
+4. **Padding** → Expande el quad ~4% para conservar margen de fondo real
+5. **Warp** → Corrección de perspectiva con esquinas ordenadas
+6. **Normalización** → Redimensiona a 744×1039px (JPEG q0.9)
+7. **Rotación** → Rota 90° si el quad era landscape
+8. **Extracción regional** → Recorta zonas específicas del juego
+9. **Imagen compuesta** → Regiones realzadas (CLAHE/equalizeHist) y escaladas ×2 sobre fondo blanco
+10. **OCR** → `/api/ocr` → Google Cloud Vision `documentTextDetection`
+11. **Clasificación** → Asigna texto a regiones por posición
+12. **Parsing** → Extrae campos con parser del juego (+ corrección de typos numéricos)
+13. **Confianza** → Calcula scores y genera feedback
 
 ### Regiones por Juego
 
@@ -290,29 +317,37 @@ Configuradas en `CARD_REGION_CONFIGS` (`domain/constants.ts`):
 
 ### Parámetros de Detección
 
-Configurables en `DETECTION_PARAMS` (`domain/constants.ts`):
+Configurables en `domain/constants.ts`:
 
 ```typescript
-{
-  minArea: 15000,           // Área mínima del contorno
-  approxEpsilon: 0.02,      // Precisión de aproximación poligonal
-  cannyThreshold1: 75,      // Umbral bajo Canny
-  cannyThreshold2: 200,     // Umbral alto Canny
-  blurKernelSize: 5,        // Tamaño kernel de blur
-  dilationIterations: 2     // Iteraciones de dilatación
-}
+DETECTION_PARAMS = {
+  bkgThresh: 60, // Distancia mínima al color de fondo (segmentación por color)
+  minAreaRatio: 0.01, // Área mínima del contorno vs frame
+  maxAreaRatio: 0.9, // Área máxima del contorno vs frame
+  approxEpsilon: 0.02, // Epsilon base de approxPolyDP (hull usa 0.1)
+  minAspectRatioPortrait: 0.55, // Rango válido de aspecto portrait
+  maxAspectRatioPortrait: 0.85,
+  minAspectRatioLandscape: 1.18, // Rango válido de aspecto landscape
+  maxAspectRatioLandscape: 1.82,
+};
+
+DETECTION_MAX_WIDTH = 640; // Ancho máx del frame para detección
+MOTION_SAMPLE_WIDTH = 160; // Downscale para el diff de movimiento
+MOTION_MAE_THRESHOLD = 7; // MAE gray sobre el que se considera "en movimiento"
+FRAME_BUFFER_SIZE = 6; // Frames estables en el buffer de captura
+QUAD_EXPAND_FACTOR = 1.04; // Padding del quad antes del warp
+QUAD_ASPECT_RANGE = { min: 1.1, max: 1.8 }; // Aspecto medido válido post-warp
 ```
 
-### Thresholds de Confianza
+### Thresholds de Calidad
 
-Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
+Configurados en `QUALITY_THRESHOLDS` (`domain/constants.ts`):
 
 ```typescript
 {
-  captureQuality: { good: 0.7, acceptable: 0.5 },
-  ocrQuality: { good: 0.8, acceptable: 0.6 },
-  extractionQuality: { good: 0.7, acceptable: 0.5 },
-  overall: { good: 0.75, acceptable: 0.6 }
+  MINIMUM_CAPTURE: 0.25, MINIMUM_OCR: 0.08, MINIMUM_EXTRACTION: 0.05, MINIMUM_OVERALL: 0.15,
+  GOOD_CAPTURE: 0.6, GOOD_OCR: 0.7, GOOD_EXTRACTION: 0.5,
+  EXCELLENT_CAPTURE: 0.8, EXCELLENT_OCR: 0.85, EXCELLENT_EXTRACTION: 0.7,
 }
 ```
 
@@ -327,11 +362,12 @@ Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
 
 ### No detecta la carta
 
-- **Mejorar iluminación** - Luz uniforme sin sombras
-- **Aumentar contraste** - Fondo oscuro para cartas claras, viceversa
-- **Ajustar distancia** - Carta debe ocupar ~60-80% del frame
-- **Revisar parámetros** - Ajustar `DETECTION_PARAMS` en `domain/constants.ts`
+- **Fondo por TCG** - Pokémon: fondo liso y oscuro; Magic: fondo liso y claro
+- **Mejorar iluminación** - Luz uniforme sin sombras ni reflejos (flag `glare` se activa si hay destellos)
+- **Ajustar distancia** - Carta debe llenar la guía (flag `tooSmall` si queda muy lejos)
+- **Mantener quieta** - El motion gate pausa la detección si el frame se mueve
 - **Limpiar lente** - Asegurar cámara sin manchas
+- **Revisar parámetros** - Ajustar constantes en `domain/constants.ts`
 
 ### Calidad de captura baja
 
@@ -356,7 +392,8 @@ Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
 
 ### Búsqueda en catálogo no funciona
 
-- **Actualmente es mock** - Pendiente integración con backend real
+- **Verificar backend** - `Failed to fetch` indica que el endpoint GraphQL no es alcanzable (revisar `NEXT_PUBLIC_API_URL`)
+- **Forzar mock** - `NEXT_PUBLIC_CARD_SCAN_USE_MOCK=true` para desarrollo sin backend
 - **Validar payload** - Revisar consola para errores de validación Zod
 - **Verificar campos** - Nombre es requerido para búsqueda
 
@@ -393,10 +430,13 @@ Configurados en `CONFIDENCE_THRESHOLDS` (`domain/constants.ts`):
 
 ### Optimizaciones
 
+- [x] Detección a resolución reducida (≤640px) + display por `drawImage` GPU
+- [x] Motion gate — omite el pipeline de detección con la cámara en movimiento
+- [x] Buffer de frames estables — captura el frame más nítido, no el del instante
 - [ ] Cache de resultados OCR por imagen hash
 - [ ] Web Worker para procesamiento OpenCV
-- [ ] Compresión de imagen antes de enviar a Vision
-- [ ] Retry automático en caso de error OCR
+- [ ] Matching por imagen (pHash/embeddings) como verificador de candidatos — ver `docs/Requirements/CardScanner-requirements.md`
+- [ ] Migrar OCR al backend (server-side Vision/Gemini) — contrato ya documentado en `docs/Requirements/CardScanner-requirements.md`
 - [ ] Telemetría de precisión y performance
 
 ### Testing
@@ -439,9 +479,9 @@ Ver [ENVIRONMENT_SETUP.md](../../../docs/ENVIRONMENT_SETUP.md) para más detalle
 
 ## 📊 Estado del Feature
 
-- **Versión**: 2.3 (Pipeline completo + UI producción + integración real `cardScanSearch`)
+- **Versión**: 2.4 (Pipeline endurecido: detección en cascada, quality gates, OCR `documentTextDetection`)
 - **Estado**: 🔵 POC congelado en `/escaneo-cartas` + 🟢 Producción integrada a `pokemonCardScanSearch`/`magicCardScanSearch` (mock detrás de `NEXT_PUBLIC_CARD_SCAN_USE_MOCK`)
 - **Última actualización**: 2026-10-01
-- **Próximo milestone**: Probar en dev → ajuste de regiones `setSymbol` si el backend requiere crops distintos
+- **Próximo milestone**: Migrar OCR al backend (`cardScanSearch` con `originalImage`) — contrato en `docs/Requirements/CardScanner-requirements.md`
 
 ---

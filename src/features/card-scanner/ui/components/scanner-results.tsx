@@ -31,8 +31,6 @@ const USE_CARD_LABELS: Record<CardScannerSource, string> = {
   fab: 'Usar esta carta',
 };
 
-const isDev = process.env.NODE_ENV === 'development';
-
 export const ScannerResults = ({
   scannedData,
   game,
@@ -261,38 +259,36 @@ export const ScannerResults = ({
         </div>
       )}
 
-      {isDev && (
-        <div className='border-divider rounded-lg border border-dashed p-3'>
-          <p className='text-content-tertiary mb-2 text-xs font-semibold tracking-wide uppercase'>
-            Debug
-          </p>
-          <Tabs aria-label='Datos del escaneo' variant='underlined' size='sm'>
-            <Tab key='editor' title='Datos extraídos'>
-              <ScanFieldsEditor
-                extractedData={scannedData.extractedData}
-                confidence={scannedData.confidence}
-                onSave={onSave}
-                onCancel={onReset}
-              />
-            </Tab>
-            <Tab key='raw' title='OCR'>
-              <ScanOcrText scannedData={scannedData} />
-            </Tab>
-          </Tabs>
+      <div className='border-divider rounded-lg border border-dashed p-3'>
+        <p className='text-content-tertiary mb-2 text-xs font-semibold tracking-wide uppercase'>
+          Debug
+        </p>
+        <Tabs aria-label='Datos del escaneo' variant='underlined' size='sm'>
+          <Tab key='editor' title='Datos extraídos'>
+            <ScanFieldsEditor
+              extractedData={scannedData.extractedData}
+              confidence={scannedData.confidence}
+              onSave={onSave}
+              onCancel={onReset}
+            />
+          </Tab>
+          <Tab key='raw' title='OCR'>
+            <ScanOcrText scannedData={scannedData} />
+          </Tab>
+        </Tabs>
 
-          {searchFeedback.length > 0 && (
-            <div className='mt-3'>
-              <ScanStatusBanner variant='info' title='Criterios de búsqueda'>
-                <ul className='space-y-1'>
-                  {searchFeedback.map((feedback, index) => (
-                    <li key={index}>{feedback}</li>
-                  ))}
-                </ul>
-              </ScanStatusBanner>
-            </div>
-          )}
-        </div>
-      )}
+        {searchFeedback.length > 0 && (
+          <div className='mt-3'>
+            <ScanStatusBanner variant='info' title='Criterios de búsqueda'>
+              <ul className='space-y-1'>
+                {searchFeedback.map((feedback, index) => (
+                  <li key={index}>{feedback}</li>
+                ))}
+              </ul>
+            </ScanStatusBanner>
+          </div>
+        )}
+      </div>
 
       <div className='border-divider flex gap-3 border-t pt-4'>
         <Button
