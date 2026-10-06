@@ -60,6 +60,33 @@ export function extractRegion(
   return regionMat.clone();
 }
 
+function enhanceRegionForOcr(regionMat: OpenCVMat, cv: OpenCV): OpenCVMat {
+  const gray = new cv.Mat();
+  const enhanced = new cv.Mat();
+
+  if (regionMat.channels() === 4) {
+    cv.cvtColor(regionMat, gray, cv.COLOR_RGBA2GRAY);
+  } else if (regionMat.channels() === 3) {
+    cv.cvtColor(regionMat, gray, cv.COLOR_RGB2GRAY);
+  } else {
+    regionMat.copyTo(gray);
+  }
+
+  if (typeof cv.createCLAHE === 'function') {
+    const clahe = cv.createCLAHE(2.0, new cv.Size(8, 8));
+    clahe.apply(gray, enhanced);
+    clahe.delete();
+  } else if (typeof cv.equalizeHist === 'function') {
+    cv.equalizeHist(gray, enhanced);
+  } else {
+    gray.copyTo(enhanced);
+  }
+
+  gray.delete();
+
+  return enhanced;
+}
+
 export function createCompositeOcrImage(
   normalizedMat: OpenCVMat,
   regions: INormalizedRegion[],
@@ -87,12 +114,15 @@ export function createCompositeOcrImage(
       continue;
     }
 
+    const enhancedMat = enhanceRegionForOcr(regionMat, cv);
+
     const scaledMat = new cv.Mat();
-    const scaledWidth = regionMat.cols * regionScale;
-    const scaledHeight = regionMat.rows * regionScale;
+    const scaledWidth = enhancedMat.cols * regionScale;
+    const scaledHeight = enhancedMat.rows * regionScale;
     const dsize = new cv.Size(scaledWidth, scaledHeight);
 
-    cv.resize(regionMat, scaledMat, dsize, 0, 0, cv.INTER_CUBIC);
+    cv.resize(enhancedMat, scaledMat, dsize, 0, 0, cv.INTER_CUBIC);
+    enhancedMat.delete();
 
     extractedRegions.push({
       id: region.id,
@@ -253,12 +283,17 @@ export function classifyTokensByRegion(
   };
 }
 
-export function matToDataURL(mat: OpenCVMat, cv: OpenCV): string {
+export function matToDataURL(
+  mat: OpenCVMat,
+  cv: OpenCV,
+  mimeType: string = 'image/png',
+  quality?: number
+): string {
   const canvas = document.createElement('canvas');
   canvas.width = mat.cols;
   canvas.height = mat.rows;
 
   cv.imshow(canvas, mat);
 
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL(mimeType, quality);
 }

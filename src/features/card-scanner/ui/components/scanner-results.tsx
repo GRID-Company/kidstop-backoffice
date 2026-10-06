@@ -109,7 +109,7 @@ export const ScannerResults = ({
           <ScanEmptyState
             title='No encontramos esta carta'
             tips={[
-              'Usa un fondo liso y oscuro detrás de la carta',
+              'Pokémon: usa fondo oscuro · Magic: usa fondo claro',
               'Evita reflejos y luz directa sobre la carta',
               'Acércate hasta que la carta llene el recuadro',
               'Limpia el lente de la cámara',

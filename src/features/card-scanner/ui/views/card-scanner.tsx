@@ -52,10 +52,11 @@ export const CardScannerView = () => {
     toggleTorch,
   } = useCameraStream(videoRef);
   const {
-    latestFrame,
+    bestFrame,
     latestCorners,
     detectionMethod,
     cardDetected,
+    captureFlags,
     resetDetection,
     debugInfo,
   } = useCardDetection(videoRef, canvasRef, cvReady, cv, isStreaming);
@@ -74,7 +75,10 @@ export const CardScannerView = () => {
       autoCapture &&
       cardDetected &&
       status === 'camera-ready' &&
-      !scannedData
+      !scannedData &&
+      !captureFlags.glare &&
+      !captureFlags.dark &&
+      !captureFlags.tooSmall
     ) {
       stableFramesRef.current += 1;
 
@@ -85,10 +89,10 @@ export const CardScannerView = () => {
     } else {
       stableFramesRef.current = 0;
     }
-  }, [cardDetected, autoCapture, status, scannedData]);
+  }, [cardDetected, autoCapture, status, scannedData, captureFlags]);
 
   const handleCapture = async () => {
-    if (!latestFrame.current || !latestCorners.current || !cv) {
+    if (!bestFrame.current || !latestCorners.current || !cv) {
       toast.error('No se detecta ninguna carta en el recuadro');
       if (hapticEnabled) {
         vibrateError();
@@ -115,17 +119,10 @@ export const CardScannerView = () => {
     }
 
     try {
-      const frameSize = {
-        width: videoRef.current.videoWidth,
-        height: videoRef.current.videoHeight,
-      };
-
-      await processCard(
-        latestFrame.current,
-        latestCorners.current,
-        cv,
-        frameSize
-      );
+      await processCard(bestFrame.current.mat, bestFrame.current.corners, cv, {
+        width: bestFrame.current.width,
+        height: bestFrame.current.height,
+      });
 
       if (hapticEnabled) {
         vibrateSuccess();
@@ -199,9 +196,6 @@ export const CardScannerView = () => {
       <Script
         src={OPENCV_CDN}
         strategy='afterInteractive'
-        onLoad={() => {
-          console.error('OpenCV.js script cargado desde CDN');
-        }}
         onError={(e) => {
           console.error('Error cargando OpenCV.js desde CDN:', e);
           toast.error(
@@ -370,10 +364,7 @@ export const CardScannerView = () => {
                 Toca el botón para solicitar acceso a la cámara
               </div>
               <button
-                onClick={() => {
-                  console.error('🔴 Botón clickeado');
-                  startCamera();
-                }}
+                onClick={startCamera}
                 className='w-full rounded-lg bg-blue-600 px-4 py-3 text-lg font-semibold text-white hover:bg-blue-700 active:bg-blue-800'
               >
                 📷 Activar Cámara

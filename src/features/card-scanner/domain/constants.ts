@@ -37,6 +37,18 @@ export const DETECTION_PARAMS: IDetectionParams = {
   maxAspectRatioLandscape: 1.82,
 } as const;
 
+export const DETECTION_MAX_WIDTH = 640 as const;
+
+export const FRAME_BUFFER_SIZE = 6 as const;
+
+export const MOTION_MAE_THRESHOLD = 7 as const;
+
+export const MOTION_SAMPLE_WIDTH = 160 as const;
+
+export const QUAD_EXPAND_FACTOR = 1.04 as const;
+
+export const QUAD_ASPECT_RANGE = { min: 1.1, max: 1.8 } as const;
+
 export const POKEMON_DEFAULT_REGIONS: INormalizedRegion[] = [
   {
     id: 'name',
