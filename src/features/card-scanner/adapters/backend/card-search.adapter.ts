@@ -28,7 +28,8 @@ const EMPTY_SCAN_RESPONSE: ICardSearchResponse = {
 export function buildCardScanSearchInput(
   extractedData: IExtractedCardData,
   originalImage: File | null,
-  setIcon: File | null
+  setIcon: File | null,
+  aiSearchOnly = false
 ): CardScanSearchInput {
   return {
     name: extractedData.name.normalizedValue ?? extractedData.name.value,
@@ -39,6 +40,7 @@ export function buildCardScanSearchInput(
       extractedData.setCode.normalizedValue ?? extractedData.setCode.value,
     originalImage,
     setIcon,
+    aiSearchOnly,
     withCardsMetrics: true,
   };
 }
@@ -61,10 +63,11 @@ export function validateCardScanSearchInput(
 }
 
 async function searchCardInBackendMock(
-  game: TCGGame
+  game: TCGGame,
+  aiSearchOnly = false
 ): Promise<ICardSearchResponse> {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  return mockCardSearchResponse(game);
+  return mockCardSearchResponse(game, aiSearchOnly);
 }
 
 function isCardScanOperationUnavailable(error: unknown): boolean {
@@ -82,7 +85,7 @@ export async function searchCardInBackend(
   logger.debug('🔍 Buscando carta en backend:', { game, input });
 
   if (process.env.NEXT_PUBLIC_CARD_SCAN_USE_MOCK === 'true') {
-    return searchCardInBackendMock(game);
+    return searchCardInBackendMock(game, Boolean(input.aiSearchOnly));
   }
 
   try {
@@ -114,7 +117,7 @@ export async function searchCardInBackend(
   } catch (error) {
     if (isCardScanOperationUnavailable(error)) {
       logger.warn('⚠️ cardScanSearch no disponible en el backend, usando mock');
-      return searchCardInBackendMock(game);
+      return searchCardInBackendMock(game, Boolean(input.aiSearchOnly));
     }
     throw error;
   }

@@ -135,6 +135,7 @@ Detección en cascada sobre el ROI de la guía (crop +4% margen) a ≤640px, con
 - ✅ Imagen normalizada como `originalImage` (Upload) + `setIcon` (crop región `setSymbol`)
 - ✅ Criterios de búsqueda por nombre, set, número (imagen como fallback)
 - ✅ `bestMatch` + `relatedCards` con precio/stock; `aiResolved` con traducciones ES
+- ✅ Toggle "Búsqueda solo con IA" (`aiSearchOnly`) en `scanner-action-bar`: omite la búsqueda de catálogo y devuelve solo la interpretación de Gemini (sección "Interpretación" con chip "Resuelto por IA"); se fija antes de capturar
 - ✅ Fallback a mock: `NEXT_PUBLIC_CARD_SCAN_USE_MOCK=true` u operación ausente del schema
 
 ### Visualización y Debug
@@ -190,7 +191,7 @@ card-scanner/
     ├── components/
     │   ├── card-scanner-drawer.tsx      # Shell del Drawer global (producción)
     │   ├── scanner-panel.tsx            # Orquestador de captura (producción)
-    │   ├── scanner-action-bar.tsx       # Botones capturar + toggle auto-capture
+    │   ├── scanner-action-bar.tsx       # Botones capturar + toggles auto-capture/aiSearchOnly
     │   ├── scanner-results.tsx          # Vista de resultados + editor + debug
     │   ├── scan-empty-state.tsx         # Estado inicial con tips por TCG
     │   ├── scan-status-banner.tsx       # Banner de estados/errores/quality flags

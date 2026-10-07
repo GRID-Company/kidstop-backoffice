@@ -28,7 +28,8 @@ interface UseCardSearchResult {
 
 export const useCardSearch = (
   game: TCGGame,
-  scannedData: IScannedCardData
+  scannedData: IScannedCardData,
+  aiSearchOnly = false
 ): UseCardSearchResult => {
   const client = useApolloClient();
   const [searchResults, setSearchResults] =
@@ -59,7 +60,8 @@ export const useCardSearch = (
       const input = buildCardScanSearchInput(
         extractedData,
         originalImage,
-        setIcon
+        setIcon,
+        aiSearchOnly
       );
 
       const validation = validateCardScanSearchInput(input);
@@ -78,7 +80,7 @@ export const useCardSearch = (
 
       if (results.error) {
         setSearchError(results.error);
-      } else if (results.candidates.length === 0) {
+      } else if (results.candidates.length === 0 && !results.aiResolved) {
         setSearchError('No se encontraron resultados');
       }
     } catch (error) {
@@ -89,7 +91,14 @@ export const useCardSearch = (
     } finally {
       setIsSearching(false);
     }
-  }, [client, extractedData, game, normalizedImageUrl, setIconImageUrl]);
+  }, [
+    client,
+    extractedData,
+    game,
+    normalizedImageUrl,
+    setIconImageUrl,
+    aiSearchOnly,
+  ]);
 
   const clearResults = useCallback(() => {
     setSearchResults(null);

@@ -129,5 +129,33 @@ const magicResponse: ICardSearchResponse = {
   error: null,
 };
 
-export const mockCardSearchResponse = (game: TCGGame): ICardSearchResponse =>
-  game === 'magic' ? magicResponse : pokemonResponse;
+const magicAiResolved: ICardSearchResponse['aiResolved'] = {
+  name: 'Lightning Bolt',
+  nameEs: 'Relámpago',
+  cardNumber: '141',
+  setCode: 'A25',
+  setName: 'Masters 25',
+  setNameEs: 'Masters 25',
+  cardText: null,
+  cardTextEs: null,
+  detectedLanguage: 'en',
+};
+
+export const mockCardSearchResponse = (
+  game: TCGGame,
+  aiSearchOnly = false
+): ICardSearchResponse => {
+  const response = game === 'magic' ? magicResponse : pokemonResponse;
+
+  if (!aiSearchOnly) {
+    return response;
+  }
+
+  return {
+    ...response,
+    resolvedByAI: true,
+    bestMatch: null,
+    candidates: [],
+    aiResolved: response.aiResolved ?? magicAiResolved,
+  };
+};

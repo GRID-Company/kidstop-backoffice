@@ -20,6 +20,7 @@ interface ScannerResultsProps {
   scannedData: IScannedCardData;
   game: TCGGame;
   source: CardScannerSource;
+  aiSearchOnly: boolean;
   onSave: (updatedData: IExtractedCardData) => void;
   onReset: () => void;
   onUseCandidate: (candidate: ICardCandidate) => void;
@@ -35,6 +36,7 @@ export const ScannerResults = ({
   scannedData,
   game,
   source,
+  aiSearchOnly,
   onSave,
   onReset,
   onUseCandidate,
@@ -46,7 +48,7 @@ export const ScannerResults = ({
     validationErrors,
     searchFeedback,
     performSearch,
-  } = useCardSearch(game, scannedData);
+  } = useCardSearch(game, scannedData, aiSearchOnly);
 
   useEffect(() => {
     performSearch();

@@ -6,6 +6,8 @@ interface ScannerActionBarProps {
   status: ScannerStatus;
   autoCapture: boolean;
   onAutoCaptureChange: (enabled: boolean) => void;
+  aiSearchOnly: boolean;
+  onAiSearchOnlyChange: (enabled: boolean) => void;
   onCapture: () => void;
   onReset: () => void;
   disabled: boolean;
@@ -22,6 +24,8 @@ export const ScannerActionBar = ({
   status,
   autoCapture,
   onAutoCaptureChange,
+  aiSearchOnly,
+  onAiSearchOnlyChange,
   onCapture,
   onReset,
   disabled,
@@ -31,15 +35,26 @@ export const ScannerActionBar = ({
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex items-center justify-between'>
-        <Switch
-          size='sm'
-          isSelected={autoCapture}
-          onValueChange={onAutoCaptureChange}
-        >
-          <span className='text-content-primary text-xs'>
-            Captura automática
-          </span>
-        </Switch>
+        <div className='flex items-center gap-4'>
+          <Switch
+            size='sm'
+            isSelected={autoCapture}
+            onValueChange={onAutoCaptureChange}
+          >
+            <span className='text-content-primary text-xs'>
+              Captura automática
+            </span>
+          </Switch>
+          <Switch
+            size='sm'
+            isSelected={aiSearchOnly}
+            onValueChange={onAiSearchOnlyChange}
+          >
+            <span className='text-content-primary text-xs'>
+              Búsqueda solo con IA
+            </span>
+          </Switch>
+        </div>
         {isProcessing && (
           <div className='text-content-tertiary flex items-center gap-2 text-xs'>
             <Spinner size='sm' />

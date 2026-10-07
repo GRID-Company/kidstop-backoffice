@@ -51,6 +51,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     selectedTCG === TCG_TYPES.POKEMON ? 'pokemon' : 'magic';
 
   const [autoCapture, setAutoCapture] = useState(false);
+  const [aiSearchOnly, setAiSearchOnly] = useState(false);
   const [hapticEnabled, setHapticEnabled] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -312,6 +313,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
             scannedData={scannedData}
             game={selectedGame}
             source={source}
+            aiSearchOnly={aiSearchOnly}
             onSave={handleSaveEdits}
             onReset={handleReset}
             onUseCandidate={handleUseCandidate}
@@ -341,6 +343,8 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
             status={status}
             autoCapture={autoCapture}
             onAutoCaptureChange={setAutoCapture}
+            aiSearchOnly={aiSearchOnly}
+            onAiSearchOnlyChange={setAiSearchOnly}
             onCapture={handleCapture}
             onReset={handleReset}
             disabled={!cvReady || !isStreaming || !latestCorners.current}
