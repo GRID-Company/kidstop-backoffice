@@ -66,6 +66,7 @@ export type MagicCardCollectionsQuery = {
   magicCardCollections: Array<{
     guid: string;
     name: string;
+    code: string | null;
     editionIconUri: string | null;
   }>;
 };
@@ -386,6 +387,7 @@ export const MagicCardCollectionsDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'code' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'editionIconUri' },

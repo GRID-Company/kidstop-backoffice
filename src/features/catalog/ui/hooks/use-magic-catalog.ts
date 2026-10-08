@@ -21,6 +21,7 @@ export function useMagicCatalog(skip = false) {
       ({
         guid: c.guid,
         name: c.name,
+        code: c.code ?? null,
         editionIconUri: c.editionIconUri ?? null,
       }) as IMagicCollection,
     skip,

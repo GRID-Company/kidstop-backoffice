@@ -245,7 +245,7 @@ export default function Users() {
         </EntitiesPage.Toolbar>
 
         <EntitiesPage.CardContainer>
-          <div className='mb-4 flex items-center gap-4'>
+          <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center'>
             <UserFiltersPanel
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}

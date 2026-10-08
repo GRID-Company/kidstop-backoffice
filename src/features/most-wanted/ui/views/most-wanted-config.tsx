@@ -103,6 +103,11 @@ export default function MostWantedConfig() {
         form={addCardModal.form}
         onSubmit={addCardModal.handleSubmit}
         loading={addCardModal.loading}
+        selectedTCG={addCardModal.selectedTCG}
+        collections={addCardModal.collections}
+        selectedSet={addCardModal.selectedSet}
+        onSetChange={addCardModal.handleSetChange}
+        setResetKey={addCardModal.resetKey}
       />
     </>
   );

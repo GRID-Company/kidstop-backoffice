@@ -40,6 +40,7 @@ import { useQuery } from '@apollo/client/react';
 import {
   PokemonCardWithMetricsDocument,
   PokemonCardInternalListDocument,
+  PokemonCardCollectionsDocument,
 } from '@/lib/api/generated/catalog-pokemon.generated';
 import { CardLanguage } from '@/lib/api/schema-types';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
@@ -47,7 +48,10 @@ import { toPokemonCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
-import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
+import {
+  isStockAdjustmentDisabled,
+  toSetCodeOptions,
+} from '../../domain/catalog.domain';
 import StockAdjustmentTab from './card-detail-tabs/stock-adjustment-tab';
 import PriceEditTab from './card-detail-tabs/price-edit-tab';
 import MovementsHistoryTab from './card-detail-tabs/movements-history-tab';
@@ -67,6 +71,7 @@ export default function PokemonCardDetailModal({
 }: PokemonCardDetailModalProps) {
   const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
+  const [setGuid, setSetGuid] = useState('');
   const prevIsOpenRef = useRef(isOpen);
   const {
     isOpen: isPreviewOpen,
@@ -84,6 +89,7 @@ export default function PokemonCardDetailModal({
     if (isOpen && !wasOpen) {
       setSelectedCard(card);
       setItemSearch('');
+      setSetGuid('');
     }
   }, [isOpen, card]);
 
@@ -133,6 +139,16 @@ export default function PokemonCardDetailModal({
     setIsConfirmModalOpen(false);
   }, [executeStockAdjust]);
 
+  const { data: collectionsData } = useQuery(PokemonCardCollectionsDocument, {
+    skip: !isOpen,
+    fetchPolicy: 'cache-first',
+  });
+
+  const setItems = useMemo(
+    () => toSetCodeOptions(collectionsData?.pokemonCardCollections ?? []),
+    [collectionsData]
+  );
+
   const { data: searchData, loading: searchLoading } = useQuery(
     PokemonCardInternalListDocument,
     {
@@ -142,10 +158,10 @@ export default function PokemonCardDetailModal({
           limit: CARD_SEARCH_LIMIT,
           search: itemSearch.trim() || undefined,
           sort: { column: 'releaseDate', order: 'DESC' },
-          filters: {},
+          filters: { set: setGuid || undefined },
         },
       },
-      skip: !!selectedCard || itemSearch.trim().length < 2,
+      skip: !!selectedCard || (itemSearch.trim().length < 2 && !setGuid),
       fetchPolicy: 'network-only',
     }
   );
@@ -240,6 +256,9 @@ export default function PokemonCardDetailModal({
                 loading={searchLoading}
                 onCardSelect={handleCardSelect}
                 placeholder='Buscar carta por nombre, set o código...'
+                setItems={setItems}
+                selectedSet={setGuid}
+                onSetChange={setSetGuid}
                 renderCard={(result) => (
                   <>
                     <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>

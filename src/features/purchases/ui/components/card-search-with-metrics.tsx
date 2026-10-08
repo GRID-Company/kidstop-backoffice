@@ -17,6 +17,7 @@ import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter-drawer';
+import SetCodeAutocomplete from '@/features/catalog/ui/components/set-code-autocomplete';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
@@ -32,6 +33,7 @@ import {
 } from '../../domain/constants';
 import { getItemKey } from '../../domain/purchases.domain';
 import { CardLanguage } from '@/lib/api/schema-types';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -384,6 +386,7 @@ export default function CardSearchWithMetrics({
     loading,
     selectedTCG,
     filters,
+    selectedSet,
     handleFilterChange,
     resetFilters,
     hasActiveFilters,
@@ -394,6 +397,8 @@ export default function CardSearchWithMetrics({
     variants,
     genres,
   } = useCardSearch();
+
+  const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
 
   const handleAddCard = useCallback(
     (
@@ -438,8 +443,8 @@ export default function CardSearchWithMetrics({
 
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex items-center gap-3'>
-        <div className='flex-1'>
+      <div className='flex flex-col gap-3 md:flex-row md:items-center'>
+        <div className='md:flex-1'>
           <Search
             label='Buscar carta'
             placeholder='Nombre, set o identificador...'
@@ -450,30 +455,44 @@ export default function CardSearchWithMetrics({
             onClear={resetSearch}
           />
         </div>
-        <Badge
-          content={
-            activeFilterCount > 0 ? String(activeFilterCount) : undefined
-          }
-          color='primary'
-          size='sm'
-          isInvisible={activeFilterCount === 0}
-          className='shrink-0'
-        >
-          <Button
-            isIconOnly
-            variant='bordered'
-            aria-label='Filtros avanzados'
-            onPress={() => setIsFilterDrawerOpen(true)}
-            className={hasActiveFilters ? 'border-primary text-primary' : ''}
+        <div className='flex items-center gap-3'>
+          <SetCodeAutocomplete
+            collections={collections}
+            selectedTCG={selectedTCG}
+            label='Expansión'
+            selectedValue={selectedSet}
+            onSelectionChange={(value) =>
+              handleFilterChange(isPokemon ? 'set' : 'edition', value)
+            }
+            resetKey={resetKey}
+            className='flex-1 md:w-56 md:flex-none'
+          />
+          <Badge
+            content={
+              activeFilterCount > 0 ? String(activeFilterCount) : undefined
+            }
+            color='primary'
+            size='sm'
+            isInvisible={activeFilterCount === 0}
+            className='shrink-0'
           >
-            <Icon icon='lucide:sliders-horizontal' width={18} />
-          </Button>
-        </Badge>
-        {search && (
-          <Chip size='sm' variant='flat' className='shrink-0'>
-            {results.length} {results.length === 1 ? 'resultado' : 'resultados'}
-          </Chip>
-        )}
+            <Button
+              isIconOnly
+              variant='bordered'
+              aria-label='Filtros avanzados'
+              onPress={() => setIsFilterDrawerOpen(true)}
+              className={hasActiveFilters ? 'border-primary text-primary' : ''}
+            >
+              <Icon icon='lucide:sliders-horizontal' width={18} />
+            </Button>
+          </Badge>
+          {(search || selectedSet) && (
+            <Chip size='sm' variant='flat' className='shrink-0'>
+              {results.length}{' '}
+              {results.length === 1 ? 'resultado' : 'resultados'}
+            </Chip>
+          )}
+        </div>
       </div>
 
       <CatalogFilterDrawer
@@ -526,7 +545,7 @@ export default function CardSearchWithMetrics({
         <div className='text-default-400 flex flex-col items-center justify-center py-12'>
           <Icon icon='lucide:search-x' width={40} className='mb-2' />
           <span className='text-sm'>
-            {search
+            {search || selectedSet
               ? 'No se encontraron cartas con ese criterio'
               : 'Busca una carta para ver sus métricas'}
           </span>

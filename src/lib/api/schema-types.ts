@@ -183,7 +183,7 @@ export type CardScanAiData = {
 };
 
 export type CardScanSearchInput = {
-  /** When true, skips the catalog search and returns only the card data resolved by AI (translated to Spanish) */
+  /** When true, skips the initial catalog search and resolves the card via AI first; the AI-resolved data is still re-applied to the catalog search */
   aiSearchOnly?: InputMaybe<Scalars['Boolean']['input']>;
   /** Collector/card number printed on the card */
   cardNumber?: InputMaybe<Scalars['String']['input']>;
@@ -863,7 +863,7 @@ export type MagicCardRecommended = {
 };
 
 export type MagicCardScanSearchResult = {
-  /** Card data resolved by AI when the catalog search was used as fallback or aiSearchOnly was requested */
+  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when aiSearchOnly is true) */
   aiResolved?: Maybe<CardScanAiData>;
   /** Best matching card */
   bestMatch?: Maybe<MagicCardInternalItem>;
@@ -1533,7 +1533,7 @@ export type PokemonCardRecommended = {
 };
 
 export type PokemonCardScanSearchResult = {
-  /** Card data resolved by AI when the catalog search was used as fallback or aiSearchOnly was requested */
+  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when aiSearchOnly is true) */
   aiResolved?: Maybe<CardScanAiData>;
   /** Best matching card */
   bestMatch?: Maybe<PokemonCardInternalItem>;

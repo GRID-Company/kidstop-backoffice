@@ -34,6 +34,7 @@ import {
 import {
   MagicCardWithMetricsDocument,
   MagicCardInternalListDocument,
+  MagicCardCollectionsDocument,
 } from '@/lib/api/generated/catalog-magic.generated';
 import { CardLanguage } from '@/lib/api/schema-types';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
@@ -41,7 +42,10 @@ import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
-import { isStockAdjustmentDisabled } from '../../domain/catalog.domain';
+import {
+  isStockAdjustmentDisabled,
+  toSetCodeOptions,
+} from '../../domain/catalog.domain';
 import StockAdjustmentTab from './card-detail-tabs/stock-adjustment-tab';
 import PriceEditTab from './card-detail-tabs/price-edit-tab';
 import MovementsHistoryTab from './card-detail-tabs/movements-history-tab';
@@ -61,6 +65,7 @@ export default function MagicCardDetailModal({
 }: MagicCardDetailModalProps) {
   const [selectedCard, setSelectedCard] = useState<IMagicCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
+  const [setGuid, setSetGuid] = useState('');
   const prevIsOpenRef = useRef(isOpen);
 
   useEffect(() => {
@@ -70,6 +75,7 @@ export default function MagicCardDetailModal({
     if (isOpen && !wasOpen) {
       setSelectedCard(card);
       setItemSearch('');
+      setSetGuid('');
     }
   }, [isOpen, card]);
 
@@ -120,6 +126,16 @@ export default function MagicCardDetailModal({
     setIsConfirmModalOpen(false);
   }, [executeStockAdjust]);
 
+  const { data: collectionsData } = useQuery(MagicCardCollectionsDocument, {
+    skip: !isOpen,
+    fetchPolicy: 'cache-first',
+  });
+
+  const setItems = useMemo(
+    () => toSetCodeOptions(collectionsData?.magicCardCollections ?? []),
+    [collectionsData]
+  );
+
   const { data: searchData, loading: searchLoading } = useQuery(
     MagicCardInternalListDocument,
     {
@@ -129,10 +145,10 @@ export default function MagicCardDetailModal({
           limit: CARD_SEARCH_LIMIT,
           search: itemSearch.trim() || undefined,
           sort: { column: 'releaseDate', order: 'DESC' },
-          filters: {},
+          filters: { edition: setGuid || undefined },
         },
       },
-      skip: !!selectedCard || itemSearch.trim().length < 2,
+      skip: !!selectedCard || (itemSearch.trim().length < 2 && !setGuid),
       fetchPolicy: 'network-only',
     }
   );
@@ -235,6 +251,9 @@ export default function MagicCardDetailModal({
                 loading={searchLoading}
                 onCardSelect={handleCardSelect}
                 placeholder='Buscar carta por nombre, edición o código...'
+                setItems={setItems}
+                selectedSet={setGuid}
+                onSetChange={setSetGuid}
                 renderCard={(result) => (
                   <>
                     <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>
