@@ -36,15 +36,17 @@ export const ScannerActionBar = ({
     <div className='flex flex-col gap-3'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
-          <Switch
-            size='sm'
-            isSelected={autoCapture}
-            onValueChange={onAutoCaptureChange}
-          >
-            <span className='text-content-primary text-xs'>
-              Captura automática
-            </span>
-          </Switch>
+          {!aiSearchOnly && (
+            <Switch
+              size='sm'
+              isSelected={autoCapture}
+              onValueChange={onAutoCaptureChange}
+            >
+              <span className='text-content-primary text-xs'>
+                Captura automática
+              </span>
+            </Switch>
+          )}
           <Switch
             size='sm'
             isSelected={aiSearchOnly}
