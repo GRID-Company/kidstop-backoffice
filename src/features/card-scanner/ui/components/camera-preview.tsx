@@ -7,6 +7,8 @@ interface CameraPreviewProps {
   cvReady: boolean;
   cardDetected?: boolean;
   torchControl?: ReactNode;
+  toggleControls?: ReactNode;
+  captureControl?: ReactNode;
 }
 
 export const CameraPreview = ({
@@ -15,6 +17,8 @@ export const CameraPreview = ({
   cvReady,
   cardDetected = false,
   torchControl,
+  toggleControls,
+  captureControl,
 }: CameraPreviewProps) => {
   return (
     <div
@@ -39,8 +43,18 @@ export const CameraPreview = ({
 
       {cvReady && <CardPositioningGuide cardDetected={cardDetected} />}
 
+      {toggleControls && (
+        <div className='absolute top-4 left-4 z-10'>{toggleControls}</div>
+      )}
+
       {torchControl && (
         <div className='absolute top-4 right-4 z-10'>{torchControl}</div>
+      )}
+
+      {captureControl && (
+        <div className='absolute bottom-4 left-1/2 z-10 -translate-x-1/2'>
+          {captureControl}
+        </div>
       )}
 
       {!cvReady && (
