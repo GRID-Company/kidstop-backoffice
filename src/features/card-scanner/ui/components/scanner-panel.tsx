@@ -14,7 +14,8 @@ import { useCardDetection } from '../hooks/use-card-detection';
 import { useCardScannerPipeline } from '../hooks/use-card-scanner-pipeline';
 import { CameraPreview } from './camera-preview';
 import { TorchControl } from './torch-control';
-import { ScannerActionBar } from './scanner-action-bar';
+import { ScannerModeToggles } from './scanner-mode-toggles';
+import { ScannerCaptureButton } from './scanner-capture-button';
 import { ScannerResults } from './scanner-results';
 import { ScanStatusBanner } from './scan-status-banner';
 import { OPENCV_CDN } from '../../domain/constants';
@@ -38,9 +39,13 @@ import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 
 interface ScannerPanelProps {
   source: CardScannerSource;
+  onOpenCardDetail: (candidate: ICardCandidate) => void;
 }
 
-export const ScannerPanel = ({ source }: ScannerPanelProps) => {
+export const ScannerPanel = ({
+  source,
+  onOpenCardDetail,
+}: ScannerPanelProps) => {
   const router = useRouter();
   const closeScanner = useCardScannerStore((state) => state.closeScanner);
   const confirmCandidate = useCardScannerStore(
@@ -220,6 +225,11 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
       return;
     }
 
+    if (source === 'fab') {
+      onOpenCardDetail(candidate);
+      return;
+    }
+
     confirmCandidate(candidate);
     toast.success(`"${candidate.name}" seleccionada`);
     closeScanner();
@@ -366,6 +376,15 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
             canvasRef={canvasRef}
             cvReady={cvReady}
             cardDetected={cardDetected}
+            toggleControls={
+              <ScannerModeToggles
+                autoCapture={autoCapture}
+                onAutoCaptureChange={setAutoCapture}
+                aiSearchOnly={aiSearchOnly}
+                onAiSearchOnlyChange={handleAiSearchOnlyChange}
+                disabled={isProcessing}
+              />
+            }
             torchControl={
               <TorchControl
                 supported={torchSupported}
@@ -374,21 +393,30 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
                 disabled={!isStreaming}
               />
             }
-          />
-          <ScannerActionBar
-            status={status}
-            autoCapture={autoCapture}
-            onAutoCaptureChange={setAutoCapture}
-            aiSearchOnly={aiSearchOnly}
-            onAiSearchOnlyChange={handleAiSearchOnlyChange}
-            onCapture={handleCapture}
-            onReset={handleReset}
-            disabled={
-              aiSearchOnly
-                ? !isStreaming
-                : !cvReady || !isStreaming || !latestCorners.current
+            captureControl={
+              <ScannerCaptureButton
+                onCapture={handleCapture}
+                loading={isProcessing}
+                disabled={
+                  aiSearchOnly
+                    ? !isStreaming
+                    : !cvReady || !isStreaming || !latestCorners.current
+                }
+              />
             }
           />
+          <div className='flex justify-end'>
+            <Button
+              variant='flat'
+              onPress={handleReset}
+              isDisabled={isProcessing}
+              className='text-content-primary font-semibold'
+              startContent={<Icon icon='lucide:rotate-ccw' width={16} />}
+              aria-label='Reiniciar escáner y limpiar captura'
+            >
+              Reiniciar
+            </Button>
+          </div>
         </div>
 
         {process.env.NODE_ENV === 'development' &&

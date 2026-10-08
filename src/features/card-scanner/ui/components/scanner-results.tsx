@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Image from 'next/image';
 import { Button, Chip, Skeleton, Tab, Tabs } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import {
@@ -10,6 +9,10 @@ import {
 } from '../../domain/types';
 import { CardScannerSource } from '@/lib/store/card-scanner';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { CardImage } from '@/shared/components/card-image';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { useCardSearch } from '../hooks/use-card-search';
 import { ScanEmptyState } from './scan-empty-state';
 import { ScanFieldsEditor } from './scan-fields-editor';
@@ -29,7 +32,7 @@ interface ScannerResultsProps {
 const USE_CARD_LABELS: Record<CardScannerSource, string> = {
   purchase: 'Usar en compra',
   catalog: 'Ver en catálogo',
-  fab: 'Usar esta carta',
+  fab: 'Ver detalle',
 };
 
 export const ScannerResults = ({
@@ -50,6 +53,16 @@ export const ScannerResults = ({
     performSearch,
   } = useCardSearch(game, scannedData, aiSearchOnly);
 
+  const tcgType = game === 'pokemon' ? TCG_TYPES.POKEMON : TCG_TYPES.MAGIC;
+  const {
+    isOpen: isImagePreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
+
   useEffect(() => {
     performSearch();
   }, [performSearch]);
@@ -60,15 +73,21 @@ export const ScannerResults = ({
     <div className='flex flex-col gap-4'>
       <div className='flex justify-center'>
         {scannedData.normalizedImageUrl ? (
-          <div className='relative h-64 w-45'>
-            <Image
-              src={scannedData.normalizedImageUrl}
-              alt='Carta normalizada'
-              fill
-              className='rounded-lg object-contain'
-              unoptimized
-            />
-          </div>
+          <CardImage
+            src={scannedData.normalizedImageUrl}
+            alt='Carta escaneada'
+            tcgType={tcgType}
+            containerClassName='relative h-64 w-45'
+            className='rounded-lg object-contain'
+            enablePreview
+            onImageClick={() =>
+              openPreview(
+                scannedData.normalizedImageUrl,
+                'Carta escaneada',
+                tcgType
+              )
+            }
+          />
         ) : (
           <div className='bg-neutral-subtle flex h-64 w-45 items-center justify-center rounded-lg'>
             <span className='text-content-tertiary text-sm'>Sin imagen</span>
@@ -136,23 +155,19 @@ export const ScannerResults = ({
                 key={`${candidate.guid}-${candidate.isBestMatch}`}
                 className='border-divider flex items-center gap-3 rounded-lg border p-3'
               >
-                <div className='bg-neutral-subtle relative h-16 w-12 shrink-0 overflow-hidden rounded'>
-                  {candidate.imageUrl ? (
-                    <img
-                      src={candidate.imageUrl}
-                      alt={candidate.name}
-                      className='h-full w-full object-contain'
-                    />
-                  ) : (
-                    <div className='flex h-full w-full items-center justify-center'>
-                      <Icon
-                        icon='lucide:image-off'
-                        width={16}
-                        className='text-content-tertiary'
-                      />
-                    </div>
-                  )}
-                </div>
+                <CardImage
+                  src={candidate.imageUrl}
+                  alt={candidate.name}
+                  tcgType={tcgType}
+                  fill
+                  sizes='48px'
+                  containerClassName='bg-neutral-subtle relative h-16 w-12 shrink-0 overflow-hidden rounded'
+                  className='object-contain'
+                  enablePreview={Boolean(candidate.imageUrl)}
+                  onImageClick={() =>
+                    openPreview(candidate.imageUrl, candidate.name, tcgType)
+                  }
+                />
                 <div className='flex min-w-0 flex-1 flex-col'>
                   <span className='text-content-primary truncate text-sm font-medium'>
                     {candidate.name}
@@ -303,6 +318,14 @@ export const ScannerResults = ({
           Nueva captura
         </Button>
       </div>
+
+      <CardImagePreviewModal
+        isOpen={isImagePreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 };

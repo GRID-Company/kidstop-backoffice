@@ -8,10 +8,10 @@ Sistema completo de escaneo y extracción de datos de cartas TCG usando OpenCV.j
 
 El scanner de producción vive en un **Drawer global** accesible desde cualquier página autenticada:
 
-- **FAB**: botón flotante `CardScannerFab` (esquina inferior derecha) montado en `AuthenticatedLayout`, visible para todos los roles.
-- **Flujos**: botón "Escanear" en `/compras/nueva` (sección "Agregar cartas").
-- **Estado global**: `useCardScannerStore` (`src/lib/store/card-scanner.ts`) controla `isOpen` y `source` (`'fab' | 'purchase' | 'catalog'`), que determina el CTA del candidato seleccionado.
-- **Componentes producción** (`ui/components/`): `card-scanner-drawer.tsx` (shell), `scanner-panel.tsx` (orquestador de captura), `scanner-action-bar.tsx`, `scanner-results.tsx`, `scan-fields-editor.tsx`, `scan-field-row.tsx`, `scan-ocr-text.tsx`, `scan-status-banner.tsx`. Tema claro alineado al design system; el TCG se toma de `useSelectedTCGStore`.
+- **FAB**: botón flotante `CardScannerFab` (esquina inferior derecha) montado en `AuthenticatedLayout`, visible para todos los roles. Se oculta en rutas `/compras` porque ahí el escáner ya está disponible en la sección "Agregar cartas".
+- **Flujos**: botón "Escanear" en `/compras/nueva` (sección "Agregar cartas") y en `/compras/[id]` cuando la compra es editable (DRAFT o QUOTED).
+- **Estado global**: `useCardScannerStore` (`src/lib/store/card-scanner.ts`) controla `isOpen` y `source` (`'fab' | 'purchase' | 'catalog'`), que determina el CTA del candidato seleccionado. Con `source === 'fab'` el CTA es "Ver detalle" y abre el drawer de detalle de carta (`PokemonCardDetailModal`/`MagicCardDetailModal` de `features/catalog`, montados en `card-scanner-drawer.tsx`); con `'purchase'` agrega el item a la compra; con `'catalog'` navega a `/catalogo`.
+- **Componentes producción** (`ui/components/`): `card-scanner-drawer.tsx` (shell), `scanner-panel.tsx` (orquestador de captura), `scanner-mode-toggles.tsx`, `scanner-toggle-button.tsx`, `scanner-capture-button.tsx`, `scanner-results.tsx`, `scan-fields-editor.tsx`, `scan-field-row.tsx`, `scan-ocr-text.tsx`, `scan-status-banner.tsx`. Tema claro alineado al design system; el TCG se toma de `useSelectedTCGStore`.
 - **Reutilizados del POC sin cambios**: `camera-preview`, `card-positioning-guide`, `torch-control` y todos los hooks (`use-camera-stream`, `use-opencv`, `use-card-detection`, `use-card-scanner-pipeline`, `use-card-search`).
 
 ### POC congelado (referencia)
@@ -135,7 +135,8 @@ Detección en cascada sobre el ROI de la guía (crop +4% margen) a ≤640px, con
 - ✅ Imagen normalizada como `originalImage` (Upload) + `setIcon` (crop región `setSymbol`)
 - ✅ Criterios de búsqueda por nombre, set, número (imagen como fallback)
 - ✅ `bestMatch` + `relatedCards` con precio/stock; `aiResolved` con traducciones ES
-- ✅ Toggle "Búsqueda solo con IA" (`aiSearchOnly`) en `scanner-action-bar`: con AI ON captura el frame crudo del video sin detección ni OCR de Vision (`processRawCapture`), oculta el toggle de captura automática y envía solo `originalImage` al backend; con AI OFF mantiene el pipeline completo de detección + OCR. La respuesta muestra solo la interpretación de Gemini (sección "Interpretación" con chip "Resuelto por IA")
+- ✅ Toggle "Búsqueda solo con IA" (`aiSearchOnly`) en `scanner-mode-toggles` (overlay top-left del preview): con AI ON captura el frame crudo del video sin detección ni OCR de Vision (`processRawCapture`), oculta el toggle de captura automática y envía solo `originalImage` al backend; con AI OFF mantiene el pipeline completo de detección + OCR. La respuesta muestra solo la interpretación de Gemini (sección "Interpretación" con chip "Resuelto por IA")
+- ✅ Controles estilo app móvil: toggles circulares con ícono flotando sobre el preview (auto-capture `lucide:zap`, AI `lucide:sparkles`, linterna top-right) y botón de captura tipo shutter circular con `lucide:camera` en overlay inferior-centro; Reset como botón de texto debajo del preview
 - ✅ Fallback a mock: `NEXT_PUBLIC_CARD_SCAN_USE_MOCK=true` u operación ausente del schema
 
 ### Visualización y Debug
@@ -191,7 +192,10 @@ card-scanner/
     ├── components/
     │   ├── card-scanner-drawer.tsx      # Shell del Drawer global (producción)
     │   ├── scanner-panel.tsx            # Orquestador de captura (producción)
-    │   ├── scanner-action-bar.tsx       # Botones capturar + toggles auto-capture/aiSearchOnly
+    │   ├── scanner-mode-toggles.tsx     # Columna overlay de toggles auto-capture/aiSearchOnly + guía IA
+    │   ├── scanner-ai-guide.tsx         # Popover con guía de cuándo forzar la búsqueda con IA
+    │   ├── scanner-toggle-button.tsx    # Botón circular con ícono + tooltip para toggles
+    │   ├── scanner-capture-button.tsx   # Botón shutter circular de captura (overlay)
     │   ├── scanner-results.tsx          # Vista de resultados + editor + debug
     │   ├── scan-empty-state.tsx         # Estado inicial con tips por TCG
     │   ├── scan-status-banner.tsx       # Banner de estados/errores/quality flags
