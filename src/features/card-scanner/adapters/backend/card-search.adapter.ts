@@ -31,6 +31,18 @@ export function buildCardScanSearchInput(
   setIcon: File | null,
   aiSearchOnly = false
 ): CardScanSearchInput {
+  if (aiSearchOnly) {
+    return {
+      name: null,
+      cardNumber: null,
+      setCode: null,
+      originalImage,
+      setIcon: null,
+      aiSearchOnly: true,
+      withCardsMetrics: true,
+    };
+  }
+
   return {
     name: extractedData.name.normalizedValue ?? extractedData.name.value,
     cardNumber:

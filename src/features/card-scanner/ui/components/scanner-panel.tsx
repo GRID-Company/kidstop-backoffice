@@ -88,6 +88,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     error: pipelineError,
     qualityFeedback,
     processCard,
+    processRawCapture,
     updateExtractedData,
     reset: resetPipeline,
   } = useCardScannerPipeline(selectedGame);
@@ -95,6 +96,7 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
   useEffect(() => {
     if (
       autoCapture &&
+      !aiSearchOnly &&
       cardDetected &&
       status === 'camera-ready' &&
       !scannedData &&
@@ -114,7 +116,41 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardDetected, autoCapture, status, scannedData, captureFlags]);
 
+  const handleAiSearchOnlyChange = (enabled: boolean) => {
+    setAiSearchOnly(enabled);
+    if (enabled) {
+      setAutoCapture(false);
+    }
+  };
+
   const handleCapture = async () => {
+    if (aiSearchOnly) {
+      if (!videoRef.current) {
+        toast.error('Video no disponible');
+        if (hapticEnabled) {
+          vibrateError();
+        }
+        return;
+      }
+
+      try {
+        await processRawCapture(videoRef.current);
+
+        if (hapticEnabled) {
+          vibrateSuccess();
+        }
+
+        toast.success('Imagen capturada exitosamente');
+      } catch (err) {
+        console.error('Error al capturar imagen:', err);
+        toast.error('Error al procesar la imagen');
+        if (hapticEnabled) {
+          vibrateError();
+        }
+      }
+      return;
+    }
+
     if (!bestFrame.current || !latestCorners.current || !cv) {
       toast.error('No se detecta ninguna carta en el recuadro');
       if (hapticEnabled) {
@@ -344,10 +380,14 @@ export const ScannerPanel = ({ source }: ScannerPanelProps) => {
             autoCapture={autoCapture}
             onAutoCaptureChange={setAutoCapture}
             aiSearchOnly={aiSearchOnly}
-            onAiSearchOnlyChange={setAiSearchOnly}
+            onAiSearchOnlyChange={handleAiSearchOnlyChange}
             onCapture={handleCapture}
             onReset={handleReset}
-            disabled={!cvReady || !isStreaming || !latestCorners.current}
+            disabled={
+              aiSearchOnly
+                ? !isStreaming
+                : !cvReady || !isStreaming || !latestCorners.current
+            }
           />
         </div>
 

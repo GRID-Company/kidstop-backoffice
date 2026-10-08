@@ -135,7 +135,7 @@ Detección en cascada sobre el ROI de la guía (crop +4% margen) a ≤640px, con
 - ✅ Imagen normalizada como `originalImage` (Upload) + `setIcon` (crop región `setSymbol`)
 - ✅ Criterios de búsqueda por nombre, set, número (imagen como fallback)
 - ✅ `bestMatch` + `relatedCards` con precio/stock; `aiResolved` con traducciones ES
-- ✅ Toggle "Búsqueda solo con IA" (`aiSearchOnly`) en `scanner-action-bar`: omite la búsqueda de catálogo y devuelve solo la interpretación de Gemini (sección "Interpretación" con chip "Resuelto por IA"); se fija antes de capturar
+- ✅ Toggle "Búsqueda solo con IA" (`aiSearchOnly`) en `scanner-action-bar`: con AI ON captura el frame crudo del video sin detección ni OCR de Vision (`processRawCapture`), oculta el toggle de captura automática y envía solo `originalImage` al backend; con AI OFF mantiene el pipeline completo de detección + OCR. La respuesta muestra solo la interpretación de Gemini (sección "Interpretación" con chip "Resuelto por IA")
 - ✅ Fallback a mock: `NEXT_PUBLIC_CARD_SCAN_USE_MOCK=true` u operación ausente del schema
 
 ### Visualización y Debug

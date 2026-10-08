@@ -1,4 +1,4 @@
-import { IExtractedField } from '../types';
+import { IExtractedCardData, IExtractedField } from '../types';
 
 export function createExtractedField<T = string>(
   value: T | null,
@@ -18,6 +18,20 @@ export function createExtractedField<T = string>(
 
 export function createEmptyField<T = string>(): IExtractedField<T> {
   return createExtractedField<T>(null, null, 0, [], []);
+}
+
+export function createEmptyExtractedData(): IExtractedCardData {
+  return {
+    name: createEmptyField(),
+    collectorNumber: createEmptyField(),
+    printedTotal: createEmptyField(),
+    setCode: createEmptyField(),
+    setSymbol: createEmptyField(),
+    hp: createEmptyField<number>(),
+    rarity: createEmptyField(),
+    language: createEmptyField(),
+    printedYear: createEmptyField<number>(),
+  };
 }
 
 export function detectLanguage(allText: string): IExtractedField {

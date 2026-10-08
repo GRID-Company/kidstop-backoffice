@@ -33,6 +33,7 @@ import {
 import { extractTextWithVisionRegional } from '../../adapters/ocr/google-vision';
 import { parsePokemonCard } from '../../domain/parsers/pokemon-parser.domain';
 import { parseMagicCard } from '../../domain/parsers/magic-parser.domain';
+import { createEmptyExtractedData } from '../../domain/parsers/common-parser.domain';
 import {
   calculateOcrQuality,
   calculateExtractionQuality,
@@ -281,6 +282,62 @@ export const useCardScannerPipeline = (game: TCGGame) => {
     }
   };
 
+  const processRawCapture = async (video: HTMLVideoElement): Promise<void> => {
+    const startTime = performance.now();
+
+    try {
+      setStatus('capturing');
+      setError(null);
+
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        throw new Error('Video no disponible');
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        throw new Error('No se pudo capturar el frame del video');
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const rawImageUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+      const cardData: IScannedCardData = {
+        imageDataUrl: rawImageUrl,
+        normalizedImageUrl: rawImageUrl,
+        setIconImageUrl: null,
+        extractedData: createEmptyExtractedData(),
+        confidence: {
+          captureQuality: 0,
+          ocrQuality: 0,
+          extractionQuality: 0,
+          overall: 0,
+        },
+        rawOcr: { fullText: '', regions: {} },
+        detectedAt: new Date(),
+        metrics: {
+          contourDetectionMs: 0,
+          perspectiveTransformMs: 0,
+          regionExtractionMs: 0,
+          ocrRequestMs: 0,
+          parsingMs: 0,
+          totalMs: performance.now() - startTime,
+        },
+      };
+
+      setScannedData(cardData);
+      setMetrics(cardData.metrics ?? null);
+      setStatus('results');
+    } catch (err) {
+      console.error('Error en captura cruda:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      setStatus('error');
+    }
+  };
+
   const updateExtractedData = (updatedData: IExtractedCardData) => {
     setScannedData((prev) =>
       prev ? { ...prev, extractedData: updatedData } : prev
@@ -302,6 +359,7 @@ export const useCardScannerPipeline = (game: TCGGame) => {
     error,
     qualityFeedback,
     processCard,
+    processRawCapture,
     updateExtractedData,
     reset,
   };

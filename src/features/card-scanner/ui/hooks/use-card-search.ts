@@ -41,7 +41,9 @@ export const useCardSearch = (
   const { extractedData, normalizedImageUrl, setIconImageUrl } = scannedData;
   const hasImage = Boolean(normalizedImageUrl);
   const canSearch = hasMinimumSearchCriteria(extractedData) || hasImage;
-  const searchFeedback = getSearchCriteriaFeedback(extractedData, hasImage);
+  const searchFeedback = aiSearchOnly
+    ? []
+    : getSearchCriteriaFeedback(extractedData, hasImage);
 
   const performSearch = useCallback(async () => {
     setIsSearching(true);
@@ -53,9 +55,10 @@ export const useCardSearch = (
       const originalImage = normalizedImageUrl
         ? await dataUrlToFile(normalizedImageUrl, 'card-scan')
         : null;
-      const setIcon = setIconImageUrl
-        ? await dataUrlToFile(setIconImageUrl, 'set-icon')
-        : null;
+      const setIcon =
+        !aiSearchOnly && setIconImageUrl
+          ? await dataUrlToFile(setIconImageUrl, 'set-icon')
+          : null;
 
       const input = buildCardScanSearchInput(
         extractedData,
