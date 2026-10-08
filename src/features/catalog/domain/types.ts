@@ -136,5 +136,6 @@ export interface MagicCatalogFilters {
 export interface IMagicCollection {
   guid: string;
   name: string;
+  code: string | null;
   editionIconUri: string | null;
 }

@@ -53,6 +53,7 @@ query MagicCardCollections {
   magicCardCollections {
     guid
     name
+    code
     editionIconUri
   }
 }

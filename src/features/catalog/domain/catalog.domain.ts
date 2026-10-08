@@ -1,4 +1,5 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
+import { ISelectOption } from '@/shared/base/heorui-overrides/select';
 import { DEFAULT_MARGIN_PERCENTAGE, MIN_PRICE } from './constants';
 import { CardFilters } from './types';
 import { BulkOperationType } from '@/lib/api/schema-types';
@@ -16,6 +17,16 @@ export const getCardsVars = (args: IPaginatedApiArgs, filters: CardFilters) => {
     },
   };
 };
+
+export const toSetCodeOptions = (
+  collections: Array<{ guid: string; name: string; code?: string | null }> = []
+): ISelectOption[] =>
+  collections.map((collection) => ({
+    value: collection.guid,
+    label: collection.code
+      ? `${collection.code.toUpperCase()} — ${collection.name}`
+      : collection.name,
+  }));
 
 export const calculatePriceMargin = (
   buyPrice: number,

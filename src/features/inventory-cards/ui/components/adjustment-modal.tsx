@@ -34,8 +34,16 @@ import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { CardLanguage } from '@/lib/api/schema-types';
-import { PokemonCardInternalListDocument } from '@/lib/api/generated/catalog-pokemon.generated';
-import { MagicCardInternalListDocument } from '@/lib/api/generated/catalog-magic.generated';
+import {
+  PokemonCardInternalListDocument,
+  PokemonCardCollectionsDocument,
+} from '@/lib/api/generated/catalog-pokemon.generated';
+import {
+  MagicCardInternalListDocument,
+  MagicCardCollectionsDocument,
+} from '@/lib/api/generated/catalog-magic.generated';
+import AutocompleteFilter from '@/shared/base/heorui-overrides/autocomplete-filter';
+import { toSetCodeOptions } from '@/features/catalog/domain/catalog.domain';
 import {
   toPokemonCard,
   toMagicCard,
@@ -73,6 +81,7 @@ export default function AdjustmentModal({
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const [resolvedItem, setResolvedItem] = useState<IInventoryItem | null>(item);
   const [itemSearch, setItemSearch] = useState('');
+  const [setGuid, setSetGuid] = useState('');
   const [selectedCard, setSelectedCard] = useState<CatalogCard | null>(null);
   const [_selectedCondition, setSelectedCondition] = useState<string>('');
   const {
@@ -88,12 +97,39 @@ export default function AdjustmentModal({
     if (isOpen) {
       setResolvedItem(item);
       setItemSearch('');
+      setSetGuid('');
       setSelectedCard(null);
       setSelectedCondition('');
     }
   }, [isOpen, item]);
 
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
+
+  useEffect(() => {
+    setSetGuid('');
+  }, [selectedTCG]);
+
+  const { data: pokemonCollectionsData } = useQuery(
+    PokemonCardCollectionsDocument,
+    { skip: !isOpen || !isPokemon, fetchPolicy: 'cache-first' }
+  );
+
+  const { data: magicCollectionsData } = useQuery(
+    MagicCardCollectionsDocument,
+    { skip: !isOpen || isPokemon, fetchPolicy: 'cache-first' }
+  );
+
+  const setItems = useMemo(
+    () =>
+      toSetCodeOptions(
+        (isPokemon
+          ? pokemonCollectionsData?.pokemonCardCollections
+          : magicCollectionsData?.magicCardCollections) ?? []
+      ),
+    [isPokemon, pokemonCollectionsData, magicCollectionsData]
+  );
+
+  const hasSearchCriteria = itemSearch.trim().length >= 2 || !!setGuid;
 
   const { data: pokemonData, loading: pokemonLoading } = useQuery(
     PokemonCardInternalListDocument,
@@ -104,10 +140,10 @@ export default function AdjustmentModal({
           limit: 6,
           search: itemSearch.trim() || undefined,
           sort: { column: 'releaseDate', order: 'DESC' },
-          filters: {},
+          filters: { set: setGuid || undefined },
         },
       },
-      skip: !isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
+      skip: !isPokemon || !!resolvedItem || !hasSearchCriteria,
       fetchPolicy: 'network-only',
     }
   );
@@ -121,10 +157,10 @@ export default function AdjustmentModal({
           limit: 6,
           search: itemSearch.trim() || undefined,
           sort: { column: 'releaseDate', order: 'DESC' },
-          filters: {},
+          filters: { edition: setGuid || undefined },
         },
       },
-      skip: isPokemon || !!resolvedItem || itemSearch.trim().length < 2,
+      skip: isPokemon || !!resolvedItem || !hasSearchCriteria,
       fetchPolicy: 'network-only',
     }
   );
@@ -250,17 +286,29 @@ export default function AdjustmentModal({
         <DrawerBody className='flex flex-col gap-6'>
           {!resolvedItem && !selectedCard ? (
             <div className='flex flex-col gap-4'>
-              <Input
-                placeholder='Buscar carta por nombre, set o código...'
-                value={itemSearch}
-                onValueChange={setItemSearch}
-                startContent={
-                  <Icon icon='lucide:search' className='text-default-400' />
-                }
-                isClearable
-                onClear={() => setItemSearch('')}
-                autoFocus
-              />
+              <div className='flex flex-col gap-3 sm:flex-row sm:items-start'>
+                <Input
+                  className='sm:flex-1'
+                  placeholder='Buscar carta por nombre, set o código...'
+                  value={itemSearch}
+                  onValueChange={setItemSearch}
+                  startContent={
+                    <Icon icon='lucide:search' className='text-default-400' />
+                  }
+                  isClearable
+                  onClear={() => setItemSearch('')}
+                  autoFocus
+                />
+                <AutocompleteFilter
+                  key={selectedTCG}
+                  placeholder='Expansión'
+                  items={setItems}
+                  selectedValue={setGuid}
+                  onSelectionChange={setSetGuid}
+                  className='w-full shrink-0 sm:w-56'
+                  aria-label='Filtrar por expansión o set code'
+                />
+              </div>
 
               {searchLoading && (
                 <div className='flex justify-center py-4'>
@@ -269,7 +317,7 @@ export default function AdjustmentModal({
               )}
 
               {!searchLoading &&
-                itemSearch.trim().length >= 2 &&
+                hasSearchCriteria &&
                 searchResults.length === 0 && (
                   <p className='text-default-400 text-center text-sm'>
                     No se encontraron cartas en el catálogo
@@ -334,7 +382,7 @@ export default function AdjustmentModal({
                 </div>
               )}
 
-              {itemSearch.trim().length < 2 && (
+              {!hasSearchCriteria && (
                 <p className='text-default-400 text-center text-sm'>
                   Escribe al menos 2 caracteres para buscar
                 </p>

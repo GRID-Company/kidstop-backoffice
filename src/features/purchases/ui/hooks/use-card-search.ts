@@ -44,6 +44,10 @@ export function useCardSearch() {
     ? (filters as MagicCatalogFilters)
     : undefined;
 
+  const selectedSet = pokemonFilters?.set ?? magicFilters?.edition;
+  const hasSearchCriteria =
+    Boolean(debouncedSearch.trim()) || Boolean(selectedSet);
+
   const { data: pokemonData, loading: pokemonLoading } = useQuery(
     PokemonCardInternalListDocument,
     {
@@ -63,7 +67,7 @@ export function useCardSearch() {
           },
         },
       },
-      skip: selectedTCG !== TCG_TYPES.POKEMON || !debouncedSearch.trim(),
+      skip: selectedTCG !== TCG_TYPES.POKEMON || !hasSearchCriteria,
     }
   );
 
@@ -85,7 +89,7 @@ export function useCardSearch() {
           },
         },
       },
-      skip: selectedTCG !== TCG_TYPES.MAGIC || !debouncedSearch.trim(),
+      skip: selectedTCG !== TCG_TYPES.MAGIC || !hasSearchCriteria,
     }
   );
 
@@ -138,6 +142,7 @@ export function useCardSearch() {
     return (magicCollectionsData?.magicCardCollections ?? []).map((c) => ({
       guid: c.guid,
       name: c.name,
+      code: c.code ?? null,
       editionIconUri: c.editionIconUri ?? null,
     }));
   }, [isPokemon, pokemonCollectionsData, magicCollectionsData]);
@@ -151,7 +156,7 @@ export function useCardSearch() {
   const genres: string[] = pokemonGenresData?.pokemonCardGenres ?? [];
 
   const results = useMemo(() => {
-    if (!debouncedSearch.trim()) return [];
+    if (!debouncedSearch.trim() && !selectedSet) return [];
 
     if (selectedTCG === TCG_TYPES.POKEMON) {
       if (!pokemonData?.pokemonCardInternalList?.data) return [];
@@ -210,7 +215,7 @@ export function useCardSearch() {
     }
 
     return [];
-  }, [debouncedSearch, selectedTCG, pokemonData, magicData]);
+  }, [debouncedSearch, selectedSet, selectedTCG, pokemonData, magicData]);
 
   const handleFilterChange = useCallback(
     (key: string, value: string | boolean) => {
@@ -249,6 +254,7 @@ export function useCardSearch() {
     selectedTCG,
     loading: isPokemon ? pokemonLoading : magicLoading,
     filters,
+    selectedSet,
     handleFilterChange,
     resetFilters,
     hasActiveFilters,

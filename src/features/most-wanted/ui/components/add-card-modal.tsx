@@ -16,7 +16,14 @@ import { Icon } from '@iconify/react';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
-import { IPokemonCard, IMagicCard } from '@/features/catalog/domain/types';
+import SetCodeAutocomplete from '@/features/catalog/ui/components/set-code-autocomplete';
+import {
+  IPokemonCard,
+  IMagicCard,
+  IPokemonCollection,
+  IMagicCollection,
+} from '@/features/catalog/domain/types';
+import { TCGType } from '@/lib/types/tcg.types';
 import { MostWantedCardFormData } from '../../adapters/forms/most-wanted-card.schema';
 import CardPrioritySelector from './card-priority-selector';
 import { useAddCardModal } from '../hooks/use-add-card-modal';
@@ -35,6 +42,11 @@ interface AddCardModalProps {
   form: ReturnType<typeof useAddCardModal>['form'];
   onSubmit: ReturnType<typeof useAddCardModal>['handleSubmit'];
   loading?: boolean;
+  selectedTCG: TCGType;
+  collections?: IPokemonCollection[] | IMagicCollection[];
+  selectedSet?: string;
+  onSetChange: (value: string) => void;
+  setResetKey?: number;
 }
 
 function CardSearchResult({
@@ -153,8 +165,14 @@ export default function AddCardModal({
   form,
   onSubmit,
   loading = false,
+  selectedTCG,
+  collections,
+  selectedSet,
+  onSetChange,
+  setResetKey,
 }: AddCardModalProps) {
   const { control, formState } = form;
+  const hasSearchCriteria = Boolean(search.trim()) || Boolean(selectedSet);
 
   return (
     <KidstopDrawer isOpen={isOpen} onClose={onClose} size='xl'>
@@ -170,15 +188,28 @@ export default function AddCardModal({
 
         <DrawerBody className='flex flex-col gap-6'>
           <div className='flex flex-col gap-3'>
-            <Search
-              label='Buscar carta'
-              placeholder='Nombre, set o identificador'
-              value={search}
-              onValueChange={onSearchChange}
-              aria-label='Buscar carta del catálogo'
-            />
+            <div className='flex flex-col gap-3 sm:flex-row sm:items-end'>
+              <div className='sm:flex-1'>
+                <Search
+                  label='Buscar carta'
+                  placeholder='Nombre, set o identificador'
+                  value={search}
+                  onValueChange={onSearchChange}
+                  aria-label='Buscar carta del catálogo'
+                />
+              </div>
+              <SetCodeAutocomplete
+                collections={collections}
+                selectedTCG={selectedTCG}
+                label='Expansión'
+                selectedValue={selectedSet}
+                onSelectionChange={onSetChange}
+                resetKey={setResetKey}
+                className='sm:w-56'
+              />
+            </div>
 
-            {search.trim() && !loading && (
+            {hasSearchCriteria && !loading && (
               <p className='text-default-400 text-xs'>
                 {searchResults.length}{' '}
                 {searchResults.length === 1
@@ -187,7 +218,7 @@ export default function AddCardModal({
               </p>
             )}
 
-            {loading && search.trim() && (
+            {loading && hasSearchCriteria && (
               <div className='flex flex-col gap-1'>
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div
@@ -219,12 +250,16 @@ export default function AddCardModal({
               </ScrollShadow>
             )}
 
-            {search.trim() && searchResults.length === 0 && !selectedCard && (
-              <div className='text-default-400 flex flex-col items-center gap-2 py-6'>
-                <Icon icon='lucide:search-x' width={32} />
-                <p className='text-sm'>No se encontraron cartas disponibles</p>
-              </div>
-            )}
+            {hasSearchCriteria &&
+              searchResults.length === 0 &&
+              !selectedCard && (
+                <div className='text-default-400 flex flex-col items-center gap-2 py-6'>
+                  <Icon icon='lucide:search-x' width={32} />
+                  <p className='text-sm'>
+                    No se encontraron cartas disponibles
+                  </p>
+                </div>
+              )}
           </div>
 
           {selectedCard && (
@@ -282,7 +317,7 @@ export default function AddCardModal({
             </>
           )}
 
-          {!selectedCard && !search.trim() && (
+          {!selectedCard && !hasSearchCriteria && (
             <div className='text-default-400 flex flex-col items-center gap-3 py-10'>
               <Icon icon='lucide:search' width={40} />
               <p className='text-sm'>
