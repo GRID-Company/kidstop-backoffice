@@ -1,15 +1,17 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { useCardScannerStore } from '@/lib/store/card-scanner';
 
 export default function CardScannerFab() {
+  const pathname = usePathname();
   const isOpen = useCardScannerStore((state) => state.isOpen);
   const openScanner = useCardScannerStore((state) => state.openScanner);
 
-  if (isOpen) return null;
+  if (isOpen || pathname.startsWith('/compras')) return null;
 
   return (
     <Tooltip

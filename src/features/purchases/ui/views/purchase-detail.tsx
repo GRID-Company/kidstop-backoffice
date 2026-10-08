@@ -33,6 +33,9 @@ import {
   PAYMENT_METHOD_LABELS,
 } from '../../domain/constants';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
+import { mapScanCandidateToPurchaseItem } from '../../adapters/mappers/scan-candidate-to-purchase-item.mapper';
+import { useCardScannerStore } from '@/lib/store/card-scanner';
+import { ICardCandidate } from '@/features/card-scanner/domain/types';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
 import { useSellerEditState } from '../hooks/use-seller-edit-state';
@@ -57,6 +60,7 @@ interface PurchaseDetailProps {
 export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   const router = useRouter();
   const displayCurrency = usePrivacyCurrency();
+  const openScanner = useCardScannerStore((state) => state.openScanner);
 
   const {
     purchase,
@@ -203,6 +207,21 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     setIsAdvancedSearchEnabled(false);
   }, []);
 
+  const handleScannedCandidate = useCallback(
+    (candidate: ICardCandidate) => {
+      try {
+        validateAndAddItems([mapScanCandidateToPurchaseItem(candidate)]);
+      } catch {
+        toast.error('Error al agregar la carta escaneada');
+      }
+    },
+    [validateAndAddItems]
+  );
+
+  const handleOpenScanner = useCallback(() => {
+    openScanner('purchase', handleScannedCandidate);
+  }, [openScanner, handleScannedCandidate]);
+
   const finalizeTooltipMessage = useMemo(() => {
     if (purchase?.status !== PURCHASE_STATUS.WAITING_PRICE) {
       return 'Finalizar la compra y registrar en inventario';
@@ -320,13 +339,24 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 <span className='text-accent text-sm font-semibold'>
                   Agregar cartas
                 </span>
-                <Switch
-                  size='sm'
-                  isSelected={isAdvancedSearchEnabled}
-                  onValueChange={setIsAdvancedSearchEnabled}
-                >
-                  <span className='text-xs'>Búsqueda avanzada</span>
-                </Switch>
+                <div className='flex items-center gap-3'>
+                  <Button
+                    size='sm'
+                    variant='flat'
+                    className='text-accent'
+                    startContent={<Icon icon='lucide:scan-line' width={16} />}
+                    onPress={handleOpenScanner}
+                  >
+                    Escanear
+                  </Button>
+                  <Switch
+                    size='sm'
+                    isSelected={isAdvancedSearchEnabled}
+                    onValueChange={setIsAdvancedSearchEnabled}
+                  >
+                    <span className='text-xs'>Búsqueda avanzada</span>
+                  </Switch>
+                </div>
               </div>
 
               {isAdvancedSearchEnabled ? (
