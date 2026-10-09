@@ -46,6 +46,7 @@ import CardSearchWithMetrics from '../components/card-search-with-metrics';
 import PaymentSplitModal from '../components/payment-split-modal';
 import PriceAdjustmentModal from '../components/price-adjustment-modal';
 import PurchaseTimeline from '../components/purchase-timeline';
+import PurchaseFinancialSummary from '../components/purchase-financial-summary';
 import SellerEditDrawer from '../components/seller-edit-drawer';
 import CompletePurchaseModal from '../components/complete-purchase-modal';
 import { DuplicateItemsConfirmationModal } from '../components/duplicate-items-confirmation-modal';
@@ -451,6 +452,10 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
             </div>
           </EntitiesPage.CardContainer>
         )}
+
+        <EntitiesPage.CardContainer>
+          <PurchaseFinancialSummary items={items} />
+        </EntitiesPage.CardContainer>
 
         {!isTerminal && (
           <EntitiesPage.CardContainer>
