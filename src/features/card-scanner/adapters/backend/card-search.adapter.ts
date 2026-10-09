@@ -1,4 +1,5 @@
 import type { ApolloClient } from '@apollo/client';
+import { CardScanEffort } from '@/lib/api/schema-types';
 import type { CardScanSearchInput } from '@/lib/api/schema-types';
 import {
   MagicCardScanSearchDocument,
@@ -29,16 +30,16 @@ export function buildCardScanSearchInput(
   extractedData: IExtractedCardData,
   originalImage: File | null,
   setIcon: File | null,
-  aiSearchOnly = false
+  effort: CardScanEffort = CardScanEffort.Normal
 ): CardScanSearchInput {
-  if (aiSearchOnly) {
+  if (effort !== CardScanEffort.Normal) {
     return {
       name: null,
       cardNumber: null,
       setCode: null,
       originalImage,
       setIcon: null,
-      aiSearchOnly: true,
+      effort,
       withCardsMetrics: true,
     };
   }
@@ -52,7 +53,7 @@ export function buildCardScanSearchInput(
       extractedData.setCode.normalizedValue ?? extractedData.setCode.value,
     originalImage,
     setIcon,
-    aiSearchOnly,
+    effort,
     withCardsMetrics: true,
   };
 }
@@ -76,10 +77,10 @@ export function validateCardScanSearchInput(
 
 async function searchCardInBackendMock(
   game: TCGGame,
-  aiSearchOnly = false
+  effort: CardScanEffort = CardScanEffort.Normal
 ): Promise<ICardSearchResponse> {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  return mockCardSearchResponse(game, aiSearchOnly);
+  return mockCardSearchResponse(game, effort);
 }
 
 function isCardScanOperationUnavailable(error: unknown): boolean {
@@ -97,7 +98,7 @@ export async function searchCardInBackend(
   logger.debug('🔍 Buscando carta en backend:', { game, input });
 
   if (process.env.NEXT_PUBLIC_CARD_SCAN_USE_MOCK === 'true') {
-    return searchCardInBackendMock(game, Boolean(input.aiSearchOnly));
+    return searchCardInBackendMock(game, input.effort ?? CardScanEffort.Normal);
   }
 
   try {
@@ -129,7 +130,10 @@ export async function searchCardInBackend(
   } catch (error) {
     if (isCardScanOperationUnavailable(error)) {
       logger.warn('⚠️ cardScanSearch no disponible en el backend, usando mock');
-      return searchCardInBackendMock(game, Boolean(input.aiSearchOnly));
+      return searchCardInBackendMock(
+        game,
+        input.effort ?? CardScanEffort.Normal
+      );
     }
     throw error;
   }

@@ -18,37 +18,35 @@ export const ScannerAiGuide = () => {
       <PopoverContent className='max-w-72 p-3'>
         <div className='flex flex-col gap-3 text-xs'>
           <p className='text-content-primary text-sm font-semibold'>
-            ¿Cuándo usar la búsqueda con IA?
+            Niveles de búsqueda
           </p>
 
           <div>
-            <p className='text-content-primary font-medium'>
-              No hace falta forzarla si:
+            <p className='text-content-primary font-medium'>Normal</p>
+            <p className='text-content-secondary mt-1'>
+              Busca en el catálogo primero y usa IA solo como respaldo.
+              Suficiente si la carta está en inglés, con buena iluminación o
+              buena cámara.
             </p>
-            <ul className='text-content-secondary mt-1 flex list-disc flex-col gap-1 pl-4'>
-              <li>
-                La carta está en inglés o el nombre no se ve afectado por el
-                idioma (común en Pokémon entre inglés y español)
-              </li>
-              <li>Tienes buena iluminación o una buena cámara</li>
-            </ul>
           </div>
 
           <div>
-            <p className='text-content-primary font-medium'>Actívala cuando:</p>
-            <ul className='text-content-secondary mt-1 flex list-disc flex-col gap-1 pl-4'>
-              <li>La carta no está en inglés</li>
-              <li>No tienes buena iluminación</li>
-              <li>
-                Ya intentaste sin forzarla y no obtuviste buenos resultados
-              </li>
-            </ul>
+            <p className='text-content-primary font-medium'>IA</p>
+            <p className='text-content-secondary mt-1'>
+              La IA resuelve la carta primero (Gemini Flash). Úsala cuando la
+              carta no está en inglés, hay mala iluminación o el modo Normal no
+              dio buenos resultados.
+            </p>
           </div>
 
-          <p className='text-content-tertiary'>
-            La búsqueda con IA es más costosa — en las condiciones anteriores el
-            escaneo normal suele dar buenos resultados.
-          </p>
+          <div>
+            <p className='text-content-primary font-medium'>IA Pro</p>
+            <p className='text-content-secondary mt-1'>
+              Igual que IA pero con Gemini Pro: máxima precisión, más lento y
+              más costoso. Para cartas difíciles que los otros modos no
+              resolvieron.
+            </p>
+          </div>
         </div>
       </PopoverContent>
     </Popover>

@@ -1,38 +1,23 @@
-import { ScannerToggleButton } from './scanner-toggle-button';
+import { CardScanEffort } from '@/lib/api/schema-types';
+import { ScannerEffortButton } from './scanner-effort-button';
 import { ScannerAiGuide } from './scanner-ai-guide';
 
 interface ScannerModeTogglesProps {
-  autoCapture: boolean;
-  onAutoCaptureChange: (enabled: boolean) => void;
-  aiSearchOnly: boolean;
-  onAiSearchOnlyChange: (enabled: boolean) => void;
+  effort: CardScanEffort;
+  onEffortChange: (effort: CardScanEffort) => void;
   disabled?: boolean;
 }
 
 export const ScannerModeToggles = ({
-  autoCapture,
-  onAutoCaptureChange,
-  aiSearchOnly,
-  onAiSearchOnlyChange,
+  effort,
+  onEffortChange,
   disabled = false,
 }: ScannerModeTogglesProps) => {
   return (
     <div className='flex flex-col gap-2'>
-      {!aiSearchOnly && (
-        <ScannerToggleButton
-          icon='lucide:zap-off'
-          activeIcon='lucide:zap'
-          isActive={autoCapture}
-          onToggle={onAutoCaptureChange}
-          label='Captura automática'
-          disabled={disabled}
-        />
-      )}
-      <ScannerToggleButton
-        icon='lucide:sparkles'
-        isActive={aiSearchOnly}
-        onToggle={onAiSearchOnlyChange}
-        label='Búsqueda solo con IA'
+      <ScannerEffortButton
+        effort={effort}
+        onEffortChange={onEffortChange}
         disabled={disabled}
       />
       <ScannerAiGuide />

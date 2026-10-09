@@ -18,7 +18,7 @@
 - `text: String` (optional) — rules text hint; not sent by the scanner.
 - `originalImage: Upload` (optional) — **normalized card photo produced by the frontend** (JPEG/PNG, ~744×1039 px). This is the primary input for AI extraction.
 - `setIcon: Upload` (optional) — cropped set-symbol region extracted from the normalized image by the frontend; intended to help the backend identify the set.
-- `aiSearchOnly: Boolean` (optional, default false) — when true, skip deterministic text matching and resolve via AI only.
+- `effort: CardScanEffort` (enum, optional, default `NORMAL`) — `NORMAL` runs deterministic catalog matching first and falls back to AI (`gemini-2.5-flash-lite`) when no match is found; `HIGH`/`MAX` skip the initial catalog search and resolve via AI first (`gemini-2.5-flash` / `gemini-2.5-pro`). The AI-resolved `name`/`cardNumber`/`setCode` are always re-applied to the catalog search.
 - `withCardsMetrics: Boolean` (optional, default false) — frontend always sends `true` for scanner requests (purchase flow needs prices/stock).
 
 At least one text field or `originalImage` is required (existing rule). For the scanner flow, `originalImage` is always present.
@@ -27,7 +27,7 @@ At least one text field or `originalImage` is required (existing rule). For the 
 
 ### Field extraction from `originalImage` (new)
 
-- When `originalImage` is present and text hints are absent/insufficient — or when `aiSearchOnly` is `true` — the backend must extract the card's identity fields from the image using a vision-capable model (implementation choice: Google Cloud Vision, Gemini multimodal, or equivalent).
+- When `originalImage` is present and text hints are absent/insufficient — or when `effort` is `HIGH`/`MAX` — the backend must extract the card's identity fields from the image using a vision-capable model (implementation choice: Google Cloud Vision, Gemini multimodal, or equivalent).
 - Extraction output must populate `aiResolved` (existing `CardScanAiData`):
   - `name` — card name as printed.
   - `cardNumber` — collector number (e.g. `026/163`, Magic collector number).
@@ -46,9 +46,10 @@ At least one text field or `originalImage` is required (existing rule). For the 
 
 ### Matching order (existing contract — restate)
 
-- With `aiSearchOnly=false`: deterministic catalog matching on provided text fields first; if no satisfactory match, fall back to AI extraction from `originalImage` and match on its output.
-- With `aiSearchOnly=true`: skip deterministic matching; extract via AI and match on extracted fields.
-- `bestMatch` and `relatedCards` continue to return catalog items as today, including `cardMetrics` when `withCardsMetrics=true`.
+- With `effort=NORMAL`: deterministic catalog matching on provided text fields first; if no satisfactory match, fall back to AI extraction from `originalImage` and match on its output.
+- With `effort=HIGH`/`MAX`: skip deterministic matching; extract via AI and match on extracted fields.
+- `bestMatch` and `relatedCards` continue to return catalog items as today, including `cardMetrics` when `withCardsMetrics=true` (also under `HIGH`/`MAX`).
+- `error` may be populated together with `aiResolved` when the AI resolved the card but the catalog search found no match.
 
 ### Business Rules
 
@@ -72,9 +73,9 @@ At least one text field or `originalImage` is required (existing rule). For the 
 The scanner flow after this change becomes a **single GraphQL round-trip**:
 
 1. Frontend: camera → detect card → perspective-correct → normalized JPEG (~744×1039) + `setIcon` crop.
-2. `pokemonCardScanSearch`/`magicCardScanSearch` with `{ originalImage, setIcon, aiSearchOnly: true, withCardsMetrics: true }` (text hints omitted on first pass).
+2. `pokemonCardScanSearch`/`magicCardScanSearch` with `{ originalImage, setIcon, effort: 'HIGH', withCardsMetrics: true }` (text hints omitted on first pass).
 3. Backend: AI extraction → `aiResolved` + `resolvedByAI` + catalog matches.
-4. UI shows AI-resolved fields (editable); user edits → re-submit with corrected text fields + `originalImage` (`aiSearchOnly=false`).
+4. UI shows AI-resolved fields (editable); user edits → re-submit with corrected text fields + `originalImage` (`effort='NORMAL'`).
 5. Confirmed candidate → purchase form (existing integration, unchanged).
 
 ### Removed from the frontend once this lands

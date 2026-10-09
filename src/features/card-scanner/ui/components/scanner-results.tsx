@@ -8,10 +8,15 @@ import {
   TCGGame,
 } from '../../domain/types';
 import { CardScannerSource } from '@/lib/store/card-scanner';
-import { ISO_LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { CardScanEffort } from '@/lib/api/schema-types';
+import {
+  ISO_LANGUAGE_LABELS,
+  LANGUAGE_LABELS,
+} from '@/lib/types/language.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import FoilChip from '@/shared/components/foil-chip';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -24,7 +29,7 @@ interface ScannerResultsProps {
   scannedData: IScannedCardData;
   game: TCGGame;
   source: CardScannerSource;
-  aiSearchOnly: boolean;
+  effort: CardScanEffort;
   onSave: (updatedData: IExtractedCardData) => void;
   onReset: () => void;
   onUseCandidate: (candidate: ICardCandidate) => void;
@@ -40,7 +45,7 @@ export const ScannerResults = ({
   scannedData,
   game,
   source,
-  aiSearchOnly,
+  effort,
   onSave,
   onReset,
   onUseCandidate,
@@ -52,7 +57,7 @@ export const ScannerResults = ({
     validationErrors,
     searchFeedback,
     performSearch,
-  } = useCardSearch(game, scannedData, aiSearchOnly);
+  } = useCardSearch(game, scannedData, effort);
 
   const tcgType = game === 'pokemon' ? TCG_TYPES.POKEMON : TCG_TYPES.MAGIC;
   const {
@@ -69,6 +74,8 @@ export const ScannerResults = ({
   }, [performSearch]);
 
   const hasCandidates = !!searchResults && searchResults.candidates.length > 0;
+  const hasAiResolved = !!searchResults?.aiResolved;
+  const hasAnyResult = hasCandidates || hasAiResolved;
 
   return (
     <div className='flex flex-col gap-4'>
@@ -124,6 +131,7 @@ export const ScannerResults = ({
 
       {!isSearching &&
         (searchError || validationErrors.length > 0) &&
+        !hasAnyResult &&
         (validationErrors.length > 0 ||
         searchError === 'No se encontraron resultados' ? (
           <ScanEmptyState
@@ -144,6 +152,10 @@ export const ScannerResults = ({
             onRetry={performSearch}
           />
         ))}
+
+      {!isSearching && searchError && hasAnyResult && (
+        <ScanStatusBanner variant='warning'>{searchError}</ScanStatusBanner>
+      )}
 
       {hasCandidates && (
         <div className='border-divider rounded-lg border bg-white p-4'>
@@ -177,16 +189,38 @@ export const ScannerResults = ({
                     {candidate.setName && (
                       <span className='truncate'>{candidate.setName}</span>
                     )}
+                    {candidate.setCode && <span>{candidate.setCode}</span>}
                     {candidate.collectorNumber && (
                       <span>#{candidate.collectorNumber}</span>
                     )}
                   </div>
-                  <div className='mt-1 flex flex-wrap items-center gap-2'>
+                  <div className='mt-1 flex flex-wrap items-center gap-1.5'>
                     {candidate.isBestMatch && (
                       <Chip size='sm' variant='flat' color='success'>
                         Mejor coincidencia
                       </Chip>
                     )}
+                    {candidate.game === 'pokemon' &&
+                      candidate.variant &&
+                      (/holo|foil/i.test(candidate.variant) ? (
+                        <FoilChip label={candidate.variant} variant='subtle' />
+                      ) : (
+                        <Chip size='sm' variant='flat'>
+                          {candidate.variant}
+                        </Chip>
+                      ))}
+                    {candidate.game === 'magic' &&
+                      (candidate.isFoil ? (
+                        <FoilChip label='Foil' variant='subtle' />
+                      ) : (
+                        <Chip size='sm' variant='flat'>
+                          Normal
+                        </Chip>
+                      ))}
+                    <Chip size='sm' variant='flat'>
+                      {LANGUAGE_LABELS[candidate.language] ??
+                        candidate.language}
+                    </Chip>
                     {candidate.referencePrice !== null && (
                       <span className='text-content-primary text-xs font-medium'>
                         {formatCurrency(candidate.referencePrice)}
