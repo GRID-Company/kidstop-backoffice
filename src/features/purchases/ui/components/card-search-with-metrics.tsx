@@ -244,6 +244,7 @@ function CardResultItem({
             <LanguageSelector
               value={addState.language}
               onChange={(language) => setAddState((s) => ({ ...s, language }))}
+              tcgType={card.tcgType}
               currentLanguage={card.language}
               size='sm'
               label='Idioma'

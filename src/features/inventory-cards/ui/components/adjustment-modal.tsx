@@ -615,6 +615,7 @@ export default function AdjustmentModal({
                     <LanguageSelector
                       value={field.value as CardLanguage}
                       onChange={field.onChange}
+                      tcgType={selectedTCG}
                       currentLanguage={resolvedItem.language}
                       label='Idioma'
                     />
