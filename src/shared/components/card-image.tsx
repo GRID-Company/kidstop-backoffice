@@ -62,6 +62,7 @@ function CardImageComponent({
           sizes={sizes}
           className={className}
           onError={onError}
+          unoptimized
         />
       ) : (
         <Image
