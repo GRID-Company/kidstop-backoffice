@@ -130,6 +130,7 @@ export default function CardDetailModal({
                   fill
                   sizes='160px'
                   className='object-contain p-1'
+                  unoptimized
                 />
               ) : (
                 <Image

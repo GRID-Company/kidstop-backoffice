@@ -1,23 +1,16 @@
 'use client';
 
 import { useState, useMemo, useCallback, forwardRef } from 'react';
-import { Accordion, AccordionItem, CardBody, Chip } from '@heroui/react';
+import { Accordion, AccordionItem, CardBody } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
 import { useFormContext, useWatch } from 'react-hook-form';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
-import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
-import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
-import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import BulkCardRelatedSelector from './bulk-card-related-selector';
 import BulkCardFormControls from './bulk-card-form-controls';
-import PriceMetricsSkeleton from './components/price-metrics-skeleton';
+import BulkCardResultSummary from './bulk-card-result-summary';
 import { useCardMetrics } from './hooks/use-card-metrics';
 import { BulkCardResultCardProps } from './types';
-import { formatCurrency } from '@/lib/utils/format-currency';
 import { isValidPrice, isValidQuantity } from '@/lib/utils/validation.utils';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
 function _MetricItem({
   icon,
@@ -48,14 +41,6 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
   ) {
     const { setValue, control } = useFormContext();
     const [isExpanded, setIsExpanded] = useState(false);
-    const {
-      isOpen: isPreviewOpen,
-      imageUrl: previewImageUrl,
-      alt: previewAlt,
-      tcgType: previewTcgType,
-      openPreview,
-      closePreview,
-    } = useCardImagePreview();
 
     const selectedCardGuid = useWatch({
       control,
@@ -220,176 +205,11 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
             aria-label={displayCard.name}
             title={
               <div className='flex items-center gap-3 py-1'>
-                <div
-                  className='bg-default-100 relative h-[90px] w-[65px] shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openPreview(
-                      displayCard.imageUri ?? null,
-                      displayCard.name,
-                      tcgType as 'POKEMON' | 'MAGIC'
-                    );
-                  }}
-                  role='button'
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.stopPropagation();
-                      openPreview(
-                        displayCard.imageUri ?? null,
-                        displayCard.name,
-                        tcgType as 'POKEMON' | 'MAGIC'
-                      );
-                    }
-                  }}
-                  aria-label={`Ver ${displayCard.name} en tamaño completo`}
-                >
-                  {displayCard.imageUri ? (
-                    <img
-                      src={displayCard.imageUri}
-                      alt={displayCard.name}
-                      className='absolute inset-0 h-full w-full object-contain p-1'
-                    />
-                  ) : (
-                    <Image
-                      src={
-                        tcgType === 'MAGIC'
-                          ? magicCardPlaceholder
-                          : pokemonCardPlaceholder
-                      }
-                      alt={`${tcgType} card placeholder`}
-                      fill
-                      sizes='65px'
-                      className='object-contain p-1'
-                    />
-                  )}
-                </div>
-                <div className='flex flex-1 flex-col gap-1'>
-                  <p className='text-sm leading-tight font-semibold'>
-                    {displayCard.name}
-                  </p>
-                  <div className='flex flex-wrap items-center gap-1.5'>
-                    {tcgType === 'POKEMON' && displayCard.type && (
-                      <PokemonTypeIcon type={displayCard.type} size='sm' />
-                    )}
-                    {tcgType === 'POKEMON' && displayCard.hp && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1 text-[9px]'
-                      >
-                        {displayCard.hp} HP
-                      </Chip>
-                    )}
-                    {displayCard.variant &&
-                      !displayCard.variant.toLowerCase().includes('normal') && (
-                        <Chip
-                          size='sm'
-                          variant='flat'
-                          color='secondary'
-                          className='h-4 px-1 text-[9px]'
-                        >
-                          {displayCard.variant}
-                        </Chip>
-                      )}
-                  </div>
-                  <p className='text-default-500 text-xs'>
-                    {displayCard.edition} · #{displayCard.collectorNumber}
-                  </p>
-                  <div className='flex items-center gap-3'>
-                    <div className='flex items-center gap-1'>
-                      <Icon
-                        icon='lucide:package'
-                        width={12}
-                        className={
-                          displayCard.totalStock > 0
-                            ? 'text-success'
-                            : 'text-danger'
-                        }
-                      />
-                      <span className='text-default-500 text-xs'>
-                        {displayCard.totalStock > 0
-                          ? `${displayCard.totalStock} en stock`
-                          : 'Sin stock'}
-                      </span>
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <Icon
-                        icon='lucide:tag'
-                        width={12}
-                        className='text-default-400'
-                      />
-                      <span
-                        className={`text-xs ${displayCard.sellPrice && displayCard.sellPrice > 0 ? 'text-accent font-semibold' : 'text-default-400'}`}
-                      >
-                        {displayCard.sellPrice && displayCard.sellPrice > 0
-                          ? formatCurrency(displayCard.sellPrice)
-                          : 'Sin precio de venta'}
-                      </span>
-                    </div>
-                  </div>
-                  {loadingMetrics && needsMetrics ? (
-                    <PriceMetricsSkeleton />
-                  ) : (
-                    displayCard.cardMetrics &&
-                    (displayCard.cardMetrics.ungradedPrice ||
-                      displayCard.cardMetrics.gradedPriceSeven ||
-                      displayCard.cardMetrics.gradedPriceEightOrAbove) && (
-                      <div className='mt-1 flex flex-wrap items-center gap-2 text-xs'>
-                        {displayCard.cardMetrics.ungradedPrice &&
-                          displayCard.cardMetrics.ungradedPrice > 0 && (
-                            <div className='flex items-center gap-0.5'>
-                              <Icon
-                                icon='lucide:trending-up'
-                                width={12}
-                                className='text-default-400'
-                              />
-                              <span className='text-default-500'>
-                                Market:{' '}
-                                {formatCurrency(
-                                  displayCard.cardMetrics.ungradedPrice
-                                )}
-                              </span>
-                            </div>
-                          )}
-                        {displayCard.cardMetrics.gradedPriceSeven &&
-                          displayCard.cardMetrics.gradedPriceSeven > 0 && (
-                            <div className='flex items-center gap-0.5'>
-                              <Icon
-                                icon='lucide:award'
-                                width={12}
-                                className='text-warning'
-                              />
-                              <span className='text-default-500'>
-                                PSA 7:{' '}
-                                {formatCurrency(
-                                  displayCard.cardMetrics.gradedPriceSeven
-                                )}
-                              </span>
-                            </div>
-                          )}
-                        {displayCard.cardMetrics.gradedPriceEightOrAbove &&
-                          displayCard.cardMetrics.gradedPriceEightOrAbove >
-                            0 && (
-                            <div className='flex items-center gap-0.5'>
-                              <Icon
-                                icon='lucide:star'
-                                width={12}
-                                className='text-success'
-                              />
-                              <span className='text-default-500'>
-                                PSA 8+:{' '}
-                                {formatCurrency(
-                                  displayCard.cardMetrics
-                                    .gradedPriceEightOrAbove
-                                )}
-                              </span>
-                            </div>
-                          )}
-                      </div>
-                    )
-                  )}
-                </div>
+                <BulkCardResultSummary
+                  card={displayCard}
+                  tcgType={tcgType}
+                  loadingMetrics={loadingMetrics && needsMetrics}
+                />
                 {onRemove && (
                   <div
                     role='button'
@@ -438,13 +258,6 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
             </div>
           </AccordionItem>
         </Accordion>
-        <CardImagePreviewModal
-          isOpen={isPreviewOpen}
-          onClose={closePreview}
-          imageUrl={previewImageUrl}
-          alt={previewAlt}
-          tcgType={previewTcgType}
-        />
       </KidstopCard>
     );
   }
