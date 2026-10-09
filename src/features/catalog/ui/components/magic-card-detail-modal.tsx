@@ -42,6 +42,7 @@ import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import { LanguageSelector } from '@/shared/components/language-selector';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 import {
   isStockAdjustmentDisabled,
   toSetCodeOptions,
@@ -378,6 +379,7 @@ export default function MagicCardDetailModal({
                   <LanguageSelector
                     value={selectedLanguage}
                     onChange={handleLanguageChange}
+                    tcgType={TCG_TYPES.MAGIC}
                     currentLanguage={
                       detail?.language ?? selectedCard?.language ?? undefined
                     }

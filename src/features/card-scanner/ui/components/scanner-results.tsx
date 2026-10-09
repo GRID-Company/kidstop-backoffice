@@ -8,6 +8,7 @@ import {
   TCGGame,
 } from '../../domain/types';
 import { CardScannerSource } from '@/lib/store/card-scanner';
+import { ISO_LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
@@ -267,8 +268,20 @@ export const ScannerResults = ({
             {searchResults.aiResolved.detectedLanguage && (
               <div className='flex justify-between'>
                 <span className='text-content-tertiary'>Idioma detectado</span>
-                <span className='text-content-primary font-medium uppercase'>
-                  {searchResults.aiResolved.detectedLanguage}
+                <span className='text-content-primary font-medium'>
+                  {ISO_LANGUAGE_LABELS[
+                    searchResults.aiResolved.detectedLanguage.toLowerCase()
+                  ] ?? searchResults.aiResolved.detectedLanguage.toUpperCase()}
+                </span>
+              </div>
+            )}
+            {(searchResults.aiResolved.cardTextEs ||
+              searchResults.aiResolved.cardText) && (
+              <div className='flex justify-between gap-2'>
+                <span className='text-content-tertiary shrink-0'>Texto</span>
+                <span className='text-content-primary line-clamp-3 text-right font-medium'>
+                  {searchResults.aiResolved.cardTextEs ??
+                    searchResults.aiResolved.cardText}
                 </span>
               </div>
             )}

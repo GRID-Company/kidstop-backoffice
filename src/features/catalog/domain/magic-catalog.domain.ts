@@ -23,6 +23,7 @@ export const getMagicCatalogVars = (
         isFoil: filters?.isFoil ?? undefined,
         condition: filters?.condition || undefined,
         stockStatus: filters?.stockStatus || undefined,
+        language: filters?.language || undefined,
         sellPrice:
           filters?.sellPriceMin !== undefined ||
           filters?.sellPriceMax !== undefined

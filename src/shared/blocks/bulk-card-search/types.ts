@@ -136,6 +136,7 @@ export interface BulkCardFormControlsProps {
   variant: BulkSearchVariant;
   index: number;
   selectedCard: BulkCardData | null;
+  tcgType: TCGType;
 }
 
 export interface BulkCardSearchPurchasesProps {

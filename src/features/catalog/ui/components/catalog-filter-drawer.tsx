@@ -15,6 +15,10 @@ import AutocompleteFilter from '@/shared/base/heorui-overrides/autocomplete-filt
 import { FilterFn } from '@/lib/types/paginated-datatable.types';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 import {
+  CARD_LANGUAGE_OPTIONS,
+  LANGUAGE_LABELS,
+} from '@/lib/types/language.types';
+import {
   CARD_CONDITION_OPTIONS,
   MAGIC_RARITY_OPTIONS,
   STOCK_STATUS_OPTIONS,
@@ -80,6 +84,15 @@ export default function CatalogFilterDrawer({
     return collections.map((c) => ({ label: c.name, value: c.guid }));
   }, [collections]);
 
+  const languageOptions = useMemo(
+    () =>
+      CARD_LANGUAGE_OPTIONS.map((lang) => ({
+        label: LANGUAGE_LABELS[lang],
+        value: lang,
+      })),
+    []
+  );
+
   const handleReset = () => {
     onReset();
     onClose();
@@ -112,6 +125,17 @@ export default function CatalogFilterDrawer({
             onChange={(e) => onFilterChange('condition', e.target.value)}
             aria-label='Filtrar por condición'
             data-testid='filter-condition-select'
+          />
+
+          <Select
+            placeholder='Todos los idiomas'
+            label='Idioma'
+            description='Cartas con inventario en este idioma'
+            items={languageOptions}
+            selectedKeys={filters?.language ? [filters.language] : []}
+            onChange={(e) => onFilterChange('language', e.target.value)}
+            aria-label='Filtrar por idioma'
+            data-testid='filter-language-select'
           />
 
           {rarityOptions.length > 0 &&

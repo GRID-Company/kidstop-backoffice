@@ -432,6 +432,7 @@ const BulkCardResultCard = forwardRef<HTMLDivElement, BulkCardResultCardProps>(
                   variant={variant}
                   index={index}
                   selectedCard={selectedCard}
+                  tcgType={tcgType}
                 />
               </div>
             </div>
