@@ -1499,21 +1499,21 @@ map: {"0":["variables.input.originalImage"],"1":["variables.input.setIcon"]}
 - `setCode`: Set code
 - `originalImage` (Upload): Image of the scanned card
 - `setIcon` (Upload): Image of the set icon cropped from the scanned card
-- `aiSearchOnly` (boolean, default: `false`): Skip the catalog search entirely and return only the AI-resolved card data translated to Spanish (`aiResolved`); `bestMatch`/`relatedCards` stay empty
-- `withCardsMetrics` (boolean, default: `false`): Include card metrics — `bestMatch.cardMetrics` gets full metrics + CardKingdom prices, `relatedCards[].cardMetrics` gets variant metrics only (prices `null`). Ignored when `aiSearchOnly: true`
+- `effort` (enum `CardScanEffort`, default: `NORMAL`): Controls how much AI effort is used. `NORMAL` runs the catalog search first and only falls back to AI (`gemini-2.5-flash-lite`) when no match is found. `HIGH` skips the initial catalog search and resolves via AI first with `gemini-2.5-flash`. `MAX` is the same AI-first flow with `gemini-2.5-pro`. The AI-resolved `name`/`cardNumber`/`setCode` are always applied to the catalog search afterward
+- `withCardsMetrics` (boolean, default: `false`): Include card metrics — `bestMatch.cardMetrics` gets full metrics + CardKingdom prices, `relatedCards[].cardMetrics` gets variant metrics only (prices `null`)
 
 **Response Fields:**
 
 - `resolvedByAI`: `true` when the result was resolved via the AI fallback
 - `bestMatch` / `relatedCards`: Same shapes as `magicBatchCardSearch` results
 - `aiResolved`: Card data resolved by Gemini — canonical English fields (`name`, `cardNumber`, `setCode`, `setName`, `cardText`) plus Spanish translations (`nameEs`, `setNameEs`, `cardTextEs`) and `detectedLanguage`
-- `error`: Error message if the search failed or no cards matched
+- `error`: Error message if the search failed or no cards matched; may coexist with a populated `aiResolved` (AI resolved the card but the catalog search found no match)
 
 **Flow:**
 
-1. Catalog search with `name`/`setCode`/`cardNumber`/`text` → if results, returns immediately (`resolvedByAI: false`)
-2. If no results → Gemini resolves the card from the provided data + images (handles non-English inputs like Japanese)
-3. The AI-resolved `name`/`cardNumber`/`setCode` are re-applied to the catalog search
+1. Catalog search with `name`/`setCode`/`cardNumber`/`text` (skipped when `effort` is `HIGH` or `MAX`) → if results, returns immediately (`resolvedByAI: false`)
+2. If no results → Gemini resolves the card from the provided data + images (handles non-English inputs like Japanese); the model depends on `effort` (`gemini-2.5-flash-lite` / `gemini-2.5-flash` / `gemini-2.5-pro`)
+3. The AI-resolved `name`/`cardNumber`/`setCode` are always re-applied to the catalog search (also under `effort: HIGH` or `MAX`)
 
 ---
 

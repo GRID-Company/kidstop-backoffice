@@ -24,6 +24,7 @@ import {
   IExtractedCardData,
   TCGGame,
 } from '../../domain/types';
+import { CardScanEffort } from '@/lib/api/schema-types';
 import {
   vibrateSuccess,
   vibrateError,
@@ -55,12 +56,10 @@ export const ScannerPanel = ({
   const selectedGame: TCGGame =
     selectedTCG === TCG_TYPES.POKEMON ? 'pokemon' : 'magic';
 
-  const [autoCapture, setAutoCapture] = useState(false);
-  const [aiSearchOnly, setAiSearchOnly] = useState(false);
+  const [effort, setEffort] = useState<CardScanEffort>(CardScanEffort.Normal);
   const [hapticEnabled, setHapticEnabled] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stableFramesRef = useRef(0);
 
   useEffect(() => {
     setHapticEnabled(checkHapticSupport().supported);
@@ -98,38 +97,10 @@ export const ScannerPanel = ({
     reset: resetPipeline,
   } = useCardScannerPipeline(selectedGame);
 
-  useEffect(() => {
-    if (
-      autoCapture &&
-      !aiSearchOnly &&
-      cardDetected &&
-      status === 'camera-ready' &&
-      !scannedData &&
-      !captureFlags.glare &&
-      !captureFlags.dark &&
-      !captureFlags.tooSmall
-    ) {
-      stableFramesRef.current += 1;
-
-      if (stableFramesRef.current >= 1) {
-        stableFramesRef.current = 0;
-        handleCapture();
-      }
-    } else {
-      stableFramesRef.current = 0;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardDetected, autoCapture, status, scannedData, captureFlags]);
-
-  const handleAiSearchOnlyChange = (enabled: boolean) => {
-    setAiSearchOnly(enabled);
-    if (enabled) {
-      setAutoCapture(false);
-    }
-  };
+  const isAiFirst = effort !== CardScanEffort.Normal;
 
   const handleCapture = async () => {
-    if (aiSearchOnly) {
+    if (isAiFirst) {
       if (!videoRef.current) {
         toast.error('Video no disponible');
         if (hapticEnabled) {
@@ -192,9 +163,7 @@ export const ScannerPanel = ({
         vibrateSuccess();
       }
 
-      if (!autoCapture) {
-        toast.success('Carta capturada exitosamente');
-      }
+      toast.success('Carta capturada exitosamente');
     } catch (err) {
       console.error('Error al capturar carta:', err);
       toast.error('Error al procesar la carta');
@@ -207,7 +176,6 @@ export const ScannerPanel = ({
   const handleReset = () => {
     resetPipeline();
     resetDetection();
-    stableFramesRef.current = 0;
     toast.success('Escáner reiniciado');
   };
 
@@ -359,7 +327,7 @@ export const ScannerPanel = ({
             scannedData={scannedData}
             game={selectedGame}
             source={source}
-            aiSearchOnly={aiSearchOnly}
+            effort={effort}
             onSave={handleSaveEdits}
             onReset={handleReset}
             onUseCandidate={handleUseCandidate}
@@ -378,10 +346,8 @@ export const ScannerPanel = ({
             cardDetected={cardDetected}
             toggleControls={
               <ScannerModeToggles
-                autoCapture={autoCapture}
-                onAutoCaptureChange={setAutoCapture}
-                aiSearchOnly={aiSearchOnly}
-                onAiSearchOnlyChange={handleAiSearchOnlyChange}
+                effort={effort}
+                onEffortChange={setEffort}
                 disabled={isProcessing}
               />
             }
@@ -398,7 +364,7 @@ export const ScannerPanel = ({
                 onCapture={handleCapture}
                 loading={isProcessing}
                 disabled={
-                  aiSearchOnly
+                  isAiFirst
                     ? !isStreaming
                     : !cvReady || !isStreaming || !latestCorners.current
                 }

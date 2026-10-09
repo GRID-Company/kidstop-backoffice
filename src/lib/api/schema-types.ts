@@ -182,11 +182,18 @@ export type CardScanAiData = {
   setNameEs?: Maybe<Scalars['String']['output']>;
 };
 
+/** Scan search effort level: NORMAL searches the catalog first and uses AI only as fallback; HIGH and MAX skip the initial catalog search and resolve via AI first */
+export enum CardScanEffort {
+  High = 'HIGH',
+  Max = 'MAX',
+  Normal = 'NORMAL',
+}
+
 export type CardScanSearchInput = {
-  /** When true, skips the initial catalog search and resolves the card via AI first; the AI-resolved data is still re-applied to the catalog search */
-  aiSearchOnly?: InputMaybe<Scalars['Boolean']['input']>;
   /** Collector/card number printed on the card */
   cardNumber?: InputMaybe<Scalars['String']['input']>;
+  /** Search effort: NORMAL searches the catalog first and uses AI only as fallback; HIGH and MAX skip the initial catalog search and resolve via AI first (gemini-2.5-flash / gemini-2.5-pro). The AI-resolved data is always re-applied to the catalog search */
+  effort?: InputMaybe<CardScanEffort>;
   /** Card name (any language) */
   name?: InputMaybe<Scalars['String']['input']>;
   /** Image of the scanned card */
@@ -863,7 +870,7 @@ export type MagicCardRecommended = {
 };
 
 export type MagicCardScanSearchResult = {
-  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when aiSearchOnly is true) */
+  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when effort is HIGH or MAX) */
   aiResolved?: Maybe<CardScanAiData>;
   /** Best matching card */
   bestMatch?: Maybe<MagicCardInternalItem>;
@@ -1533,7 +1540,7 @@ export type PokemonCardRecommended = {
 };
 
 export type PokemonCardScanSearchResult = {
-  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when aiSearchOnly is true) */
+  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when effort is HIGH or MAX) */
   aiResolved?: Maybe<CardScanAiData>;
   /** Best matching card */
   bestMatch?: Maybe<PokemonCardInternalItem>;

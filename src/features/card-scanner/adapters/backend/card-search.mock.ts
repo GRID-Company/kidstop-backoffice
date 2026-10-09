@@ -1,4 +1,4 @@
-import { CardLanguage } from '@/lib/api/schema-types';
+import { CardLanguage, CardScanEffort } from '@/lib/api/schema-types';
 import { ICardSearchResponse, TCGGame } from '../../domain/types';
 
 const pokemonResponse: ICardSearchResponse = {
@@ -143,19 +143,17 @@ const magicAiResolved: ICardSearchResponse['aiResolved'] = {
 
 export const mockCardSearchResponse = (
   game: TCGGame,
-  aiSearchOnly = false
+  effort: CardScanEffort = CardScanEffort.Normal
 ): ICardSearchResponse => {
   const response = game === 'magic' ? magicResponse : pokemonResponse;
 
-  if (!aiSearchOnly) {
+  if (effort === CardScanEffort.Normal) {
     return response;
   }
 
   return {
     ...response,
     resolvedByAI: true,
-    bestMatch: null,
-    candidates: [],
     aiResolved: response.aiResolved ?? magicAiResolved,
   };
 };

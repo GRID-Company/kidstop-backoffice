@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useApolloClient } from '@apollo/client/react';
+import { CardScanEffort } from '@/lib/api/schema-types';
 import {
   TCGGame,
   ICardSearchResponse,
@@ -29,7 +30,7 @@ interface UseCardSearchResult {
 export const useCardSearch = (
   game: TCGGame,
   scannedData: IScannedCardData,
-  aiSearchOnly = false
+  effort: CardScanEffort = CardScanEffort.Normal
 ): UseCardSearchResult => {
   const client = useApolloClient();
   const [searchResults, setSearchResults] =
@@ -41,7 +42,8 @@ export const useCardSearch = (
   const { extractedData, normalizedImageUrl, setIconImageUrl } = scannedData;
   const hasImage = Boolean(normalizedImageUrl);
   const canSearch = hasMinimumSearchCriteria(extractedData) || hasImage;
-  const searchFeedback = aiSearchOnly
+  const isAiFirst = effort !== CardScanEffort.Normal;
+  const searchFeedback = isAiFirst
     ? []
     : getSearchCriteriaFeedback(extractedData, hasImage);
 
@@ -56,7 +58,7 @@ export const useCardSearch = (
         ? await dataUrlToFile(normalizedImageUrl, 'card-scan')
         : null;
       const setIcon =
-        !aiSearchOnly && setIconImageUrl
+        effort === CardScanEffort.Normal && setIconImageUrl
           ? await dataUrlToFile(setIconImageUrl, 'set-icon')
           : null;
 
@@ -64,7 +66,7 @@ export const useCardSearch = (
         extractedData,
         originalImage,
         setIcon,
-        aiSearchOnly
+        effort
       );
 
       const validation = validateCardScanSearchInput(input);
@@ -100,7 +102,7 @@ export const useCardSearch = (
     game,
     normalizedImageUrl,
     setIconImageUrl,
-    aiSearchOnly,
+    effort,
   ]);
 
   const clearResults = useCallback(() => {

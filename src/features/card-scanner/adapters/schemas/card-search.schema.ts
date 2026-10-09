@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CardScanEffort } from '@/lib/api/schema-types';
 
 export const cardScanSearchInputSchema = z
   .object({
@@ -8,7 +9,7 @@ export const cardScanSearchInputSchema = z
     text: z.string().optional().nullable(),
     originalImage: z.instanceof(File).optional().nullable(),
     setIcon: z.instanceof(File).optional().nullable(),
-    aiSearchOnly: z.boolean().optional().nullable(),
+    effort: z.enum(CardScanEffort).optional().nullable(),
     withCardsMetrics: z.boolean().optional().nullable(),
   })
   .refine(
