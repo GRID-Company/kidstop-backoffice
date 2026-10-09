@@ -81,7 +81,6 @@ export const ScannerPanel = ({
     latestCorners,
     detectionMethod,
     cardDetected,
-    captureFlags,
     resetDetection,
     debugInfo,
   } = useCardDetection(videoRef, canvasRef, cvReady, cv, isStreaming);
@@ -260,19 +259,7 @@ export const ScannerPanel = ({
                     title: 'Error de procesamiento',
                     message: getFriendlyPipelineError(pipelineError),
                   }
-                : status === 'camera-ready' &&
-                    (captureFlags.glare ||
-                      captureFlags.dark ||
-                      captureFlags.tooSmall)
-                  ? {
-                      variant: 'warning' as const,
-                      message: captureFlags.glare
-                        ? 'Hay reflejos sobre la carta. Inclínala un poco para evitarlos.'
-                        : captureFlags.dark
-                          ? 'Está muy oscuro. Busca mejor iluminación.'
-                          : 'La carta está muy lejos. Acércala a la guía.',
-                    }
-                  : null;
+                : null;
 
   return (
     <>
