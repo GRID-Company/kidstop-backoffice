@@ -33,9 +33,7 @@ import {
   PAYMENT_METHOD_LABELS,
 } from '../../domain/constants';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
-import { mapScanCandidateToPurchaseItem } from '../../adapters/mappers/scan-candidate-to-purchase-item.mapper';
 import { useCardScannerStore } from '@/lib/store/card-scanner';
-import { ICardCandidate } from '@/features/card-scanner/domain/types';
 import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
 import { useSellerEditState } from '../hooks/use-seller-edit-state';
@@ -207,10 +205,10 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     setIsAdvancedSearchEnabled(false);
   }, []);
 
-  const handleScannedCandidate = useCallback(
-    (candidate: ICardCandidate) => {
+  const handleScannedPurchaseItem = useCallback(
+    (item: IPurchaseItem) => {
       try {
-        validateAndAddItems([mapScanCandidateToPurchaseItem(candidate)]);
+        validateAndAddItems([item]);
       } catch {
         toast.error('Error al agregar la carta escaneada');
       }
@@ -219,8 +217,8 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
   );
 
   const handleOpenScanner = useCallback(() => {
-    openScanner('purchase', handleScannedCandidate);
-  }, [openScanner, handleScannedCandidate]);
+    openScanner('purchase', handleScannedPurchaseItem, existingItemIds);
+  }, [openScanner, handleScannedPurchaseItem, existingItemIds]);
 
   const finalizeTooltipMessage = useMemo(() => {
     if (purchase?.status !== PURCHASE_STATUS.WAITING_PRICE) {

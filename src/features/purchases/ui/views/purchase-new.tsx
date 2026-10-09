@@ -12,12 +12,10 @@ import { BulkSearchFormDataPurchases } from '@/shared/blocks/bulk-card-search/sc
 import { BulkCardResult } from '@/shared/blocks/bulk-card-search/types';
 import { mapBulkSearchToPurchaseItems } from '../../adapters/mappers/bulk-search-to-purchase-items.mapper';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
-import { ISeller } from '../../domain/types';
+import { IPurchaseItem, ISeller } from '../../domain/types';
 import { SellerFormData } from '../../adapters/forms/seller-form.schema';
 import { useNewPurchase } from '../hooks/use-new-purchase';
 import { useCardScannerStore } from '@/lib/store/card-scanner';
-import { mapScanCandidateToPurchaseItem } from '../../adapters/mappers/scan-candidate-to-purchase-item.mapper';
-import { ICardCandidate } from '@/features/card-scanner/domain/types';
 import { useSellers } from '../hooks/use-sellers';
 import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
@@ -89,10 +87,10 @@ export default function PurchaseNew() {
     setIsAdvancedSearchEnabled(false);
   }, []);
 
-  const handleScannedCandidate = useCallback(
-    (candidate: ICardCandidate) => {
+  const handleScannedPurchaseItem = useCallback(
+    (item: IPurchaseItem) => {
       try {
-        validateAndAddItems([mapScanCandidateToPurchaseItem(candidate)]);
+        validateAndAddItems([item]);
       } catch {
         toast.error('Error al agregar la carta escaneada');
       }
@@ -101,8 +99,8 @@ export default function PurchaseNew() {
   );
 
   const handleOpenScanner = useCallback(() => {
-    openScanner('purchase', handleScannedCandidate);
-  }, [openScanner, handleScannedCandidate]);
+    openScanner('purchase', handleScannedPurchaseItem, existingItemIds);
+  }, [openScanner, handleScannedPurchaseItem, existingItemIds]);
 
   const handleConfirmSeller = useCallback(() => {
     if (!selectedSellerGuid) return;

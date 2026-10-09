@@ -16,6 +16,9 @@ import { CardImagePreviewModal } from '@/shared/components/card-image-preview-mo
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { BulkCardResultSummary } from '@/shared/blocks/bulk-card-search';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
+import { IPurchaseItem } from '@/features/purchases/domain/types';
+import PurchaseCardResultItem from '@/features/purchases/ui/components/purchase-card-result-item';
+import { mapScanCandidateToCardSearchResult } from '@/features/purchases/adapters/mappers/scan-candidate-to-card-search-result.mapper';
 import { mapScanCandidateToBulkCard } from '../../adapters/mappers/scan-candidate-to-bulk-card.mapper';
 import { useCardSearch } from '../hooks/use-card-search';
 import { ScanEmptyState } from './scan-empty-state';
@@ -31,10 +34,11 @@ interface ScannerResultsProps {
   onSave: (updatedData: IExtractedCardData) => void;
   onReset: () => void;
   onUseCandidate: (candidate: ICardCandidate) => void;
+  onAddPurchaseItem: (item: IPurchaseItem) => void;
+  existingItemIds: Set<string>;
 }
 
-const USE_CARD_LABELS: Record<CardScannerSource, string> = {
-  purchase: 'Usar en compra',
+const USE_CARD_LABELS: Partial<Record<CardScannerSource, string>> = {
   catalog: 'Ver en catálogo',
   fab: 'Ver detalle',
 };
@@ -47,6 +51,8 @@ export const ScannerResults = ({
   onSave,
   onReset,
   onUseCandidate,
+  onAddPurchaseItem,
+  existingItemIds,
 }: ScannerResultsProps) => {
   const {
     searchResults,
@@ -155,7 +161,27 @@ export const ScannerResults = ({
         <ScanStatusBanner variant='warning'>{searchError}</ScanStatusBanner>
       )}
 
-      {hasCandidates && (
+      {hasCandidates && source === 'purchase' && (
+        <div className='border-divider rounded-lg border bg-white p-4'>
+          <h4 className='text-content-primary mb-3 text-sm font-semibold'>
+            Coincidencias ({searchResults.candidates.length})
+          </h4>
+          <div className='flex flex-col gap-2'>
+            {searchResults.candidates.map((candidate) => (
+              <PurchaseCardResultItem
+                key={`${candidate.guid}-${candidate.isBestMatch}`}
+                card={mapScanCandidateToCardSearchResult(candidate)}
+                onAdd={onAddPurchaseItem}
+                existingItemIds={existingItemIds}
+                isBestMatch={candidate.isBestMatch}
+                stacked
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {hasCandidates && source !== 'purchase' && (
         <div className='border-divider rounded-lg border bg-white p-4'>
           <h4 className='text-content-primary mb-3 text-sm font-semibold'>
             Coincidencias ({searchResults.candidates.length})
