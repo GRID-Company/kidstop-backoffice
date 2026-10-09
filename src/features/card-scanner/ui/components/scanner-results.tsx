@@ -9,16 +9,14 @@ import {
 } from '../../domain/types';
 import { CardScannerSource } from '@/lib/store/card-scanner';
 import { CardScanEffort } from '@/lib/api/schema-types';
-import {
-  ISO_LANGUAGE_LABELS,
-  LANGUAGE_LABELS,
-} from '@/lib/types/language.types';
-import { formatCurrency } from '@/lib/utils/format-currency';
+import { ISO_LANGUAGE_LABELS } from '@/lib/types/language.types';
+import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
-import FoilChip from '@/shared/components/foil-chip';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { BulkCardResultSummary } from '@/shared/blocks/bulk-card-search';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
+import { mapScanCandidateToBulkCard } from '../../adapters/mappers/scan-candidate-to-bulk-card.mapper';
 import { useCardSearch } from '../hooks/use-card-search';
 import { ScanEmptyState } from './scan-empty-state';
 import { ScanFieldsEditor } from './scan-fields-editor';
@@ -118,7 +116,7 @@ export const ScannerResults = ({
           <div className='flex flex-col gap-2'>
             {[0, 1, 2].map((row) => (
               <div key={row} className='flex items-center gap-3'>
-                <Skeleton className='h-16 w-12 shrink-0 rounded' />
+                <Skeleton className='h-[90px] w-[65px] shrink-0 rounded-md' />
                 <div className='flex flex-1 flex-col gap-2'>
                   <Skeleton className='h-3 w-3/5 rounded' />
                   <Skeleton className='h-3 w-2/5 rounded' />
@@ -164,83 +162,31 @@ export const ScannerResults = ({
           </h4>
           <div className='flex flex-col gap-2'>
             {searchResults.candidates.map((candidate) => (
-              <div
+              <KidstopCard
                 key={`${candidate.guid}-${candidate.isBestMatch}`}
-                className='border-divider flex items-center gap-3 rounded-lg border p-3'
+                className='w-full'
               >
-                <CardImage
-                  src={candidate.imageUrl}
-                  alt={candidate.name}
-                  tcgType={tcgType}
-                  fill
-                  sizes='48px'
-                  containerClassName='bg-neutral-subtle relative h-16 w-12 shrink-0 overflow-hidden rounded'
-                  className='object-contain'
-                  enablePreview={Boolean(candidate.imageUrl)}
-                  onImageClick={() =>
-                    openPreview(candidate.imageUrl, candidate.name, tcgType)
-                  }
-                />
-                <div className='flex min-w-0 flex-1 flex-col'>
-                  <span className='text-content-primary truncate text-sm font-medium'>
-                    {candidate.name}
-                  </span>
-                  <div className='text-content-tertiary flex items-center gap-2 text-xs'>
-                    {candidate.setName && (
-                      <span className='truncate'>{candidate.setName}</span>
-                    )}
-                    {candidate.setCode && <span>{candidate.setCode}</span>}
-                    {candidate.collectorNumber && (
-                      <span>#{candidate.collectorNumber}</span>
-                    )}
-                  </div>
-                  <div className='mt-1 flex flex-wrap items-center gap-1.5'>
+                <div className='flex items-center gap-3 p-3'>
+                  <BulkCardResultSummary
+                    card={mapScanCandidateToBulkCard(candidate)}
+                    tcgType={tcgType}
+                  />
+                  <div className='flex shrink-0 flex-col items-end gap-2'>
                     {candidate.isBestMatch && (
                       <Chip size='sm' variant='flat' color='success'>
                         Mejor coincidencia
                       </Chip>
                     )}
-                    {candidate.game === 'pokemon' &&
-                      candidate.variant &&
-                      (/holo|foil/i.test(candidate.variant) ? (
-                        <FoilChip label={candidate.variant} variant='subtle' />
-                      ) : (
-                        <Chip size='sm' variant='flat'>
-                          {candidate.variant}
-                        </Chip>
-                      ))}
-                    {candidate.game === 'magic' &&
-                      (candidate.isFoil ? (
-                        <FoilChip label='Foil' variant='subtle' />
-                      ) : (
-                        <Chip size='sm' variant='flat'>
-                          Normal
-                        </Chip>
-                      ))}
-                    <Chip size='sm' variant='flat'>
-                      {LANGUAGE_LABELS[candidate.language] ??
-                        candidate.language}
-                    </Chip>
-                    {candidate.referencePrice !== null && (
-                      <span className='text-content-primary text-xs font-medium'>
-                        {formatCurrency(candidate.referencePrice)}
-                      </span>
-                    )}
-                    <span className='text-content-tertiary text-xs'>
-                      {candidate.availableStock
-                        ? `Stock: ${candidate.totalStock}`
-                        : 'Sin stock'}
-                    </span>
+                    <Button
+                      size='sm'
+                      className='bg-accent text-white'
+                      onPress={() => onUseCandidate(candidate)}
+                    >
+                      {USE_CARD_LABELS[source]}
+                    </Button>
                   </div>
                 </div>
-                <Button
-                  size='sm'
-                  className='bg-accent shrink-0 text-white'
-                  onPress={() => onUseCandidate(candidate)}
-                >
-                  {USE_CARD_LABELS[source]}
-                </Button>
-              </div>
+              </KidstopCard>
             ))}
           </div>
         </div>

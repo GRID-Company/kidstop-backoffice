@@ -22,7 +22,7 @@ export const CameraPreview = ({
 }: CameraPreviewProps) => {
   return (
     <div
-      className='border-accent relative aspect-3/4 w-full overflow-hidden rounded-lg border-4 bg-black'
+      className='border-accent relative mx-auto aspect-3/4 w-full max-w-md overflow-hidden rounded-lg border-4 bg-black'
       role='region'
       aria-label='Vista previa de la cámara para escaneo de cartas'
     >
