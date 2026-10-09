@@ -6,6 +6,7 @@ import {
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { calculatePublicPrice } from '@/lib/utils/price.utils';
 import { buildWhatsAppUrl } from '@/lib/utils/whatsapp.utils';
 import { DEFAULT_BUDGET_LIMIT, DEFAULT_INVENTORY_LIMIT } from './constants';
 import {
@@ -57,6 +58,44 @@ export const calculateSellTotal = (items: IPurchaseItem[]): number => {
     (total, item) => total + (item.sellPrice ?? 0) * item.quantity,
     0
   );
+};
+
+export const calculateReferenceTotal = (items: IPurchaseItem[]): number => {
+  return items.reduce(
+    (total, item) =>
+      total +
+      (item.currentReferencePrice || item.referencePrice || 0) * item.quantity,
+    0
+  );
+};
+
+export const calculateEstimatedSellTotal = (items: IPurchaseItem[]): number => {
+  return items.reduce((total, item) => {
+    const sellPrice =
+      item.sellPrice && item.sellPrice > 0
+        ? item.sellPrice
+        : calculatePublicPrice(
+            item.currentReferencePrice || item.referencePrice || 0
+          );
+    return total + sellPrice * item.quantity;
+  }, 0);
+};
+
+export const calculateBuyRate = (items: IPurchaseItem[]): number | null => {
+  let purchaseTotal = 0;
+  let referenceTotal = 0;
+
+  items.forEach((item) => {
+    const referencePrice =
+      item.currentReferencePrice || item.referencePrice || 0;
+    if (referencePrice > 0) {
+      referenceTotal += referencePrice * item.quantity;
+      purchaseTotal += item.offerPrice * item.quantity;
+    }
+  });
+
+  if (referenceTotal <= 0) return null;
+  return (purchaseTotal / referenceTotal) * 100;
 };
 
 export interface BudgetCheckResult {
