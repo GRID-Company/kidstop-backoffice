@@ -24,6 +24,7 @@ import {
   IExtractedCardData,
   TCGGame,
 } from '../../domain/types';
+import { IPurchaseItem } from '@/features/purchases/domain/types';
 import { CardScanEffort } from '@/lib/api/schema-types';
 import {
   vibrateSuccess,
@@ -49,9 +50,10 @@ export const ScannerPanel = ({
 }: ScannerPanelProps) => {
   const router = useRouter();
   const closeScanner = useCardScannerStore((state) => state.closeScanner);
-  const confirmCandidate = useCardScannerStore(
-    (state) => state.confirmCandidate
+  const confirmPurchaseItem = useCardScannerStore(
+    (state) => state.confirmPurchaseItem
   );
+  const existingItemIds = useCardScannerStore((state) => state.existingItemIds);
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const selectedGame: TCGGame =
     selectedTCG === TCG_TYPES.POKEMON ? 'pokemon' : 'magic';
@@ -194,11 +196,11 @@ export const ScannerPanel = ({
 
     if (source === 'fab') {
       onOpenCardDetail(candidate);
-      return;
     }
+  };
 
-    confirmCandidate(candidate);
-    toast.success(`"${candidate.name}" seleccionada`);
+  const handleAddPurchaseItem = (item: IPurchaseItem) => {
+    confirmPurchaseItem(item);
     closeScanner();
   };
 
@@ -318,6 +320,8 @@ export const ScannerPanel = ({
             onSave={handleSaveEdits}
             onReset={handleReset}
             onUseCandidate={handleUseCandidate}
+            onAddPurchaseItem={handleAddPurchaseItem}
+            existingItemIds={existingItemIds}
           />
         )}
 
