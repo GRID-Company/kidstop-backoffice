@@ -68,7 +68,7 @@ Detección en cascada sobre el ROI de la guía (crop +4% margen) a ≤640px, con
 - ✅ **EMA** en esquinas (α=0.4) + estabilidad temporal antes de habilitar captura
 - ✅ **Buffer de frames estables** (6) con sharpness Laplacian — la captura usa el frame más nítido
 - ✅ **Rechazos**: skew extremo, quads que tocan el borde del crop, cobertura fuera de rango, aspecto medido inválido
-- ✅ **Quality flags** con debounce: `glare` (reflejos), `dark` (escena oscura), `tooSmall` (carta lejos) → hints persistentes + bloqueo de auto-captura
+- ✅ **Quality flags** con debounce: `glare` (reflejos), `dark` (escena oscura), `tooSmall` (carta lejos) → bloqueo de auto-captura (POC)
 - ✅ Feedback visual con contorno verde (polyline sobre `drawImage` GPU — sin `cv.imshow` por frame)
 
 ### Pipeline Completo de Procesamiento
@@ -200,7 +200,7 @@ card-scanner/
     │   ├── scanner-capture-button.tsx   # Botón shutter circular de captura (overlay)
     │   ├── scanner-results.tsx          # Vista de resultados + editor + debug
     │   ├── scan-empty-state.tsx         # Estado inicial con tips por TCG
-    │   ├── scan-status-banner.tsx       # Banner de estados/errores/quality flags
+    │   ├── scan-status-banner.tsx       # Banner de estados y errores
     │   ├── scan-fields-editor.tsx       # Editor de campos extraídos
     │   ├── scan-field-row.tsx           # Campo editable individual
     │   ├── scan-ocr-text.tsx            # Texto OCR raw
