@@ -305,7 +305,7 @@ export const CardScannerView = () => {
               <div className='flex items-center gap-3'>
                 <div className='h-5 w-5 animate-spin rounded-full border-2 border-yellow-200 border-t-transparent'></div>
                 <div>
-                  <strong>Cargando OpenCV.js...</strong>
+                  <strong>Cargando</strong>
                   <p className='mt-1 text-xs'>
                     Esto puede tardar 10-20 segundos en la primera carga
                   </p>
@@ -314,7 +314,7 @@ export const CardScannerView = () => {
             </div>
           )}
 
-          {isClient && (
+          {isClient && process.env.NODE_ENV === 'development' && (
             <div className='mb-4 rounded-lg bg-gray-800 p-4 text-sm text-gray-300'>
               <strong>Debug:</strong>
               <br />
