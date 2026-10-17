@@ -88,6 +88,7 @@ export interface PokemonCatalogFilters {
   condition?: string;
   variant?: string;
   genre?: string;
+  language?: string;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
 }
@@ -127,6 +128,7 @@ export interface MagicCatalogFilters {
   isFoil?: boolean;
   condition?: string;
   stockStatus?: string;
+  language?: string;
   sellPriceMin?: number;
   sellPriceMax?: number;
   sortBy?: string;
@@ -136,5 +138,6 @@ export interface MagicCatalogFilters {
 export interface IMagicCollection {
   guid: string;
   name: string;
+  code: string | null;
   editionIconUri: string | null;
 }

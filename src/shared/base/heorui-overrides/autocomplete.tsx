@@ -26,11 +26,17 @@ export default function KidstopAutocomplete({
       }}
       listboxProps={{}}
       allowsCustomValue={true}
+      isVirtualized={true}
+      itemHeight={60}
       {...autocompleteProps}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       {(item: any) => (
-        <AutocompleteItem key={item.value} textValue={item.label}>
+        <AutocompleteItem
+          key={item.value}
+          textValue={item.label}
+          className='h-[60px] py-2.5'
+        >
           <div className='max-w-full truncate'>
             <span className='line-clamp-2 block overflow-hidden text-ellipsis whitespace-normal'>
               {item.label}

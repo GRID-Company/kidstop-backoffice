@@ -1,0 +1,124 @@
+query PokemonCardScanSearch($input: CardScanSearchInput!) {
+  pokemonCardScanSearch(input: $input) {
+    resolvedByAI
+    bestMatch {
+      guid
+      name
+      variant
+      setName
+      setCode
+      cardNumber
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      language
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+      cardMetrics {
+        variantsMetrics {
+          condition
+          language
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        ungradedPrice
+        gradedPriceSeven
+        gradedPriceEightOrAbove
+      }
+    }
+    relatedCards {
+      guid
+      name
+      variant
+      setName
+      setCode
+      cardNumber
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      language
+    }
+    aiResolved {
+      name
+      cardNumber
+      setCode
+      setName
+      cardText
+      detectedLanguage
+      nameEs
+      setNameEs
+      cardTextEs
+    }
+    error
+  }
+}
+
+query MagicCardScanSearch($input: CardScanSearchInput!) {
+  magicCardScanSearch(input: $input) {
+    resolvedByAI
+    bestMatch {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      language
+      inventoryCards {
+        guid
+        condition
+        stock
+        purchasePrice
+        sellPrice
+      }
+      cardMetrics {
+        variantsMetrics {
+          condition
+          language
+          stock
+          lastSellDate
+          avgDaysInInventory
+          wishlistCount
+        }
+        priceRetail
+        priceBuy
+      }
+    }
+    relatedCards {
+      guid
+      name
+      edition
+      collectorNumber
+      isFoil
+      sellPrice
+      availableStock
+      totalStock
+      imageUri
+      language
+    }
+    aiResolved {
+      name
+      cardNumber
+      setCode
+      setName
+      cardText
+      detectedLanguage
+      nameEs
+      setNameEs
+      cardTextEs
+    }
+    error
+  }
+}

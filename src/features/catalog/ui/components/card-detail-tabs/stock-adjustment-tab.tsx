@@ -29,9 +29,21 @@ export default function StockAdjustmentTab({
           items={BULK_ADJUSTMENT_OPTIONS}
           data-testid='stock-movement-type-select'
         >
-          {(option: any) => (
-            <SelectItem key={option.key} description={option.description}>
-              {option.label}
+          {(option) => (
+            <SelectItem
+              key={
+                (option as { key: string; label: string; description: string })
+                  .key
+              }
+              description={
+                (option as { key: string; label: string; description: string })
+                  .description
+              }
+            >
+              {
+                (option as { key: string; label: string; description: string })
+                  .label
+              }
             </SelectItem>
           )}
         </SelectForm>

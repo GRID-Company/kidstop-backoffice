@@ -5,12 +5,13 @@ import KidstopAutocomplete from './autocomplete';
 import { type ISelectOption } from './select';
 
 interface AutocompleteFilterProps {
-  label: string;
+  label?: string;
   placeholder: string;
   items: ISelectOption[];
   onSelectionChange: (value: string) => void;
   resetKey?: number;
   selectedValue?: string;
+  className?: string;
   'aria-label'?: string;
   'data-testid'?: string;
 }
@@ -22,6 +23,7 @@ export default function AutocompleteFilter({
   onSelectionChange,
   resetKey,
   selectedValue,
+  className,
   'aria-label': ariaLabel,
   'data-testid': dataTestId,
 }: AutocompleteFilterProps) {
@@ -87,6 +89,7 @@ export default function AutocompleteFilter({
       inputValue={inputValue}
       onSelectionChange={handleSelectionChange}
       onInputChange={handleInputChange}
+      className={className}
       aria-label={ariaLabel}
       data-testid={dataTestId}
     />

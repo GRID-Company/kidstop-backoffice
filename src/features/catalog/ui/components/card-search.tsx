@@ -7,6 +7,7 @@ import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
 import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import CatalogFilterDrawer from './catalog-filter-drawer';
+import SetCodeAutocomplete from './set-code-autocomplete';
 import { TCGType, TCG_TYPES } from '@/lib/types/tcg.types';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import {
@@ -60,8 +61,8 @@ export default function CardSearch({
     <div className='flex flex-col gap-4'>
       <TcgSegmentedSelector />
 
-      <div className='flex items-end gap-3'>
-        <div className='flex-1'>
+      <div className='flex flex-col gap-3 md:flex-row md:items-end'>
+        <div className='md:flex-1'>
           <Search
             key={resetKey}
             label='Buscar carta'
@@ -71,32 +72,49 @@ export default function CardSearch({
             data-testid='catalog-search-input'
           />
         </div>
-        <Select
-          placeholder='Relevancia'
-          label='Ordenar por'
-          items={isPokemon ? POKEMON_SORT_OPTIONS : MAGIC_SORT_OPTIONS}
-          onChange={(e) => onSortChange(e.target.value)}
-          aria-label='Ordenar resultados'
-          className='w-48'
-          data-testid='catalog-sort-select'
+        <SetCodeAutocomplete
+          collections={collections}
+          selectedTCG={selectedTCG}
+          label='Expansión'
+          selectedValue={
+            isPokemon
+              ? (filters as PokemonCatalogFilters)?.set
+              : (filters as MagicCatalogFilters)?.edition
+          }
+          onSelectionChange={(value) =>
+            onFilterChange(isPokemon ? 'set' : 'edition', value)
+          }
+          resetKey={resetKey}
+          className='md:w-56'
         />
-        <Badge
-          content={activeFilterCount > 0 ? activeFilterCount : undefined}
-          color='danger'
-          size='sm'
-          isInvisible={activeFilterCount === 0}
-        >
-          <Button
-            variant='bordered'
-            onPress={() => setIsDrawerOpen(true)}
-            startContent={<Icon icon='lucide:sliders-horizontal' />}
-            aria-label='Abrir filtros avanzados'
-            className='h-14'
-            data-testid='catalog-filters-button'
+        <div className='flex items-end gap-3'>
+          <Select
+            placeholder='Relevancia'
+            label='Ordenar por'
+            items={isPokemon ? POKEMON_SORT_OPTIONS : MAGIC_SORT_OPTIONS}
+            onChange={(e) => onSortChange(e.target.value)}
+            aria-label='Ordenar resultados'
+            className='flex-1 md:w-48 md:flex-none'
+            data-testid='catalog-sort-select'
+          />
+          <Badge
+            content={activeFilterCount > 0 ? activeFilterCount : undefined}
+            color='danger'
+            size='sm'
+            isInvisible={activeFilterCount === 0}
           >
-            Filtros
-          </Button>
-        </Badge>
+            <Button
+              variant='bordered'
+              onPress={() => setIsDrawerOpen(true)}
+              startContent={<Icon icon='lucide:sliders-horizontal' />}
+              aria-label='Abrir filtros avanzados'
+              className='h-14'
+              data-testid='catalog-filters-button'
+            >
+              Filtros
+            </Button>
+          </Badge>
+        </div>
       </div>
 
       <div className='flex items-center justify-between'>

@@ -111,6 +111,7 @@ function renderCell(
                 fill
                 sizes='32px'
                 className='object-contain'
+                unoptimized
               />
             </div>
           )}
@@ -211,6 +212,7 @@ function MobileResultCard({
               fill
               sizes='40px'
               className='object-contain'
+              unoptimized
             />
           </div>
         )}
