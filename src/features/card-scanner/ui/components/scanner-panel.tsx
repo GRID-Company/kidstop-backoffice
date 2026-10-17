@@ -246,7 +246,7 @@ export const ScannerPanel = ({
           : !cvReady
             ? {
                 variant: 'info' as const,
-                title: 'Cargando OpenCV.js…',
+                title: 'Cargando',
                 message:
                   'Esto puede tardar 10-20 segundos en la primera carga.',
               }
