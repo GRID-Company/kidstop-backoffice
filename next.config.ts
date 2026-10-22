@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'assets.tcgdex.net',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'cards.scryfall.io',
         pathname: '/**',
       },
