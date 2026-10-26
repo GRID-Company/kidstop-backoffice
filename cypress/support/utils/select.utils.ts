@@ -11,7 +11,7 @@ export const selectHeroUIOption = (
   cy.get(triggerSelectorCombined)
     .first()
     .then(($trigger) => {
-      if ($trigger.text().trim().includes(optionLabel)) return;
+      if ($trigger.text().trim() === optionLabel) return;
 
       cy.wrap($trigger).focus().type('{alt}{downArrow}');
       cy.get('[role="listbox"]', { timeout: TIMEOUTS.DROPDOWN_OPEN }).should(

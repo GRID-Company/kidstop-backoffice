@@ -21,7 +21,6 @@ import {
 import {
   CARD_CONDITION_OPTIONS,
   MAGIC_RARITY_OPTIONS,
-  STOCK_STATUS_OPTIONS,
 } from '../../domain/constants';
 import {
   IPokemonCollection,
@@ -209,15 +208,6 @@ export default function CatalogFilterDrawer({
               aria-label='Filtrar por edición'
             />
           )}
-
-          <Select
-            placeholder='Todos los estados'
-            label='Estado de stock'
-            items={STOCK_STATUS_OPTIONS}
-            selectedKeys={filters?.stockStatus ? [filters.stockStatus] : []}
-            onChange={(e) => onFilterChange('stockStatus', e.target.value)}
-            aria-label='Filtrar por estado de stock'
-          />
 
           {!isPokemon && (
             <Select

@@ -29,21 +29,21 @@ export interface InventoryCard {
 }
 
 interface CardDetail {
-  language?: CardLanguage;
+  language?: CardLanguage | null;
   inventoryCards?: Array<{
     guid: string;
     condition: string;
-    language: CardLanguage;
+    language: string;
     stock: number;
     purchasePrice: number | null;
     sellPrice: number | null;
-  }>;
+  }> | null;
   name?: string;
 }
 
 interface CardBasic {
   guid: string;
-  language?: CardLanguage;
+  language?: CardLanguage | null;
 }
 
 interface UseCardDetailModalParams {
@@ -89,7 +89,7 @@ export function useCardDetailModal({
       cardGuid: card.guid,
       inventoryItemGuid: ic.guid,
       condition: ic.condition,
-      language: ic.language,
+      language: ic.language as CardLanguage,
       stock: ic.stock,
       purchasePrice: ic.purchasePrice,
       sellPrice: ic.sellPrice,

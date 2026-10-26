@@ -56,7 +56,6 @@ export const DEFAULT_MARGIN_PERCENTAGE = 30;
 export const STOCK_STATUS_OPTIONS = [
   { label: 'Disponible', value: 'AVAILABLE' },
   { label: 'No disponible', value: 'UNAVAILABLE' },
-  { label: 'Esperando recolección', value: 'AWAITING_PICKUP' },
 ];
 
 export const DEFAULT_HISTORY_LIMIT = 10;

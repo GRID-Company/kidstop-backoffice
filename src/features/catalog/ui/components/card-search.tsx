@@ -11,7 +11,7 @@ import SetCodeAutocomplete from './set-code-autocomplete';
 import { TCGType, TCG_TYPES } from '@/lib/types/tcg.types';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
-import { CardCondition } from '@/lib/types/card.types';
+import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import {
   POKEMON_SORT_OPTIONS,
@@ -24,6 +24,7 @@ import {
   IMagicCollection,
   PokemonCatalogFilters,
   MagicCatalogFilters,
+  CardCondition,
 } from '../../domain/types';
 
 interface CardSearchProps {
@@ -47,8 +48,7 @@ interface CardSearchProps {
 
 const AVAILABILITY_OPTIONS = [
   { label: 'Todas', value: '' },
-  { label: 'En existencia', value: 'AVAILABLE' },
-  { label: 'Sin stock', value: 'UNAVAILABLE' },
+  ...STOCK_STATUS_OPTIONS,
 ];
 
 export default function CardSearch({
@@ -71,6 +71,7 @@ export default function CardSearch({
 }: CardSearchProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
+  const isPrivacyMode = usePrivacyModeStore((s) => s.isPrivacyMode);
   const stockStatus = filters?.stockStatus ?? '';
 
   const collectionNameByGuid = useMemo(
@@ -220,6 +221,7 @@ export default function CardSearch({
             <Switch
               size='sm'
               isSelected={!!showCosts}
+              isDisabled={isPrivacyMode}
               onValueChange={onShowCostsChange}
               classNames={{ wrapper: 'group-data-[selected=true]:bg-accent' }}
               data-testid='catalog-show-costs-switch'

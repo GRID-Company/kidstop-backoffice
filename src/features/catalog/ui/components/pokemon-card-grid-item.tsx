@@ -52,11 +52,7 @@ export default function PokemonCardGridItem({
       imageSrc={imageSrc}
       name={card.name}
       number={card.cardNumber}
-      ident={
-        [card.setCode, card.cardNumber && `#${card.cardNumber}`]
-          .filter(Boolean)
-          .join(' · ') || null
-      }
+      ident={card.setCode}
       subtitle={card.setName}
       chipRows={[metaChips, attrChips]}
       available={card.availableStock}

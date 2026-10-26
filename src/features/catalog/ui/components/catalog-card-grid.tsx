@@ -35,7 +35,7 @@ export default function CatalogCardGrid<T>({
     return <GridSkeleton count={10} />;
   }
 
-  if (error) {
+  if (error && cards.length === 0) {
     return (
       <div
         className='text-default-400 flex min-h-[400px] flex-col items-center justify-center gap-3'

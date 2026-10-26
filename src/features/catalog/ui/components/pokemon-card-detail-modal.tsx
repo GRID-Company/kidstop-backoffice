@@ -127,10 +127,8 @@ export default function PokemonCardDetailModal({
     adjustLoading,
     cardName,
   } = useCardDetailModal({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    detail: detail as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    card: selectedCard as any,
+    detail,
+    card: selectedCard,
     tcgType: 'POKEMON',
     onRefetch: refetch,
   });
@@ -279,21 +277,6 @@ export default function PokemonCardDetailModal({
                         {detail.variant}
                       </Chip>
                     ))}
-                  {(detail?.language ?? selectedCard?.language) && (
-                    <Chip
-                      size='sm'
-                      variant='flat'
-                      className='bg-accent-soft'
-                      classNames={{ content: 'text-accent-text' }}
-                    >
-                      {
-                        LANGUAGE_LABELS[
-                          (detail?.language ?? selectedCard?.language) ||
-                            CardLanguage.English
-                        ]
-                      }
-                    </Chip>
-                  )}
                 </>
               )}
             </div>

@@ -83,22 +83,31 @@ export default function InventoryConditionTable({
             const testId = primary
               ? `variant-button-${slug}`
               : `variant-button-${slug}-${variant?.language.toLowerCase()}`;
+            const handleSelect = () =>
+              onVariantSelect(
+                variant ?? {
+                  cardGuid: selectedVariant?.cardGuid ?? '',
+                  isNew: true,
+                  condition,
+                  language: selectedLanguage,
+                  stock: 0,
+                  purchasePrice: null,
+                  sellPrice: null,
+                }
+              );
             return (
               <tr
                 key={primary ? condition : `${condition}-${variant?.language}`}
-                onClick={() =>
-                  onVariantSelect(
-                    variant ?? {
-                      cardGuid: selectedVariant?.cardGuid ?? '',
-                      isNew: true,
-                      condition,
-                      language: selectedVariant?.language ?? selectedLanguage,
-                      stock: 0,
-                      purchasePrice: null,
-                      sellPrice: null,
-                    }
-                  )
-                }
+                onClick={handleSelect}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelect();
+                  }
+                }}
+                tabIndex={0}
+                role='button'
+                aria-pressed={isSelected}
                 className={`cursor-pointer border-b border-transparent transition-colors last:border-0 ${
                   isSelected ? 'bg-accent-soft' : 'hover:bg-default-50'
                 }`}

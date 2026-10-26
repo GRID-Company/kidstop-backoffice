@@ -170,7 +170,9 @@ export default function MarketTab({
                   </td>
                   <td className='text-default-600 px-3 py-2.5 text-right'>
                     {metric.lastSellDate
-                      ? new Date(metric.lastSellDate).toLocaleDateString()
+                      ? new Date(metric.lastSellDate).toLocaleDateString(
+                          'es-MX'
+                        )
                       : '—'}
                   </td>
                 </tr>

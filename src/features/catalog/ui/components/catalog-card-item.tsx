@@ -77,7 +77,9 @@ export default function CatalogCardItem({
         {chipRows.map(
           (row, rowIndex) =>
             row.length > 0 && (
-              <CardShell.ChipRow key={rowIndex}>
+              <CardShell.ChipRow
+                key={`${rowIndex}-${row.map((chip) => chip.label).join('-')}`}
+              >
                 {row.map((chip) => (
                   <Chip
                     key={chip.label}

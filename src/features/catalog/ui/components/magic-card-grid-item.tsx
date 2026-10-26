@@ -39,7 +39,6 @@ export default function MagicCardGridItem({
       imageSrc={card.imageUri}
       name={card.name}
       number={card.collectorNumber}
-      ident={card.collectorNumber ? `#${card.collectorNumber}` : null}
       subtitle={card.edition}
       chipRows={[metaChips]}
       available={card.availableStock}

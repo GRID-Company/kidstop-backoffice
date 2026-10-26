@@ -124,10 +124,8 @@ export default function MagicCardDetailModal({
     adjustLoading,
     cardName,
   } = useCardDetailModal({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    detail: detail as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    card: selectedCard as any,
+    detail,
+    card: selectedCard,
     tcgType: 'MAGIC',
     onRefetch: refetch,
   });
@@ -270,21 +268,6 @@ export default function MagicCardDetailModal({
                   {rarity && (
                     <Chip size='sm' variant='flat' color='secondary'>
                       {rarity}
-                    </Chip>
-                  )}
-                  {(detail?.language ?? selectedCard?.language) && (
-                    <Chip
-                      size='sm'
-                      variant='flat'
-                      className='bg-accent-soft'
-                      classNames={{ content: 'text-accent-text' }}
-                    >
-                      {
-                        LANGUAGE_LABELS[
-                          (detail?.language ?? selectedCard?.language) ||
-                            CardLanguage.English
-                        ]
-                      }
                     </Chip>
                   )}
                 </>
@@ -464,18 +447,7 @@ export default function MagicCardDetailModal({
                         <div className='flex flex-col gap-4 pt-3'>
                           <PrintDataSection
                             fields={[
-                              {
-                                label: 'Tratamiento',
-                                value: isFoil ? 'Foil' : 'No Foil',
-                              },
                               { label: 'Rareza', value: rarity ?? null },
-                              {
-                                label: 'Número',
-                                value: collectorNumber
-                                  ? `#${collectorNumber}`
-                                  : null,
-                              },
-                              { label: 'Edición', value: edition ?? null },
                             ]}
                           />
                         </div>

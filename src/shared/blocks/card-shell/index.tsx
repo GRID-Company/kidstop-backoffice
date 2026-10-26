@@ -15,7 +15,6 @@ import {
   ConditionRow,
   CostLine,
 } from './slots';
-import { Footer, DetailButton, ZoomButton } from './actions';
 import { TCGType } from '@/lib/types/tcg.types';
 
 interface CardShellProps extends PropsWithChildren {
@@ -70,8 +69,5 @@ CardShell.ChipRow = ChipRow;
 CardShell.PriceBar = PriceBar;
 CardShell.ConditionRow = ConditionRow;
 CardShell.CostLine = CostLine;
-CardShell.Footer = Footer;
-CardShell.DetailButton = DetailButton;
-CardShell.ZoomButton = ZoomButton;
 
 export default CardShell;
