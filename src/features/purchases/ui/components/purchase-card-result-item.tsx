@@ -14,6 +14,7 @@ import {
 import { Icon } from '@iconify/react';
 
 import KidstopCard from '@/shared/base/heorui-overrides/card';
+import { CardImage } from '@/shared/components/card-image';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
@@ -147,17 +148,15 @@ export default function PurchaseCardResultItem({
           className={`flex gap-3 ${stacked ? '' : 'xl:w-[200px] xl:shrink-0'}`}
         >
           <div className='bg-default-100 relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md xl:h-[100px] xl:w-[72px]'>
-            {card.imageUrl ? (
-              <img
-                src={card.imageUrl}
-                alt={card.name}
-                className='absolute inset-0 h-full w-full object-contain p-1'
-              />
-            ) : (
-              <div className='text-default-400 flex h-full items-center justify-center'>
-                <Icon icon='lucide:image-off' width={24} />
-              </div>
-            )}
+            <CardImage
+              src={card.imageUrl}
+              alt={card.name}
+              tcgType={card.tcgType}
+              containerClassName='absolute inset-0'
+              className='object-contain p-1'
+              fill
+              sizes='72px'
+            />
           </div>
           <div className='flex flex-col justify-center gap-1'>
             <p className='text-sm leading-tight font-semibold'>{card.name}</p>

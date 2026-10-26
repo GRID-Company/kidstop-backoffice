@@ -1,8 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
+import { CardImage } from '@/shared/components/card-image';
 import {
   DrawerContent,
   DrawerHeader,
@@ -86,25 +84,15 @@ export default function MovementDetailDrawer({
               }}
               aria-label={`Ver ${item.cardName} en tamaño completo`}
             >
-              {item.cardImageUrl ? (
-                <img
-                  src={item.cardImageUrl}
-                  alt={item.cardName}
-                  className='absolute inset-0 h-full w-full object-contain'
-                />
-              ) : (
-                <Image
-                  src={
-                    item.tcg === 'MAGIC'
-                      ? magicCardPlaceholder
-                      : pokemonCardPlaceholder
-                  }
-                  alt='Card placeholder'
-                  fill
-                  sizes='48px'
-                  className='object-contain'
-                />
-              )}
+              <CardImage
+                src={item.cardImageUrl}
+                alt={item.cardName}
+                tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+                containerClassName='absolute inset-0'
+                className='object-contain'
+                fill
+                sizes='48px'
+              />
             </div>
             <div className='min-w-0 flex-1'>
               <p className='truncate text-sm font-semibold'>{item.cardName}</p>

@@ -6,7 +6,10 @@ const cardDetailModal = new CardDetailModal();
 
 // Given - Setup
 Given('el usuario tiene el modal de detalle abierto', () => {
-  cy.get('[data-testid="pokemon-card-item"]').first().click();
+  cy.get('[data-testid="pokemon-card-item"]')
+    .first()
+    .find('[data-testid$="-name"]')
+    .click();
   cy.wait(TIMEOUTS.DEBOUNCE);
   cardDetailModal.shouldSeeModal();
 });

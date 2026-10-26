@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Badge, Button } from '@heroui/react';
+import { useMemo, useState } from 'react';
+import { Badge, Button, Chip, Switch } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import Select from '@/shared/base/heorui-overrides/select';
@@ -9,10 +9,15 @@ import TcgSegmentedSelector from '@/shared/base/tcg-segmented-selector';
 import CatalogFilterDrawer from './catalog-filter-drawer';
 import SetCodeAutocomplete from './set-code-autocomplete';
 import { TCGType, TCG_TYPES } from '@/lib/types/tcg.types';
+import { CardLanguage } from '@/lib/api/schema-types';
+import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { CardCondition } from '@/lib/types/card.types';
 import { SearchFn, FilterFn } from '@/lib/types/paginated-datatable.types';
 import {
   POKEMON_SORT_OPTIONS,
   MAGIC_SORT_OPTIONS,
+  CARD_CONDITION_LABELS,
+  STOCK_STATUS_OPTIONS,
 } from '../../domain/constants';
 import {
   IPokemonCollection,
@@ -36,7 +41,15 @@ interface CardSearchProps {
   rarities?: string[];
   variants?: string[];
   genres?: string[];
+  showCosts?: boolean;
+  onShowCostsChange?: (show: boolean) => void;
 }
+
+const AVAILABILITY_OPTIONS = [
+  { label: 'Todas', value: '' },
+  { label: 'En existencia', value: 'AVAILABLE' },
+  { label: 'Sin stock', value: 'UNAVAILABLE' },
+];
 
 export default function CardSearch({
   onSearchChange,
@@ -53,9 +66,53 @@ export default function CardSearch({
   rarities,
   variants,
   genres,
+  showCosts,
+  onShowCostsChange,
 }: CardSearchProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
+  const stockStatus = filters?.stockStatus ?? '';
+
+  const collectionNameByGuid = useMemo(
+    () => new Map((collections ?? []).map((c) => [c.guid, c.name])),
+    [collections]
+  );
+
+  const activeFilterChips = useMemo(() => {
+    if (!filters) return [];
+    const labelFor = (key: string, value: unknown): string => {
+      switch (key) {
+        case 'set':
+        case 'edition':
+          return `Expansión: ${collectionNameByGuid.get(String(value)) ?? String(value)}`;
+        case 'condition':
+          return `Condición: ${CARD_CONDITION_LABELS[value as CardCondition] ?? String(value)}`;
+        case 'language':
+          return `Idioma: ${LANGUAGE_LABELS[value as CardLanguage] ?? String(value)}`;
+        case 'rarity':
+          return `Rareza: ${String(value)}`;
+        case 'variant':
+          return `Variante: ${String(value)}`;
+        case 'genre':
+          return `Género: ${String(value)}`;
+        case 'stockStatus':
+          return `Stock: ${STOCK_STATUS_OPTIONS.find((o) => o.value === value)?.label ?? String(value)}`;
+        case 'isFoil':
+          return value === true || value === 'true' ? 'Foil' : 'No Foil';
+        case 'sellPriceMin':
+          return `Precio desde ${String(value)}`;
+        case 'sellPriceMax':
+          return `Precio hasta ${String(value)}`;
+        default:
+          return `${key}: ${String(value)}`;
+      }
+    };
+
+    return Object.entries(filters)
+      .filter(([key]) => key !== 'sortBy' && key !== 'sortOrder')
+      .filter(([, value]) => value !== undefined && value !== '')
+      .map(([key, value]) => ({ key, label: labelFor(key, value) }));
+  }, [filters, collectionNameByGuid]);
 
   return (
     <div className='flex flex-col gap-4'>
@@ -117,25 +174,90 @@ export default function CardSearch({
         </div>
       </div>
 
-      <div className='flex items-center justify-between'>
-        <p
-          className='text-content-tertiary text-sm'
-          data-testid='catalog-result-count'
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
+        <span className='text-default-500 text-xs font-medium'>
+          Disponibilidad
+        </span>
+        <div
+          className='flex items-center gap-1'
+          data-testid='catalog-availability-pills'
         >
-          {resultCount}{' '}
-          {resultCount === 1 ? 'carta encontrada' : 'cartas encontradas'}
-        </p>
+          {AVAILABILITY_OPTIONS.map((option) => {
+            const active = stockStatus === option.value;
+            return (
+              <Button
+                key={option.label}
+                size='sm'
+                variant='flat'
+                onPress={() => onFilterChange('stockStatus', option.value)}
+                className={`h-7 min-w-0 px-3 text-xs font-medium ${
+                  active
+                    ? 'bg-accent-soft text-accent-text'
+                    : 'text-default-500'
+                }`}
+                data-testid={`catalog-availability-${option.value || 'all'}`}
+              >
+                {option.label}
+              </Button>
+            );
+          })}
+        </div>
         {hasActiveFilters && (
           <Button
             variant='light'
             size='sm'
             startContent={<Icon icon='lucide:x' />}
             onPress={onReset}
+            className='h-7 text-xs'
             data-testid='catalog-clear-filters-button'
           >
             Limpiar filtros
           </Button>
         )}
+
+        <div className='ms-auto flex items-center gap-4'>
+          {onShowCostsChange && (
+            <Switch
+              size='sm'
+              isSelected={!!showCosts}
+              onValueChange={onShowCostsChange}
+              classNames={{ wrapper: 'group-data-[selected=true]:bg-accent' }}
+              data-testid='catalog-show-costs-switch'
+            >
+              <span className='text-default-500 text-xs'>Mostrar costos</span>
+            </Switch>
+          )}
+        </div>
+      </div>
+
+      {activeFilterChips.length > 0 && (
+        <div
+          className='flex flex-wrap items-center gap-1.5'
+          data-testid='catalog-active-filters'
+        >
+          {activeFilterChips.map((chip) => (
+            <Chip
+              key={chip.key}
+              size='sm'
+              variant='flat'
+              className='bg-accent-soft'
+              classNames={{ content: 'text-accent-text' }}
+              onClose={() => onFilterChange(chip.key, '')}
+            >
+              {chip.label}
+            </Chip>
+          ))}
+        </div>
+      )}
+
+      <div className='flex items-center justify-between'>
+        <p
+          className='text-content-tertiary text-sm'
+          data-testid='catalog-result-count'
+        >
+          {resultCount.toLocaleString('es-MX')}{' '}
+          {resultCount === 1 ? 'carta encontrada' : 'cartas encontradas'}
+        </p>
       </div>
 
       <CatalogFilterDrawer

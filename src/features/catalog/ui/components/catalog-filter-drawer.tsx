@@ -210,20 +210,14 @@ export default function CatalogFilterDrawer({
             />
           )}
 
-          {!isPokemon && (
-            <Select
-              placeholder='Todos los estados'
-              label='Estado de stock'
-              items={STOCK_STATUS_OPTIONS}
-              selectedKeys={
-                (filters as MagicCatalogFilters)?.stockStatus
-                  ? [(filters as MagicCatalogFilters).stockStatus!]
-                  : []
-              }
-              onChange={(e) => onFilterChange('stockStatus', e.target.value)}
-              aria-label='Filtrar por estado de stock'
-            />
-          )}
+          <Select
+            placeholder='Todos los estados'
+            label='Estado de stock'
+            items={STOCK_STATUS_OPTIONS}
+            selectedKeys={filters?.stockStatus ? [filters.stockStatus] : []}
+            onChange={(e) => onFilterChange('stockStatus', e.target.value)}
+            aria-label='Filtrar por estado de stock'
+          />
 
           {!isPokemon && (
             <Select

@@ -1,9 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 import {
   DrawerContent,
   DrawerHeader,
@@ -19,6 +16,7 @@ import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import { useQuery } from '@apollo/client/react';
+import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
@@ -341,25 +339,15 @@ export default function AdjustmentModal({
                         className='border-default-200 hover:bg-default-50 flex items-center gap-3 rounded-lg border p-3 text-left transition'
                       >
                         <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>
-                          {result.imageUri ? (
-                            <img
-                              src={result.imageUri}
-                              alt={result.name}
-                              className='absolute inset-0 h-full w-full object-contain'
-                            />
-                          ) : (
-                            <Image
-                              src={
-                                isPokemon
-                                  ? pokemonCardPlaceholder
-                                  : magicCardPlaceholder
-                              }
-                              alt='Card placeholder'
-                              fill
-                              sizes='32px'
-                              className='object-contain'
-                            />
-                          )}
+                          <CardImage
+                            src={result.imageUri}
+                            alt={result.name}
+                            tcgType={selectedTCG}
+                            containerClassName='absolute inset-0'
+                            className='object-contain'
+                            fill
+                            sizes='32px'
+                          />
                         </div>
                         <div className='min-w-0 flex-1'>
                           <p className='truncate text-sm font-medium'>
@@ -413,25 +401,15 @@ export default function AdjustmentModal({
                   }}
                   aria-label={`Ver ${selectedCard.name} en tamaño completo`}
                 >
-                  {selectedCard.imageUri ? (
-                    <img
-                      src={selectedCard.imageUri}
-                      alt={selectedCard.name}
-                      className='absolute inset-0 h-full w-full object-contain'
-                    />
-                  ) : (
-                    <Image
-                      src={
-                        isPokemon
-                          ? pokemonCardPlaceholder
-                          : magicCardPlaceholder
-                      }
-                      alt='Card placeholder'
-                      fill
-                      sizes='48px'
-                      className='object-contain'
-                    />
-                  )}
+                  <CardImage
+                    src={selectedCard.imageUri}
+                    alt={selectedCard.name}
+                    tcgType={selectedTCG}
+                    containerClassName='absolute inset-0'
+                    className='object-contain'
+                    fill
+                    sizes='48px'
+                  />
                 </div>
 
                 <div className='flex min-w-0 flex-1 flex-col gap-1'>
@@ -520,25 +498,15 @@ export default function AdjustmentModal({
                   }}
                   aria-label={`Ver ${resolvedItem.name} en tamaño completo`}
                 >
-                  {resolvedItem.imageUrl ? (
-                    <img
-                      src={resolvedItem.imageUrl}
-                      alt={resolvedItem.name}
-                      className='absolute inset-0 h-full w-full object-contain'
-                    />
-                  ) : (
-                    <Image
-                      src={
-                        resolvedItem.tcg === 'MAGIC'
-                          ? magicCardPlaceholder
-                          : pokemonCardPlaceholder
-                      }
-                      alt='Card placeholder'
-                      fill
-                      sizes='48px'
-                      className='object-contain'
-                    />
-                  )}
+                  <CardImage
+                    src={resolvedItem.imageUrl}
+                    alt={resolvedItem.name}
+                    tcgType={resolvedItem.tcg as 'POKEMON' | 'MAGIC'}
+                    containerClassName='absolute inset-0'
+                    className='object-contain'
+                    fill
+                    sizes='48px'
+                  />
                 </div>
 
                 <div className='flex min-w-0 flex-1 flex-col gap-1'>

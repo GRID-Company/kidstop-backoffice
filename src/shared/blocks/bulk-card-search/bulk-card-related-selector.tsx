@@ -2,13 +2,11 @@
 
 import { RadioGroup, Radio, Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { BulkCardRelatedSelectorProps } from './types';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
 export default function BulkCardRelatedSelector({
   relatedCards,
@@ -53,7 +51,7 @@ export default function BulkCardRelatedSelector({
           >
             <div className='flex items-center gap-2'>
               <div
-                className='bg-default-100 relative h-[60px] w-[43px] shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
+                className='bg-default-100 relative h-15 w-10.75 shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
                 onClick={(e) => {
                   e.stopPropagation();
                   openPreview(
@@ -76,25 +74,15 @@ export default function BulkCardRelatedSelector({
                 }}
                 aria-label={`Ver ${card.name} en tamaño completo`}
               >
-                {card.imageUri ? (
-                  <img
-                    src={card.imageUri}
-                    alt={card.name}
-                    className='absolute inset-0 h-full w-full object-contain p-0.5'
-                  />
-                ) : (
-                  <Image
-                    src={
-                      tcgType === 'MAGIC'
-                        ? magicCardPlaceholder
-                        : pokemonCardPlaceholder
-                    }
-                    alt={`${tcgType} card placeholder`}
-                    fill
-                    sizes='43px'
-                    className='object-contain p-0.5'
-                  />
-                )}
+                <CardImage
+                  src={card.imageUri}
+                  alt={card.name}
+                  tcgType={tcgType}
+                  containerClassName='absolute inset-0'
+                  className='object-contain p-0.5'
+                  fill
+                  sizes='43px'
+                />
               </div>
               <div className='flex flex-col gap-0.5'>
                 <p className='line-clamp-2 text-xs leading-tight font-semibold'>
