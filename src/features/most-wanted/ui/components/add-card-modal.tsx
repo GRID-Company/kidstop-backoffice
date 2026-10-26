@@ -13,6 +13,7 @@ import {
 } from '@heroui/react';
 import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import { Icon } from '@iconify/react';
+import { CardImage } from '@/shared/components/card-image';
 
 import Search from '@/shared/base/heorui-overrides/search';
 import TextareaForm from '@/shared/base/form-controls/textarea-form';
@@ -74,17 +75,15 @@ function CardSearchResult({
       onPress={onPress}
     >
       <div className='bg-default-100 relative h-14 w-10 shrink-0 overflow-hidden rounded'>
-        {card.imageUri ? (
-          <img
-            src={card.imageUri}
-            alt={card.name}
-            className='absolute inset-0 h-full w-full object-contain'
-          />
-        ) : (
-          <div className='text-default-400 flex h-full items-center justify-center'>
-            <Icon icon='lucide:image' width={16} />
-          </div>
-        )}
+        <CardImage
+          src={card.imageUri}
+          alt={card.name}
+          tcgType={isPokemon ? 'POKEMON' : 'MAGIC'}
+          containerClassName='absolute inset-0'
+          className='object-contain'
+          fill
+          sizes='40px'
+        />
       </div>
 
       <div className='flex min-w-0 flex-1 flex-col items-start gap-0.5'>
@@ -113,17 +112,15 @@ function SelectedCardPreview({ card }: { card: CardType }) {
   return (
     <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
       <div className='bg-default-100 relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-lg'>
-        {card.imageUri ? (
-          <img
-            src={card.imageUri}
-            alt={card.name}
-            className='absolute inset-0 h-full w-full object-contain p-1'
-          />
-        ) : (
-          <div className='text-default-400 flex h-full items-center justify-center'>
-            <Icon icon='lucide:image' width={24} />
-          </div>
-        )}
+        <CardImage
+          src={card.imageUri}
+          alt={card.name}
+          tcgType={isPokemon ? 'POKEMON' : 'MAGIC'}
+          containerClassName='absolute inset-0'
+          className='object-contain p-1'
+          fill
+          sizes='96px'
+        />
       </div>
 
       <div className='flex flex-col gap-1.5'>

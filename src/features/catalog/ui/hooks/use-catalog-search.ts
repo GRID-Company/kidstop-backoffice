@@ -42,7 +42,7 @@ export function useCatalogSearch<TCard, TCollection>({
 
   const vars = getVarsFunction(page, search, filters);
 
-  const { data, loading } = useQuery(listDocument, {
+  const { data, loading, error, refetch } = useQuery(listDocument, {
     variables: vars,
     fetchPolicy: 'cache-and-network',
     skip,
@@ -201,6 +201,8 @@ export function useCatalogSearch<TCard, TCollection>({
     page,
     setPage,
     loading,
+    error,
+    refetch,
     search,
     setSearch,
     filters,

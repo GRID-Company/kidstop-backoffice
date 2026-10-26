@@ -2,16 +2,14 @@
 
 import { Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import PriceMetricsSkeleton from './components/price-metrics-skeleton';
 import { BulkCardData } from './types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
 
 interface BulkCardResultSummaryProps {
   card: BulkCardData;
@@ -60,25 +58,15 @@ export default function BulkCardResultSummary({
           }}
           aria-label={`Ver ${card.name} en tamaño completo`}
         >
-          {card.imageUri ? (
-            <img
-              src={card.imageUri}
-              alt={card.name}
-              className='absolute inset-0 h-full w-full object-contain p-1'
-            />
-          ) : (
-            <Image
-              src={
-                tcgType === 'MAGIC'
-                  ? magicCardPlaceholder
-                  : pokemonCardPlaceholder
-              }
-              alt={`${tcgType} card placeholder`}
-              fill
-              sizes='65px'
-              className='object-contain p-1'
-            />
-          )}
+          <CardImage
+            src={card.imageUri}
+            alt={card.name}
+            tcgType={tcgType}
+            containerClassName='absolute inset-0'
+            className='object-contain p-1'
+            fill
+            sizes='65px'
+          />
         </div>
         <div className='flex flex-1 flex-col gap-1'>
           <p className='text-sm leading-tight font-semibold'>{card.name}</p>

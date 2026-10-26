@@ -6,6 +6,8 @@ Guía completa para agentes de IA trabajando en el proyecto Kidstop Backoffice -
 
 **Kidstop Backoffice** es el panel administrativo de Kidstop Singles Platform, una aplicación web construida con Next.js 16 y React 19 para gestionar la compra, venta e inventario de cartas singles de Pokémon TCG y Magic: The Gathering. Implementa una arquitectura Feature-First con separación en tres capas (Adapters, Domain, UI) y sigue principios SOLID.
 
+**Versión actual**: `v1.2.1` (ver [RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)). La migración mock → Apollo está **completa**: todos los features consumen el backend GraphQL real.
+
 ### Dominio de Negocio
 
 Sistema KSP-001: **Kidstop Singles Platform** para operación de tienda TCG:
@@ -42,6 +44,7 @@ Sistema KSP-001: **Kidstop Singles Platform** para operación de tienda TCG:
 
 - Zustand (state management global)
 - Apollo Client 4 (cliente GraphQL)
+- apollo-upload-client (uploads GraphQL, ej. imágenes del Card Scanner)
 - GraphQL Codegen (generación automática de tipos)
 
 **Utilities:**
@@ -50,6 +53,7 @@ Sistema KSP-001: **Kidstop Singles Platform** para operación de tienda TCG:
 - jspdf (generación de PDF para picking lists)
 - react-hot-toast (notificaciones)
 - react-dropzone (upload de archivos)
+- @google-cloud/vision (OCR para detección de cartas en Card Scanner)
 
 **Development:**
 
@@ -88,6 +92,9 @@ kidstop-backoffice/
 │   ├── CARPETA_DIGITAL_TEMPLATE.md # Template para repo Carpeta Digital
 │   ├── IMPLEMENTATION_PLAN.md     # Plan de implementación
 │   ├── CLICKUP_WORKFLOW.md        # Workflow de ClickUp
+│   ├── RELEASE_PROCESS.md         # Proceso de releases dev → main con tags
+│   ├── Requirements/              # Requerimientos por módulo (CardScanner, ...)
+│   ├── digital-binder/            # Copias de docs del repo Carpeta Digital
 │   └── api-guides/                # Documentación de APIs GraphQL
 │       ├── Pokemon-catalog-api-guide.md
 │       ├── Magic-Catalog-API-Guide.md
@@ -102,7 +109,7 @@ kidstop-backoffice/
 │       └── csv-export-api-guide.md
 ├── cypress/                       # Tests E2E con Cucumber
 ├── public/                        # Assets estáticos
-├── scripts/                       # Scripts de automatización
+├── scripts/                       # Scripts (ngrok-share.sh, write-server-env.mjs)
 ├── src/
 │   ├── app/                       # Next.js App Router
 │   │   ├── (authenticated)/       # Rutas protegidas (requieren auth)
@@ -113,10 +120,14 @@ kidstop-backoffice/
 │   │   │   ├── clientes/
 │   │   │   ├── usuarios/
 │   │   │   ├── most-wanted/
-│   │   │   ├── configuracion/
-│   │   │   └── deck-builder/
-│   │   ├── (not-authenticated)/   # Rutas públicas (login)
-│   │   └── api/                   # API routes (manejo de cookies)
+│   │   │   └── configuracion/
+│   │   ├── (not-authenticated)/   # Rutas públicas
+│   │   │   ├── login/
+│   │   │   ├── registro/
+│   │   │   ├── recuperar-contrasena/
+│   │   │   └── cambiar-contrasena/
+│   │   ├── escaneo-cartas/        # POC congelado del Card Scanner (layout propio)
+│   │   └── api/                   # API routes (login, logout, image-proxy, ocr)
 │   ├── assets/                    # Imágenes y recursos
 │   ├── features/                  # Features del negocio (ver sección Modules)
 │   │   ├── login/
@@ -131,25 +142,29 @@ kidstop-backoffice/
 │   │   └── card-scanner/
 │   ├── lib/                       # Core compartido
 │   │   ├── api/                   # Apollo Client + GraphQL codegen
-│   │   │   ├── graphql/           # Archivos .gql (queries/mutations)
+│   │   │   ├── graphql/           # ⭐ Archivos .gql centralizados
 │   │   │   ├── generated/         # Tipos auto-generados por codegen
 │   │   │   └── schema-types.ts    # Tipos del schema GraphQL
 │   │   ├── auth/                  # Hooks de autenticación
 │   │   ├── consts/                # Constantes globales
 │   │   ├── hooks/                 # Hooks globales
-│   │   ├── store/                 # Zustand stores
+│   │   ├── store/                 # Zustand stores (auth, selected-tcg, privacy-mode, card-scanner)
 │   │   ├── types/                 # Tipos globales
 │   │   └── utils/                 # Utilidades compartidas
 │   ├── shared/                    # Componentes compartidos
-│   │   ├── base/                  # Componentes base (buttons, search, card, skeleton)
-│   │   ├── blocks/                # Bloques compuestos (EntitiesPage, DataTable, bulk-card-search)
-│   │   ├── layouts/               # Layouts (sidebar, authenticated layout)
+│   │   ├── base/                  # Componentes base (buttons, form-controls, skeletons,
+│   │   │                          #   tcg-selectors, export-button, heorui-overrides)
+│   │   ├── blocks/                # Bloques compuestos (entities-page, data-table,
+│   │   │                          #   card-search, bulk-card-search, files, navigation, ...)
+│   │   ├── layouts/               # authenticated.tsx, not-authenticated.tsx
 │   │   └── providers/             # Providers (Apollo, HeroUI)
 │   └── proxy.ts                   # Middleware de auth y routing
 ├── .env.template                  # Template de variables de entorno
 ├── codegen.ts                     # Configuración GraphQL Codegen
 ├── hero.ts                        # Configuración tema HeroUI
 ├── cypress.config.ts              # Configuración Cypress
+├── commitlint.config.cjs          # Conventional commits (husky)
+├── server.mjs                     # Servidor HTTPS de desarrollo (dev:https)
 ├── package.json
 └── AGENTS.md                      # Este archivo
 ```
@@ -162,9 +177,10 @@ kidstop-backoffice/
 
 ```bash
 npm run dev              # Servidor de desarrollo (http://localhost:3000)
-npm run dev:https        # Servidor HTTPS (para testing de geolocalización)
+npm run dev:https        # Servidor HTTPS (server.mjs; para testing de geolocalización)
 npm run dev:ngrok        # Exponer servidor local vía túnel ngrok (requiere servidor corriendo)
-npm run build            # Build de producción
+npm run prod             # Segunda instancia de desarrollo en puerto 3120
+npm run build            # Build de producción (prebuild ejecuta write-server-env.mjs)
 npm run start            # Servidor de producción
 ```
 
@@ -180,8 +196,10 @@ npm run validate         # Lint + format check + type check
 ### GraphQL
 
 ```bash
-npm run codegen          # Generar tipos de GraphQL desde .gql files
+npm run codegen          # Generar tipos desde .gql (incluye prettier + eslint --fix en generados)
 ```
+
+Requiere `NEXT_PUBLIC_GRAPHQL_ENDPOINT` apuntando a un backend accesible en `.env`.
 
 ### Testing
 
@@ -296,23 +314,23 @@ features/{feature-name}/
 
 ### Features Implementadas
 
-| Feature       | Path                        | Descripción                                                                                                                                                                                      | Estado          | Referencia                                                                   |
-| ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- | ---------------------------------------------------------------------------- |
-| Login         | `features/login/`           | Autenticación con email/contraseña, sesión via cookies, recuperación contraseña                                                                                                                  | 🟢 Implementado | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#1-autenticación-y-seguridad)    |
-| Usuarios      | `features/users/`           | CRUD de usuarios internos (Admin, Recepción, Comprador), activar/desactivar                                                                                                                      | 🟡 Mock         | [users-api-guide.md](docs/api-guides/users-api-guide.md)                     |
-| Catálogo      | `features/catalog/`         | Búsqueda de cartas con contexto TCG, catálogo interno, precios públicos                                                                                                                          | 🟡 Mock         | [Pokemon-catalog-api-guide.md](docs/api-guides/Pokemon-catalog-api-guide.md) |
-| Compras       | `features/purchases/`       | Buylist con negociación, presupuesto, cotización WhatsApp, modo privacidad                                                                                                                       | 🟡 Mock         | [Purchase_API-guide.md](docs/api-guides/Purchase_API-guide.md)               |
-| Inventario    | `features/inventory-cards/` | Stock por Carta + Variante + Condición, movimientos, métricas                                                                                                                                    | 🟡 Mock         | [inventory.md](docs/api-guides/inventory.md)                                 |
-| Ventas        | `features/sales/`           | Pedidos desde Carpeta Digital, picking list PDF, código Shopify                                                                                                                                  | 🟡 Mock         | [Sales-api-guide.md](docs/api-guides/Sales-api-guide.md)                     |
-| Clientes      | `features/customers/`       | Clasificación VIP, bloqueos, validación de ubicación                                                                                                                                             | 🟡 Mock         | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#7-clientes)                     |
-| Most Wanted   | `features/most-wanted/`     | Configuración de páginas públicas por TCG con drag & drop                                                                                                                                        | 🟡 Mock         | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#9-most-wanted-página-pública)   |
-| Configuración | `features/settings/`        | Geofence, umbrales, presupuestos, límites de inventario                                                                                                                                          | 🟡 Mock         | [global-config-api-guide.md](docs/api-guides/global-config-api-guide.md)     |
-| Card Scanner  | `features/card-scanner/`    | Escaneo con Google Cloud Vision + `pokemonCardScanSearch`/`magicCardScanSearch` (Gemini + catálogo, imágenes vía Upload). POC congelado en `/escaneo-cartas`; producción vía FAB + Drawer global | 🔵 POC + API    | [Pokemon-catalog-api-guide.md](docs/api-guides/Pokemon-catalog-api-guide.md) |
+| Feature       | Path                        | Descripción                                                                                                                                                                                      | Estado       | Referencia                                                                   |
+| ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ---------------------------------------------------------------------------- |
+| Login         | `features/login/`           | Autenticación con email/contraseña, sesión via cookies, registro, recuperación y cambio de contraseña                                                                                            | 🟢 Integrado | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#1-autenticación-y-seguridad)    |
+| Usuarios      | `features/users/`           | CRUD de usuarios internos (Admin, Recepción, Comprador), activar/desactivar                                                                                                                      | 🟢 Integrado | [users-api-guide.md](docs/api-guides/users-api-guide.md)                     |
+| Catálogo      | `features/catalog/`         | Búsqueda de cartas con contexto TCG, búsqueda avanzada con import de listas (Moxfield, Limitless TCG), autocomplete por set-code, soporte de idiomas de carta por TCG                            | 🟢 Integrado | [Pokemon-catalog-api-guide.md](docs/api-guides/Pokemon-catalog-api-guide.md) |
+| Compras       | `features/purchases/`       | Buylist con negociación, presupuesto, cotización WhatsApp, modo privacidad, resumen financiero en detalle                                                                                        | 🟢 Integrado | [Purchase_API-guide.md](docs/api-guides/Purchase_API-guide.md)               |
+| Inventario    | `features/inventory-cards/` | Stock por Carta + Variante + Condición, movimientos, métricas, carga masiva CSV                                                                                                                  | 🟢 Integrado | [inventory.md](docs/api-guides/inventory.md)                                 |
+| Ventas        | `features/sales/`           | Pedidos desde Carpeta Digital, picking list PDF, código Shopify                                                                                                                                  | 🟢 Integrado | [Sales-api-guide.md](docs/api-guides/Sales-api-guide.md)                     |
+| Clientes      | `features/customers/`       | Clasificación VIP, bloqueos, validación de ubicación                                                                                                                                             | 🟢 Integrado | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#7-clientes)                     |
+| Most Wanted   | `features/most-wanted/`     | Configuración de páginas públicas por TCG con drag & drop                                                                                                                                        | 🟢 Integrado | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#9-most-wanted-página-pública)   |
+| Configuración | `features/settings/`        | Geofence, umbrales, presupuestos, límites de inventario                                                                                                                                          | 🟢 Integrado | [global-config-api-guide.md](docs/api-guides/global-config-api-guide.md)     |
+| Card Scanner  | `features/card-scanner/`    | Escaneo con Google Cloud Vision + `pokemonCardScanSearch`/`magicCardScanSearch` (Gemini + catálogo, imágenes vía Upload). Producción vía FAB + Drawer global; POC congelado en `/escaneo-cartas` | 🟢 Integrado | [Pokemon-catalog-api-guide.md](docs/api-guides/Pokemon-catalog-api-guide.md) |
 
 **Leyenda:**
 
-- 🟢 Implementado - Feature completo con Apollo Client
-- 🟡 Mock - Feature funcional con datos mock, pendiente migración a Apollo
+- 🟢 Integrado - Feature conectado al backend via Apollo Client
+- 🟡 Mock - Feature funcional con datos mock (ninguno actualmente; el mock de `card-scanner` solo actúa como fallback, ver `NEXT_PUBLIC_CARD_SCAN_USE_MOCK`)
 - 🔵 POC - Proof of Concept, en evaluación
 
 ### Rutas Principales
@@ -329,19 +347,37 @@ features/{feature-name}/
 | `/usuarios`          | Gestión de usuarios internos     | users           |
 | `/most-wanted`       | Configuración páginas públicas   | most-wanted     |
 | `/configuracion`     | Configuración global del sistema | settings        |
-| `/deck-builder`      | Importador de listas de cartas   | catalog         |
 
 **Rutas Públicas** (`app/(not-authenticated)/`):
 
-| Ruta     | Descripción | Feature |
-| -------- | ----------- | ------- |
-| `/login` | Login       | login   |
+| Ruta                    | Descripción          | Feature |
+| ----------------------- | -------------------- | ------- |
+| `/login`                | Login                | login   |
+| `/registro`             | Registro de usuario  | login   |
+| `/recuperar-contrasena` | Recuperar contraseña | login   |
+| `/cambiar-contrasena`   | Cambiar contraseña   | login   |
+
+**Rutas Standalone** (raíz `app/`, layout propio):
+
+| Ruta              | Descripción                    | Feature      |
+| ----------------- | ------------------------------ | ------------ |
+| `/escaneo-cartas` | POC congelado del Card Scanner | card-scanner |
+
+**API Routes** (`app/api/`): `api/login`, `api/logout` (cookies de sesión), `api/image-proxy` (proxy de imágenes remotas), `api/ocr` (Google Cloud Vision para Card Scanner).
 
 ---
 
 ## Roadmap - Features Planeadas
 
-### Integraciones Externas Pendientes
+### Integraciones Externas
+
+**Implementadas:**
+
+| Integración         | Descripción                                                        | Referencia                                                   |
+| ------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Google Cloud Vision | OCR para detección de cartas en Card Scanner (API route `api/ocr`) | [features/card-scanner](src/features/card-scanner/README.md) |
+
+**Pendientes:**
 
 | Integración         | Descripción                                                     | Prioridad | Referencia                                                                    |
 | ------------------- | --------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------- |
@@ -351,7 +387,6 @@ features/{feature-name}/
 | Shopify Integration | Código de venta como custom item (flujo manual)                 | Media     | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#3-shopify)                       |
 | WhatsApp API        | Envío de cotizaciones con hipervínculo                          | Media     | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#5-whatsapp)                      |
 | Email Transaccional | Notificaciones (pedido listo, restock, recuperación contraseña) | Media     | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#4-email-transaccional)           |
-| Google Cloud Vision | OCR para escaneo de cartas (POC completado)                     | Baja      | [features/card-scanner](src/features/card-scanner/README.md)                  |
 
 ### Carpeta Digital (Repo Separado)
 
@@ -361,19 +396,15 @@ La **Carpeta Digital** es una aplicación web independiente para clientes finale
 - **Superficies**: Dos dominios independientes (Pokémon y Magic)
 - **Roles**: Público, Cliente, Cliente VIP, Cliente Tienda (Kiosk)
 - **Features**: Catálogo, búsqueda, carrito, wishlist, perfil, historial, validación ubicación
-- **Estado**: Pendiente de desarrollo
+- **Estado**: En producción — repo `kidstop-digital-binder` (v1.2.1); sus docs de arquitectura están copiados en `docs/digital-binder/`
 
-Ver template completo en [CARPETA_DIGITAL_TEMPLATE.md](docs/CARPETA_DIGITAL_TEMPLATE.md)
+Ver template original en [CARPETA_DIGITAL_TEMPLATE.md](docs/CARPETA_DIGITAL_TEMPLATE.md)
 
 ### Migración Mock → Apollo
 
-**Estado actual**: Todos los features de Kidstop operan con datos mock (`*.mock.ts`).
+**Estado: completada.** Todos los features consumen el backend GraphQL real. El único `*.mock.ts` restante es el fallback del Card Scanner (`NEXT_PUBLIC_CARD_SCAN_USE_MOCK`).
 
-**Próximos pasos**:
-
-1. Completar desarrollo del backend NestJS (ver [BACKEND_SPEC.md](docs/BACKEND_SPEC.md))
-2. Migrar features uno por uno siguiendo [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md)
-3. Mantener mocks como fallback para desarrollo
+La guía [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) se conserva como referencia histórica del patrón.
 
 ---
 
@@ -396,6 +427,18 @@ NEXT_PUBLIC_API_URL=https://api.kidstop.com
 ```
 
 **Variables Opcionales:**
+
+```bash
+# Google Cloud Vision (Card Scanner — requerido para api/ocr)
+GOOGLE_CLOUD_PROJECT_ID=
+GOOGLE_CLOUD_PRIVATE_KEY=
+GOOGLE_CLOUD_CLIENT_EMAIL=
+
+# Card Scanner — forzar mock de búsqueda (default: false = queries reales)
+NEXT_PUBLIC_CARD_SCAN_USE_MOCK=false
+```
+
+**Variables Legacy** (permanecen en `.env.template` pero sus scripts de automatización fueron eliminados — no las consume la app):
 
 ```bash
 # ClickUp Integration
@@ -424,11 +467,6 @@ CLIENT_EMAILS=
 GITHUB_TOKEN=
 GITHUB_REPO_OWNER=GRID-Company
 GITHUB_REPO_NAME=
-
-# Google Cloud Vision (Card Scanner)
-GOOGLE_CLOUD_PROJECT_ID=
-GOOGLE_CLOUD_PRIVATE_KEY=
-GOOGLE_CLOUD_CLIENT_EMAIL=
 
 # Automation Features
 AUTO_CREATE_BRANCHES=true
@@ -460,6 +498,12 @@ Ver [ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) para detalles completos.
 | [CYPRESS_ARCHITECTURE.md](docs/CYPRESS_ARCHITECTURE.md)                                                 | Arquitectura de tests E2E con Cypress                                                                               |
 | [PERFORMANCE_OPTIMIZATION_GUIDE.md](docs/PERFORMANCE_OPTIMIZATION_GUIDE.md)                             | Guía de optimización de performance                                                                                 |
 | [LANGUAGE_SELECTOR_SPEC.md](docs/LANGUAGE_SELECTOR_SPEC.md)                                             | Especificación del selector de idioma                                                                               |
+| [RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)                                                           | Proceso de releases: PRs a `dev`, squash a `main`, tags `v*` y backup                                               |
+| [PROJECT_SETUP.md](docs/PROJECT_SETUP.md)                                                               | Setup inicial del proyecto                                                                                          |
+| [GITHUB_SECRETS_SETUP.md](docs/GITHUB_SECRETS_SETUP.md)                                                 | Configuración de secrets de GitHub                                                                                  |
+| [BACKEND_PROPOSAL_VALIDATE_STOCK.md](docs/BACKEND_PROPOSAL_VALIDATE_STOCK.md)                           | Propuesta de validación de stock en backend                                                                         |
+| [Requirements/](docs/Requirements/)                                                                     | Documentos de requerimientos por módulo (Card Scanner, ...)                                                         |
+| [digital-binder/](docs/digital-binder/)                                                                 | Copias de ARCHITECTURE/IMPLEMENTATION_PLAN del repo Carpeta Digital                                                 |
 | [api-guides/](docs/api-guides/)                                                                         | **11 guías de APIs GraphQL** (Pokemon, Magic, Purchase, Sales, Inventory, Users, Seller, Budget, Config, Bulk, CSV) |
 
 ---
@@ -513,23 +557,17 @@ const {
 
 ### 2. GraphQL Queries/Mutations
 
-**Patrón para operaciones GraphQL:**
+**Convención del repo**: los archivos `.gql` están **centralizados** en `src/lib/api/graphql/` (no dentro de cada feature). Codegen genera `Document` tipados en `src/lib/api/generated/{name}.generated.ts`.
 
-```typescript
-// 1. Definir operación (adapters/api/{name}.gql)
-query GetPurchases($args: FindPurchasesArgs!) {
+```graphql
+# src/lib/api/graphql/purchases.gql
+query Purchases($args: FindPurchasesArgs!) {
   purchases(args: $args) {
     items {
       id
       sellerName
       status
       totalAmount
-      cards {
-        id
-        cardName
-        condition
-        quantity
-      }
     }
     total
   }
@@ -541,25 +579,38 @@ mutation CreatePurchase($input: CreatePurchaseInput!) {
     status
   }
 }
+```
 
-// 2. Ejecutar codegen
-// npm run codegen
+```typescript
+// 1. Ejecutar codegen: npm run codegen
 
-// 3. Usar en hook
-import { useGetPurchasesQuery, useCreatePurchaseMutation } from '@/lib/api/generated/purchases.generated';
+// 2. Usar en hook (features/{feature}/ui/hooks/use-{name}.ts)
+import { useMutation, useQuery } from '@apollo/client/react';
+import {
+  PurchasesDocument,
+  type PurchasesQuery,
+  CreatePurchaseDocument,
+} from '@/lib/api/generated/purchases.generated';
 
 export const usePurchases = () => {
-  const { data, loading, refetch } = useGetPurchasesQuery({
-    variables: { args: getPurchaseVars() },
-  });
+  const { data, loading, refetch } = useQuery<PurchasesQuery>(
+    PurchasesDocument,
+    { variables: { args: getPurchaseVars() } }
+  );
 
-  const [createPurchase] = useCreatePurchaseMutation({
+  const [createPurchase] = useMutation(CreatePurchaseDocument, {
     onCompleted: () => refetch(),
   });
 
   return { purchases: data?.purchases.items || [], loading, createPurchase };
 };
 ```
+
+**Reglas**:
+
+- Importar hooks desde `@apollo/client/react` (no `@apollo/client`)
+- Después de agregar/editar un `.gql`, ejecutar `npm run codegen`
+- Los globs de `codegen.ts` cubren `src/lib/api/graphql/**` y `src/shared/blocks/**/api/**`
 
 ### 3. Mappers (Transformación de Datos)
 
@@ -672,9 +723,11 @@ EntitiesPage.Actions = Actions;
 </EntitiesPage>
 ```
 
-### 6. Mock Strategy (Temporal)
+### 6. Mock Strategy (Solo fallback del Card Scanner)
 
-**Patrón para desarrollo sin backend:**
+El único mock vigente es `features/card-scanner/adapters/backend/card-search.mock.ts`, que se usa cuando `NEXT_PUBLIC_CARD_SCAN_USE_MOCK=true` o cuando el schema no expone las queries de escaneo. **No crear mocks nuevos** — el resto de features consume GraphQL real.
+
+**Patrón (referencia):**
 
 ```typescript
 // features/{feature}/adapters/api/{name}.mock.ts
@@ -720,7 +773,7 @@ const [searchTerm, setSearchTerm] = useState('');
 
 ### 2. Global State (Zustand)
 
-Tres stores globales con persistencia en localStorage:
+Cuatro stores globales (`auth`, `selected-tcg` y `privacy-mode` persisten en localStorage):
 
 #### auth.ts — Sesión del usuario
 
@@ -763,6 +816,18 @@ interface PrivacyModeState {
 
 // Uso
 const { isPrivacyMode, togglePrivacyMode } = usePrivacyModeStore();
+```
+
+#### card-scanner.ts — Drawer global del scanner
+
+```typescript
+// lib/store/card-scanner.ts
+// Controla el FAB + Drawer global del Card Scanner: apertura con origen
+// ('fab' | 'purchase' | 'catalog'), items existentes y callback de confirmación.
+
+// Uso
+const { openScanner, closeScanner } = useCardScannerStore();
+openScanner('purchase', onConfirm, existingItemIds);
 ```
 
 ### 3. Server State (Apollo Client)
@@ -898,9 +963,9 @@ export default config;
 
 ### Mock Strategy (Estado Actual)
 
-**Todos los features actualmente usan mocks** mientras se desarrolla el backend.
+La migración a Apollo está **completa** — los features consumen el backend real. El único mock activo es el fallback del Card Scanner (`NEXT_PUBLIC_CARD_SCAN_USE_MOCK`).
 
-Ver [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) para la estrategia de migración.
+Ver [MOCK_TO_APOLLO_MIGRATION.md](docs/MOCK_TO_APOLLO_MIGRATION.md) como referencia del patrón.
 
 ---
 
@@ -1118,6 +1183,12 @@ Ver [.devin/agents/README.md](../.devin/agents/README.md) para detalles completo
 
 ## Git Workflow
 
+### Branches y Releases
+
+- **Base branch para PRs**: `dev`
+- **Releases**: squash de `dev` → `main` con tags `v*` y tag de backup (ver [RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md))
+- **Commits**: en inglés, conventional commits (`feat:`, `fix:`, `chore:`, `refactor:`) — enforceado por commitlint + husky
+
 ### Creating Commits
 
 1. Run in parallel: `git status`, `git diff`, `git log` (to match commit style)
@@ -1225,5 +1296,5 @@ Privado — GRID Company / Kidstop
 
 ---
 
-**Última actualización**: 2026-09-03  
-**Versión**: 1.0.0
+**Última actualización**: 2026-10-23  
+**Versión**: 1.1.0 (proyecto v1.2.1)

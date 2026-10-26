@@ -15,10 +15,7 @@ export default function PriceEditTab({ control, watch }: PriceEditTabProps) {
   const showWarning = watch && watch('sellPrice') < watch('buyPrice');
 
   return (
-    <div
-      className='mx-auto flex max-w-4xl flex-col gap-4'
-      data-testid='tab-price'
-    >
+    <div className='flex w-full flex-col gap-4' data-testid='tab-price'>
       <div className='grid grid-cols-2 gap-4'>
         <InputForm
           label='Precio de compra'

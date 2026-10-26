@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Modal, ModalContent, Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
@@ -23,6 +24,12 @@ export function CardImagePreviewModal({
 }: CardImagePreviewModalProps) {
   const placeholder =
     tcgType === 'MAGIC' ? magicCardPlaceholder : pokemonCardPlaceholder;
+
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [imageUrl, isOpen]);
 
   return (
     <Modal
@@ -57,12 +64,13 @@ export function CardImagePreviewModal({
                 className='relative flex max-h-[90vh] max-w-[90vw] items-center justify-center'
                 onClick={(e) => e.stopPropagation()}
               >
-                {imageUrl ? (
+                {imageUrl && !hasError ? (
                   <img
                     src={imageUrl}
                     alt={alt}
                     className='max-h-[90vh] max-w-[90vw] object-contain'
                     loading='eager'
+                    onError={() => setHasError(true)}
                   />
                 ) : (
                   <div className='relative h-[90vh] w-[calc(90vh*3/4)]'>

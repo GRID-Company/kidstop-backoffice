@@ -14,6 +14,8 @@ export function useTcgTheme() {
     root.style.setProperty('--tcg-sidebar-bg', theme.sidebarBg);
     root.style.setProperty('--tcg-sidebar-active', theme.sidebarActive);
     root.style.setProperty('--color-accent', theme.accent);
+    root.style.setProperty('--color-accent-soft', theme.accentSoft);
+    root.style.setProperty('--color-accent-text', theme.accentText);
     root.style.setProperty('--color-page-bg', theme.pageBg);
   }, [selectedTCG]);
 }
