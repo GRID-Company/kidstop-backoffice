@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { SubmitHandler, useWatch } from 'react-hook-form';
 
 import InputForm from '@/shared/base/form-controls/input-form';
+import PasswordForm from '@/shared/base/form-controls/password-form';
 import SelectForm from '@/shared/base/form-controls/select-form';
 import { useUserForm } from '../../adapters/forms/use-user-form';
 import { UserFormData } from '../../adapters/forms/user-form.schema';
@@ -93,11 +94,12 @@ export default function UserFormModal({
             />
 
             {isKioskRole && (
-              <InputForm
+              <PasswordForm<UserFormData>
                 label='Contraseña'
-                placeholder='Ingresa la contraseña (mínimo 6 caracteres)'
+                placeholder='Ingresa la contraseña'
+                hasTooltip
+                tooltipType='criteria'
                 controlProps={{ control, name: 'password' }}
-                type='password'
               />
             )}
           </DrawerBody>
