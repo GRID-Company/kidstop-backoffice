@@ -7,6 +7,8 @@ import { Icon } from '@iconify/react';
 import Search from '@/shared/base/heorui-overrides/search';
 import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter-drawer';
 import SetCodeAutocomplete from '@/features/catalog/ui/components/set-code-autocomplete';
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { IPurchaseItem } from '../../domain/types';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { useCardSearch } from '../hooks/use-card-search';
@@ -22,6 +24,14 @@ export default function CardSearchWithMetrics({
   existingItemIds,
 }: CardSearchWithMetricsProps) {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   const {
     search,
@@ -150,6 +160,9 @@ export default function CardSearchWithMetrics({
               card={card}
               onAdd={handleAddCard}
               existingItemIds={existingItemIds}
+              onImageClick={() =>
+                openPreview(card.imageUrl, card.name, card.tcgType)
+              }
             />
           ))}
         </div>
@@ -163,6 +176,13 @@ export default function CardSearchWithMetrics({
           </span>
         </div>
       )}
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
+      />
     </div>
   );
 }

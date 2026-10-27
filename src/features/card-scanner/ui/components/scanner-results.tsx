@@ -168,16 +168,26 @@ export const ScannerResults = ({
             Coincidencias ({searchResults.candidates.length})
           </h4>
           <div className='flex flex-col gap-2'>
-            {searchResults.candidates.map((candidate) => (
-              <PurchaseCardResultItem
-                key={`${candidate.guid}-${candidate.isBestMatch}`}
-                card={mapScanCandidateToCardSearchResult(candidate)}
-                onAdd={onAddPurchaseItem}
-                existingItemIds={existingItemIds}
-                isBestMatch={candidate.isBestMatch}
-                stacked
-              />
-            ))}
+            {searchResults.candidates.map((candidate) => {
+              const cardResult = mapScanCandidateToCardSearchResult(candidate);
+              return (
+                <PurchaseCardResultItem
+                  key={`${candidate.guid}-${candidate.isBestMatch}`}
+                  card={cardResult}
+                  onAdd={onAddPurchaseItem}
+                  existingItemIds={existingItemIds}
+                  isBestMatch={candidate.isBestMatch}
+                  onImageClick={() =>
+                    openPreview(
+                      cardResult.imageUrl,
+                      cardResult.name,
+                      cardResult.tcgType
+                    )
+                  }
+                  stacked
+                />
+              );
+            })}
           </div>
         </div>
       )}
