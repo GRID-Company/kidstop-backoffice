@@ -35,30 +35,7 @@ export default function BulkCardResultSummary({
   return (
     <>
       <div className='flex min-w-0 flex-1 items-center gap-3'>
-        <div
-          className='bg-default-100 relative h-[90px] w-[65px] shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
-          onClick={(e) => {
-            e.stopPropagation();
-            openPreview(
-              card.imageUri ?? null,
-              card.name,
-              tcgType as 'POKEMON' | 'MAGIC'
-            );
-          }}
-          role='button'
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.stopPropagation();
-              openPreview(
-                card.imageUri ?? null,
-                card.name,
-                tcgType as 'POKEMON' | 'MAGIC'
-              );
-            }
-          }}
-          aria-label={`Ver ${card.name} en tamaño completo`}
-        >
+        <div className='bg-default-100 relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md'>
           <CardImage
             src={card.imageUri}
             alt={card.name}
@@ -67,6 +44,14 @@ export default function BulkCardResultSummary({
             className='object-contain p-1'
             fill
             sizes='65px'
+            enablePreview
+            onImageClick={() =>
+              openPreview(
+                card.imageUri ?? null,
+                card.name,
+                tcgType as 'POKEMON' | 'MAGIC'
+              )
+            }
           />
         </div>
         <div className='flex flex-1 flex-col gap-1'>
