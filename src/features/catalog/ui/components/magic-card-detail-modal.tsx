@@ -437,6 +437,11 @@ export default function MagicCardDetailModal({
                           <PrintDataSection
                             fields={[
                               { label: 'Rareza', value: rarity ?? null },
+                              {
+                                label: 'Tratamiento',
+                                value: isFoil ? 'Foil' : 'No Foil',
+                              },
+                              { label: 'Edición', value: edition ?? null },
                             ]}
                           />
                         </div>
