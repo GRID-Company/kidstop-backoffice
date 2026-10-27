@@ -9,6 +9,7 @@ import {
   Select,
   SelectItem,
   Tooltip,
+  useDisclosure,
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 
@@ -16,13 +17,19 @@ import toast from 'react-hot-toast';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { DataTable } from '@/shared/blocks/data-table/data-table';
+import ExportDateRangeModal, {
+  ExportDateRange,
+} from '@/shared/blocks/export-date-range-modal';
 import Search from '@/shared/base/heorui-overrides/search';
 import { ExportButton } from '@/shared/base/export-button';
 import { ITableColumn } from '@/lib/types/datatable.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { ISale, SaleStatus } from '../../domain/types';
-import { SALE_STATUS_OPTIONS } from '../../domain/constants';
+import {
+  SALE_STATUS_LABELS,
+  SALE_STATUS_OPTIONS,
+} from '../../domain/constants';
 import {
   getCustomerDisplayName,
   getCustomerDisplayEmail,
@@ -53,6 +60,11 @@ export default function Sales() {
     error,
   } = useSales();
   const { handleExport, exporting } = useExportSales();
+  const {
+    isOpen: isExportModalOpen,
+    onOpen: onExportModalOpen,
+    onClose: onExportModalClose,
+  } = useDisclosure();
 
   useEffect(() => {
     if (error) {
@@ -91,32 +103,50 @@ export default function Sales() {
     [router]
   );
 
-  const handleExportClick = useCallback(() => {
-    handleExport({
-      findSalesArgs: {
-        skip: 0,
-        limit: 0,
-        sort: { column: 'createdDate', order: 'DESC' },
-        search: filters.search?.trim() || undefined,
-        filters: {
-          tcg: selectedTCG,
-          status: filters.status || undefined,
-          customer: filters.customer || undefined,
-          ...(filters.dateFrom || filters.dateTo
-            ? {
-                createdDate: {
-                  filterType: ':daterange:',
-                  range: {
-                    from: filters.dateFrom,
-                    to: filters.dateTo,
+  const handleConfirmExport = useCallback(
+    (range: ExportDateRange | undefined) => {
+      handleExport({
+        findSalesArgs: {
+          skip: 0,
+          limit: 0,
+          sort: { column: 'createdDate', order: 'DESC' },
+          search: filters.search?.trim() || undefined,
+          filters: {
+            tcg: selectedTCG,
+            status: filters.status || undefined,
+            customer: filters.customer || undefined,
+            ...(range
+              ? {
+                  createdDate: {
+                    filterType: ':daterange:',
+                    range,
                   },
-                },
-              }
-            : {}),
+                }
+              : {}),
+          },
         },
-      },
-    });
-  }, [handleExport, selectedTCG, filters]);
+      });
+    },
+    [handleExport, selectedTCG, filters]
+  );
+
+  const exportActiveFilters = useMemo(() => {
+    const active: string[] = [];
+
+    if (filters.status) {
+      active.push(`Estado: ${SALE_STATUS_LABELS[filters.status]}`);
+    }
+    if (filters.search?.trim()) {
+      active.push(`Búsqueda: "${filters.search.trim()}"`);
+    }
+
+    return active;
+  }, [filters.status, filters.search]);
+
+  const exportInitialRange = useMemo(() => {
+    if (!filters.dateFrom || !filters.dateTo) return undefined;
+    return { start: filters.dateFrom, end: filters.dateTo };
+  }, [filters.dateFrom, filters.dateTo]);
 
   const columns: ITableColumn<ISale>[] = useMemo(
     () => [
@@ -220,7 +250,7 @@ export default function Sales() {
   return (
     <EntitiesPage>
       <EntitiesPage.Toolbar label='Pedidos / Ventas'>
-        <ExportButton onPress={handleExportClick} isLoading={exporting} />
+        <ExportButton onPress={onExportModalOpen} isLoading={exporting} />
       </EntitiesPage.Toolbar>
 
       <EntitiesPage.CardContainer>
@@ -341,6 +371,15 @@ export default function Sales() {
           </div>
         )}
       </EntitiesPage.CardContainer>
+
+      <ExportDateRangeModal
+        isOpen={isExportModalOpen}
+        onClose={onExportModalClose}
+        onConfirm={handleConfirmExport}
+        title='Exportar ventas'
+        activeFilters={exportActiveFilters}
+        initialRange={exportInitialRange}
+      />
     </EntitiesPage>
   );
 }
