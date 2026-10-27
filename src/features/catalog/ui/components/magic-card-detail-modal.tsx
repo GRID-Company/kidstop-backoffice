@@ -20,6 +20,7 @@ import FoilChip from '@/shared/components/foil-chip';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IMagicCard } from '../../domain/types';
 import { CARD_SEARCH_LIMIT } from '../../domain/constants';
 import { useMagicCardDetail } from '../hooks/use-magic-card-detail';
@@ -253,7 +254,7 @@ export default function MagicCardDetailModal({
             </span>
             <span className='text-accent text-lg font-semibold'>
               {selectedCard
-                ? `${name}${collectorNumber ? ` #${collectorNumber}` : ''}`
+                ? `${name}${collectorNumber ? ` ${formatCardNumber(collectorNumber)}` : ''}`
                 : 'Ajuste de inventario'}
             </span>
             <div className='flex items-center gap-2'>
@@ -305,7 +306,8 @@ export default function MagicCardDetailModal({
                         {result.name}
                       </p>
                       <p className='text-default-500 truncate text-xs'>
-                        {result.edition} · #{result.collectorNumber}
+                        {result.edition} ·{' '}
+                        {formatCardNumber(result.collectorNumber)}
                       </p>
                     </div>
                     <Chip
@@ -366,7 +368,7 @@ export default function MagicCardDetailModal({
                         <>
                           <span className='text-default-500'>Número</span>
                           <span className='font-medium'>
-                            #{collectorNumber}
+                            {formatCardNumber(collectorNumber)}
                           </span>
                         </>
                       ) : null}

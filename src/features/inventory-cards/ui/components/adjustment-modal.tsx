@@ -58,6 +58,7 @@ import { useAdjustmentForm } from '../../adapters/forms/use-adjustment-form';
 import { InventoryAdjustmentFormData } from '../../adapters/forms/inventory-adjustment.form.schema';
 import { toAdjustmentFormDefaults } from '../../adapters/mappers/inventory.mapper';
 import { BulkOperationType } from '@/lib/api/schema-types';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface AdjustmentModalProps {
   item: IInventoryItem | null;
@@ -354,7 +355,7 @@ export default function AdjustmentModal({
                             {result.name}
                           </p>
                           <p className='text-default-500 truncate text-xs'>
-                            {setName} · #{number}
+                            {setName} · {formatCardNumber(number)}
                           </p>
                         </div>
                         <Chip

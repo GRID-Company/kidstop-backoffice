@@ -16,6 +16,7 @@ import { CardImagePreviewModal } from '@/shared/components/card-image-preview-mo
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import { formatUnixDateTime } from '@/lib/utils/format-date';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IInventoryMovement } from '../../domain/types';
 import {
   MOVEMENT_TYPE_LABELS,
@@ -97,7 +98,8 @@ export default function MovementDetailDrawer({
             <div className='min-w-0 flex-1'>
               <p className='truncate text-sm font-semibold'>{item.cardName}</p>
               <p className='text-default-400 truncate text-xs'>
-                {item.setName} ({item.setCode}) · #{item.cardNumber}
+                {item.setName} ({item.setCode}) ·{' '}
+                {formatCardNumber(item.cardNumber)}
               </p>
               <p className='text-default-400 mt-1 text-xs'>{item.tcg}</p>
             </div>

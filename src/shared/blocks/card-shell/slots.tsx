@@ -3,6 +3,7 @@
 import { PropsWithChildren } from 'react';
 import { Chip } from '@heroui/react';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { useCardShell } from './context';
 
 interface SlotProps extends PropsWithChildren {
@@ -63,10 +64,12 @@ export function Title({ children, className, testId }: SlotProps) {
 }
 
 export function Number({ children, className }: SlotProps) {
-  if (!children) return null;
+  if (children == null || children === '') return null;
+  const label = formatCardNumber(String(children));
+  if (!label) return null;
   return (
     <span className={`text-default-400 font-medium ${className ?? ''}`}>
-      #{children}
+      {label}
     </span>
   );
 }

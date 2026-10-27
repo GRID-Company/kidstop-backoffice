@@ -18,6 +18,7 @@ import { CardImage } from '@/shared/components/card-image';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import {
   CardCondition,
   ICardSearchResult,
@@ -164,7 +165,8 @@ export default function PurchaseCardResultItem({
               {card.setName} · {card.setCode}
             </p>
             <p className='text-default-400 text-xs'>
-              #{card.number} {card.rarity ? `· ${card.rarity}` : ''}
+              {formatCardNumber(card.number)}{' '}
+              {card.rarity ? `· ${card.rarity}` : ''}
             </p>
           </div>
         </div>

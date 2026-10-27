@@ -10,6 +10,7 @@ import PriceMetricsSkeleton from './components/price-metrics-skeleton';
 import { BulkCardData } from './types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface BulkCardResultSummaryProps {
   card: BulkCardData;
@@ -91,7 +92,7 @@ export default function BulkCardResultSummary({
             )}
           </div>
           <p className='text-default-500 text-xs'>
-            {card.edition} · #{card.collectorNumber}
+            {card.edition} · {formatCardNumber(card.collectorNumber)}
           </p>
           <div className='flex items-center gap-3'>
             <div className='flex items-center gap-1'>

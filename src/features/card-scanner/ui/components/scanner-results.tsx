@@ -25,6 +25,7 @@ import { ScanEmptyState } from './scan-empty-state';
 import { ScanFieldsEditor } from './scan-fields-editor';
 import { ScanOcrText } from './scan-ocr-text';
 import { ScanStatusBanner } from './scan-status-banner';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface ScannerResultsProps {
   scannedData: IScannedCardData;
@@ -267,7 +268,7 @@ export const ScannerResults = ({
               <div className='flex justify-between'>
                 <span className='text-content-tertiary'>Número</span>
                 <span className='text-content-primary font-medium'>
-                  #{searchResults.aiResolved.cardNumber}
+                  {formatCardNumber(searchResults.aiResolved.cardNumber)}
                 </span>
               </div>
             )}
