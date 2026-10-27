@@ -35,7 +35,7 @@ export default function BulkCardResultSummary({
   return (
     <>
       <div className='flex min-w-0 flex-1 items-center gap-3'>
-        <div className='bg-default-100 relative h-[90px] w-[65px] shrink-0 overflow-hidden rounded-md'>
+        <div className='bg-default-100 relative h-22.5 w-16.25 shrink-0 overflow-hidden rounded-md'>
           <CardImage
             src={card.imageUri}
             alt={card.name}

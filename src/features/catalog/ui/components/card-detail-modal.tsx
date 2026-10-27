@@ -111,7 +111,7 @@ export default function CardDetailModal({
         <DrawerBody className='flex flex-col gap-6'>
           <div className='flex gap-6'>
             <div
-              className='bg-default-100 relative aspect-[3/4] w-40 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
+              className='bg-default-100 relative aspect-3/4 w-40 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
               onClick={() =>
                 openPreview(card.imageUrl, card.name, card.tcgType)
               }

@@ -123,7 +123,7 @@ export const ScannerResults = ({
           <div className='flex flex-col gap-2'>
             {[0, 1, 2].map((row) => (
               <div key={row} className='flex items-center gap-3'>
-                <Skeleton className='h-[90px] w-[65px] shrink-0 rounded-md' />
+                <Skeleton className='h-22.5 w-16.25 shrink-0 rounded-md' />
                 <div className='flex flex-1 flex-col gap-2'>
                   <Skeleton className='h-3 w-3/5 rounded' />
                   <Skeleton className='h-3 w-2/5 rounded' />
