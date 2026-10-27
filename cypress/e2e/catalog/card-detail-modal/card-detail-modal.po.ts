@@ -164,7 +164,7 @@ export default class CardDetailModal {
     cy.get(CardDetailModalSelectors.pokemonModal)
       .should('be.visible')
       .and('contain', 'Set')
-      .and('contain', 'Stock total');
+      .and('contain', 'Existencias');
   }
 
   shouldSeeMagicCardInformation() {
@@ -181,8 +181,8 @@ export default class CardDetailModal {
   }
 
   shouldSeePriceDisplayed() {
-    // Verificar en cualquiera de los dos modales
-    cy.get('body').should('contain', 'Precio venta');
+    // El precio de venta se muestra en la columna Venta de la tabla de condiciones
+    cy.get('[data-testid="condition-stock-table"]').should('contain', 'Venta');
   }
 
   // Tabs/Sections
