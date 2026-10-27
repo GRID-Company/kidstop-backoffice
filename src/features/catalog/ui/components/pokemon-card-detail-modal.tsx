@@ -47,7 +47,6 @@ import StockAdjustmentTab from './card-detail-tabs/stock-adjustment-tab';
 import PriceEditTab from './card-detail-tabs/price-edit-tab';
 import MovementsHistoryTab from './card-detail-tabs/movements-history-tab';
 import PriceHistoryTab from './card-detail-tabs/price-history-tab';
-import DetailStatsRow from './card-detail/detail-stats-row';
 import InventoryConditionTable from './card-detail/inventory-condition-table';
 import PrintDataSection from './card-detail/print-data-section';
 import MarketTab, {
@@ -230,12 +229,6 @@ export default function PokemonCardDetailModal({
   const setName = detail?.setName ?? selectedCard?.setName;
   const setCode = detail?.setCode ?? selectedCard?.setCode;
   const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
-  const sellPrice =
-    selectedVariant?.sellPrice ??
-    detail?.sellPrice ??
-    selectedCard?.sellPrice ??
-    null;
-  const purchasePrice = selectedVariant?.purchasePrice ?? null;
   const displayImage =
     getHighestQualityImage(detail?.moreImages)?.imageUrl ?? imageUri ?? null;
 
@@ -398,12 +391,6 @@ export default function PokemonCardDetailModal({
                     </div>
                   </div>
                 </div>
-
-                <DetailStatsRow
-                  totalStock={totalStock ?? 0}
-                  sellPrice={sellPrice}
-                  purchasePrice={purchasePrice}
-                />
 
                 <div className='flex flex-col gap-3'>
                   <h4 className='text-sm font-semibold'>
