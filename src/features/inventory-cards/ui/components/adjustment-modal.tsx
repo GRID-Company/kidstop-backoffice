@@ -380,28 +380,7 @@ export default function AdjustmentModal({
           ) : selectedCard ? (
             <div className='flex flex-col gap-4'>
               <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
-                <div
-                  className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-                  onClick={() =>
-                    openPreview(
-                      selectedCard.imageUri ?? null,
-                      selectedCard.name,
-                      selectedTCG as 'POKEMON' | 'MAGIC'
-                    )
-                  }
-                  role='button'
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      openPreview(
-                        selectedCard.imageUri ?? null,
-                        selectedCard.name,
-                        selectedTCG as 'POKEMON' | 'MAGIC'
-                      );
-                    }
-                  }}
-                  aria-label={`Ver ${selectedCard.name} en tamaño completo`}
-                >
+                <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
                   <CardImage
                     src={selectedCard.imageUri}
                     alt={selectedCard.name}
@@ -410,6 +389,14 @@ export default function AdjustmentModal({
                     className='object-contain'
                     fill
                     sizes='48px'
+                    enablePreview
+                    onImageClick={() =>
+                      openPreview(
+                        selectedCard.imageUri ?? null,
+                        selectedCard.name,
+                        selectedTCG as 'POKEMON' | 'MAGIC'
+                      )
+                    }
                   />
                 </div>
 
@@ -421,10 +408,12 @@ export default function AdjustmentModal({
                     {'setName' in selectedCard
                       ? selectedCard.setName
                       : selectedCard.edition}{' '}
-                    · #
-                    {'cardNumber' in selectedCard
-                      ? selectedCard.cardNumber
-                      : selectedCard.collectorNumber}
+                    ·{' '}
+                    {formatCardNumber(
+                      'cardNumber' in selectedCard
+                        ? selectedCard.cardNumber
+                        : selectedCard.collectorNumber
+                    )}
                   </p>
                 </div>
 
@@ -477,28 +466,7 @@ export default function AdjustmentModal({
           ) : resolvedItem ? (
             <>
               <div className='bg-default-50 flex gap-4 rounded-lg p-4'>
-                <div
-                  className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-                  onClick={() =>
-                    openPreview(
-                      resolvedItem.imageUrl,
-                      resolvedItem.name,
-                      resolvedItem.tcg as 'POKEMON' | 'MAGIC'
-                    )
-                  }
-                  role='button'
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      openPreview(
-                        resolvedItem.imageUrl,
-                        resolvedItem.name,
-                        resolvedItem.tcg as 'POKEMON' | 'MAGIC'
-                      );
-                    }
-                  }}
-                  aria-label={`Ver ${resolvedItem.name} en tamaño completo`}
-                >
+                <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
                   <CardImage
                     src={resolvedItem.imageUrl}
                     alt={resolvedItem.name}
@@ -507,6 +475,14 @@ export default function AdjustmentModal({
                     className='object-contain'
                     fill
                     sizes='48px'
+                    enablePreview
+                    onImageClick={() =>
+                      openPreview(
+                        resolvedItem.imageUrl,
+                        resolvedItem.name,
+                        resolvedItem.tcg as 'POKEMON' | 'MAGIC'
+                      )
+                    }
                   />
                 </div>
 
@@ -515,8 +491,8 @@ export default function AdjustmentModal({
                     {resolvedItem.name}
                   </p>
                   <p className='text-default-500 truncate text-xs'>
-                    {resolvedItem.setName} ({resolvedItem.setCode}) · #
-                    {resolvedItem.number}
+                    {resolvedItem.setName} ({resolvedItem.setCode}) ·{' '}
+                    {formatCardNumber(resolvedItem.number)}
                   </p>
                   <div className='flex items-center gap-2'>
                     <Chip

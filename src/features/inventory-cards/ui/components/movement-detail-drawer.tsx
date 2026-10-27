@@ -63,28 +63,7 @@ export default function MovementDetailDrawer({
 
         <DrawerBody className='flex flex-col gap-6'>
           <div className='bg-default-50 flex items-center gap-4 rounded-lg p-4'>
-            <div
-              className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-              onClick={() =>
-                openPreview(
-                  item.cardImageUrl,
-                  item.cardName,
-                  item.tcg as 'POKEMON' | 'MAGIC'
-                )
-              }
-              role='button'
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  openPreview(
-                    item.cardImageUrl,
-                    item.cardName,
-                    item.tcg as 'POKEMON' | 'MAGIC'
-                  );
-                }
-              }}
-              aria-label={`Ver ${item.cardName} en tamaño completo`}
-            >
+            <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
               <CardImage
                 src={item.cardImageUrl}
                 alt={item.cardName}
@@ -93,6 +72,14 @@ export default function MovementDetailDrawer({
                 className='object-contain'
                 fill
                 sizes='48px'
+                enablePreview
+                onImageClick={() =>
+                  openPreview(
+                    item.cardImageUrl,
+                    item.cardName,
+                    item.tcg as 'POKEMON' | 'MAGIC'
+                  )
+                }
               />
             </div>
             <div className='min-w-0 flex-1'>
