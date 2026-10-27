@@ -6,6 +6,7 @@ import { Button, Chip, Switch, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IMostWantedCard } from '../../domain/types';
 import { MOST_WANTED_PRIORITY_LABELS } from '../../domain/constants';
 
@@ -120,7 +121,7 @@ export default function MostWantedCardItem({
       <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
         <span className='truncate text-sm font-semibold'>{cardName}</span>
         <span className='text-default-500 truncate text-xs'>
-          {cardSet} {cardNumber ? `· ${cardNumber}` : ''}
+          {cardSet} {cardNumber ? `· ${formatCardNumber(cardNumber)}` : ''}
         </span>
         {item.notes && (
           <span className='text-default-400 truncate text-xs italic'>

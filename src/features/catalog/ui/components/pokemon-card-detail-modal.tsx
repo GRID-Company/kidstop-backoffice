@@ -20,6 +20,7 @@ import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { formatReleaseDate } from '@/lib/utils/format-date';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';
 import { IPokemonCard } from '../../domain/types';
 import { CARD_SEARCH_LIMIT } from '../../domain/constants';
@@ -257,7 +258,7 @@ export default function PokemonCardDetailModal({
             </span>
             <span className='text-accent text-lg font-semibold'>
               {selectedCard
-                ? `${name}${cardNumber ? ` #${cardNumber}` : ''}`
+                ? `${name}${cardNumber ? ` ${formatCardNumber(cardNumber)}` : ''}`
                 : 'Ajuste de inventario'}
             </span>
             <div className='flex items-center gap-2'>
@@ -312,7 +313,7 @@ export default function PokemonCardDetailModal({
                         {result.name}
                       </p>
                       <p className='text-default-500 truncate text-xs'>
-                        {result.setName} · #{result.cardNumber}
+                        {result.setName} · {formatCardNumber(result.cardNumber)}
                       </p>
                     </div>
                     <Chip
@@ -378,7 +379,9 @@ export default function PokemonCardDetailModal({
                       ) : cardNumber ? (
                         <>
                           <span className='text-default-500'>Número</span>
-                          <span className='font-medium'>{cardNumber}</span>
+                          <span className='font-medium'>
+                            {formatCardNumber(cardNumber)}
+                          </span>
                         </>
                       ) : null}
                       <span className='text-default-500'>Idioma</span>
