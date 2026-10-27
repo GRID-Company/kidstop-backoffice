@@ -6,6 +6,7 @@ import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { BulkCardRelatedSelectorProps } from './types';
 
 export default function BulkCardRelatedSelector({
@@ -50,30 +51,7 @@ export default function BulkCardRelatedSelector({
             }}
           >
             <div className='flex items-center gap-2'>
-              <div
-                className='bg-default-100 relative h-15 w-10.75 shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openPreview(
-                    card.imageUri ?? null,
-                    card.name,
-                    tcgType as 'POKEMON' | 'MAGIC'
-                  );
-                }}
-                role='button'
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.stopPropagation();
-                    openPreview(
-                      card.imageUri ?? null,
-                      card.name,
-                      tcgType as 'POKEMON' | 'MAGIC'
-                    );
-                  }
-                }}
-                aria-label={`Ver ${card.name} en tamaño completo`}
-              >
+              <div className='bg-default-100 relative h-15 w-10.75 shrink-0 overflow-hidden rounded-md'>
                 <CardImage
                   src={card.imageUri}
                   alt={card.name}
@@ -82,6 +60,14 @@ export default function BulkCardRelatedSelector({
                   className='object-contain p-0.5'
                   fill
                   sizes='43px'
+                  enablePreview
+                  onImageClick={() =>
+                    openPreview(
+                      card.imageUri ?? null,
+                      card.name,
+                      tcgType as 'POKEMON' | 'MAGIC'
+                    )
+                  }
                 />
               </div>
               <div className='flex flex-col gap-0.5'>
@@ -105,7 +91,7 @@ export default function BulkCardRelatedSelector({
                     )}
                 </div>
                 <p className='text-default-500 text-[10px]'>
-                  {card.edition} · {card.collectorNumber}
+                  {card.edition} · {formatCardNumber(card.collectorNumber)}
                 </p>
                 <div className='flex items-center gap-1'>
                   <Icon

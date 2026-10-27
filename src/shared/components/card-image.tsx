@@ -45,56 +45,72 @@ function CardImageComponent({
   };
 
   const showPlaceholder = !src || hasError;
-
-  const wrapperClassName =
-    enablePreview && onImageClick
-      ? 'h-full w-full cursor-pointer transition-opacity hover:opacity-80'
-      : '';
+  const isInteractive = enablePreview && !!onImageClick;
 
   const handleClick = (e: React.MouseEvent) => {
-    if (enablePreview && onImageClick) {
+    if (isInteractive) {
       e.stopPropagation();
       onImageClick();
     }
   };
 
   const handlePointerEvent = (e: React.PointerEvent) => {
-    if (enablePreview && onImageClick) {
+    if (isInteractive) {
       e.stopPropagation();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (enablePreview && onImageClick && e.key === 'Enter') {
+    if (isInteractive && e.key === 'Enter') {
       e.stopPropagation();
       onImageClick();
     }
   };
 
-  const imageContent = fill ? (
-    <div className={containerClassName}>
-      {showPlaceholder ? (
-        <Image
-          src={placeholder}
-          alt={`${tcgType} card placeholder`}
-          fill
-          sizes={sizes}
-          className={className}
-        />
-      ) : (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes={sizes}
-          className={className}
-          onError={handleError}
-          unoptimized
-        />
-      )}
-    </div>
-  ) : (
-    <div className={containerClassName}>
+  const interactiveProps = isInteractive
+    ? {
+        onClick: handleClick,
+        onPointerDown: handlePointerEvent,
+        onPointerUp: handlePointerEvent,
+        onKeyDown: handleKeyDown,
+        role: 'button' as const,
+        tabIndex: 0,
+        'aria-label': `Ver ${alt} en tamaño completo`,
+      }
+    : {};
+
+  const containerClasses = `${containerClassName} ${
+    isInteractive ? 'cursor-pointer transition-opacity hover:opacity-80' : ''
+  }`;
+
+  if (fill) {
+    return (
+      <div className={containerClasses} {...interactiveProps}>
+        {showPlaceholder ? (
+          <Image
+            src={placeholder}
+            alt={`${tcgType} card placeholder`}
+            fill
+            sizes={sizes}
+            className={className}
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={sizes}
+            className={className}
+            onError={handleError}
+            unoptimized
+          />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={containerClasses} {...interactiveProps}>
       {showPlaceholder ? (
         <Image
           src={placeholder}
@@ -112,25 +128,6 @@ function CardImageComponent({
       )}
     </div>
   );
-
-  if (enablePreview && onImageClick) {
-    return (
-      <div
-        onClick={handleClick}
-        onPointerDown={handlePointerEvent}
-        onPointerUp={handlePointerEvent}
-        onKeyDown={handleKeyDown}
-        className={wrapperClassName}
-        role='button'
-        tabIndex={0}
-        aria-label={`Ver ${alt} en tamaño completo`}
-      >
-        {imageContent}
-      </div>
-    );
-  }
-
-  return imageContent;
 }
 
 export const CardImage = memo(CardImageComponent);

@@ -203,7 +203,7 @@ export default function ItemCard({
                         variant='flat'
                         className='h-4 px-1.5 text-[10px]'
                       >
-                        {item.cardNumber}
+                        {formatCardNumber(item.cardNumber)}
                       </Chip>
                     )}
                     {item.rarity && (

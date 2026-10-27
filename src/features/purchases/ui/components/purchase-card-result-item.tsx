@@ -66,6 +66,7 @@ interface PurchaseCardResultItemProps {
   existingItemIds?: Set<string>;
   isBestMatch?: boolean;
   stacked?: boolean;
+  onImageClick?: () => void;
 }
 
 export default function PurchaseCardResultItem({
@@ -74,6 +75,7 @@ export default function PurchaseCardResultItem({
   existingItemIds = EMPTY_ITEM_IDS,
   isBestMatch = false,
   stacked = false,
+  onImageClick,
 }: PurchaseCardResultItemProps) {
   const [addState, setAddState] = useState<AddToCartState>({
     ...DEFAULT_ADD_STATE,
@@ -157,6 +159,8 @@ export default function PurchaseCardResultItem({
               className='object-contain p-1'
               fill
               sizes='72px'
+              enablePreview={!!onImageClick}
+              onImageClick={onImageClick}
             />
           </div>
           <div className='flex flex-col justify-center gap-1'>
