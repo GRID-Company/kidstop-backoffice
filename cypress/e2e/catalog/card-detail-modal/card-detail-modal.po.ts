@@ -1,5 +1,6 @@
 import { CardDetailModalSelectors } from './card-detail-modal.selectors';
 import { TIMEOUTS } from '../../../support/consts/timeouts.const';
+import { selectHeroUIOption } from '../../../support/utils/select.utils';
 import {
   SUCCESS_MESSAGE_REGEX,
   ERROR_MESSAGE_REGEX,
@@ -63,11 +64,10 @@ export default class CardDetailModal {
   }
 
   selectVariantWithStock() {
-    cy.get('[data-testid^="variant-button-"]').each(($btn) => {
-      const text = $btn.text();
-      const match = text.match(/\((\d+)\)/);
-      if (match && parseInt(match[1], 10) > 0) {
-        cy.wrap($btn).click();
+    cy.get('[data-testid^="variant-button-"]').each(($row) => {
+      const stock = parseInt($row.attr('data-stock') ?? '0', 10);
+      if (stock > 0) {
+        cy.wrap($row).click();
         return false;
       }
     });
@@ -75,22 +75,43 @@ export default class CardDetailModal {
   }
 
   // Stock Adjustment
+  ensureStockView() {
+    cy.get('body').then(($body) => {
+      if (
+        $body.find(CardDetailModalSelectors.stockAdjustmentInput).length === 0
+      ) {
+        cy.get(CardDetailModalSelectors.openStockAdjustButton).click();
+        cy.wait(TIMEOUTS.DEBOUNCE);
+      }
+    });
+  }
+
+  ensurePriceView() {
+    cy.get('body').then(($body) => {
+      if (
+        $body.find(CardDetailModalSelectors.priceNotesTextarea).length === 0
+      ) {
+        cy.get(CardDetailModalSelectors.openPriceEditButton).click();
+        cy.wait(TIMEOUTS.DEBOUNCE);
+      }
+    });
+  }
+
   selectMovementType(type: 'Entrada' | 'Salida' | 'Ajuste') {
-    cy.get(CardDetailModalSelectors.stockMovementTypeSelect).click();
-    cy.contains('li', type, { timeout: TIMEOUTS.DROPDOWN_OPEN })
-      .should('be.visible')
-      .first()
-      .click({ force: true });
+    this.ensureStockView();
+    selectHeroUIOption(CardDetailModalSelectors.stockMovementTypeSelect, type);
     cy.wait(TIMEOUTS.ANIMATION);
   }
 
   enterStockAdjustment(quantity: string) {
+    this.ensureStockView();
     cy.get(CardDetailModalSelectors.stockAdjustmentInput)
       .clear()
       .type(quantity);
   }
 
   enterStockNotes(notes: string) {
+    this.ensureStockView();
     cy.get(CardDetailModalSelectors.stockNotesTextarea).clear().type(notes);
   }
 
@@ -105,10 +126,12 @@ export default class CardDetailModal {
 
   // Price Edit
   enterPrice(fieldLabel: string, price: string) {
+    this.ensurePriceView();
     cy.contains('label', fieldLabel).parent().find('input').clear().type(price);
   }
 
   enterPriceNotes(notes: string) {
+    this.ensurePriceView();
     cy.get(CardDetailModalSelectors.priceNotesTextarea).clear().type(notes);
   }
 
@@ -141,7 +164,7 @@ export default class CardDetailModal {
     cy.get(CardDetailModalSelectors.pokemonModal)
       .should('be.visible')
       .and('contain', 'Set')
-      .and('contain', 'Stock total');
+      .and('contain', 'Existencias');
   }
 
   shouldSeeMagicCardInformation() {
@@ -158,8 +181,8 @@ export default class CardDetailModal {
   }
 
   shouldSeePriceDisplayed() {
-    // Verificar en cualquiera de los dos modales
-    cy.get('body').should('contain', 'Precio venta');
+    // El precio de venta se muestra en la columna Venta de la tabla de condiciones
+    cy.get('[data-testid="condition-stock-table"]').should('contain', 'Venta');
   }
 
   // Tabs/Sections
@@ -169,33 +192,35 @@ export default class CardDetailModal {
   }
 
   navigateToStockTab() {
-    cy.get(CardDetailModalSelectors.tabStock).click();
+    cy.get(CardDetailModalSelectors.openStockAdjustButton).click();
     cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   navigateToPriceTab() {
-    cy.get(CardDetailModalSelectors.tabPrice).click();
+    cy.get(CardDetailModalSelectors.openPriceEditButton).click();
     cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   navigateToMovementsTab() {
-    cy.contains('button', 'Historial de movimientos').click();
+    cy.contains('[role="tab"]', 'Historial de movimientos').click();
     cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   navigateToPriceHistoryTab() {
-    cy.contains('button', 'Historial de precios').click();
+    cy.contains('[role="tab"]', 'Historial de precios').click();
     cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
   shouldSeeMovementsTable() {
-    cy.contains('Historial de movimientos')
+    cy.get('[data-testid="tab-movements"]')
       .scrollIntoView()
       .should('be.visible');
   }
 
   shouldSeePriceHistoryTable() {
-    cy.contains('Historial de precios').scrollIntoView().should('be.visible');
+    cy.get('[data-testid="tab-price-history"]')
+      .scrollIntoView()
+      .should('be.visible');
   }
 
   // Price Update Verification

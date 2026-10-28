@@ -89,6 +89,7 @@ export interface PokemonCatalogFilters {
   variant?: string;
   genre?: string;
   language?: string;
+  stockStatus?: string;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
 }

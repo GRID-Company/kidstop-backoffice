@@ -16,6 +16,8 @@ interface UsePurchasesReturn {
   setStatusFilter: (status: PurchaseStatus | undefined) => void;
   setSearch: (search: string) => void;
   setSellerFilter: (sellerGuid: string | undefined) => void;
+  dateFrom?: string;
+  dateTo?: string;
   setDateFrom: (from: string | undefined) => void;
   setDateTo: (to: string | undefined) => void;
   resetFilters: () => void;
@@ -116,6 +118,8 @@ export function usePurchases(): UsePurchasesReturn {
     setStatusFilter,
     setSearch,
     setSellerFilter,
+    dateFrom,
+    dateTo,
     setDateFrom: handleSetDateFrom,
     setDateTo: handleSetDateTo,
     resetFilters,

@@ -15,6 +15,7 @@ import { LANGUAGE_LABELS } from '@/lib/types/language.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import {
   AdaptedPurchaseItem,
   AdaptedSaleItem,
@@ -202,7 +203,7 @@ export default function ItemCard({
                         variant='flat'
                         className='h-4 px-1.5 text-[10px]'
                       >
-                        {item.cardNumber}
+                        {formatCardNumber(item.cardNumber)}
                       </Chip>
                     )}
                     {item.rarity && (
@@ -286,7 +287,7 @@ export default function ItemCard({
                         variant='flat'
                         className='h-4 px-1.5 text-[10px]'
                       >
-                        #{item.collectorNumber}
+                        {formatCardNumber(item.collectorNumber)}
                       </Chip>
                     )}
                     {item.rarity && (

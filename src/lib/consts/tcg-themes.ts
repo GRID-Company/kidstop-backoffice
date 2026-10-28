@@ -5,6 +5,8 @@ type TCGTheme = {
   sidebarActive: string;
   accent: string;
   accentHsl: string;
+  accentSoft: string;
+  accentText: string;
   pageBg: string;
 };
 
@@ -14,6 +16,8 @@ export const TCG_THEMES: Record<TCGType, TCGTheme> = {
     sidebarActive: 'rgba(255, 255, 255, 0.2)',
     accent: '#e53223',
     accentHsl: '5 79% 52%',
+    accentSoft: '#fff0ed',
+    accentText: '#b32420',
     pageBg: '#f5f5f5',
   },
   [TCG_TYPES.MAGIC]: {
@@ -21,6 +25,8 @@ export const TCG_THEMES: Record<TCGType, TCGTheme> = {
     sidebarActive: '#e85d26',
     accent: '#e85d26',
     accentHsl: '17 81% 53%',
+    accentSoft: '#fff2ec',
+    accentText: '#b94827',
     pageBg: '#f5f5f5',
   },
 };

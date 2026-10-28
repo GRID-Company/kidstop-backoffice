@@ -75,16 +75,25 @@ export default function PasswordForm<T extends FieldValues>({
                     <ul className='ml-4 list-disc text-xs'>
                       <li
                         className={
-                          field.value?.match(/(?=.*\d).*$/) !== null
+                          field.value?.match(/.{8,}$/) !== null
                             ? 'font-semibold text-green-700'
                             : ''
                         }
                       >
-                        Un número
+                        Mínimo 8 caracteres
                       </li>
                       <li
                         className={
-                          field.value?.match(/(?=.*[A-Z]).*$/) !== null
+                          field.value?.match(/^.{0,20}$/) !== null
+                            ? 'font-semibold text-green-700'
+                            : ''
+                        }
+                      >
+                        Máximo 20 caracteres
+                      </li>
+                      <li
+                        className={
+                          field.value?.match(/(?=.*[A-Z])/) !== null
                             ? 'font-semibold text-green-700'
                             : ''
                         }
@@ -93,21 +102,23 @@ export default function PasswordForm<T extends FieldValues>({
                       </li>
                       <li
                         className={
-                          field.value?.match(/(?=.*[a-z]).*$/) !== null
+                          field.value?.match(/(?=.*[a-z])/) !== null
                             ? 'font-semibold text-green-700'
                             : ''
                         }
                       >
-                        Una letra minúsula
+                        Una letra minúscula
                       </li>
                       <li
                         className={
-                          field.value?.match(/.{8,}$/) !== null
+                          field.value?.match(
+                            /(?=.*[\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/
+                          ) !== null
                             ? 'font-semibold text-green-700'
                             : ''
                         }
                       >
-                        Mínimo 8 carácteres
+                        Un número o carácter especial
                       </li>
                     </ul>
                   </div>

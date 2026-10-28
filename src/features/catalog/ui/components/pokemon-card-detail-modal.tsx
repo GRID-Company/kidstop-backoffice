@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
 import {
   DrawerContent,
   DrawerHeader,
@@ -10,7 +8,6 @@ import {
   DrawerFooter,
   Button,
   Chip,
-  Divider,
   Skeleton,
   Tabs,
   Tab,
@@ -19,24 +16,17 @@ import KidstopDrawer from '@/shared/base/heorui-overrides/drawer';
 import KidstopButton from '@/shared/base/heorui-overrides/button';
 import { Icon } from '@iconify/react';
 import FoilChip from '@/shared/components/foil-chip';
-import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { formatReleaseDate } from '@/lib/utils/format-date';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { getHighestQualityImage } from '@/lib/utils/image-utils';
-import { IPokemonCard, CardCondition } from '../../domain/types';
-import {
-  CARD_CONDITION_LABELS,
-  CARD_CONDITION_SHORT_LABELS,
-  CARD_SEARCH_LIMIT,
-} from '../../domain/constants';
-import { CARD_CONDITIONS } from '@/lib/types/card.types';
+import { IPokemonCard } from '../../domain/types';
+import { CARD_SEARCH_LIMIT } from '../../domain/constants';
 import { usePokemonCardDetail } from '../hooks/use-pokemon-card-detail';
-import {
-  useCardDetailModal,
-  InventoryCard,
-} from '../hooks/use-card-detail-modal';
-import { useQuery } from '@apollo/client/react';
+import { useCardDetailModal } from '../hooks/use-card-detail-modal';
+import { useLazyQuery, useQuery } from '@apollo/client/react';
 import {
   PokemonCardWithMetricsDocument,
   PokemonCardInternalListDocument,
@@ -46,9 +36,9 @@ import { CardLanguage } from '@/lib/api/schema-types';
 import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/components/inventory-adjustment-confirmation-modal';
 import { toPokemonCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
-import { LanguageSelector } from '@/shared/components/language-selector';
+import LanguagePills, { LanguageFilter } from './card-detail/language-pills';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
-import { TCG_TYPES } from '@/lib/types/tcg.types';
+import { TCG_THEMES } from '@/lib/consts/tcg-themes';
 import {
   isStockAdjustmentDisabled,
   toSetCodeOptions,
@@ -57,7 +47,14 @@ import StockAdjustmentTab from './card-detail-tabs/stock-adjustment-tab';
 import PriceEditTab from './card-detail-tabs/price-edit-tab';
 import MovementsHistoryTab from './card-detail-tabs/movements-history-tab';
 import PriceHistoryTab from './card-detail-tabs/price-history-tab';
-import VariantInfoTab from './card-detail-tabs/variant-info-tab';
+import InventoryConditionTable from './card-detail/inventory-condition-table';
+import PrintDataSection from './card-detail/print-data-section';
+import MarketTab, {
+  MarketReferencePrice,
+  MarketVariantMetric,
+} from './card-detail/market-tab';
+
+type DetailActionView = 'summary' | 'adjust' | 'price';
 
 interface PokemonCardDetailModalProps {
   card: IPokemonCard | null;
@@ -73,6 +70,9 @@ export default function PokemonCardDetailModal({
   const [selectedCard, setSelectedCard] = useState<IPokemonCard | null>(card);
   const [itemSearch, setItemSearch] = useState('');
   const [setGuid, setSetGuid] = useState('');
+  const [actionView, setActionView] = useState<DetailActionView>('summary');
+  const [metricsRequested, setMetricsRequested] = useState(false);
+  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>('ALL');
   const prevIsOpenRef = useRef(isOpen);
   const {
     isOpen: isPreviewOpen,
@@ -91,8 +91,15 @@ export default function PokemonCardDetailModal({
       setSelectedCard(card);
       setItemSearch('');
       setSetGuid('');
+      setActionView('summary');
+      setMetricsRequested(false);
+      setLanguageFilter('ALL');
     }
   }, [isOpen, card]);
+
+  useEffect(() => {
+    setMetricsRequested(false);
+  }, [selectedCard?.guid]);
 
   const { detail, loading, refetch } = usePokemonCardDetail(
     isOpen ? (selectedCard?.guid ?? null) : null
@@ -103,6 +110,8 @@ export default function PokemonCardDetailModal({
     selectedVariant,
     selectedLanguage,
     availableVariants,
+    allVariants,
+    languageOptions,
     handleLanguageChange,
     stockControl,
     stockFormState,
@@ -118,15 +127,14 @@ export default function PokemonCardDetailModal({
     adjustLoading,
     cardName,
   } = useCardDetailModal({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    detail: detail as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    card: selectedCard as any,
+    detail,
+    card: selectedCard,
     tcgType: 'POKEMON',
     onRefetch: refetch,
   });
 
-  const [selectedTab, setSelectedTab] = useState('info');
+  const { isValid: isStockFormValid, isDirty: isStockFormDirty } =
+    stockFormState;
 
   const handleStockAdjustClick = useCallback(() => {
     const formValues = stockWatch();
@@ -179,33 +187,57 @@ export default function PokemonCardDetailModal({
     setSelectedCard(card);
   }, []);
 
-  const { data: metricsData } = useQuery(PokemonCardWithMetricsDocument, {
-    variables: { guid: selectedCard?.guid ?? '' },
-    skip: !selectedCard?.guid || !isOpen,
+  const [
+    fetchMetrics,
+    { data: metricsData, loading: metricsLoading, error: metricsError },
+  ] = useLazyQuery(PokemonCardWithMetricsDocument, {
     fetchPolicy: 'cache-and-network',
   });
 
-  const variantMetrics =
-    metricsData?.pokemonCardWithMetrics?.variantsMetrics?.find(
-      (v) =>
-        v?.condition === selectedVariant?.condition &&
-        v?.language === selectedVariant?.language
-    );
+  const handleMetricsRequest = useCallback(() => {
+    if (!selectedCard?.guid) return;
+    setMetricsRequested(true);
+    void fetchMetrics({ variables: { guid: selectedCard.guid } });
+  }, [fetchMetrics, selectedCard?.guid]);
 
-  const totalWishlistCount = useMemo(() => {
-    if (!metricsData?.pokemonCardWithMetrics?.variantsMetrics) return 0;
-    return metricsData.pokemonCardWithMetrics.variantsMetrics.reduce(
-      (sum, variant) => sum + (variant?.wishlistCount ?? 0),
-      0
-    );
-  }, [metricsData]);
+  const metrics = metricsData?.pokemonCardWithMetrics;
+
+  const referencePrices = useMemo<MarketReferencePrice[]>(
+    () => [
+      { label: 'Ungraded', value: metrics?.ungradedPrice ?? null },
+      { label: 'PSA 7', value: metrics?.gradedPriceSeven ?? null },
+      { label: 'PSA 8+', value: metrics?.gradedPriceEightOrAbove ?? null },
+    ],
+    [metrics]
+  );
+
+  const variantMetrics = useMemo<MarketVariantMetric[]>(
+    () =>
+      (metrics?.variantsMetrics ?? [])
+        .filter((v): v is NonNullable<typeof v> => v != null)
+        .map((v) => ({
+          condition: v.condition,
+          language: v.language as CardLanguage,
+          stock: v.stock,
+          wishlistCount: v.wishlistCount,
+          avgDaysInInventory: v.avgDaysInInventory,
+          lastSellDate: v.lastSellDate as string | number | null,
+        })),
+    [metrics]
+  );
 
   const imageUri = detail?.imageUri ?? selectedCard?.imageUri;
   const name = detail?.name ?? selectedCard?.name;
+  const cardNumber = detail?.cardNumber ?? selectedCard?.cardNumber;
   const setName = detail?.setName ?? selectedCard?.setName;
   const setCode = detail?.setCode ?? selectedCard?.setCode;
   const totalStock = detail?.totalStock ?? selectedCard?.totalStock;
-  const sellPrice = detail?.sellPrice ?? selectedCard?.sellPrice;
+  const displayImage =
+    getHighestQualityImage(detail?.moreImages)?.imageUrl ?? imageUri ?? null;
+
+  const handleImagePreview = useCallback(() => {
+    openPreview(displayImage, name ?? '', 'POKEMON');
+  }, [openPreview, displayImage, name]);
 
   return (
     <>
@@ -216,39 +248,38 @@ export default function PokemonCardDetailModal({
         data-testid='pokemon-card-detail-modal'
       >
         <DrawerContent>
-          <DrawerHeader className='flex flex-col gap-2'>
+          <DrawerHeader className='flex flex-col gap-1'>
+            <span className='text-accent text-[10px] font-semibold tracking-widest uppercase'>
+              Pokémon TCG · Catálogo interno
+            </span>
             <span className='text-accent text-lg font-semibold'>
-              {selectedCard ? name : 'Ajuste de inventario'}
+              {selectedCard
+                ? `${name}${cardNumber ? ` ${formatCardNumber(cardNumber)}` : ''}`
+                : 'Ajuste de inventario'}
             </span>
             <div className='flex items-center gap-2'>
               <span className='text-default-500 text-sm font-normal'>
-                {selectedCard ? (
-                  <>
-                    {[setName, setCode].filter(Boolean).join(' · ')}
-                    {detail?.cardNumber ? ` · ${detail.cardNumber}` : ''}
-                  </>
-                ) : (
-                  'Buscar carta por nombre, set o código'
-                )}
+                {selectedCard
+                  ? [setName, setCode].filter(Boolean).join(' · ')
+                  : 'Buscar carta por nombre, set o código'}
               </span>
-              {selectedCard && selectedVariant && (
+              {selectedCard && (
                 <>
-                  <Chip size='sm' variant='flat' color='primary'>
-                    {LANGUAGE_LABELS[selectedLanguage]}
-                  </Chip>
-                  <Chip size='sm' variant='flat' color='secondary'>
-                    {
-                      CARD_CONDITION_LABELS[
-                        selectedVariant.condition as CardCondition
-                      ]
-                    }
-                  </Chip>
+                  {detail?.variant &&
+                    (detail.variant.toLowerCase().includes('holo') ||
+                    detail.variant.toLowerCase().includes('foil') ? (
+                      <FoilChip label={detail.variant} variant='subtle' />
+                    ) : (
+                      <Chip size='sm' variant='flat' color='secondary'>
+                        {detail.variant}
+                      </Chip>
+                    ))}
                 </>
               )}
             </div>
           </DrawerHeader>
 
-          <DrawerBody className='flex flex-col gap-6'>
+          <DrawerBody className='flex flex-col gap-5'>
             {!selectedCard && (
               <CardSearch
                 searchValue={itemSearch}
@@ -263,28 +294,22 @@ export default function PokemonCardDetailModal({
                 renderCard={(result) => (
                   <>
                     <div className='bg-default-100 relative h-10 w-8 shrink-0 overflow-hidden rounded'>
-                      {result.imageUri ? (
-                        <img
-                          src={result.imageUri}
-                          alt={result.name}
-                          className='absolute inset-0 h-full w-full object-contain'
-                        />
-                      ) : (
-                        <Image
-                          src={pokemonCardPlaceholder}
-                          alt='Card placeholder'
-                          fill
-                          sizes='32px'
-                          className='object-contain'
-                        />
-                      )}
+                      <CardImage
+                        src={result.imageUri}
+                        alt={result.name}
+                        tcgType='POKEMON'
+                        containerClassName='absolute inset-0'
+                        className='object-contain'
+                        fill
+                        sizes='32px'
+                      />
                     </div>
                     <div className='min-w-0 flex-1'>
                       <p className='truncate text-sm font-medium'>
                         {result.name}
                       </p>
                       <p className='text-default-500 truncate text-xs'>
-                        {result.setName} · #{result.cardNumber}
+                        {result.setName} · {formatCardNumber(result.cardNumber)}
                       </p>
                     </div>
                     <Chip
@@ -301,78 +326,35 @@ export default function PokemonCardDetailModal({
 
             {selectedCard && (
               <>
-                <div className='flex flex-col gap-6 sm:flex-row'>
-                  <div className='w-full shrink-0 sm:w-40'>
+                <div className='flex flex-col gap-5 sm:flex-row'>
+                  <div className='w-full shrink-0 sm:w-44'>
                     <div
-                      className='bg-default-100 relative aspect-3/4 w-full cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
-                      onClick={() => {
-                        const highQualityImage = getHighestQualityImage(
-                          detail?.moreImages
-                        );
-                        const displayImage =
-                          highQualityImage?.imageUrl || imageUri || null;
-                        openPreview(displayImage, name ?? '', 'POKEMON');
-                      }}
+                      className='bg-default-100 relative aspect-3/4 w-full cursor-pointer overflow-hidden rounded-xl transition-opacity hover:opacity-80'
+                      onClick={handleImagePreview}
                       role='button'
                       tabIndex={0}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          const highQualityImage = getHighestQualityImage(
-                            detail?.moreImages
-                          );
-                          const displayImage =
-                            highQualityImage?.imageUrl || imageUri || null;
-                          openPreview(displayImage, name ?? '', 'POKEMON');
-                        }
+                        if (e.key === 'Enter') handleImagePreview();
                       }}
                       aria-label={`Ver ${name} en tamaño completo`}
                     >
-                      {(() => {
-                        const highQualityImage = getHighestQualityImage(
-                          detail?.moreImages
-                        );
-                        const displayImage =
-                          highQualityImage?.imageUrl || imageUri;
-
-                        return displayImage ? (
-                          <img
-                            src={displayImage}
-                            alt={name}
-                            className='absolute inset-0 h-full w-full object-contain p-1'
-                          />
-                        ) : (
-                          <Image
-                            src={pokemonCardPlaceholder}
-                            alt='Pokemon card placeholder'
-                            fill
-                            sizes='160px'
-                            className='object-contain p-1'
-                          />
-                        );
-                      })()}
+                      <CardImage
+                        src={displayImage}
+                        alt={name ?? ''}
+                        tcgType='POKEMON'
+                        containerClassName='absolute inset-0'
+                        className='object-contain p-1'
+                        fill
+                        sizes='176px'
+                      />
                     </div>
                   </div>
 
-                  <div className='flex flex-col gap-2'>
-                    <div className='flex items-center gap-2'>
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        classNames={{
-                          base: 'bg-accent/10',
-                          content: 'text-accent font-medium',
-                        }}
-                      >
-                        Pokemon
-                      </Chip>
-                      {detail?.variant &&
-                        (detail.variant.toLowerCase().includes('holo') ||
-                          detail.variant.toLowerCase().includes('foil')) && (
-                          <FoilChip label={detail.variant} variant='subtle' />
-                        )}
-                    </div>
-
-                    <div className='mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm'>
+                  <div className='border-default-200 flex-1 rounded-xl border bg-white p-4'>
+                    <h4 className='text-default-500 mb-3 text-xs font-semibold tracking-wide uppercase'>
+                      Datos de la impresión
+                    </h4>
+                    <div className='grid grid-cols-2 gap-x-6 gap-y-2 text-sm'>
                       {setName && (
                         <>
                           <span className='text-default-500'>Set</span>
@@ -390,325 +372,284 @@ export default function PokemonCardDetailModal({
                           <span className='text-default-500'>Número</span>
                           <Skeleton className='h-4 w-12 rounded' />
                         </>
-                      ) : detail?.cardNumber ? (
+                      ) : cardNumber ? (
                         <>
                           <span className='text-default-500'>Número</span>
                           <span className='font-medium'>
-                            {detail.cardNumber}
+                            {formatCardNumber(cardNumber)}
                           </span>
                         </>
                       ) : null}
-                      {loading ? (
-                        <>
-                          <span className='text-default-500'>Rareza</span>
-                          <Skeleton className='h-4 w-20 rounded' />
-                        </>
-                      ) : detail?.rarity ? (
-                        <>
-                          <span className='text-default-500'>Rareza</span>
-                          <span className='font-medium'>{detail.rarity}</span>
-                        </>
-                      ) : null}
-                      {!loading &&
-                        (detail?.language || selectedCard?.language) && (
-                          <>
-                            <span className='text-default-500'>Idioma</span>
-                            <span className='font-medium'>
-                              {
-                                LANGUAGE_LABELS[
-                                  (detail?.language ??
-                                    selectedCard?.language) ||
-                                    CardLanguage.English
-                                ]
-                              }
-                            </span>
-                          </>
-                        )}
-                      {!loading && detail?.variant && (
-                        <>
-                          <span className='text-default-500'>Variante</span>
-                          <span className='font-medium'>{detail.variant}</span>
-                        </>
-                      )}
-                      {!loading && detail?.type && (
-                        <>
-                          <span className='text-default-500'>Tipo</span>
-                          <div className='flex items-center gap-1'>
-                            <PokemonTypeIcon type={detail.type} size='sm' />
-                            <span className='font-medium'>{detail.type}</span>
-                          </div>
-                        </>
-                      )}
-                      {!loading && detail?.hp && (
-                        <>
-                          <span className='text-default-500'>HP</span>
-                          <span className='font-medium'>{detail.hp}</span>
-                        </>
-                      )}
-                      {!loading && detail?.stage && (
-                        <>
-                          <span className='text-default-500'>Etapa</span>
-                          <span className='font-medium'>{detail.stage}</span>
-                        </>
-                      )}
-                      {!loading && detail?.releaseDate && (
-                        <>
-                          <span className='text-default-500'>Lanzamiento</span>
-                          <span className='font-medium'>
-                            {formatReleaseDate(detail.releaseDate)}
-                          </span>
-                        </>
-                      )}
-                      {!loading && detail?.artist && (
-                        <>
-                          <span className='text-default-500'>Artista</span>
-                          <span className='font-medium'>{detail.artist}</span>
-                        </>
-                      )}
-                      <span className='text-default-500'>Stock total</span>
-                      <span className='font-medium'>{totalStock}</span>
-                      {sellPrice !== null && (
-                        <>
-                          <span className='text-default-500'>Precio venta</span>
-                          <span className='text-success font-medium'>
-                            ${sellPrice?.toFixed(2)}
-                          </span>
-                        </>
-                      )}
-                      <span className='text-default-500'>Disponible</span>
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        color={
-                          selectedCard?.availableStock ? 'success' : 'default'
+                      <span className='text-default-500'>Idioma</span>
+                      <span className='font-medium'>
+                        {
+                          LANGUAGE_LABELS[
+                            (detail?.language ?? selectedCard?.language) ||
+                              CardLanguage.English
+                          ]
                         }
-                      >
-                        {selectedCard?.availableStock ? 'Sí' : 'No'}
-                      </Chip>
+                      </span>
+                      <span className='text-default-500'>Existencias</span>
+                      <span className='font-medium'>{totalStock ?? 0} uds</span>
                     </div>
                   </div>
                 </div>
 
-                {!loading && detail?.cardText && (
-                  <>
-                    <Divider />
-                    <div className='flex flex-col gap-2'>
-                      <h4 className='text-sm font-semibold'>
-                        Texto de la carta
-                      </h4>
-                      <div className='bg-default-50 rounded-lg p-3'>
-                        <div
-                          className='text-default-700 text-sm'
-                          dangerouslySetInnerHTML={{ __html: detail.cardText }}
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <Divider />
-
-                <div className='flex flex-col gap-3'>
-                  <h4 className='text-sm font-semibold'>Idioma y condición</h4>
-                  <LanguageSelector
-                    value={selectedLanguage}
-                    onChange={handleLanguageChange}
-                    tcgType={TCG_TYPES.POKEMON}
-                    currentLanguage={
-                      detail?.language ?? selectedCard?.language ?? undefined
-                    }
-                    size='sm'
-                  />
-                </div>
-
                 <div className='flex flex-col gap-3'>
                   <h4 className='text-sm font-semibold'>
-                    Variantes por condición
+                    Inventario por condición
                   </h4>
+                  <LanguagePills
+                    options={languageOptions}
+                    totalCount={allVariants.reduce(
+                      (acc, v) => acc + v.stock,
+                      0
+                    )}
+                    value={languageFilter}
+                    onChange={(value) => {
+                      setLanguageFilter(value);
+                      if (value !== 'ALL') handleLanguageChange(value);
+                    }}
+                  />
                   {loading ? (
-                    <div className='flex gap-2'>
-                      <Skeleton className='h-8 w-20 rounded-lg' />
-                      <Skeleton className='h-8 w-20 rounded-lg' />
-                    </div>
+                    <Skeleton className='h-40 w-full rounded-xl' />
                   ) : (
-                    <div className='flex flex-wrap gap-2'>
-                      {Object.values(CARD_CONDITIONS).map((condition) => {
-                        const existing = availableVariants.find(
-                          (v: InventoryCard) => v.condition === condition
-                        );
-                        const variant: InventoryCard = existing ?? {
-                          cardGuid: selectedCard?.guid ?? '',
-                          inventoryItemGuid: undefined,
-                          isNew: true,
-                          condition,
-                          language: selectedLanguage,
-                          stock: 0,
-                          purchasePrice: null,
-                          sellPrice: null,
-                        };
-                        const isSelected =
-                          selectedVariant?.condition === condition;
-                        return (
-                          <Button
-                            key={condition}
-                            size='sm'
-                            variant={isSelected ? 'solid' : 'bordered'}
-                            color='default'
-                            className={
-                              isSelected ? 'border-none text-white' : ''
-                            }
-                            style={
-                              isSelected
-                                ? { backgroundColor: 'var(--color-accent)' }
-                                : undefined
-                            }
-                            onPress={() => handleVariantSelect(variant)}
-                            data-testid={`variant-button-${condition.toLowerCase().replace(/_/g, '-')}`}
-                          >
-                            {CARD_CONDITION_SHORT_LABELS[condition]} (
-                            {variant.stock})
-                          </Button>
-                        );
-                      })}
-                    </div>
+                    <InventoryConditionTable
+                      availableVariants={
+                        languageFilter === 'ALL'
+                          ? allVariants
+                          : availableVariants
+                      }
+                      selectedVariant={selectedVariant}
+                      selectedLanguage={selectedLanguage}
+                      showAllLanguages={languageFilter === 'ALL'}
+                      onVariantSelect={handleVariantSelect}
+                    />
                   )}
                 </div>
 
-                {selectedVariant && (
+                {actionView === 'summary' && (
                   <>
-                    <Divider />
-
                     <Tabs
-                      aria-label='Opciones de gestión de carta'
+                      aria-label='Detalle de la carta'
                       fullWidth
-                      color='default'
-                      selectedKey={selectedTab}
-                      onSelectionChange={(key) => setSelectedTab(key as string)}
+                      color='primary'
                       classNames={{
                         tabList: 'w-full',
-                        tab: 'text-accent',
-                        cursor: 'bg-accent',
-                        tabContent: 'group-data-[selected=true]:text-white',
                       }}
+                      style={
+                        {
+                          '--heroui-primary': TCG_THEMES.POKEMON.accentHsl,
+                        } as React.CSSProperties
+                      }
                     >
-                      <Tab key='info' title='Información'>
-                        <VariantInfoTab
-                          stock={selectedVariant.stock}
-                          purchasePrice={selectedVariant.purchasePrice}
-                          sellPrice={selectedVariant.sellPrice}
-                          marketPrices={
-                            metricsData?.pokemonCardWithMetrics
-                              ? {
-                                  ungradedPrice:
-                                    metricsData.pokemonCardWithMetrics
-                                      .ungradedPrice,
-                                  gradedPriceSeven:
-                                    metricsData.pokemonCardWithMetrics
-                                      .gradedPriceSeven,
-                                }
-                              : undefined
-                          }
-                          wishlistMetrics={{
-                            total: totalWishlistCount,
-                            variant: variantMetrics?.wishlistCount ?? 0,
-                          }}
-                          additionalMetrics={
-                            variantMetrics
-                              ? {
-                                  lastSellDate: variantMetrics.lastSellDate
-                                    ? new Date(
-                                        variantMetrics.lastSellDate as
-                                          | string
-                                          | number
-                                      ).getTime()
-                                    : null,
-                                  avgDaysInInventory:
-                                    variantMetrics.avgDaysInInventory,
-                                }
-                              : undefined
-                          }
-                        />
-                      </Tab>
-
-                      <Tab key='stock' title='Ajustar stock'>
-                        <StockAdjustmentTab control={stockControl} />
-                      </Tab>
-
-                      <Tab key='price' title='Editar precio de venta'>
-                        <form
-                          onSubmit={(...args) => {
-                            void handleSubmit(handlePriceSubmit)(...args);
-                          }}
-                        >
-                          <PriceEditTab
-                            control={control}
-                            formState={formState}
-                            watch={watch}
+                      <Tab key='resumen' title='Resumen'>
+                        <div className='flex flex-col gap-4 pt-3'>
+                          <PrintDataSection
+                            fields={[
+                              {
+                                label: 'Variante',
+                                value: detail?.variant ?? null,
+                              },
+                              {
+                                label: 'Rareza',
+                                value: detail?.rarity ?? null,
+                              },
+                              { label: 'Tipo', value: detail?.type ?? null },
+                              {
+                                label: 'HP',
+                                value:
+                                  detail?.hp != null ? String(detail.hp) : null,
+                              },
+                              { label: 'Etapa', value: detail?.stage ?? null },
+                              {
+                                label: 'Artista',
+                                value: detail?.artist ?? null,
+                              },
+                              {
+                                label: 'Lanzamiento',
+                                value: detail?.releaseDate
+                                  ? formatReleaseDate(detail.releaseDate)
+                                  : null,
+                              },
+                            ]}
                           />
-                        </form>
+                          {!loading && detail?.cardText && (
+                            <div className='border-default-200 rounded-xl border bg-white p-4'>
+                              <h5 className='text-default-500 mb-3 text-xs font-semibold tracking-wide uppercase'>
+                                Texto de la carta
+                              </h5>
+                              <div
+                                className='text-default-700 text-sm'
+                                dangerouslySetInnerHTML={{
+                                  __html: detail.cardText,
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </Tab>
 
-                      {selectedVariant.inventoryItemGuid && (
-                        <>
-                          <Tab key='movements' title='Movimientos'>
+                      <Tab key='movements' title='Historial de movimientos'>
+                        <div className='pt-3'>
+                          {selectedVariant?.inventoryItemGuid ? (
                             <MovementsHistoryTab
                               inventoryItemGuid={
                                 selectedVariant.inventoryItemGuid
                               }
                               tcgType='POKEMON'
                             />
-                          </Tab>
+                          ) : (
+                            <p className='text-default-400 p-6 text-center text-sm'>
+                              Sin registro de inventario para esta condición.
+                            </p>
+                          )}
+                        </div>
+                      </Tab>
 
-                          <Tab key='price-history' title='Historial de precios'>
+                      <Tab key='price-history' title='Historial de precios'>
+                        <div className='pt-3'>
+                          {selectedVariant?.inventoryItemGuid ? (
                             <PriceHistoryTab
                               inventoryItemGuid={
                                 selectedVariant.inventoryItemGuid
                               }
                             />
-                          </Tab>
-                        </>
-                      )}
+                          ) : (
+                            <p className='text-default-400 p-6 text-center text-sm'>
+                              Sin registro de inventario para esta condición.
+                            </p>
+                          )}
+                        </div>
+                      </Tab>
+
+                      <Tab key='market' title='Mercado'>
+                        <div className='pt-3'>
+                          <MarketTab
+                            providerName='PriceCharting'
+                            referencePrices={referencePrices}
+                            variantMetrics={variantMetrics}
+                            loading={metricsLoading}
+                            requested={metricsRequested}
+                            error={!!metricsError}
+                            onRequest={handleMetricsRequest}
+                          />
+                        </div>
+                      </Tab>
                     </Tabs>
                   </>
+                )}
+
+                {actionView === 'adjust' && (
+                  <div className='flex flex-col gap-3'>
+                    <h4 className='text-sm font-semibold'>
+                      Ajustar inventario
+                    </h4>
+                    <StockAdjustmentTab control={stockControl} />
+                  </div>
+                )}
+
+                {actionView === 'price' && (
+                  <div className='flex flex-col gap-3'>
+                    <h4 className='text-sm font-semibold'>
+                      Editar precio de venta
+                    </h4>
+                    <form
+                      onSubmit={(...args) => {
+                        void handleSubmit(handlePriceSubmit)(...args);
+                      }}
+                    >
+                      <PriceEditTab
+                        control={control}
+                        formState={formState}
+                        watch={watch}
+                      />
+                    </form>
+                  </div>
                 )}
               </>
             )}
           </DrawerBody>
 
-          <DrawerFooter className='flex justify-end gap-4'>
-            <Button
-              variant='light'
-              onPress={onClose}
-              className='text-accent'
-              data-testid='close-modal-button'
-            >
-              Cerrar
-            </Button>
-
-            {selectedTab === 'stock' && (
-              <KidstopButton
-                variant='accent'
-                onPress={handleStockAdjustClick}
-                isLoading={adjustLoading}
-                isDisabled={!stockFormState.isValid}
-                startContent={<Icon icon='lucide:package-plus' />}
-                data-testid='save-stock-adjustment-button'
-              >
-                Aplicar ajuste
-              </KidstopButton>
+          <DrawerFooter className='flex justify-end gap-3'>
+            {actionView === 'summary' && (
+              <>
+                <Button
+                  variant='light'
+                  onPress={onClose}
+                  className='text-accent'
+                  data-testid='close-modal-button'
+                >
+                  Cerrar
+                </Button>
+                {selectedCard && (
+                  <>
+                    <Button
+                      variant='bordered'
+                      onPress={() => setActionView('price')}
+                      startContent={<Icon icon='lucide:pencil' />}
+                      className='text-accent border-accent/40'
+                      data-testid='open-price-edit-button'
+                    >
+                      Editar precios
+                    </Button>
+                    <KidstopButton
+                      variant='accent'
+                      onPress={() => setActionView('adjust')}
+                      startContent={<Icon icon='lucide:package-plus' />}
+                      data-testid='open-stock-adjust-button'
+                    >
+                      Ajustar inventario
+                    </KidstopButton>
+                  </>
+                )}
+              </>
             )}
 
-            {selectedTab === 'price' && (
-              <KidstopButton
-                variant='accent'
-                onPress={() => void handleSubmit(handlePriceSubmit)()}
-                isLoading={updatingPrice}
-                isDisabled={!formState.isValid}
-                startContent={<Icon icon='lucide:save' />}
-                data-testid='save-price-button'
-              >
-                Guardar precios
-              </KidstopButton>
+            {actionView === 'adjust' && (
+              <>
+                <Button
+                  variant='light'
+                  onPress={() => setActionView('summary')}
+                  className='text-accent'
+                  data-testid='back-to-summary-button'
+                >
+                  Volver al resumen
+                </Button>
+                <KidstopButton
+                  variant='accent'
+                  onPress={handleStockAdjustClick}
+                  isLoading={adjustLoading}
+                  isDisabled={!isStockFormValid || !isStockFormDirty}
+                  startContent={<Icon icon='lucide:package-plus' />}
+                  data-testid='save-stock-adjustment-button'
+                >
+                  Aplicar ajuste
+                </KidstopButton>
+              </>
+            )}
+
+            {actionView === 'price' && (
+              <>
+                <Button
+                  variant='light'
+                  onPress={() => setActionView('summary')}
+                  className='text-accent'
+                  data-testid='back-to-summary-button'
+                >
+                  Volver al resumen
+                </Button>
+                <KidstopButton
+                  variant='accent'
+                  onPress={() => void handleSubmit(handlePriceSubmit)()}
+                  isLoading={updatingPrice}
+                  isDisabled={!formState.isValid}
+                  startContent={<Icon icon='lucide:save' />}
+                  data-testid='save-price-button'
+                >
+                  Guardar precios
+                </KidstopButton>
+              </>
             )}
           </DrawerFooter>
         </DrawerContent>

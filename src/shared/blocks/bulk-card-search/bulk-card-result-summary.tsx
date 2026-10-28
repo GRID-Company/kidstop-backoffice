@@ -2,16 +2,15 @@
 
 import { Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import Image from 'next/image';
 import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import PriceMetricsSkeleton from './components/price-metrics-skeleton';
 import { BulkCardData } from './types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { formatCurrency } from '@/lib/utils/format-currency';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface BulkCardResultSummaryProps {
   card: BulkCardData;
@@ -36,49 +35,24 @@ export default function BulkCardResultSummary({
   return (
     <>
       <div className='flex min-w-0 flex-1 items-center gap-3'>
-        <div
-          className='bg-default-100 relative h-[90px] w-[65px] shrink-0 cursor-pointer overflow-hidden rounded-md transition-opacity hover:opacity-80'
-          onClick={(e) => {
-            e.stopPropagation();
-            openPreview(
-              card.imageUri ?? null,
-              card.name,
-              tcgType as 'POKEMON' | 'MAGIC'
-            );
-          }}
-          role='button'
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.stopPropagation();
+        <div className='bg-default-100 relative h-22.5 w-16.25 shrink-0 overflow-hidden rounded-md'>
+          <CardImage
+            src={card.imageUri}
+            alt={card.name}
+            tcgType={tcgType}
+            containerClassName='absolute inset-0'
+            className='object-contain p-1'
+            fill
+            sizes='65px'
+            enablePreview
+            onImageClick={() =>
               openPreview(
                 card.imageUri ?? null,
                 card.name,
                 tcgType as 'POKEMON' | 'MAGIC'
-              );
+              )
             }
-          }}
-          aria-label={`Ver ${card.name} en tamaño completo`}
-        >
-          {card.imageUri ? (
-            <img
-              src={card.imageUri}
-              alt={card.name}
-              className='absolute inset-0 h-full w-full object-contain p-1'
-            />
-          ) : (
-            <Image
-              src={
-                tcgType === 'MAGIC'
-                  ? magicCardPlaceholder
-                  : pokemonCardPlaceholder
-              }
-              alt={`${tcgType} card placeholder`}
-              fill
-              sizes='65px'
-              className='object-contain p-1'
-            />
-          )}
+          />
         </div>
         <div className='flex flex-1 flex-col gap-1'>
           <p className='text-sm leading-tight font-semibold'>{card.name}</p>
@@ -103,7 +77,7 @@ export default function BulkCardResultSummary({
             )}
           </div>
           <p className='text-default-500 text-xs'>
-            {card.edition} · #{card.collectorNumber}
+            {card.edition} · {formatCardNumber(card.collectorNumber)}
           </p>
           <div className='flex items-center gap-3'>
             <div className='flex items-center gap-1'>

@@ -5,7 +5,9 @@ import { Divider } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { CardImage } from '@/shared/components/card-image';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 import { TCGType } from '@/lib/types/tcg.types';
 import { TCG_OPTIONS } from '@/lib/consts/tcg-options';
@@ -130,44 +132,31 @@ function PreviewCardItem({
       </span>
 
       <motion.div
-        className='relative aspect-[3/4] w-24 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 border-amber-900/25 bg-amber-100/50 shadow-md transition-opacity hover:opacity-80'
+        className='relative aspect-[3/4] w-24 shrink-0 overflow-hidden rounded-lg border-2 border-amber-900/25 bg-amber-100/50 shadow-md'
         animate={{ y: [0, -3, 0] }}
         transition={{
           duration: 3 + index * 0.4,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
-        onClick={() =>
-          openPreview(
-            cardImage,
-            cardName,
-            item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
-          )
-        }
-        role='button'
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+      >
+        <CardImage
+          src={cardImage}
+          alt={cardName}
+          tcgType={item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'}
+          containerClassName='relative h-full w-full'
+          className='object-contain p-0.5'
+          fill
+          sizes='96px'
+          enablePreview
+          onImageClick={() =>
             openPreview(
               cardImage,
               cardName,
               item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
-            );
+            )
           }
-        }}
-        aria-label={`Ver ${cardName} en tamaño completo`}
-      >
-        {cardImage ? (
-          <img
-            src={cardImage}
-            alt={cardName}
-            className='absolute inset-0 h-full w-full object-contain p-0.5'
-          />
-        ) : (
-          <div className='flex h-full items-center justify-center text-amber-700/40'>
-            <Icon icon='lucide:image' width={28} />
-          </div>
-        )}
+        />
       </motion.div>
 
       <div className='flex min-w-0 flex-1 flex-col gap-1'>
@@ -175,7 +164,7 @@ function PreviewCardItem({
           {cardName}
         </span>
         <span className='truncate text-base text-amber-800/70'>
-          {cardSet} {cardNumber ? `— ${cardNumber}` : ''}
+          {cardSet} {cardNumber ? `• ${formatCardNumber(cardNumber)}` : ''}
         </span>
         {item.notes && (
           <span className='truncate text-sm text-amber-700/60 italic'>

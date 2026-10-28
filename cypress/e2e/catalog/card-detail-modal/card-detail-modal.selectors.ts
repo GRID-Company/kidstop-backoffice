@@ -12,6 +12,11 @@ export const CardDetailModalSelectors = {
   variantButtonHeavilyPlayed: '[data-testid="variant-button-heavily-played"]',
   variantButtonDamaged: '[data-testid="variant-button-damaged"]',
 
+  // Action Views
+  openStockAdjustButton: '[data-testid="open-stock-adjust-button"]',
+  openPriceEditButton: '[data-testid="open-price-edit-button"]',
+  backToSummaryButton: '[data-testid="back-to-summary-button"]',
+
   // Stock Adjustment
   stockMovementTypeSelect: '[data-testid="stock-movement-type-select"]',
   stockAdjustmentInput: '[data-testid="stock-adjustment-input"]',
@@ -22,11 +27,9 @@ export const CardDetailModalSelectors = {
   priceNotesTextarea: '[data-testid="price-notes-textarea"]',
   savePriceButton: '[data-testid="save-price-button"]',
 
-  // Tabs
-  tabStock: '[data-testid="tab-stock"]',
-  tabPrice: '[data-testid="tab-price"]',
-  tabMovements: '[data-testid="tab-movements"]',
-  tabPriceHistory: '[data-testid="tab-price-history"]',
+  // Market
+  loadMarketPricesButton: '[data-testid="load-market-prices-button"]',
+  marketTabContent: '[data-testid="market-tab-content"]',
 
   // Success/Error Messages
   successMessage: '[role="status"]',

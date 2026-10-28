@@ -25,6 +25,7 @@ import { ScanEmptyState } from './scan-empty-state';
 import { ScanFieldsEditor } from './scan-fields-editor';
 import { ScanOcrText } from './scan-ocr-text';
 import { ScanStatusBanner } from './scan-status-banner';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface ScannerResultsProps {
   scannedData: IScannedCardData;
@@ -122,7 +123,7 @@ export const ScannerResults = ({
           <div className='flex flex-col gap-2'>
             {[0, 1, 2].map((row) => (
               <div key={row} className='flex items-center gap-3'>
-                <Skeleton className='h-[90px] w-[65px] shrink-0 rounded-md' />
+                <Skeleton className='h-22.5 w-16.25 shrink-0 rounded-md' />
                 <div className='flex flex-1 flex-col gap-2'>
                   <Skeleton className='h-3 w-3/5 rounded' />
                   <Skeleton className='h-3 w-2/5 rounded' />
@@ -167,16 +168,26 @@ export const ScannerResults = ({
             Coincidencias ({searchResults.candidates.length})
           </h4>
           <div className='flex flex-col gap-2'>
-            {searchResults.candidates.map((candidate) => (
-              <PurchaseCardResultItem
-                key={`${candidate.guid}-${candidate.isBestMatch}`}
-                card={mapScanCandidateToCardSearchResult(candidate)}
-                onAdd={onAddPurchaseItem}
-                existingItemIds={existingItemIds}
-                isBestMatch={candidate.isBestMatch}
-                stacked
-              />
-            ))}
+            {searchResults.candidates.map((candidate) => {
+              const cardResult = mapScanCandidateToCardSearchResult(candidate);
+              return (
+                <PurchaseCardResultItem
+                  key={`${candidate.guid}-${candidate.isBestMatch}`}
+                  card={cardResult}
+                  onAdd={onAddPurchaseItem}
+                  existingItemIds={existingItemIds}
+                  isBestMatch={candidate.isBestMatch}
+                  onImageClick={() =>
+                    openPreview(
+                      cardResult.imageUrl,
+                      cardResult.name,
+                      cardResult.tcgType
+                    )
+                  }
+                  stacked
+                />
+              );
+            })}
           </div>
         </div>
       )}
@@ -267,7 +278,7 @@ export const ScannerResults = ({
               <div className='flex justify-between'>
                 <span className='text-content-tertiary'>Número</span>
                 <span className='text-content-primary font-medium'>
-                  #{searchResults.aiResolved.cardNumber}
+                  {formatCardNumber(searchResults.aiResolved.cardNumber)}
                 </span>
               </div>
             )}

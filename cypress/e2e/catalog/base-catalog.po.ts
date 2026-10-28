@@ -1,6 +1,7 @@
 import { config } from '../../support/consts/config.const';
 import { TIMEOUTS } from '../../support/consts/timeouts.const';
 import { parsePrice } from '../../support/utils/price.utils';
+import { selectHeroUIOption } from '../../support/utils/select.utils';
 
 const { graphqlQuery } = config.params.timeouts;
 
@@ -52,11 +53,7 @@ export abstract class BaseCatalogPage {
 
   // Sort
   sortBy(option: string) {
-    cy.get(this.selectors.sortSelect).click();
-    cy.contains('li', option, { timeout: TIMEOUTS.DROPDOWN_OPEN })
-      .should('be.visible')
-      .first()
-      .click({ force: true });
+    selectHeroUIOption(this.selectors.sortSelect, option);
     cy.wait(this.graphqlAliases.cardsQuery, { timeout: graphqlQuery });
     cy.contains(this.selectors.loadingIndicator).should('not.exist');
     cy.wait(TIMEOUTS.DEBOUNCE);
@@ -74,11 +71,7 @@ export abstract class BaseCatalogPage {
   }
 
   selectCondition(condition: string) {
-    cy.get(this.selectors.filterConditionSelect).click();
-    cy.contains('li', condition, { timeout: TIMEOUTS.DROPDOWN_OPEN })
-      .should('be.visible')
-      .first()
-      .click({ force: true });
+    selectHeroUIOption(this.selectors.filterConditionSelect, condition);
     cy.wait(TIMEOUTS.ANIMATION);
   }
 
@@ -98,7 +91,10 @@ export abstract class BaseCatalogPage {
 
   // Card Interaction
   clickFirstCard() {
-    cy.get(this.selectors.cardItem).first().click();
+    cy.get(this.selectors.cardItem)
+      .first()
+      .find('[data-testid$="-name"]')
+      .click();
     cy.wait(TIMEOUTS.DEBOUNCE);
   }
 
@@ -137,16 +133,20 @@ export abstract class BaseCatalogPage {
   shouldSeeResultCountGreaterThan(count: number) {
     cy.get(this.selectors.resultCount).should(($el) => {
       const text = $el.text();
-      const match = text.match(/(\d+)/);
+      const match = text.match(/([\d,]+)/);
       if (match) {
-        const resultCount = parseInt(match[1], 10);
+        const resultCount = parseInt(match[1].replace(/,/g, ''), 10);
         return expect(resultCount).to.be.greaterThan(count);
       }
     });
   }
 
   shouldSeeResultCountEqual(count: number) {
-    cy.get(this.selectors.resultCount).should('contain', String(count));
+    cy.get(this.selectors.resultCount).should(($el) => {
+      const match = $el.text().match(/([\d,]+)/);
+      const actual = match ? parseInt(match[1].replace(/,/g, ''), 10) : NaN;
+      return expect(actual).to.equal(count);
+    });
   }
 
   // Filter Drawer

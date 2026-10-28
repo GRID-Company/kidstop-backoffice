@@ -1,7 +1,12 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
 import { ISelectOption } from '@/shared/base/heorui-overrides/select';
-import { DEFAULT_MARGIN_PERCENTAGE, MIN_PRICE } from './constants';
-import { CardFilters } from './types';
+import {
+  CARD_CONDITIONS,
+  CARD_CONDITION_SHORT_LABELS,
+  DEFAULT_MARGIN_PERCENTAGE,
+  MIN_PRICE,
+} from './constants';
+import { CardCondition, CardFilters } from './types';
 import { BulkOperationType } from '@/lib/api/schema-types';
 
 export const getCardsVars = (args: IPaginatedApiArgs, filters: CardFilters) => {
@@ -27,6 +32,49 @@ export const toSetCodeOptions = (
       ? `${collection.code.toUpperCase()} — ${collection.name}`
       : collection.name,
   }));
+
+export const summarizeConditionStock = (
+  variants: Array<{ condition: string; stock: number }>
+): Array<{ label: string; stock: number }> => {
+  const totals = new Map<string, number>();
+  for (const variant of variants) {
+    if (variant.stock <= 0) continue;
+    totals.set(
+      variant.condition,
+      (totals.get(variant.condition) ?? 0) + variant.stock
+    );
+  }
+
+  const order = Object.values(CARD_CONDITIONS) as string[];
+  return [...totals.entries()]
+    .sort(
+      ([a], [b]) =>
+        (order.includes(a) ? order.indexOf(a) : order.length) -
+        (order.includes(b) ? order.indexOf(b) : order.length)
+    )
+    .map(([condition, stock]) => ({
+      label:
+        CARD_CONDITION_SHORT_LABELS[condition as CardCondition] ?? condition,
+      stock,
+    }));
+};
+
+export const getMinStockedPurchasePrice = (
+  variants: Array<{ stock: number; purchasePrice: number | null }>
+): number | null => {
+  const prices = variants
+    .filter((v) => v.stock > 0 && v.purchasePrice != null)
+    .map((v) => v.purchasePrice as number);
+  return prices.length > 0 ? Math.min(...prices) : null;
+};
+
+export const calculateGrossMarginPercent = (
+  sellPrice: number | null | undefined,
+  purchasePrice: number | null | undefined
+): number | null => {
+  if (sellPrice == null || purchasePrice == null || sellPrice <= 0) return null;
+  return ((sellPrice - purchasePrice) / sellPrice) * 100;
+};
 
 export const calculatePriceMargin = (
   buyPrice: number,

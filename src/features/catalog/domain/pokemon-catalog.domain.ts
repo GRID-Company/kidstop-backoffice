@@ -24,6 +24,7 @@ export const getPokemonCatalogVars = (
         variant: filters?.variant || undefined,
         genre: filters?.genre || undefined,
         language: filters?.language || undefined,
+        stockStatus: filters?.stockStatus || undefined,
       },
     },
   };
