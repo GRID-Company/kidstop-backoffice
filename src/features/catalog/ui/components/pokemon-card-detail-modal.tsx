@@ -133,6 +133,9 @@ export default function PokemonCardDetailModal({
     onRefetch: refetch,
   });
 
+  const { isValid: isStockFormValid, isDirty: isStockFormDirty } =
+    stockFormState;
+
   const handleStockAdjustClick = useCallback(() => {
     const formValues = stockWatch();
     if (isStockAdjustmentDisabled(formValues.quantity, formValues.movementType))
@@ -617,7 +620,7 @@ export default function PokemonCardDetailModal({
                   variant='accent'
                   onPress={handleStockAdjustClick}
                   isLoading={adjustLoading}
-                  isDisabled={!stockFormState.isValid}
+                  isDisabled={!isStockFormValid || !isStockFormDirty}
                   startContent={<Icon icon='lucide:package-plus' />}
                   data-testid='save-stock-adjustment-button'
                 >

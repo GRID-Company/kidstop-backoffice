@@ -130,6 +130,9 @@ export default function MagicCardDetailModal({
     onRefetch: refetch,
   });
 
+  const { isValid: isStockFormValid, isDirty: isStockFormDirty } =
+    stockFormState;
+
   const handleStockAdjustClick = useCallback(() => {
     const formValues = stockWatch();
     if (isStockAdjustmentDisabled(formValues.quantity, formValues.movementType))
@@ -573,9 +576,7 @@ export default function MagicCardDetailModal({
                   variant='accent'
                   onPress={handleStockAdjustClick}
                   isLoading={adjustLoading}
-                  isDisabled={
-                    !stockFormState.isValid || !stockFormState.isDirty
-                  }
+                  isDisabled={!isStockFormValid || !isStockFormDirty}
                   startContent={<Icon icon='lucide:package-plus' />}
                   data-testid='save-stock-adjustment-button'
                 >

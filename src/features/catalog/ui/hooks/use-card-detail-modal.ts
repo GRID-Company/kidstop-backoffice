@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useFormState } from 'react-hook-form';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
 import {
   DEFAULT_CARD_LANGUAGE,
@@ -163,7 +163,8 @@ export function useCardDetailModal({
   // Reset isInitialLoadRef when card changes
   useEffect(() => {
     isInitialLoadRef.current = true;
-  }, [card?.guid]);
+    stockForm.reset();
+  }, [card?.guid, stockForm]);
 
   useEffect(() => {
     if (selectedVariant) {
@@ -261,7 +262,7 @@ export function useCardDetailModal({
     adjustLoading,
     cardName: detail?.name,
     stockControl: stockForm.control,
-    stockFormState: stockForm.formState,
+    stockFormState: useFormState({ control: stockForm.control }),
     stockWatch: stockForm.watch,
   };
 }
