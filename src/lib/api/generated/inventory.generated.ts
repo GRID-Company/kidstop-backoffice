@@ -139,7 +139,12 @@ export type InventoryItemSellPriceHistoryQuery = {
       notes: string | null;
       createdDate: unknown;
       createdBy: { name: string | null } | null;
-      inventoryItem: { guid: string; tcg: string; condition: string };
+      inventoryItem: {
+        guid: string;
+        tcg: string;
+        condition: string;
+        language: Types.CardLanguage;
+      };
     }> | null;
   };
 };
@@ -791,6 +796,10 @@ export const InventoryItemSellPriceHistoryDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'condition' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'language' },
                             },
                           ],
                         },

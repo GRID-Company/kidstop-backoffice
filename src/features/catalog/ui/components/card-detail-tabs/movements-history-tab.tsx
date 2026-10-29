@@ -1,21 +1,25 @@
 'use client';
 
+import { ISelectOption } from '@/shared/base/heorui-overrides/select';
 import InventoryMovementsTable from '../inventory-movements-table';
 
 interface MovementsHistoryTabProps {
-  inventoryItemGuid: string;
+  cardGuid: string;
   tcgType: 'POKEMON' | 'MAGIC';
+  languageOptions: ISelectOption[];
 }
 
 export default function MovementsHistoryTab({
-  inventoryItemGuid,
+  cardGuid,
   tcgType,
+  languageOptions,
 }: MovementsHistoryTabProps) {
   return (
     <div data-testid='tab-movements'>
       <InventoryMovementsTable
-        inventoryItemGuid={inventoryItemGuid}
+        cardGuid={cardGuid}
         tcg={tcgType}
+        languageOptions={languageOptions}
       />
     </div>
   );
