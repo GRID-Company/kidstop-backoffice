@@ -392,8 +392,12 @@ export type FindInventoryMovementsArgs = {
 };
 
 export type FindInventoryMovementsFilter = {
+  /** Card guid; returns movements for every inventory item belonging to that card */
+  cardGuid?: InputMaybe<Scalars['String']['input']>;
+  condition?: InputMaybe<Scalars['String']['input']>;
   createdDate?: InputMaybe<DateRangeFilter>;
   inventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<CardLanguage>;
   movementType?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
 };
@@ -523,8 +527,12 @@ export type FindSellPriceHistoryArgs = {
 };
 
 export type FindSellPriceHistoryFilter = {
+  /** Card guid; returns history for every inventory item belonging to that card */
+  cardGuid?: InputMaybe<Scalars['String']['input']>;
+  condition?: InputMaybe<Scalars['String']['input']>;
   createdDate?: InputMaybe<DateRangeFilter>;
   inventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<CardLanguage>;
   reason?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -690,6 +698,7 @@ export type MagicCard = {
   edhrecRank?: Maybe<Scalars['Float']['output']>;
   edition: Scalars['String']['output'];
   finishes?: Maybe<Array<Scalars['String']['output']>>;
+  flavorName?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
@@ -1400,6 +1409,7 @@ export type PokemonCardCollection = {
   releaseDate?: Maybe<Scalars['String']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setLogo?: Maybe<Scalars['String']['output']>;
+  tcgDexId?: Maybe<Scalars['String']['output']>;
   tcgType: Scalars['String']['output'];
   totalCards: Scalars['Float']['output'];
   updatedBy?: Maybe<User>;
@@ -1693,7 +1703,7 @@ export type Query = {
   magicCardPublicDetail: MagicCardPublicDetail;
   /** Get paginated public list of Magic cards with filters and search */
   magicCardPublicList: PaginatedMagicCardsPublic;
-  /** Get all unique card rarities available in the Magic catalog (cached 1hr) */
+  /** Get all unique card rarities available in the Magic catalog (cached daily) */
   magicCardRarities: Array<Scalars['String']['output']>;
   /** Scan search for a single Magic card by partial data and/or card images, with AI fallback (authenticated) */
   magicCardScanSearch: MagicCardScanSearchResult;
@@ -1721,7 +1731,7 @@ export type Query = {
   pokemonBatchCardSearch: PokemonCardBatchSearchResult;
   /** Get all Pokemon card collections, optionally filtered by set code or name (public) */
   pokemonCardCollections: Array<PokemonCardCollectionOutput>;
-  /** Get all unique card genres available in the catalog (cached 1hr) */
+  /** Get all unique card genres available in the catalog (cached daily) */
   pokemonCardGenres: Array<Scalars['String']['output']>;
   /** Get internal detail of a single Pokemon card with inventory data */
   pokemonCardInternalDetail: PokemonCardInternalDetail;
@@ -1731,11 +1741,11 @@ export type Query = {
   pokemonCardPublicDetail: PokemonCardPublicDetail;
   /** Get paginated public list of Pokemon cards with filters and search */
   pokemonCardPublicList: PaginatedPokemonCardsPublic;
-  /** Get all unique card rarities available in the catalog (cached 1hr) */
+  /** Get all unique card rarities available in the catalog (cached daily) */
   pokemonCardRarities: Array<Scalars['String']['output']>;
   /** Scan search for a single Pokemon card by partial data and/or card images, with AI fallback (authenticated) */
   pokemonCardScanSearch: PokemonCardScanSearchResult;
-  /** Get all unique card variants available in the catalog (cached 1hr) */
+  /** Get all unique card variants available in the catalog (cached daily) */
   pokemonCardVariants: Array<Scalars['String']['output']>;
   /** Get inventory variants with metrics for a Pokemon card (authenticated) */
   pokemonCardWithMetrics: PokemonCardWithMetrics;

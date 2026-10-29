@@ -58,4 +58,4 @@ export const STOCK_STATUS_OPTIONS = [
   { label: 'No disponible', value: 'UNAVAILABLE' },
 ];
 
-export const DEFAULT_HISTORY_LIMIT = 10;
+export const DEFAULT_HISTORY_LIMIT = 5;

@@ -35,7 +35,10 @@ import InventoryAdjustmentConfirmationModal from '@/features/inventory-cards/ui/
 import { toMagicCard } from '../../adapters/mappers/card.mapper';
 import CardSearch from '@/shared/blocks/card-search';
 import LanguagePills, { LanguageFilter } from './card-detail/language-pills';
-import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import {
+  getCardLanguageOptions,
+  LANGUAGE_LABELS,
+} from '@/lib/types/language.types';
 import { TCG_THEMES } from '@/lib/consts/tcg-themes';
 import {
   isStockAdjustmentDisabled,
@@ -198,6 +201,18 @@ export default function MagicCardDetailModal({
   }, [fetchMetrics, selectedCard?.guid]);
 
   const metrics = metricsData?.magicCardWithMetrics;
+
+  const historyLanguageOptions = useMemo(
+    () =>
+      getCardLanguageOptions(
+        'MAGIC',
+        detail?.language ?? selectedCard?.language
+      ).map((language) => ({
+        value: language,
+        label: LANGUAGE_LABELS[language],
+      })),
+    [detail?.language, selectedCard?.language]
+  );
 
   const referencePrices = useMemo<MarketReferencePrice[]>(
     () => [
@@ -452,34 +467,20 @@ export default function MagicCardDetailModal({
 
                       <Tab key='movements' title='Historial de movimientos'>
                         <div className='pt-3'>
-                          {selectedVariant?.inventoryItemGuid ? (
-                            <MovementsHistoryTab
-                              inventoryItemGuid={
-                                selectedVariant.inventoryItemGuid
-                              }
-                              tcgType='MAGIC'
-                            />
-                          ) : (
-                            <p className='text-default-400 p-6 text-center text-sm'>
-                              Sin registro de inventario para esta condición.
-                            </p>
-                          )}
+                          <MovementsHistoryTab
+                            cardGuid={selectedCard.guid}
+                            tcgType='MAGIC'
+                            languageOptions={historyLanguageOptions}
+                          />
                         </div>
                       </Tab>
 
                       <Tab key='price-history' title='Historial de precios'>
                         <div className='pt-3'>
-                          {selectedVariant?.inventoryItemGuid ? (
-                            <PriceHistoryTab
-                              inventoryItemGuid={
-                                selectedVariant.inventoryItemGuid
-                              }
-                            />
-                          ) : (
-                            <p className='text-default-400 p-6 text-center text-sm'>
-                              Sin registro de inventario para esta condición.
-                            </p>
-                          )}
+                          <PriceHistoryTab
+                            cardGuid={selectedCard.guid}
+                            languageOptions={historyLanguageOptions}
+                          />
                         </div>
                       </Tab>
 
