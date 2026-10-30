@@ -1,0 +1,60 @@
+{
+  "data": {
+    "magicCardScanSearch": {
+      "resolvedByAI": true,
+      "bestMatch": {
+        "guid": "scan-magic-nonfoil",
+        "name": "Toxrill, the Corrosive",
+        "edition": "Secret Lair Drop",
+        "collectorNumber": "1929",
+        "isFoil": false,
+        "sellPrice": 650,
+        "availableStock": true,
+        "totalStock": 2,
+        "imageUri": null,
+        "language": "ENGLISH",
+        "inventoryCards": [],
+        "cardMetrics": {
+          "variantsMetrics": [
+            {
+              "condition": "NEAR_MINT",
+              "language": "ENGLISH",
+              "stock": 2,
+              "lastSellDate": null,
+              "avgDaysInInventory": null,
+              "wishlistCount": 0
+            }
+          ],
+          "priceRetail": 650,
+          "priceBuy": null
+        }
+      },
+      "relatedCards": [
+        {
+          "guid": "scan-magic-foil",
+          "name": "Toxrill, the Corrosive",
+          "edition": "Secret Lair Drop",
+          "collectorNumber": "1929",
+          "isFoil": true,
+          "sellPrice": 1400,
+          "availableStock": true,
+          "totalStock": 1,
+          "imageUri": null,
+          "language": "ENGLISH"
+        }
+      ],
+      "aiResolved": {
+        "name": "Toxrill, the Corrosive",
+        "cardNumber": "1929",
+        "setCode": "SLD",
+        "setName": "Secret Lair Drop",
+        "cardText": null,
+        "detectedLanguage": "en",
+        "nameEs": null,
+        "setNameEs": null,
+        "cardTextEs": null
+      },
+      "error": null
+    }
+  }
+}

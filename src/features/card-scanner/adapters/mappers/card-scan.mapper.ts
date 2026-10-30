@@ -36,6 +36,9 @@ const mapPokemonItemToCandidate = (
   language: item.language,
   isFoil: false,
   variant: item.variant,
+  type: item.type,
+  hp: item.hp,
+  stage: item.stage,
   sellPrice: item.sellPrice,
   referencePrice:
     ('cardMetrics' in item ? item.cardMetrics?.ungradedPrice : null) ??

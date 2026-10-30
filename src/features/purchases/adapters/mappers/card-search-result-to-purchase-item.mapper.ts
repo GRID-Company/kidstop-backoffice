@@ -28,7 +28,7 @@ export function mapCardSearchResultToPurchaseItem(
     cardName: card.name,
     cardImageUrl: card.imageUrl,
     setName: card.setName,
-    setCode: card.setCode,
+    setCode: card.setCode || card.collectorNumber || '',
     cardNumber: card.number ? `#${card.number}` : undefined,
     tcgType: card.tcgType,
     variant: card.variant,

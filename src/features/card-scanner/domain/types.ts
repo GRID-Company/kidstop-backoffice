@@ -433,6 +433,9 @@ export interface ICardCandidate {
   language: CardLanguage;
   isFoil: boolean;
   variant: string | null;
+  type?: string | null;
+  hp?: string | null;
+  stage?: string | null;
   sellPrice: number | null;
   referencePrice: number | null;
   totalStock: number;

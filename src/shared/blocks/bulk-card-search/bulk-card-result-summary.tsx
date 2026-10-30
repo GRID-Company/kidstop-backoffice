@@ -1,8 +1,7 @@
 'use client';
 
-import { Chip } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import CardAttributeChips from '@/shared/components/card-attribute-chips';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
@@ -34,7 +33,10 @@ export default function BulkCardResultSummary({
 
   return (
     <>
-      <div className='flex min-w-0 flex-1 items-center gap-3'>
+      <div
+        className='flex min-w-0 flex-1 items-center gap-3'
+        data-testid='bulk-card-result-summary'
+      >
         <div className='bg-default-100 relative h-22.5 w-16.25 shrink-0 overflow-hidden rounded-md'>
           <CardImage
             src={card.imageUri}
@@ -56,26 +58,16 @@ export default function BulkCardResultSummary({
         </div>
         <div className='flex flex-1 flex-col gap-1'>
           <p className='text-sm leading-tight font-semibold'>{card.name}</p>
-          <div className='flex flex-wrap items-center gap-1.5'>
-            {tcgType === 'POKEMON' && card.type && (
-              <PokemonTypeIcon type={card.type} size='sm' />
-            )}
-            {tcgType === 'POKEMON' && card.hp && (
-              <Chip size='sm' variant='flat' className='h-4 px-1 text-[9px]'>
-                {card.hp} HP
-              </Chip>
-            )}
-            {card.variant && !card.variant.toLowerCase().includes('normal') && (
-              <Chip
-                size='sm'
-                variant='flat'
-                color='secondary'
-                className='h-4 px-1 text-[9px]'
-              >
-                {card.variant}
-              </Chip>
-            )}
-          </div>
+          <CardAttributeChips
+            tcgType={tcgType}
+            isFoil={card.isFoil}
+            variant={card.variant}
+            language={card.language}
+            type={card.type}
+            hp={card.hp}
+            stage={card.stage}
+            rarity={card.rarity}
+          />
           <p className='text-default-500 text-xs'>
             {card.edition} · {formatCardNumber(card.collectorNumber)}
           </p>

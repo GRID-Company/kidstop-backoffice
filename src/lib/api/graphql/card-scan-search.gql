@@ -13,6 +13,9 @@ query PokemonCardScanSearch($input: CardScanSearchInput!) {
       totalStock
       imageUri
       language
+      type
+      hp
+      stage
       inventoryCards {
         guid
         condition
@@ -46,6 +49,9 @@ query PokemonCardScanSearch($input: CardScanSearchInput!) {
       totalStock
       imageUri
       language
+      type
+      hp
+      stage
     }
     aiResolved {
       name

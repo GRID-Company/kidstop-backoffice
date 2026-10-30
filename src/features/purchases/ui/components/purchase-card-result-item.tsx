@@ -15,6 +15,7 @@ import { Icon } from '@iconify/react';
 
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
+import CardAttributeChips from '@/shared/components/card-attribute-chips';
 import { formatCurrency } from '@/lib/utils/format-currency';
 import { formatDate } from '@/lib/utils/format-date';
 import { formatDaysInInventory } from '@/lib/utils/format-inventory';
@@ -143,7 +144,7 @@ export default function PurchaseCardResultItem({
   const displayMetrics = variantMetrics || card.metrics;
 
   return (
-    <KidstopCard className='w-full'>
+    <KidstopCard className='w-full' data-testid='purchase-card-result-item'>
       <CardBody
         className={`flex flex-col gap-3 !p-3 ${stacked ? '' : 'xl:flex-row xl:gap-4 xl:!p-4'}`}
       >
@@ -166,12 +167,22 @@ export default function PurchaseCardResultItem({
           <div className='flex flex-col justify-center gap-1'>
             <p className='text-sm leading-tight font-semibold'>{card.name}</p>
             <p className='text-default-500 text-xs'>
-              {card.setName} · {card.setCode}
+              {card.setName}
+              {card.setCode ? ` · ${card.setCode}` : ''}
             </p>
             <p className='text-default-400 text-xs'>
               {formatCardNumber(card.number)}{' '}
               {card.rarity ? `· ${card.rarity}` : ''}
             </p>
+            <CardAttributeChips
+              tcgType={card.tcgType}
+              isFoil={card.isFoil}
+              variant={card.variant}
+              language={card.language}
+              type={card.type}
+              hp={card.hp}
+              stage={card.stage}
+            />
           </div>
         </div>
 
