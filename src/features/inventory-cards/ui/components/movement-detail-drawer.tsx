@@ -24,6 +24,7 @@ import {
   MOVEMENT_TYPE_ICONS,
   formatMovementQuantity,
 } from '../../domain/constants';
+import MovementReferenceLink from './movement-reference-link';
 
 interface MovementDetailDrawerProps {
   item: IInventoryMovement | null;
@@ -127,9 +128,11 @@ export default function MovementDetailDrawer({
             {item.reference && (
               <div className='flex items-center justify-between'>
                 <span className='text-default-500 text-sm'>Referencia</span>
-                <span className='text-default-700 text-sm'>
-                  {item.reference}
-                </span>
+                <MovementReferenceLink
+                  movementType={item.movementType}
+                  reference={item.reference}
+                  className='text-sm'
+                />
               </div>
             )}
           </div>

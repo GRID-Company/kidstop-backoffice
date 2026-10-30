@@ -29,6 +29,7 @@ import {
   MOVEMENT_TYPE_ICONS,
   formatMovementQuantity,
 } from '../../domain/constants';
+import MovementReferenceLink from './movement-reference-link';
 
 interface MovementHistoryTableProps {
   items: IInventoryMovement[];
@@ -133,9 +134,11 @@ function renderCell(
       return <span className='text-sm'>{item.userName}</span>;
     case 'reference':
       return (
-        <span className='text-default-500 text-sm'>
-          {item.reference ?? '—'}
-        </span>
+        <MovementReferenceLink
+          movementType={item.movementType}
+          reference={item.reference}
+          className='text-sm'
+        />
       );
     default:
       return null;
@@ -215,7 +218,13 @@ function MovementMobileCardComponent({
           <div className='text-default-400 flex items-center gap-3 text-[11px]'>
             <span>{formatUnixDateTime(item.createdDate)}</span>
             <span>{item.userName}</span>
-            {item.reference && <span>{item.reference}</span>}
+            {item.reference && (
+              <MovementReferenceLink
+                movementType={item.movementType}
+                reference={item.reference}
+                className='text-[11px]'
+              />
+            )}
           </div>
         </div>
       </CardBody>
