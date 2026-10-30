@@ -3,6 +3,8 @@ import { SortDescriptor } from '@heroui/react';
 import { useQuery } from '@apollo/client/react';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
 import { InventoryItemsDocument } from '@/lib/api/generated/inventory.generated';
+import { CardLanguage } from '@/lib/api/schema-types';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { fromApiInventoryItem } from '../../adapters/mappers/inventory.mapper';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 import {
@@ -18,6 +20,7 @@ export function useInventorySearch() {
     Omit<InventoryFilters, 'search' | 'dateRange'>
   >({});
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [resetKey, setResetKey] = useState(0);
   const [sortDescriptor, setSortDescriptor] = useState<
     SortDescriptor | undefined
   >(undefined);
@@ -55,16 +58,19 @@ export function useInventorySearch() {
     setFilters({});
     setDateRange(undefined);
     setPage(1);
+    setResetKey((k) => k + 1);
   }, []);
 
   const sortColumn = sortDescriptor?.column as string | undefined;
   const sortOrder = sortDescriptor?.direction === 'descending' ? 'DESC' : 'ASC';
+  const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
 
   useEffect(() => {
     setPage(1);
     setFilters({});
     setSearch('');
     setDateRange(undefined);
+    setResetKey((k) => k + 1);
   }, [selectedTCG]);
 
   const { data, loading, error, refetch } = useQuery(InventoryItemsDocument, {
@@ -77,6 +83,7 @@ export function useInventorySearch() {
         filters: {
           tcg: selectedTCG,
           condition: filters.condition || undefined,
+          language: (filters.language as CardLanguage) || undefined,
           // TODO: Backend no soporta lastSellDate como DateRangeFilter
           // Error: invalid input syntax for type timestamp
           // ...(dateRange && {
@@ -85,9 +92,23 @@ export function useInventorySearch() {
           //     range: { from: dateRange.start, to: dateRange.end },
           //   },
           // }),
-          ...(filters.rarity && {
-            pokemonFilters: { rarity: filters.rarity },
-          }),
+          ...(isPokemon &&
+            (filters.rarity || filters.set) && {
+              pokemonFilters: {
+                rarity: filters.rarity || undefined,
+                set: filters.set || undefined,
+              },
+            }),
+          ...(!isPokemon &&
+            (filters.rarity ||
+              filters.edition ||
+              filters.isFoil !== undefined) && {
+              magicFilters: {
+                rarity: filters.rarity || undefined,
+                edition: filters.edition || undefined,
+                isFoil: filters.isFoil ?? undefined,
+              },
+            }),
         },
       },
     },
@@ -103,8 +124,9 @@ export function useInventorySearch() {
   const totalCount = data?.inventoryItems?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
 
+  const activeFilterCount = Object.keys(filters).length;
   const hasActiveFilters =
-    search.trim() !== '' || Object.keys(filters).length > 0 || !!dateRange;
+    search.trim() !== '' || activeFilterCount > 0 || !!dateRange;
 
   return {
     search,
@@ -114,6 +136,8 @@ export function useInventorySearch() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
+    resetKey,
+    activeFilterCount,
     items,
     hasActiveFilters,
     selectedTCG,
