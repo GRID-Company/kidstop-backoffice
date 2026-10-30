@@ -67,6 +67,7 @@ export type InventoryMovementsQuery = {
           cardNumber: string | null;
           setName: string | null;
           setCode: string | null;
+          rarity: string | null;
           imageUri: string | null;
         } | null;
         magicCardSummary: {
@@ -74,6 +75,7 @@ export type InventoryMovementsQuery = {
           name: string;
           edition: string | null;
           collectorNumber: string | null;
+          rarity: string | null;
           imageUri: string | null;
           isFoil: boolean;
         } | null;
@@ -446,6 +448,10 @@ export const InventoryMovementsDocument = {
                                   },
                                   {
                                     kind: 'Field',
+                                    name: { kind: 'Name', value: 'rarity' },
+                                  },
+                                  {
+                                    kind: 'Field',
                                     name: { kind: 'Name', value: 'imageUri' },
                                   },
                                 ],
@@ -475,6 +481,10 @@ export const InventoryMovementsDocument = {
                                       kind: 'Name',
                                       value: 'collectorNumber',
                                     },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'rarity' },
                                   },
                                   {
                                     kind: 'Field',

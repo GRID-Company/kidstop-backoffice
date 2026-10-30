@@ -59,6 +59,7 @@ query InventoryMovements(
           cardNumber
           setName
           setCode
+          rarity
           imageUri
         }
         magicCardSummary {
@@ -66,6 +67,7 @@ query InventoryMovements(
           name
           edition
           collectorNumber
+          rarity
           imageUri
           isFoil
         }
