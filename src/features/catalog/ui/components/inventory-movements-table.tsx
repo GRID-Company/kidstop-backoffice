@@ -23,6 +23,7 @@ import {
   MOVEMENT_TYPE_COLORS,
   MOVEMENT_TYPE_OPTIONS,
 } from '@/features/inventory-cards/domain/constants';
+import MovementReferenceLink from '@/features/inventory-cards/ui/components/movement-reference-link';
 import { DEFAULT_HISTORY_LIMIT } from '../../domain/constants';
 import { KidstopPagination } from '@/shared/base/heorui-overrides/pagination';
 import Search from '@/shared/base/heorui-overrides/search';
@@ -168,11 +169,16 @@ export default function InventoryMovementsTable({
         label: 'Referencia',
         allowSorting: false,
         customCol: (item: unknown) => {
-          const movement = item as { reference?: string };
+          const movement = item as {
+            reference?: string;
+            movementType: string;
+          };
           return (
-            <span className='text-default-500 text-xs'>
-              {movement.reference ?? '—'}
-            </span>
+            <MovementReferenceLink
+              movementType={movement.movementType}
+              reference={movement.reference}
+              className='text-xs'
+            />
           );
         },
       },

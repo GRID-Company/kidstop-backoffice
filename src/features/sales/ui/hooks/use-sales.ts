@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -29,7 +30,10 @@ const DEFAULT_FILTERS: SaleFilters = {};
 
 export function useSales(): UseSalesReturn {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
-  const [filters, setFilters] = useState<SaleFilters>(DEFAULT_FILTERS);
+  const searchParams = useSearchParams();
+  const [filters, setFilters] = useState<SaleFilters>({
+    search: searchParams.get('search') ?? undefined,
+  });
   const [page, setPage] = useState(1);
 
   const { data, loading, error, refetch } = useQuery(SalesDocument, {
