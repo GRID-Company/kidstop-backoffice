@@ -206,6 +206,7 @@ function BulkCardSearchRoot({
           onSearch={handleSearch}
           onClear={handleClear}
           isLoading={loading}
+          tcgType={selectedTCG}
         />
 
         {error && (
