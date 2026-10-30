@@ -1,0 +1,56 @@
+{
+  "data": {
+    "magicBatchCardSearch": {
+      "successfulCount": 1,
+      "totalCount": 1,
+      "results": [
+        {
+          "originalLine": "1 Toxrill, the Corrosive",
+          "parsedQuantity": 1,
+          "parsedName": "Toxrill, the Corrosive",
+          "parsedSet": null,
+          "parsedNumber": "1929",
+          "bestMatch": {
+            "guid": "batch-magic-foil",
+            "name": "Toxrill, the Corrosive",
+            "language": "ENGLISH",
+            "edition": "Secret Lair Drop",
+            "collectorNumber": "1929",
+            "imageUri": null,
+            "isFoil": true,
+            "sellPrice": 1400,
+            "totalStock": 1,
+            "cardMetrics": {
+              "variantsMetrics": [
+                {
+                  "condition": "NEAR_MINT",
+                  "language": "ENGLISH",
+                  "stock": 1,
+                  "lastSellDate": null,
+                  "avgDaysInInventory": null,
+                  "wishlistCount": 0
+                }
+              ],
+              "priceRetail": 1400,
+              "priceBuy": null
+            }
+          },
+          "relatedCards": [
+            {
+              "guid": "batch-magic-nonfoil",
+              "name": "Toxrill, the Corrosive",
+              "language": "ENGLISH",
+              "edition": "Secret Lair Drop",
+              "collectorNumber": "1929",
+              "imageUri": null,
+              "isFoil": false,
+              "sellPrice": 650,
+              "totalStock": 2
+            }
+          ],
+          "error": null
+        }
+      ]
+    }
+  }
+}

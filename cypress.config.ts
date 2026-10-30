@@ -46,6 +46,16 @@ export default defineConfig({
 
       installLogsPrinter(on);
 
+      on('before:browser:launch', (browser, launchOptions) => {
+        if (browser.family === 'chromium') {
+          launchOptions.args.push(
+            '--use-fake-device-for-media-stream',
+            '--use-fake-ui-for-media-stream'
+          );
+        }
+        return launchOptions;
+      });
+
       return config;
     },
   },

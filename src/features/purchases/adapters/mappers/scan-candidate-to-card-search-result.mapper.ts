@@ -16,6 +16,9 @@ export function mapScanCandidateToCardSearchResult(
     tcgType: candidate.game === 'magic' ? TCG_TYPES.MAGIC : TCG_TYPES.POKEMON,
     language: candidate.language,
     variant: candidate.variant,
+    type: candidate.type,
+    hp: candidate.hp,
+    stage: candidate.stage,
     isFoil: candidate.isFoil,
     collectorNumber: candidate.collectorNumber,
     metrics: {

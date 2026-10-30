@@ -979,6 +979,11 @@ npm run cypress:open
 
 # Ejecutar tests
 npm run cypress:run
+
+# En shells heredadas de un IDE Electron (Devin/Windsurf/VS Code):
+# ELECTRON_RUN_AS_NODE=1 rompe el binario de Cypress ("bad option: --no-sandbox").
+# NO reinstalar Cypress — correr con:
+env -u ELECTRON_RUN_AS_NODE npx cypress run
 ```
 
 **Estructura de tests:**

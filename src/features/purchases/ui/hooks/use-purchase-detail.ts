@@ -136,6 +136,12 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         type: item.pokemonCardSummary?.type || undefined,
         hp: item.pokemonCardSummary?.hp || undefined,
         stage: item.pokemonCardSummary?.stage || undefined,
+        rarity:
+          item.pokemonCardSummary?.rarity ||
+          item.magicCardSummary?.rarity ||
+          undefined,
+        isFoil: item.magicCardSummary?.isFoil ?? undefined,
+        collectorNumber: item.magicCardSummary?.collectorNumber || undefined,
         tcgType: p.tcg === 'POKEMON' ? 'POKEMON' : 'MAGIC',
         condition: item.condition as CardCondition,
         language: item.language as CardLanguage,

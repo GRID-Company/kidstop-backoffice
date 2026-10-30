@@ -21,6 +21,9 @@ export type PokemonCardScanSearchQuery = {
       totalStock: number;
       imageUri: string | null;
       language: Types.CardLanguage;
+      type: string | null;
+      hp: string | null;
+      stage: string | null;
       inventoryCards: Array<{
         guid: string;
         condition: string;
@@ -54,6 +57,9 @@ export type PokemonCardScanSearchQuery = {
       totalStock: number;
       imageUri: string | null;
       language: Types.CardLanguage;
+      type: string | null;
+      hp: string | null;
+      stage: string | null;
     }>;
     aiResolved: {
       name: string | null;
@@ -224,6 +230,9 @@ export const PokemonCardScanSearchDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'language' },
                       },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'hp' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'stage' } },
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'inventoryCards' },
@@ -366,6 +375,9 @@ export const PokemonCardScanSearchDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'language' },
                       },
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'hp' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'stage' } },
                     ],
                   },
                 },

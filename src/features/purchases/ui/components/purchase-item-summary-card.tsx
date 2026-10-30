@@ -1,8 +1,7 @@
 import { Icon } from '@iconify/react';
-import { Chip } from '@heroui/react';
 import { IPurchaseItem } from '../../domain/types';
 import { CARD_CONDITION_LABELS } from '@/lib/types/card.types';
-import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import CardAttributeChips from '@/shared/components/card-attribute-chips';
 
 interface PurchaseItemSummaryCardProps {
   item: IPurchaseItem;
@@ -35,9 +34,16 @@ export function PurchaseItemSummaryCard({
           <p className='text-default-400 text-xs'>
             Condición: {CARD_CONDITION_LABELS[item.condition]}
           </p>
-          <Chip size='sm' variant='flat' className='h-5 text-xs'>
-            {LANGUAGE_LABELS[item.language]}
-          </Chip>
+          <CardAttributeChips
+            tcgType={item.tcgType}
+            isFoil={item.isFoil}
+            variant={item.variant}
+            language={item.language}
+            rarity={item.rarity}
+            type={item.type}
+            hp={item.hp}
+            stage={item.stage}
+          />
         </div>
         {variant === 'duplicate' && (
           <p className='text-warning mt-1 text-xs font-medium'>

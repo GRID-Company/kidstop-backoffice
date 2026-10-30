@@ -1,0 +1,72 @@
+{
+  "data": {
+    "purchase": {
+      "guid": "purchase-cypress-1",
+      "reference": "COM-0099",
+      "status": "DRAFT",
+      "tcg": "MAGIC",
+      "total": 2050,
+      "notes": null,
+      "buyer": {
+        "guid": "buyer-1",
+        "name": "Comprador"
+      },
+      "seller": {
+        "guid": "seller-cypress-1",
+        "name": "Vendedor Cypress",
+        "phone": "555-0000",
+        "email": "vendedor.cypress@kidstop.test",
+        "notes": null
+      },
+      "items": [
+        {
+          "guid": "purchase-item-foil",
+          "condition": "NEAR_MINT",
+          "language": "ENGLISH",
+          "offerPrice": 1400,
+          "referencePrice": 1400,
+          "sellPrice": null,
+          "quantity": 1,
+          "tcg": "MAGIC",
+          "pokemonCardSummary": null,
+          "magicCardSummary": {
+            "guid": "card-magic-foil",
+            "name": "Toxrill, the Corrosive",
+            "edition": "Secret Lair Drop",
+            "collectorNumber": "1929",
+            "rarity": "Mythic Rare",
+            "imageUri": null,
+            "isFoil": true
+          }
+        },
+        {
+          "guid": "purchase-item-nonfoil",
+          "condition": "NEAR_MINT",
+          "language": "ENGLISH",
+          "offerPrice": 650,
+          "referencePrice": 650,
+          "sellPrice": null,
+          "quantity": 1,
+          "tcg": "MAGIC",
+          "pokemonCardSummary": null,
+          "magicCardSummary": {
+            "guid": "card-magic-nonfoil",
+            "name": "Toxrill, the Corrosive",
+            "edition": "Secret Lair Drop",
+            "collectorNumber": "1929",
+            "rarity": "Mythic Rare",
+            "imageUri": null,
+            "isFoil": false
+          }
+        }
+      ],
+      "payments": [],
+      "createdBy": {
+        "guid": "user-1",
+        "name": "Admin"
+      },
+      "createdDate": "2026-01-01T00:00:00.000Z",
+      "updatedDate": "2026-01-01T00:00:00.000Z"
+    }
+  }
+}
