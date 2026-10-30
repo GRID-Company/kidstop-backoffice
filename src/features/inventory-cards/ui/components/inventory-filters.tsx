@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
-import { Button } from '@heroui/react';
+import { useCallback, useMemo, useState } from 'react';
+import { Badge, Button } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { parseDate } from '@internationalized/date';
 import type { RangeValue } from '@react-types/shared';
@@ -17,6 +17,9 @@ import {
   MAGIC_RARITY_OPTIONS,
 } from '@/lib/types/card.types';
 import { DateRange } from '@/lib/types/date.types';
+import CatalogFilterDrawer from '@/features/catalog/ui/components/catalog-filter-drawer';
+import { InventoryFilters as IInventoryFilters } from '../../domain/types';
+import { useInventoryFilterOptions } from '../hooks/use-inventory-filter-options';
 
 interface InventoryFiltersProps {
   onSearchChange: SearchFn;
@@ -24,9 +27,12 @@ interface InventoryFiltersProps {
   onDateRangeChange: (range: DateRange | undefined) => void;
   onReset: () => void;
   hasActiveFilters: boolean;
+  activeFilterCount: number;
   resultCount: number;
   selectedTCG: TCGType;
   dateRange?: DateRange;
+  filters?: Omit<IInventoryFilters, 'search' | 'dateRange'>;
+  resetKey?: number;
 }
 
 export default function InventoryFilters({
@@ -35,10 +41,16 @@ export default function InventoryFilters({
   onDateRangeChange,
   onReset,
   hasActiveFilters,
+  activeFilterCount,
   resultCount,
   selectedTCG,
   dateRange,
+  filters,
+  resetKey,
 }: InventoryFiltersProps) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { collections, rarities } = useInventoryFilterOptions();
+
   const rarityOptions = useMemo(
     () =>
       selectedTCG === TCG_TYPES.POKEMON
@@ -73,18 +85,41 @@ export default function InventoryFilters({
     <div className='flex flex-col gap-4'>
       <TcgSegmentedSelector />
 
-      <Search
-        label='Buscar en inventario'
-        placeholder='Nombre de carta, set o identificador'
-        onValueChange={onSearchChange}
-        aria-label='Buscar en inventario por nombre, set o identificador'
-      />
+      <div className='flex flex-col gap-3 md:flex-row md:items-end'>
+        <div className='md:flex-1'>
+          <Search
+            key={resetKey}
+            label='Buscar en inventario'
+            placeholder='Nombre de carta, set o identificador'
+            onValueChange={onSearchChange}
+            aria-label='Buscar en inventario por nombre, set o identificador'
+          />
+        </div>
+        <Badge
+          content={activeFilterCount > 0 ? activeFilterCount : undefined}
+          color='danger'
+          size='sm'
+          isInvisible={activeFilterCount === 0}
+        >
+          <Button
+            variant='bordered'
+            onPress={() => setIsDrawerOpen(true)}
+            startContent={<Icon icon='lucide:sliders-horizontal' />}
+            aria-label='Abrir filtros avanzados'
+            className='h-14'
+            data-testid='inventory-filters-button'
+          >
+            Filtros
+          </Button>
+        </Badge>
+      </div>
 
       <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
         <Select
           placeholder='Todas las condiciones'
           label='Condición'
           items={CARD_CONDITION_OPTIONS}
+          selectedKeys={filters?.condition ? [filters.condition] : []}
           onChange={(e) => onFilterChange('condition', e.target.value)}
           aria-label='Filtrar por condición'
         />
@@ -92,6 +127,7 @@ export default function InventoryFilters({
           placeholder='Todas las rarezas'
           label='Rareza'
           items={rarityOptions}
+          selectedKeys={filters?.rarity ? [filters.rarity] : []}
           onChange={(e) => onFilterChange('rarity', e.target.value)}
           aria-label='Filtrar por rareza'
         />
@@ -124,6 +160,19 @@ export default function InventoryFilters({
           </Button>
         )}
       </div>
+
+      <CatalogFilterDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onFilterChange={onFilterChange}
+        onReset={onReset}
+        hasActiveFilters={hasActiveFilters}
+        selectedTCG={selectedTCG}
+        resetKey={resetKey}
+        filters={filters}
+        collections={collections}
+        rarities={rarities}
+      />
     </div>
   );
 }

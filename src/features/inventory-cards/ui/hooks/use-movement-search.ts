@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { SortDescriptor } from '@heroui/react';
 import { useQuery } from '@apollo/client/react';
 import { InventoryMovementsDocument } from '@/lib/api/generated/inventory.generated';
+import { CardLanguage } from '@/lib/api/schema-types';
 import { fromApiInventoryMovement } from '../../adapters/mappers/inventory.mapper';
 import { DEFAULT_PAGE_SIZE } from '../../domain/constants';
 import {
@@ -18,6 +19,7 @@ export function useMovementSearch() {
     Omit<MovementFilters, 'search' | 'dateRange'>
   >({});
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [resetKey, setResetKey] = useState(0);
   const [sortDescriptor, setSortDescriptor] = useState<
     SortDescriptor | undefined
   >({
@@ -58,6 +60,7 @@ export function useMovementSearch() {
     setFilters({});
     setDateRange(undefined);
     setPage(1);
+    setResetKey((k) => k + 1);
   }, []);
 
   const sortColumn = sortDescriptor?.column as string | undefined;
@@ -75,6 +78,8 @@ export function useMovementSearch() {
           filters: {
             tcg: selectedTCG,
             movementType: filters.movementType || undefined,
+            condition: filters.condition || undefined,
+            language: (filters.language as CardLanguage) || undefined,
             ...(dateRange && {
               createdDate: {
                 filterType: ':daterange:',
@@ -96,8 +101,9 @@ export function useMovementSearch() {
   const totalCount = data?.inventoryMovements?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / DEFAULT_PAGE_SIZE));
 
+  const activeFilterCount = Object.keys(filters).length;
   const hasActiveFilters =
-    search.trim() !== '' || Object.keys(filters).length > 0 || !!dateRange;
+    search.trim() !== '' || activeFilterCount > 0 || !!dateRange;
 
   return {
     search,
@@ -107,6 +113,9 @@ export function useMovementSearch() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
+    resetKey,
+    activeFilterCount,
+    selectedTCG,
     items,
     hasActiveFilters,
     sortDescriptor,

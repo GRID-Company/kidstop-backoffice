@@ -19,8 +19,12 @@ export default function MovementsContent() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
+    resetKey,
+    filters,
+    activeFilterCount,
     items,
     hasActiveFilters,
+    selectedTCG,
     sortDescriptor,
     setSortDescriptor,
     page,
@@ -48,8 +52,12 @@ export default function MovementsContent() {
           onDateRangeChange={handleDateRangeChange}
           onReset={resetFilters}
           hasActiveFilters={hasActiveFilters}
+          activeFilterCount={activeFilterCount}
           resultCount={totalCount}
+          selectedTCG={selectedTCG}
           dateRange={dateRange}
+          filters={filters}
+          resetKey={resetKey}
         />
       </div>
 
