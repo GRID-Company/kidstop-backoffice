@@ -106,6 +106,7 @@ export interface BulkCardSearchInputProps {
   onSearch: () => void;
   onClear: () => void;
   isLoading: boolean;
+  tcgType: TCGType;
   isDisabled?: boolean;
 }
 
