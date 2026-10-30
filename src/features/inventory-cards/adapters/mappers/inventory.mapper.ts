@@ -66,6 +66,10 @@ export function fromApiInventoryMovement(
       inventoryItem.pokemonCardSummary?.cardNumber ??
       inventoryItem.magicCardSummary?.collectorNumber ??
       '',
+    rarity:
+      inventoryItem.pokemonCardSummary?.rarity ??
+      inventoryItem.magicCardSummary?.rarity ??
+      '',
     tcg: inventoryItem.tcg,
     condition: inventoryItem.condition as IInventoryMovement['condition'],
     language: inventoryItem.language,

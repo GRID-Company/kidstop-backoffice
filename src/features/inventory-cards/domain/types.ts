@@ -35,6 +35,7 @@ export interface IInventoryMovement {
   setName: string;
   setCode: string;
   cardNumber: string;
+  rarity: string;
   tcg: string;
   condition: CardCondition;
   language: CardLanguage;
