@@ -63,7 +63,7 @@ Produce a short mental (or written) implementation plan before writing code. Do 
 
 ## 3. Implement the new module
 
-Follow the **`backend_new-module`** skill (`.devin/skills/backend_new-module/SKILL.md`).
+Follow the **`backend-new-module`** skill (`.devin/skills/backend-new-module/SKILL.md`).
 
 Create, in order:
 
@@ -81,7 +81,7 @@ Verify the app compiles before continuing.
 
 ## 4. Add the API Collection
 
-Follow the **`backend_add-api-collection`** skill (`.devin/skills/backend_add-api-collection/SKILL.md`).
+Follow the **`backend-add-api-collection`** skill (`.devin/skills/backend-add-api-collection/SKILL.md`).
 
 Create a folder `api-collection/{module}/` with one `.yml` file per operation (list, filters, search, detail, create, update, lifecycle mutations, delete), using the correct `seq` ordering and the Bruno file format.
 
@@ -89,7 +89,7 @@ Create a folder `api-collection/{module}/` with one `.yml` file per operation (l
 
 ## 5. Update / add the Integration Guide
 
-Follow the **`backend_add-api-guide`** skill (`.devin/skills/backend_add-api-guide/SKILL.md`).
+Follow the **`backend-add-api-guide`** skill (`.devin/skills/backend-add-api-guide/SKILL.md`).
 
 Create `api-guides/{Module}API.md` documenting all queries, mutations, TypeScript interfaces, response examples, business rules, search & filtering, status lifecycle, and error handling.
 

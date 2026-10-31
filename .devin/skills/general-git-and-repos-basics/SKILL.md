@@ -1,5 +1,5 @@
 ---
-name: general_git-and-repos-basics
+name: general-git-and-repos-basics
 description: Siempore al trabjar con pull request o repositorios en nube
 ---
 
