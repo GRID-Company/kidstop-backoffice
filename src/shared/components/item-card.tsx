@@ -8,13 +8,14 @@ import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
-import PokemonTypeIcon from '@/shared/components/pokemon-type-icon';
+import CardAttributeChips from '@/shared/components/card-attribute-chips';
 import InputForm from '@/shared/base/form-controls/input-form';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
-import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { formatCurrencyWithPrivacy } from '@/lib/utils/privacy.utils';
 import { formatCurrency } from '@/lib/utils/format-currency';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import {
   AdaptedPurchaseItem,
   AdaptedSaleItem,
@@ -127,7 +128,10 @@ export default function ItemCard({
   const displaySubtotal = formatCurrency(subtotal);
 
   return (
-    <KidstopCard className='border-default-200 w-full'>
+    <KidstopCard
+      className='border-default-200 w-full'
+      data-testid='purchase-item-card'
+    >
       <div className='relative flex flex-col gap-3 p-3 xl:p-4'>
         {!isReadOnly && onRemove && (
           <div className='absolute top-2 right-2'>
@@ -167,152 +171,52 @@ export default function ItemCard({
                 {item.cardName}
               </h4>
 
-              {item.tcgType === 'POKEMON' &&
-                (item.language ||
-                  item.cardNumber ||
-                  item.rarity ||
-                  item.type ||
-                  item.hp ||
-                  item.variant ||
-                  item.stage) && (
-                  <div className='flex flex-wrap items-center gap-1.5'>
-                    {item.language && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        color='primary'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {LANGUAGE_LABELS[item.language]}
-                      </Chip>
-                    )}
-                    {item.condition && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        color='default'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {CARD_CONDITION_SHORT_LABELS[item.condition]}
-                      </Chip>
-                    )}
-                    {item.cardNumber && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {item.cardNumber}
-                      </Chip>
-                    )}
-                    {item.rarity && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {item.rarity}
-                      </Chip>
-                    )}
-                    {item.type && (
-                      <div className='flex items-center gap-0.5'>
-                        <PokemonTypeIcon type={item.type} size='sm' />
-                        <span className='text-default-600 text-[10px]'>
-                          {item.type}
-                        </span>
-                      </div>
-                    )}
-                    {item.hp && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {item.hp} HP
-                      </Chip>
-                    )}
-                    {item.variant &&
-                      !item.variant.toLowerCase().includes('normal') && (
-                        <Chip
-                          size='sm'
-                          variant='flat'
-                          color='secondary'
-                          className='h-4 px-1.5 text-[10px]'
-                        >
-                          {item.variant}
-                        </Chip>
-                      )}
-                    {item.stage && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {item.stage}
-                      </Chip>
-                    )}
-                  </div>
+              <div className='flex flex-wrap items-center gap-1.5'>
+                {item.condition && (
+                  <Chip
+                    size='sm'
+                    variant='flat'
+                    color='default'
+                    className='h-5 px-1.5 text-[10px]'
+                  >
+                    {CARD_CONDITION_SHORT_LABELS[item.condition]}
+                  </Chip>
                 )}
-
-              {item.tcgType === 'MAGIC' &&
-                (item.language ||
-                  item.collectorNumber ||
-                  item.rarity ||
-                  item.isFoil) && (
-                  <div className='flex flex-wrap items-center gap-1.5'>
-                    {item.language && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        color='primary'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {LANGUAGE_LABELS[item.language]}
-                      </Chip>
-                    )}
-                    {item.condition && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        color='default'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {CARD_CONDITION_SHORT_LABELS[item.condition]}
-                      </Chip>
-                    )}
-                    {item.collectorNumber && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        #{item.collectorNumber}
-                      </Chip>
-                    )}
-                    {item.rarity && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        {item.rarity}
-                      </Chip>
-                    )}
-                    {item.isFoil && (
-                      <Chip
-                        size='sm'
-                        variant='flat'
-                        color='secondary'
-                        className='h-4 px-1.5 text-[10px]'
-                      >
-                        FOIL
-                      </Chip>
-                    )}
-                  </div>
+                {item.tcgType === TCG_TYPES.POKEMON && item.cardNumber && (
+                  <Chip
+                    size='sm'
+                    variant='flat'
+                    className='h-5 px-1.5 text-[10px]'
+                  >
+                    {formatCardNumber(item.cardNumber)}
+                  </Chip>
                 )}
+                {item.tcgType === TCG_TYPES.MAGIC &&
+                  item.collectorNumber &&
+                  item.collectorNumber !== item.setCode && (
+                    <Chip
+                      size='sm'
+                      variant='flat'
+                      className='h-5 px-1.5 text-[10px]'
+                    >
+                      {formatCardNumber(item.collectorNumber)}
+                    </Chip>
+                  )}
+                <CardAttributeChips
+                  tcgType={item.tcgType}
+                  isFoil={item.isFoil}
+                  variant={item.variant}
+                  language={item.language}
+                  type={item.type}
+                  hp={item.hp}
+                  stage={item.stage}
+                  rarity={item.rarity}
+                />
+              </div>
 
               <p className='text-default-500 text-xs'>
-                {item.setName} · {item.setCode}
+                {item.setName}
+                {item.setCode ? ` · ${item.setCode}` : ''}
               </p>
             </div>
 

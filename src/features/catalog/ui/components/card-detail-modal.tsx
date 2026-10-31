@@ -28,6 +28,7 @@ import {
 import { useCardPriceForm } from '../../adapters/forms/use-card-price-form';
 import { CardPriceFormData } from '../../adapters/forms/card-price.form.schema';
 import { toCardPriceFormDefaults } from '../../adapters/mappers/card.mapper';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface CardDetailModalProps {
   card: ICard | null;
@@ -103,14 +104,14 @@ export default function CardDetailModal({
         <DrawerHeader className='flex flex-col gap-1'>
           <span className='text-accent text-lg font-semibold'>{card.name}</span>
           <span className='text-default-500 text-sm font-normal'>
-            {card.setName} · {card.setCode} · #{card.number}
+            {card.setName} · {card.setCode} · {formatCardNumber(card.number)}
           </span>
         </DrawerHeader>
 
         <DrawerBody className='flex flex-col gap-6'>
           <div className='flex gap-6'>
             <div
-              className='bg-default-100 relative aspect-[3/4] w-40 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
+              className='bg-default-100 relative aspect-3/4 w-40 shrink-0 cursor-pointer overflow-hidden rounded-lg transition-opacity hover:opacity-80'
               onClick={() =>
                 openPreview(card.imageUrl, card.name, card.tcgType)
               }
@@ -130,6 +131,7 @@ export default function CardDetailModal({
                   fill
                   sizes='160px'
                   className='object-contain p-1'
+                  unoptimized
                 />
               ) : (
                 <Image
@@ -171,7 +173,9 @@ export default function CardDetailModal({
                 <span className='font-medium'>{card.setCode}</span>
 
                 <span className='text-default-500'>Número</span>
-                <span className='font-medium'>#{card.number}</span>
+                <span className='font-medium'>
+                  {formatCardNumber(card.number)}
+                </span>
 
                 <span className='text-default-500'>Stock total</span>
                 <span className='font-medium'>{totalStock}</span>

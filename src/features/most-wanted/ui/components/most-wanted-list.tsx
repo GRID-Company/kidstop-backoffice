@@ -18,6 +18,8 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { Icon } from '@iconify/react';
 
+import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
+import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { IMostWantedCard, MostWantedPriority } from '../../domain/types';
 import MostWantedCardItem from './most-wanted-card-item';
 import EditCardModal from './edit-card-modal';
@@ -44,6 +46,14 @@ export default function MostWantedList({
   onRemoveCard,
 }: MostWantedListProps) {
   const [editingItem, setEditingItem] = useState<IMostWantedCard | null>(null);
+  const {
+    isOpen: isPreviewOpen,
+    imageUrl: previewImageUrl,
+    alt: previewAlt,
+    tcgType: previewTcgType,
+    openPreview,
+    closePreview,
+  } = useCardImagePreview();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -96,6 +106,7 @@ export default function MostWantedList({
                 onToggleActive={onToggleActive}
                 onEdit={setEditingItem}
                 onRemove={onRemoveCard}
+                onOpenPreview={openPreview}
               />
             ))}
           </div>
@@ -107,6 +118,13 @@ export default function MostWantedList({
         isOpen={!!editingItem}
         onClose={() => setEditingItem(null)}
         onSave={handleSave}
+      />
+      <CardImagePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        imageUrl={previewImageUrl}
+        alt={previewAlt}
+        tcgType={previewTcgType}
       />
     </>
   );

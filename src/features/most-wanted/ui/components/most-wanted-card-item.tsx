@@ -4,8 +4,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Chip, Switch, Tooltip } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
-import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
+import { CardImage } from '@/shared/components/card-image';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IMostWantedCard } from '../../domain/types';
 import { MOST_WANTED_PRIORITY_LABELS } from '../../domain/constants';
 
@@ -17,6 +17,11 @@ interface MostWantedCardItemProps {
   ) => void | Promise<void>;
   onEdit: (item: IMostWantedCard) => void;
   onRemove: (guid: string) => void | Promise<void>;
+  onOpenPreview: (
+    url: string | null,
+    alt: string,
+    tcg: 'POKEMON' | 'MAGIC'
+  ) => void;
 }
 
 const PRIORITY_STYLES: Record<string, { bg: string; text: string }> = {
@@ -30,6 +35,7 @@ export default function MostWantedCardItem({
   onToggleActive,
   onEdit,
   onRemove,
+  onOpenPreview,
 }: MostWantedCardItemProps) {
   const {
     attributes,
@@ -39,14 +45,6 @@ export default function MostWantedCardItem({
     transition,
     isDragging,
   } = useSortable({ id: item.guid });
-  const {
-    isOpen: isPreviewOpen,
-    imageUrl: previewImageUrl,
-    alt: previewAlt,
-    tcgType: previewTcgType,
-    openPreview,
-    closePreview,
-  } = useCardImagePreview();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -82,45 +80,30 @@ export default function MostWantedCardItem({
         <Icon icon='lucide:grip-vertical' width={20} />
       </button>
 
-      <div
-        className='bg-default-100 relative h-12 w-9 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-        onClick={() =>
-          openPreview(
-            cardImage,
-            cardName,
-            item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
-          )
-        }
-        role='button'
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            openPreview(
+      <div className='bg-default-100 relative h-12 w-9 shrink-0 overflow-hidden rounded'>
+        <CardImage
+          src={cardImage}
+          alt={cardName}
+          tcgType={item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'}
+          containerClassName='absolute inset-0'
+          className='object-contain'
+          fill
+          sizes='36px'
+          enablePreview
+          onImageClick={() =>
+            onOpenPreview(
               cardImage,
               cardName,
               item.pokemonCardSummary ? 'POKEMON' : 'MAGIC'
-            );
+            )
           }
-        }}
-        aria-label={`Ver ${cardName} en tamaño completo`}
-      >
-        {cardImage ? (
-          <img
-            src={cardImage}
-            alt={cardName}
-            className='absolute inset-0 h-full w-full object-contain'
-          />
-        ) : (
-          <div className='text-default-400 flex h-full items-center justify-center'>
-            <Icon icon='lucide:image' width={14} />
-          </div>
-        )}
+        />
       </div>
 
       <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
         <span className='truncate text-sm font-semibold'>{cardName}</span>
         <span className='text-default-500 truncate text-xs'>
-          {cardSet} {cardNumber ? `· ${cardNumber}` : ''}
+          {cardSet} {cardNumber ? `· ${formatCardNumber(cardNumber)}` : ''}
         </span>
         {item.notes && (
           <span className='text-default-400 truncate text-xs italic'>
@@ -173,13 +156,6 @@ export default function MostWantedCardItem({
           </Button>
         </Tooltip>
       </div>
-      <CardImagePreviewModal
-        isOpen={isPreviewOpen}
-        onClose={closePreview}
-        imageUrl={previewImageUrl}
-        alt={previewAlt}
-        tcgType={previewTcgType}
-      />
     </div>
   );
 }

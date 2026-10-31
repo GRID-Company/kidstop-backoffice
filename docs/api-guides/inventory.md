@@ -168,6 +168,7 @@ query InventoryItems($findInventoryItemsArgs: FindInventoryItemsArgs!) {
 - `language`: Optional — Card language (ENGLISH, SPANISH, JAPANESE, KOREAN, CHINESE)
 - `stockStatus`: "AVAILABLE" | "UNAVAILABLE" | "AWAITING_PICKUP"
 - `pokemonFilters.rarity`: Filter by Pokemon card rarity (matches against tcgPlayer or priceCharting rarity)
+- `pokemonFilters.set`: Filter by Pokemon collection guid
 - `lastSellDate`: Date range filter with `filterType: ":daterange:"` and `range: { from, to }`
 - `search` (string): Text search in card names (top-level parameter, not inside filters)
 - `prioritizeSearch` (boolean, optional): Defaults to `false`. When `true` and a search term is provided, results are sorted by relevance first instead of the default stock priority ordering

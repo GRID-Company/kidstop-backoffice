@@ -32,7 +32,7 @@ export default async function RootLayout({
   const jwt = cookieStore.get('jwt')?.value ?? null;
 
   return (
-    <html lang='es-MX'>
+    <html lang='es-MX' suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

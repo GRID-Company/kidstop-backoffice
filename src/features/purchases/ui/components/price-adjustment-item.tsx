@@ -5,7 +5,7 @@ import { CardImage } from '@/shared/components/card-image';
 import { CardImagePreviewModal } from '@/shared/components/card-image-preview-modal';
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '../../domain/constants';
-import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import CardAttributeChips from '@/shared/components/card-attribute-chips';
 import { PriceAdjustmentItemProps } from './price-adjustment-types';
 
 const PriceAdjustmentItem = forwardRef<
@@ -58,9 +58,12 @@ const PriceAdjustmentItem = forwardRef<
             >
               {CARD_CONDITION_SHORT_LABELS[item.condition]}
             </Chip>
-            <Chip size='sm' variant='flat' className='text-xs'>
-              {LANGUAGE_LABELS[item.language]}
-            </Chip>
+            <CardAttributeChips
+              tcgType={item.tcgType}
+              isFoil={item.isFoil}
+              variant={item.variant}
+              language={item.language}
+            />
           </div>
           <span className='text-default-400 text-xs'>
             {item.setName} · {item.setCode}

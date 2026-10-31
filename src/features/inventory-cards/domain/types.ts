@@ -35,6 +35,7 @@ export interface IInventoryMovement {
   setName: string;
   setCode: string;
   cardNumber: string;
+  rarity: string;
   tcg: string;
   condition: CardCondition;
   language: CardLanguage;
@@ -48,6 +49,8 @@ export interface IInventoryMovement {
 
 export interface MovementFilters {
   movementType?: MovementType;
+  condition?: CardCondition;
+  language?: CardLanguage;
   search?: string;
   dateRange?: DateRange;
 }
@@ -57,6 +60,10 @@ export type { DateRange };
 export interface InventoryFilters {
   condition?: CardCondition;
   rarity?: string;
+  language?: CardLanguage;
+  set?: string;
+  edition?: string;
+  isFoil?: boolean;
   search?: string;
   dateRange?: DateRange;
 }

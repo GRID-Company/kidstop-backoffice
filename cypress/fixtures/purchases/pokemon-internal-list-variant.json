@@ -1,0 +1,51 @@
+{
+  "data": {
+    "pokemonCardInternalList": {
+      "data": [
+        {
+          "guid": "search-pokemon-reverse",
+          "name": "Charizard ex",
+          "language": "ENGLISH",
+          "cardNumber": "125",
+          "setName": "Obsidian Flames",
+          "setCode": "OBF",
+          "variant": "Reverse Holo",
+          "sellPrice": 480,
+          "availableStock": true,
+          "totalStock": 1,
+          "imageUri": null,
+          "moreImages": [],
+          "releaseDate": null,
+          "type": "Fire",
+          "hp": "330",
+          "stage": "Stage 2",
+          "cardText": null,
+          "artist": null,
+          "inventoryCards": []
+        },
+        {
+          "guid": "search-pokemon-normal",
+          "name": "Charizard ex",
+          "language": "ENGLISH",
+          "cardNumber": "125",
+          "setName": "Obsidian Flames",
+          "setCode": "OBF",
+          "variant": "Normal",
+          "sellPrice": 320,
+          "availableStock": false,
+          "totalStock": 0,
+          "imageUri": null,
+          "moreImages": [],
+          "releaseDate": null,
+          "type": "Fire",
+          "hp": "330",
+          "stage": "Stage 2",
+          "cardText": null,
+          "artist": null,
+          "inventoryCards": []
+        }
+      ],
+      "count": 2
+    }
+  }
+}

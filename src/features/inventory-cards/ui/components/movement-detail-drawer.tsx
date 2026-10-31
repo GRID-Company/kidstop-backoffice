@@ -1,8 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import pokemonCardPlaceholder from '@/assets/img/pokemon-card-placeholder.png';
-import magicCardPlaceholder from '@/assets/img/magic-card-placeholder.png';
+import { CardImage } from '@/shared/components/card-image';
 import {
   DrawerContent,
   DrawerHeader,
@@ -18,6 +16,7 @@ import { CardImagePreviewModal } from '@/shared/components/card-image-preview-mo
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 
 import { formatUnixDateTime } from '@/lib/utils/format-date';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IInventoryMovement } from '../../domain/types';
 import {
   MOVEMENT_TYPE_LABELS,
@@ -25,6 +24,7 @@ import {
   MOVEMENT_TYPE_ICONS,
   formatMovementQuantity,
 } from '../../domain/constants';
+import MovementReferenceLink from './movement-reference-link';
 
 interface MovementDetailDrawerProps {
   item: IInventoryMovement | null;
@@ -64,52 +64,30 @@ export default function MovementDetailDrawer({
 
         <DrawerBody className='flex flex-col gap-6'>
           <div className='bg-default-50 flex items-center gap-4 rounded-lg p-4'>
-            <div
-              className='bg-default-100 relative h-16 w-12 shrink-0 cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-80'
-              onClick={() =>
-                openPreview(
-                  item.cardImageUrl,
-                  item.cardName,
-                  item.tcg as 'POKEMON' | 'MAGIC'
-                )
-              }
-              role='button'
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+            <div className='bg-default-100 relative h-16 w-12 shrink-0 overflow-hidden rounded'>
+              <CardImage
+                src={item.cardImageUrl}
+                alt={item.cardName}
+                tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
+                containerClassName='absolute inset-0'
+                className='object-contain'
+                fill
+                sizes='48px'
+                enablePreview
+                onImageClick={() =>
                   openPreview(
                     item.cardImageUrl,
                     item.cardName,
                     item.tcg as 'POKEMON' | 'MAGIC'
-                  );
+                  )
                 }
-              }}
-              aria-label={`Ver ${item.cardName} en tamaño completo`}
-            >
-              {item.cardImageUrl ? (
-                <img
-                  src={item.cardImageUrl}
-                  alt={item.cardName}
-                  className='absolute inset-0 h-full w-full object-contain'
-                />
-              ) : (
-                <Image
-                  src={
-                    item.tcg === 'MAGIC'
-                      ? magicCardPlaceholder
-                      : pokemonCardPlaceholder
-                  }
-                  alt='Card placeholder'
-                  fill
-                  sizes='48px'
-                  className='object-contain'
-                />
-              )}
+              />
             </div>
             <div className='min-w-0 flex-1'>
               <p className='truncate text-sm font-semibold'>{item.cardName}</p>
               <p className='text-default-400 truncate text-xs'>
-                {item.setName} ({item.setCode}) · #{item.cardNumber}
+                {item.setName} ({item.setCode}) ·{' '}
+                {formatCardNumber(item.cardNumber)}
               </p>
               <p className='text-default-400 mt-1 text-xs'>{item.tcg}</p>
             </div>
@@ -150,9 +128,11 @@ export default function MovementDetailDrawer({
             {item.reference && (
               <div className='flex items-center justify-between'>
                 <span className='text-default-500 text-sm'>Referencia</span>
-                <span className='text-default-700 text-sm'>
-                  {item.reference}
-                </span>
+                <MovementReferenceLink
+                  movementType={item.movementType}
+                  reference={item.reference}
+                  className='text-sm'
+                />
               </div>
             )}
           </div>

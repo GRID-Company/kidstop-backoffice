@@ -1,17 +1,23 @@
 'use client';
 
+import { ISelectOption } from '@/shared/base/heorui-overrides/select';
 import SellPriceHistoryTable from '../sell-price-history-table';
 
 interface PriceHistoryTabProps {
-  inventoryItemGuid: string;
+  cardGuid: string;
+  languageOptions: ISelectOption[];
 }
 
 export default function PriceHistoryTab({
-  inventoryItemGuid,
+  cardGuid,
+  languageOptions,
 }: PriceHistoryTabProps) {
   return (
     <div data-testid='tab-price-history'>
-      <SellPriceHistoryTable inventoryItemGuid={inventoryItemGuid} />
+      <SellPriceHistoryTable
+        cardGuid={cardGuid}
+        languageOptions={languageOptions}
+      />
     </div>
   );
 }

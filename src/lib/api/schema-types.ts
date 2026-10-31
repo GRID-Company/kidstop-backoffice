@@ -145,14 +145,67 @@ export type CancelSaleInput = {
 export enum CardLanguage {
   Chinese = 'CHINESE',
   English = 'ENGLISH',
+  French = 'FRENCH',
+  German = 'GERMAN',
+  Italian = 'ITALIAN',
   Japanese = 'JAPANESE',
   Korean = 'KOREAN',
+  Portuguese = 'PORTUGUESE',
+  Russian = 'RUSSIAN',
   Spanish = 'SPANISH',
 }
 
 export type CardOrderInput = {
   mostWantedCardGuid: Scalars['String']['input'];
   priority: Scalars['String']['input'];
+};
+
+/** Card data resolved by AI (Gemini). Canonical fields are in English, *Es fields are Spanish translations. */
+export type CardScanAiData = {
+  /** Collector/card number printed on the card */
+  cardNumber?: Maybe<Scalars['String']['output']>;
+  /** Card rules text in English */
+  cardText?: Maybe<Scalars['String']['output']>;
+  /** Card rules text translated to Spanish */
+  cardTextEs?: Maybe<Scalars['String']['output']>;
+  /** ISO 639-1 code of the detected input language */
+  detectedLanguage?: Maybe<Scalars['String']['output']>;
+  /** Canonical English card name */
+  name?: Maybe<Scalars['String']['output']>;
+  /** Card name translated to Spanish */
+  nameEs?: Maybe<Scalars['String']['output']>;
+  /** Official set code of the card */
+  setCode?: Maybe<Scalars['String']['output']>;
+  /** Official English set/edition name */
+  setName?: Maybe<Scalars['String']['output']>;
+  /** Set/edition name translated to Spanish */
+  setNameEs?: Maybe<Scalars['String']['output']>;
+};
+
+/** Scan search effort level: NORMAL searches the catalog first and uses AI only as fallback; HIGH and MAX skip the initial catalog search and resolve via AI first */
+export enum CardScanEffort {
+  High = 'HIGH',
+  Max = 'MAX',
+  Normal = 'NORMAL',
+}
+
+export type CardScanSearchInput = {
+  /** Collector/card number printed on the card */
+  cardNumber?: InputMaybe<Scalars['String']['input']>;
+  /** Search effort: NORMAL searches the catalog first and uses AI only as fallback; HIGH and MAX skip the initial catalog search and resolve via AI first (gemini-2.5-flash / gemini-2.5-pro). The AI-resolved data is always re-applied to the catalog search */
+  effort?: InputMaybe<CardScanEffort>;
+  /** Card name (any language) */
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Image of the scanned card */
+  originalImage?: InputMaybe<Scalars['Upload']['input']>;
+  /** Set code of the card */
+  setCode?: InputMaybe<Scalars['String']['input']>;
+  /** Image of the set icon cropped from the scanned card */
+  setIcon?: InputMaybe<Scalars['Upload']['input']>;
+  /** Card rules text (any language) */
+  text?: InputMaybe<Scalars['String']['input']>;
+  /** Include card metrics for best match (variants metrics + external prices). WARNING: Significantly increases response time due to external API calls. */
+  withCardsMetrics?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Cart = {
@@ -339,8 +392,12 @@ export type FindInventoryMovementsArgs = {
 };
 
 export type FindInventoryMovementsFilter = {
+  /** Card guid; returns movements for every inventory item belonging to that card */
+  cardGuid?: InputMaybe<Scalars['String']['input']>;
+  condition?: InputMaybe<Scalars['String']['input']>;
   createdDate?: InputMaybe<DateRangeFilter>;
   inventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<CardLanguage>;
   movementType?: InputMaybe<Scalars['String']['input']>;
   tcg: Scalars['String']['input'];
 };
@@ -470,8 +527,12 @@ export type FindSellPriceHistoryArgs = {
 };
 
 export type FindSellPriceHistoryFilter = {
+  /** Card guid; returns history for every inventory item belonging to that card */
+  cardGuid?: InputMaybe<Scalars['String']['input']>;
+  condition?: InputMaybe<Scalars['String']['input']>;
   createdDate?: InputMaybe<DateRangeFilter>;
   inventoryItemGuid?: InputMaybe<Scalars['String']['input']>;
+  language?: InputMaybe<CardLanguage>;
   reason?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -622,26 +683,39 @@ export type LoginUserInput = {
 };
 
 export type MagicCard = {
+  artist?: Maybe<Scalars['String']['output']>;
   cardKingdomId: Scalars['Float']['output'];
   cardType?: Maybe<Scalars['String']['output']>;
   castSymbols?: Maybe<Scalars['String']['output']>;
   collection: MagicCardCollection;
   collectorNumber?: Maybe<Scalars['String']['output']>;
+  colorIdentity?: Maybe<Array<Scalars['String']['output']>>;
+  colors?: Maybe<Array<Scalars['String']['output']>>;
   createdBy?: Maybe<User>;
   createdDate: Scalars['Timestamp']['output'];
   description?: Maybe<Scalars['String']['output']>;
   detailsUrl: Scalars['String']['output'];
+  edhrecRank?: Maybe<Scalars['Float']['output']>;
   edition: Scalars['String']['output'];
+  finishes?: Maybe<Array<Scalars['String']['output']>>;
+  flavorName?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   isFoil: Scalars['Boolean']['output'];
+  keywords?: Maybe<Array<Scalars['String']['output']>>;
   language: CardLanguage;
+  layout?: Maybe<Scalars['String']['output']>;
+  legalities?: Maybe<Scalars['JSONObject']['output']>;
+  manaValue?: Maybe<Scalars['Float']['output']>;
+  moreImages?: Maybe<Array<MagicImageResolution>>;
   name: Scalars['String']['output'];
   power?: Maybe<Scalars['String']['output']>;
   priceBuy?: Maybe<Scalars['Float']['output']>;
   priceRetail?: Maybe<Scalars['Float']['output']>;
   rarity?: Maybe<Scalars['String']['output']>;
+  releaseDate?: Maybe<Scalars['String']['output']>;
   scryfallId?: Maybe<Scalars['String']['output']>;
+  scryfallUri?: Maybe<Scalars['String']['output']>;
   sku: Scalars['String']['output'];
   toughness?: Maybe<Scalars['String']['output']>;
   transformDescription?: Maybe<Scalars['String']['output']>;
@@ -686,9 +760,12 @@ export type MagicCardCollection = {
   createdDate: Scalars['Timestamp']['output'];
   editionIconUri?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  languages?: Maybe<Array<Scalars['String']['output']>>;
   name: Scalars['String']['output'];
   normalizedName: Scalars['String']['output'];
+  printedCardCount?: Maybe<Scalars['Float']['output']>;
   releaseDate?: Maybe<Scalars['String']['output']>;
+  setCode?: Maybe<Scalars['String']['output']>;
   tcgType: Scalars['String']['output'];
   totalCards: Scalars['Float']['output'];
   updatedBy?: Maybe<User>;
@@ -696,9 +773,13 @@ export type MagicCardCollection = {
 };
 
 export type MagicCardCollectionOutput = {
+  cardCount?: Maybe<Scalars['Float']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   editionIconUri?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
+  languages?: Maybe<Array<Scalars['String']['output']>>;
   name: Scalars['String']['output'];
+  releaseDate?: Maybe<Scalars['String']['output']>;
 };
 
 export type MagicCardInternalDetail = {
@@ -748,14 +829,23 @@ export type MagicCardInventoryItemPublic = {
 };
 
 export type MagicCardPublicDetail = {
+  artist?: Maybe<Scalars['String']['output']>;
+  cardType?: Maybe<Scalars['String']['output']>;
   collectorNumber?: Maybe<Scalars['String']['output']>;
+  colors?: Maybe<Array<Scalars['String']['output']>>;
+  description?: Maybe<Scalars['String']['output']>;
   edition?: Maybe<Scalars['String']['output']>;
   editionGuid?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   imageUri?: Maybe<Scalars['String']['output']>;
   inventoryCards?: Maybe<Array<MagicCardInventoryItemPublic>>;
   isFoil: Scalars['Boolean']['output'];
+  keywords?: Maybe<Array<Scalars['String']['output']>>;
   language: CardLanguage;
+  layout?: Maybe<Scalars['String']['output']>;
+  legalities?: Maybe<Scalars['JSONObject']['output']>;
+  manaValue?: Maybe<Scalars['Float']['output']>;
+  moreImages?: Maybe<Array<MagicImageResolution>>;
   name: Scalars['String']['output'];
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
@@ -786,6 +876,19 @@ export type MagicCardRecommended = {
   rarity?: Maybe<Scalars['String']['output']>;
   sellPrice?: Maybe<Scalars['Float']['output']>;
   totalStock: Scalars['Int']['output'];
+};
+
+export type MagicCardScanSearchResult = {
+  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when effort is HIGH or MAX) */
+  aiResolved?: Maybe<CardScanAiData>;
+  /** Best matching card */
+  bestMatch?: Maybe<MagicCardInternalItem>;
+  /** Error message if search failed */
+  error?: Maybe<Scalars['String']['output']>;
+  /** Related cards (up to 3) */
+  relatedCards: Array<MagicCardInternalItem>;
+  /** Whether the card data was resolved via AI fallback */
+  resolvedByAI: Scalars['Boolean']['output'];
 };
 
 export type MagicCardSummary = {
@@ -833,6 +936,11 @@ export type MagicFilters = {
   edition?: InputMaybe<Scalars['String']['input']>;
   isFoil?: InputMaybe<Scalars['Boolean']['input']>;
   rarity?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type MagicImageResolution = {
+  imageUrl: Scalars['String']['output'];
+  resolution: Scalars['String']['output'];
 };
 
 export type MostWantedCard = {
@@ -1301,6 +1409,7 @@ export type PokemonCardCollection = {
   releaseDate?: Maybe<Scalars['String']['output']>;
   setCode?: Maybe<Scalars['String']['output']>;
   setLogo?: Maybe<Scalars['String']['output']>;
+  tcgDexId?: Maybe<Scalars['String']['output']>;
   tcgType: Scalars['String']['output'];
   totalCards: Scalars['Float']['output'];
   updatedBy?: Maybe<User>;
@@ -1311,6 +1420,7 @@ export type PokemonCardCollectionOutput = {
   code?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   name: Scalars['String']['output'];
+  setLogo?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonCardInternalDetail = {
@@ -1439,6 +1549,19 @@ export type PokemonCardRecommended = {
   variant?: Maybe<Scalars['String']['output']>;
 };
 
+export type PokemonCardScanSearchResult = {
+  /** Card data resolved by AI (fallback when the catalog search found no match, or first pass when effort is HIGH or MAX) */
+  aiResolved?: Maybe<CardScanAiData>;
+  /** Best matching card */
+  bestMatch?: Maybe<PokemonCardInternalItem>;
+  /** Error message if search failed */
+  error?: Maybe<Scalars['String']['output']>;
+  /** Related cards (up to 3) */
+  relatedCards: Array<PokemonCardInternalItem>;
+  /** Whether the card data was resolved via AI fallback */
+  resolvedByAI: Scalars['Boolean']['output'];
+};
+
 export type PokemonCardSummary = {
   artist?: Maybe<Scalars['String']['output']>;
   cardNumber?: Maybe<Scalars['String']['output']>;
@@ -1498,6 +1621,8 @@ export type PokemonCardWithMetrics = {
 
 export type PokemonFilters = {
   rarity?: InputMaybe<Scalars['String']['input']>;
+  /** Collection guid to filter by set */
+  set?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Purchase = {
@@ -1568,7 +1693,7 @@ export type Query = {
   isValidToken: IsValidTokenOutput;
   /** Batch search Magic cards from multiline text (Moxfield format) */
   magicBatchCardSearch: MagicCardBatchSearchResult;
-  /** Get all Magic card collections/editions (public) */
+  /** Get all Magic card collections/editions, optionally filtered by set code or name (public) */
   magicCardCollections: Array<MagicCardCollectionOutput>;
   /** Get internal detail of a single Magic card with inventory data */
   magicCardInternalDetail: MagicCardInternalDetail;
@@ -1578,8 +1703,10 @@ export type Query = {
   magicCardPublicDetail: MagicCardPublicDetail;
   /** Get paginated public list of Magic cards with filters and search */
   magicCardPublicList: PaginatedMagicCardsPublic;
-  /** Get all unique card rarities available in the Magic catalog (cached 1hr) */
+  /** Get all unique card rarities available in the Magic catalog (cached daily) */
   magicCardRarities: Array<Scalars['String']['output']>;
+  /** Scan search for a single Magic card by partial data and/or card images, with AI fallback (authenticated) */
+  magicCardScanSearch: MagicCardScanSearchResult;
   /** Get inventory variants with metrics for a Magic card (authenticated) */
   magicCardWithMetrics: MagicCardWithMetrics;
   /** Get top 5 best-selling Magic cards of all time (public) */
@@ -1602,9 +1729,9 @@ export type Query = {
   myWishlist: PaginatedWishlistItems;
   /** Batch search Pokemon cards from multiline text (Limitless format) */
   pokemonBatchCardSearch: PokemonCardBatchSearchResult;
-  /** Get all Pokemon card collections (public) */
+  /** Get all Pokemon card collections, optionally filtered by set code or name (public) */
   pokemonCardCollections: Array<PokemonCardCollectionOutput>;
-  /** Get all unique card genres available in the catalog (cached 1hr) */
+  /** Get all unique card genres available in the catalog (cached daily) */
   pokemonCardGenres: Array<Scalars['String']['output']>;
   /** Get internal detail of a single Pokemon card with inventory data */
   pokemonCardInternalDetail: PokemonCardInternalDetail;
@@ -1614,9 +1741,11 @@ export type Query = {
   pokemonCardPublicDetail: PokemonCardPublicDetail;
   /** Get paginated public list of Pokemon cards with filters and search */
   pokemonCardPublicList: PaginatedPokemonCardsPublic;
-  /** Get all unique card rarities available in the catalog (cached 1hr) */
+  /** Get all unique card rarities available in the catalog (cached daily) */
   pokemonCardRarities: Array<Scalars['String']['output']>;
-  /** Get all unique card variants available in the catalog (cached 1hr) */
+  /** Scan search for a single Pokemon card by partial data and/or card images, with AI fallback (authenticated) */
+  pokemonCardScanSearch: PokemonCardScanSearchResult;
+  /** Get all unique card variants available in the catalog (cached daily) */
   pokemonCardVariants: Array<Scalars['String']['output']>;
   /** Get inventory variants with metrics for a Pokemon card (authenticated) */
   pokemonCardWithMetrics: PokemonCardWithMetrics;
@@ -1700,6 +1829,10 @@ export type QueryMagicBatchCardSearchArgs = {
   input: BatchSearchMagicCardsInput;
 };
 
+export type QueryMagicCardCollectionsArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type QueryMagicCardInternalDetailArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1714,6 +1847,10 @@ export type QueryMagicCardPublicDetailArgs = {
 
 export type QueryMagicCardPublicListArgs = {
   findMagicCardsPublicArgs: FindMagicCardsPublicArgs;
+};
+
+export type QueryMagicCardScanSearchArgs = {
+  input: CardScanSearchInput;
 };
 
 export type QueryMagicCardWithMetricsArgs = {
@@ -1748,6 +1885,10 @@ export type QueryPokemonBatchCardSearchArgs = {
   input: BatchSearchPokemonCardsInput;
 };
 
+export type QueryPokemonCardCollectionsArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type QueryPokemonCardInternalDetailArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1762,6 +1903,10 @@ export type QueryPokemonCardPublicDetailArgs = {
 
 export type QueryPokemonCardPublicListArgs = {
   findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs;
+};
+
+export type QueryPokemonCardScanSearchArgs = {
+  input: CardScanSearchInput;
 };
 
 export type QueryPokemonCardWithMetricsArgs = {

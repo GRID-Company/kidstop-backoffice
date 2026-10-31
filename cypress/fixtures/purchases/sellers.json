@@ -1,0 +1,18 @@
+{
+  "data": {
+    "sellers": {
+      "data": [
+        {
+          "guid": "seller-cypress-1",
+          "name": "Vendedor Cypress",
+          "phone": "555-0000",
+          "email": "vendedor.cypress@kidstop.test",
+          "notes": null,
+          "createdDate": "2026-01-01T00:00:00.000Z",
+          "updatedDate": "2026-01-01T00:00:00.000Z"
+        }
+      ],
+      "count": 1
+    }
+  }
+}

@@ -1,7 +1,11 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useFormState } from 'react-hook-form';
 import { CARD_CONDITIONS } from '@/lib/types/card.types';
-import { DEFAULT_CARD_LANGUAGE } from '@/lib/types/language.types';
+import {
+  DEFAULT_CARD_LANGUAGE,
+  getCardLanguageOptions,
+  LANGUAGE_LABELS,
+} from '@/lib/types/language.types';
 import { CardCondition } from '../../domain/types';
 import { useUpdateInventoryPrice } from './use-update-inventory-price';
 import { useAdjustInventoryStock } from './use-adjust-inventory-stock';
@@ -25,21 +29,21 @@ export interface InventoryCard {
 }
 
 interface CardDetail {
-  language?: CardLanguage;
+  language?: CardLanguage | null;
   inventoryCards?: Array<{
     guid: string;
     condition: string;
-    language: CardLanguage;
+    language: string;
     stock: number;
     purchasePrice: number | null;
     sellPrice: number | null;
-  }>;
+  }> | null;
   name?: string;
 }
 
 interface CardBasic {
   guid: string;
-  language?: CardLanguage;
+  language?: CardLanguage | null;
 }
 
 interface UseCardDetailModalParams {
@@ -79,20 +83,46 @@ export function useCardDetailModal({
     }
   }, [detail?.language]);
 
-  const availableVariants = useMemo(() => {
+  const allVariants = useMemo<InventoryCard[]>(() => {
     if (!detail?.inventoryCards || !card?.guid) return [];
-    return detail.inventoryCards
-      .map((ic) => ({
-        cardGuid: card.guid,
-        inventoryItemGuid: ic.guid,
-        condition: ic.condition,
-        language: ic.language,
-        stock: ic.stock,
-        purchasePrice: ic.purchasePrice,
-        sellPrice: ic.sellPrice,
-      }))
-      .filter((item: InventoryCard) => item.language === selectedLanguage);
-  }, [detail?.inventoryCards, selectedLanguage, card?.guid]);
+    return detail.inventoryCards.map((ic) => ({
+      cardGuid: card.guid,
+      inventoryItemGuid: ic.guid,
+      condition: ic.condition,
+      language: ic.language as CardLanguage,
+      stock: ic.stock,
+      purchasePrice: ic.purchasePrice,
+      sellPrice: ic.sellPrice,
+    }));
+  }, [detail?.inventoryCards, card?.guid]);
+
+  const availableVariants = useMemo(
+    () =>
+      allVariants.filter(
+        (item: InventoryCard) => item.language === selectedLanguage
+      ),
+    [allVariants, selectedLanguage]
+  );
+
+  const languageOptions = useMemo(() => {
+    const allowed = getCardLanguageOptions(
+      tcgType,
+      detail?.language ?? card?.language ?? null
+    );
+    const counts = new Map<CardLanguage, number>();
+    for (const variant of allVariants) {
+      counts.set(
+        variant.language,
+        (counts.get(variant.language) ?? 0) + variant.stock
+      );
+    }
+    const languages = new Set<CardLanguage>([...allowed, ...counts.keys()]);
+    return [...languages]
+      .map((language) => ({ language, count: counts.get(language) ?? 0 }))
+      .sort((a, b) =>
+        LANGUAGE_LABELS[a.language].localeCompare(LANGUAGE_LABELS[b.language])
+      );
+  }, [allVariants, tcgType, detail?.language, card?.language]);
 
   useEffect(() => {
     if (availableVariants.length > 0) {
@@ -133,7 +163,8 @@ export function useCardDetailModal({
   // Reset isInitialLoadRef when card changes
   useEffect(() => {
     isInitialLoadRef.current = true;
-  }, [card?.guid]);
+    stockForm.reset();
+  }, [card?.guid, stockForm]);
 
   useEffect(() => {
     if (selectedVariant) {
@@ -217,6 +248,8 @@ export function useCardDetailModal({
     selectedVariant,
     selectedLanguage,
     availableVariants,
+    allVariants,
+    languageOptions,
     handleLanguageChange,
     handleVariantSelect,
     handlePriceSubmit,
@@ -229,7 +262,7 @@ export function useCardDetailModal({
     adjustLoading,
     cardName: detail?.name,
     stockControl: stockForm.control,
-    stockFormState: stockForm.formState,
+    stockFormState: useFormState({ control: stockForm.control }),
     stockWatch: stockForm.watch,
   };
 }

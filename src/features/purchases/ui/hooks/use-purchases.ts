@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@apollo/client/react';
 
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
@@ -16,6 +17,8 @@ interface UsePurchasesReturn {
   setStatusFilter: (status: PurchaseStatus | undefined) => void;
   setSearch: (search: string) => void;
   setSellerFilter: (sellerGuid: string | undefined) => void;
+  dateFrom?: string;
+  dateTo?: string;
   setDateFrom: (from: string | undefined) => void;
   setDateTo: (to: string | undefined) => void;
   resetFilters: () => void;
@@ -29,7 +32,10 @@ const DEFAULT_FILTERS: PurchaseFilters = {};
 
 export function usePurchases(): UsePurchasesReturn {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
-  const [filters, setFilters] = useState<PurchaseFilters>(DEFAULT_FILTERS);
+  const searchParams = useSearchParams();
+  const [filters, setFilters] = useState<PurchaseFilters>({
+    search: searchParams.get('search') ?? undefined,
+  });
   const [dateFrom, setDateFrom] = useState<string | undefined>();
   const [dateTo, setDateTo] = useState<string | undefined>();
   const [page, setPage] = useState(1);
@@ -116,6 +122,8 @@ export function usePurchases(): UsePurchasesReturn {
     setStatusFilter,
     setSearch,
     setSellerFilter,
+    dateFrom,
+    dateTo,
     setDateFrom: handleSetDateFrom,
     setDateTo: handleSetDateTo,
     resetFilters,

@@ -20,17 +20,39 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
 
   const form = useMostWantedForm();
 
+  const pokemonCatalog = usePokemonCatalog(selectedTCG !== 'POKEMON');
+  const magicCatalog = useMagicCatalog(selectedTCG !== 'MAGIC');
+
   const {
     cards: pokemonCards,
     loading: pokemonLoading,
     setSearch: setPokemonSearch,
-  } = usePokemonCatalog(selectedTCG !== 'POKEMON');
+  } = pokemonCatalog;
 
   const {
     cards: magicCards,
     loading: magicLoading,
     setSearch: setMagicSearch,
-  } = useMagicCatalog(selectedTCG !== 'MAGIC');
+  } = magicCatalog;
+
+  const activeCatalog =
+    selectedTCG === 'POKEMON' ? pokemonCatalog : magicCatalog;
+
+  const selectedSet = (
+    selectedTCG === 'POKEMON'
+      ? pokemonCatalog.filters.set
+      : magicCatalog.filters.edition
+  ) as string | undefined;
+
+  const handleSetChange = useCallback(
+    (value: string) => {
+      activeCatalog.handleFilterChange(
+        selectedTCG === 'POKEMON' ? 'set' : 'edition',
+        value
+      );
+    },
+    [activeCatalog, selectedTCG]
+  );
 
   useEffect(() => {
     if (selectedTCG === 'POKEMON') {
@@ -47,12 +69,12 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
 
   const searchResults = useMemo(() => {
     if (selectedTCG === 'POKEMON') {
-      return pokemonCards.filter(
-        (card: any) => !existingCardGuids.has(card.guid)
+      return (pokemonCards as IPokemonCard[]).filter(
+        (card) => !existingCardGuids.has(card.guid)
       );
     } else if (selectedTCG === 'MAGIC') {
-      return magicCards.filter(
-        (card: any) => !existingCardGuids.has(card.guid)
+      return (magicCards as IMagicCard[]).filter(
+        (card) => !existingCardGuids.has(card.guid)
       );
     }
     return [];
@@ -62,8 +84,10 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
     setIsOpen(true);
     setSearch('');
     setSelectedCard(null);
+    pokemonCatalog.resetFilters();
+    magicCatalog.resetFilters();
     form.reset();
-  }, [form]);
+  }, [form, pokemonCatalog, magicCatalog]);
 
   const closeModal = useCallback(() => {
     setIsOpen(false);
@@ -107,5 +131,9 @@ export function useAddCardModal({ existingCards }: UseAddCardModalProps) {
     handleSubmit,
     selectedTCG,
     loading,
+    collections: activeCatalog.collections,
+    selectedSet,
+    handleSetChange,
+    resetKey: activeCatalog.resetKey,
   };
 }

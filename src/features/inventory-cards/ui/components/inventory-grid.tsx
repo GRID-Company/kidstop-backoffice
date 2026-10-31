@@ -18,6 +18,7 @@ import { CardImagePreviewModal } from '@/shared/components/card-image-preview-mo
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IInventoryItem } from '../../domain/types';
 import StockIndicator from './stock-indicator';
 
@@ -94,7 +95,7 @@ function renderCell(
           <div className='min-w-0'>
             <p className='truncate text-sm font-medium'>{item.name}</p>
             <p className='text-default-400 truncate text-xs'>
-              {item.number} · {item.rarity}
+              {formatCardNumber(item.number)} · {item.rarity}
             </p>
           </div>
         </div>
@@ -190,7 +191,7 @@ function InventoryMobileCard({
           </div>
 
           <p className='text-default-500 truncate text-xs'>
-            {item.setName} ({item.setCode}) · {item.number}
+            {item.setName} ({item.setCode}) · {formatCardNumber(item.number)}
           </p>
 
           <div className='flex flex-wrap items-center gap-2'>

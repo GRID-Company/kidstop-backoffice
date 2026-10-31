@@ -1,11 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['192.168.100.6', 'monastery-hangout-facsimile.ngrok-free.dev'],
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.pokemontcg.io',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.tcgdex.net',
         pathname: '/**',
       },
       {

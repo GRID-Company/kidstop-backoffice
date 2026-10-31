@@ -54,6 +54,9 @@ export default function Inventory() {
     dateRange,
     handleDateRangeChange,
     resetFilters,
+    resetKey,
+    filters,
+    activeFilterCount,
     items,
     hasActiveFilters,
     selectedTCG,
@@ -306,9 +309,12 @@ export default function Inventory() {
                   onDateRangeChange={handleDateRangeChange}
                   onReset={resetFilters}
                   hasActiveFilters={hasActiveFilters}
+                  activeFilterCount={activeFilterCount}
                   resultCount={totalCount}
                   selectedTCG={selectedTCG}
                   dateRange={dateRange}
+                  filters={filters}
+                  resetKey={resetKey}
                 />
               </div>
 

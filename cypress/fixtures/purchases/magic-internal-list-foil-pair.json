@@ -1,0 +1,35 @@
+{
+  "data": {
+    "magicCardInternalList": {
+      "data": [
+        {
+          "guid": "search-magic-nonfoil",
+          "name": "Toxrill, the Corrosive",
+          "language": "ENGLISH",
+          "edition": "Secret Lair Drop",
+          "collectorNumber": "1929",
+          "isFoil": false,
+          "sellPrice": 650,
+          "availableStock": true,
+          "totalStock": 2,
+          "imageUri": null,
+          "inventoryCards": []
+        },
+        {
+          "guid": "search-magic-foil",
+          "name": "Toxrill, the Corrosive",
+          "language": "ENGLISH",
+          "edition": "Secret Lair Drop",
+          "collectorNumber": "1929",
+          "isFoil": true,
+          "sellPrice": 1400,
+          "availableStock": true,
+          "totalStock": 1,
+          "imageUri": null,
+          "inventoryCards": []
+        }
+      ],
+      "count": 2
+    }
+  }
+}

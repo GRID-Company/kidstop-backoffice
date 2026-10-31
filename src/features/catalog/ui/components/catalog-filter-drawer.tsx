@@ -15,9 +15,12 @@ import AutocompleteFilter from '@/shared/base/heorui-overrides/autocomplete-filt
 import { FilterFn } from '@/lib/types/paginated-datatable.types';
 import { TCG_TYPES, TCGType } from '@/lib/types/tcg.types';
 import {
+  CARD_LANGUAGE_OPTIONS,
+  LANGUAGE_LABELS,
+} from '@/lib/types/language.types';
+import {
   CARD_CONDITION_OPTIONS,
   MAGIC_RARITY_OPTIONS,
-  STOCK_STATUS_OPTIONS,
 } from '../../domain/constants';
 import {
   IPokemonCollection,
@@ -25,6 +28,15 @@ import {
   PokemonCatalogFilters,
   MagicCatalogFilters,
 } from '../../domain/types';
+
+export type CatalogDrawerFilterKey =
+  | 'condition'
+  | 'language'
+  | 'rarity'
+  | 'collection'
+  | 'variant'
+  | 'genre'
+  | 'isFoil';
 
 interface CatalogFilterDrawerProps {
   isOpen: boolean;
@@ -39,6 +51,7 @@ interface CatalogFilterDrawerProps {
   rarities?: string[];
   variants?: string[];
   genres?: string[];
+  visibleFilters?: CatalogDrawerFilterKey[];
 }
 
 export default function CatalogFilterDrawer({
@@ -54,8 +67,12 @@ export default function CatalogFilterDrawer({
   rarities,
   variants,
   genres,
+  visibleFilters,
 }: CatalogFilterDrawerProps) {
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
+
+  const isFilterVisible = (key: CatalogDrawerFilterKey) =>
+    !visibleFilters || visibleFilters.includes(key);
 
   const rarityOptions = useMemo(() => {
     if (isPokemon && rarities && rarities.length > 0) {
@@ -79,6 +96,15 @@ export default function CatalogFilterDrawer({
     if (!collections) return [];
     return collections.map((c) => ({ label: c.name, value: c.guid }));
   }, [collections]);
+
+  const languageOptions = useMemo(
+    () =>
+      CARD_LANGUAGE_OPTIONS.map((lang) => ({
+        label: LANGUAGE_LABELS[lang],
+        value: lang,
+      })),
+    []
+  );
 
   const handleReset = () => {
     onReset();
@@ -104,17 +130,33 @@ export default function CatalogFilterDrawer({
         </DrawerHeader>
 
         <DrawerBody className='flex flex-col gap-4'>
-          <Select
-            placeholder='Todas las condiciones'
-            label='Condición'
-            items={CARD_CONDITION_OPTIONS}
-            selectedKeys={filters?.condition ? [filters.condition] : []}
-            onChange={(e) => onFilterChange('condition', e.target.value)}
-            aria-label='Filtrar por condición'
-            data-testid='filter-condition-select'
-          />
+          {isFilterVisible('condition') && (
+            <Select
+              placeholder='Todas las condiciones'
+              label='Condición'
+              items={CARD_CONDITION_OPTIONS}
+              selectedKeys={filters?.condition ? [filters.condition] : []}
+              onChange={(e) => onFilterChange('condition', e.target.value)}
+              aria-label='Filtrar por condición'
+              data-testid='filter-condition-select'
+            />
+          )}
 
-          {rarityOptions.length > 0 &&
+          {isFilterVisible('language') && (
+            <Select
+              placeholder='Todos los idiomas'
+              label='Idioma'
+              description='Cartas con inventario en este idioma'
+              items={languageOptions}
+              selectedKeys={filters?.language ? [filters.language] : []}
+              onChange={(e) => onFilterChange('language', e.target.value)}
+              aria-label='Filtrar por idioma'
+              data-testid='filter-language-select'
+            />
+          )}
+
+          {isFilterVisible('rarity') &&
+            rarityOptions.length > 0 &&
             (isPokemon ? (
               <AutocompleteFilter
                 placeholder='Todas las rarezas'
@@ -138,31 +180,35 @@ export default function CatalogFilterDrawer({
               />
             ))}
 
-          {isPokemon && collectionOptions.length > 0 && (
-            <AutocompleteFilter
-              placeholder='Todas las colecciones'
-              label='Colección'
-              items={collectionOptions}
-              onSelectionChange={(value) => onFilterChange('set', value)}
-              resetKey={resetKey}
-              selectedValue={(filters as PokemonCatalogFilters)?.set}
-              aria-label='Filtrar por colección'
-            />
-          )}
+          {isPokemon &&
+            isFilterVisible('collection') &&
+            collectionOptions.length > 0 && (
+              <AutocompleteFilter
+                placeholder='Todas las colecciones'
+                label='Colección'
+                items={collectionOptions}
+                onSelectionChange={(value) => onFilterChange('set', value)}
+                resetKey={resetKey}
+                selectedValue={(filters as PokemonCatalogFilters)?.set}
+                aria-label='Filtrar por colección'
+              />
+            )}
 
-          {isPokemon && variantOptions.length > 0 && (
-            <AutocompleteFilter
-              placeholder='Todas las variantes'
-              label='Variante'
-              items={variantOptions}
-              onSelectionChange={(value) => onFilterChange('variant', value)}
-              resetKey={resetKey}
-              selectedValue={(filters as PokemonCatalogFilters)?.variant}
-              aria-label='Filtrar por variante'
-            />
-          )}
+          {isPokemon &&
+            isFilterVisible('variant') &&
+            variantOptions.length > 0 && (
+              <AutocompleteFilter
+                placeholder='Todas las variantes'
+                label='Variante'
+                items={variantOptions}
+                onSelectionChange={(value) => onFilterChange('variant', value)}
+                resetKey={resetKey}
+                selectedValue={(filters as PokemonCatalogFilters)?.variant}
+                aria-label='Filtrar por variante'
+              />
+            )}
 
-          {isPokemon && genreOptions.length > 0 && (
+          {isPokemon && isFilterVisible('genre') && genreOptions.length > 0 && (
             <AutocompleteFilter
               placeholder='Todos los géneros'
               label='Género'
@@ -174,34 +220,21 @@ export default function CatalogFilterDrawer({
             />
           )}
 
-          {!isPokemon && collectionOptions.length > 0 && (
-            <AutocompleteFilter
-              placeholder='Todas las ediciones'
-              label='Edición'
-              items={collectionOptions}
-              onSelectionChange={(value) => onFilterChange('edition', value)}
-              resetKey={resetKey}
-              selectedValue={(filters as MagicCatalogFilters)?.edition}
-              aria-label='Filtrar por edición'
-            />
-          )}
+          {!isPokemon &&
+            isFilterVisible('collection') &&
+            collectionOptions.length > 0 && (
+              <AutocompleteFilter
+                placeholder='Todas las ediciones'
+                label='Edición'
+                items={collectionOptions}
+                onSelectionChange={(value) => onFilterChange('edition', value)}
+                resetKey={resetKey}
+                selectedValue={(filters as MagicCatalogFilters)?.edition}
+                aria-label='Filtrar por edición'
+              />
+            )}
 
-          {!isPokemon && (
-            <Select
-              placeholder='Todos los estados'
-              label='Estado de stock'
-              items={STOCK_STATUS_OPTIONS}
-              selectedKeys={
-                (filters as MagicCatalogFilters)?.stockStatus
-                  ? [(filters as MagicCatalogFilters).stockStatus!]
-                  : []
-              }
-              onChange={(e) => onFilterChange('stockStatus', e.target.value)}
-              aria-label='Filtrar por estado de stock'
-            />
-          )}
-
-          {!isPokemon && (
+          {!isPokemon && isFilterVisible('isFoil') && (
             <Select
               placeholder='Todas'
               label='Foil'

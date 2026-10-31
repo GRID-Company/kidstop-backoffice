@@ -14,6 +14,7 @@ export default function BulkCardFormControls({
   variant,
   index,
   selectedCard,
+  tcgType,
 }: BulkCardFormControlsProps) {
   const { control, setValue, watch } = useFormContext();
 
@@ -71,6 +72,7 @@ export default function BulkCardFormControls({
           <LanguageSelector
             value={field.value as CardLanguage}
             onChange={field.onChange}
+            tcgType={tcgType}
             currentLanguage={selectedCard?.language as CardLanguage}
             size='sm'
           />

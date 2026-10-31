@@ -1,0 +1,60 @@
+{
+  "data": {
+    "pokemonCardScanSearch": {
+      "resolvedByAI": true,
+      "bestMatch": {
+        "guid": "scan-pokemon-normal",
+        "name": "Charizard ex",
+        "variant": "Normal",
+        "setName": "Obsidian Flames",
+        "setCode": "OBF",
+        "cardNumber": "125",
+        "sellPrice": 320,
+        "availableStock": false,
+        "totalStock": 0,
+        "imageUri": null,
+        "language": "ENGLISH",
+        "type": "Fire",
+        "hp": "330",
+        "stage": "Stage 2",
+        "inventoryCards": [],
+        "cardMetrics": {
+          "variantsMetrics": [],
+          "ungradedPrice": 320,
+          "gradedPriceSeven": null,
+          "gradedPriceEightOrAbove": null
+        }
+      },
+      "relatedCards": [
+        {
+          "guid": "scan-pokemon-reverse",
+          "name": "Charizard ex",
+          "variant": "Reverse Holo",
+          "setName": "Obsidian Flames",
+          "setCode": "OBF",
+          "cardNumber": "125",
+          "sellPrice": 480,
+          "availableStock": true,
+          "totalStock": 1,
+          "imageUri": null,
+          "language": "ENGLISH",
+          "type": "Fire",
+          "hp": "330",
+          "stage": "Stage 2"
+        }
+      ],
+      "aiResolved": {
+        "name": "Charizard ex",
+        "cardNumber": "125",
+        "setCode": "OBF",
+        "setName": "Obsidian Flames",
+        "cardText": null,
+        "detectedLanguage": "en",
+        "nameEs": null,
+        "setNameEs": null,
+        "cardTextEs": null
+      },
+      "error": null
+    }
+  }
+}

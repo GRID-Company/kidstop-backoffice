@@ -226,7 +226,9 @@ A `success: true` response means the export job has been queued. The XLSX file w
 
 ### XLSX Columns (Sales)
 
-The generated file contains one row per sale with the following columns:
+The generated file contains two sheets.
+
+**Sheet "Ventas"** — one row per sale with the following columns:
 
 | Column            | Description                              |
 | ----------------- | ---------------------------------------- |
@@ -238,6 +240,20 @@ The generated file contains one row per sale with the following columns:
 | Estado            | Sale status                              |
 | Total             | Sale total (currency formatted)          |
 | Total de Items    | Sum of all item quantities               |
+
+**Sheet "Detalle"** — one row per sold card (sale item), linked to the "Ventas" sheet by `Código`:
+
+| Column          | Description                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| Código          | Sale code of the sale containing this item (e.g. KSS-2025-00001) |
+| Carta           | Card name                                                        |
+| Set/Colección   | Card collection/set name (edition for Magic cards)               |
+| Número          | Card number (e.g. `#4` for Pokemon, collector number for Magic)  |
+| Condición       | Card condition (Near Mint, Ligeramente Jugada, etc.)             |
+| Idioma          | Card language                                                    |
+| Cantidad        | Quantity sold                                                    |
+| Precio Unitario | Unit sale price (currency formatted)                             |
+| Subtotal        | Unit price × quantity (currency formatted)                       |
 
 ---
 

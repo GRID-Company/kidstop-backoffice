@@ -19,6 +19,7 @@ import { Icon } from '@iconify/react';
 import { KidstopTable } from '@/shared/base/heorui-overrides/table';
 import KidstopCard from '@/shared/base/heorui-overrides/card';
 import { IDeckListResolvedLine } from '../../domain/deck-list-parser.types';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 
 interface DeckListResultsTableProps {
   lines: IDeckListResolvedLine[];
@@ -111,6 +112,7 @@ function renderCell(
                 fill
                 sizes='32px'
                 className='object-contain'
+                unoptimized
               />
             </div>
           )}
@@ -211,6 +213,7 @@ function MobileResultCard({
               fill
               sizes='40px'
               className='object-contain'
+              unoptimized
             />
           </div>
         )}
@@ -229,7 +232,7 @@ function MobileResultCard({
 
           {line.isValid && (
             <p className='text-default-500 text-xs'>
-              ({line.setCode}) #{line.collectorNumber}
+              ({line.setCode}) {formatCardNumber(line.collectorNumber)}
             </p>
           )}
 

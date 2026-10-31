@@ -45,8 +45,9 @@ export const MAGIC_SORT_OPTIONS = [
   { label: 'Nombre Z → A', value: 'name_DESC' },
   { label: 'Precio menor', value: 'sellPrice_ASC' },
   { label: 'Precio mayor', value: 'sellPrice_DESC' },
-  { label: 'Rareza', value: 'rarity_ASC' },
-  { label: 'Set', value: 'setName_ASC' },
+  { label: 'Mayor stock', value: 'totalStock_DESC' },
+  { label: 'Edición A → Z', value: 'edition_ASC' },
+  { label: 'Número', value: 'collectorNumber_ASC' },
 ];
 
 export const MIN_PRICE = 0;
@@ -55,7 +56,6 @@ export const DEFAULT_MARGIN_PERCENTAGE = 30;
 export const STOCK_STATUS_OPTIONS = [
   { label: 'Disponible', value: 'AVAILABLE' },
   { label: 'No disponible', value: 'UNAVAILABLE' },
-  { label: 'Esperando recolección', value: 'AWAITING_PICKUP' },
 ];
 
-export const DEFAULT_HISTORY_LIMIT = 10;
+export const DEFAULT_HISTORY_LIMIT = 5;

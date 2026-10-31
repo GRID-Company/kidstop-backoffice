@@ -16,11 +16,8 @@ export default function StockAdjustmentTab({
   control,
 }: StockAdjustmentTabProps) {
   return (
-    <div
-      className='mx-auto flex max-w-4xl flex-col gap-4'
-      data-testid='tab-stock'
-    >
-      <div className='flex flex-col gap-4 sm:flex-row'>
+    <div className='flex w-full flex-col gap-4' data-testid='tab-stock'>
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
         <SelectForm
           controlProps={{ control, name: 'movementType' }}
           label='Tipo de operación'
@@ -29,9 +26,21 @@ export default function StockAdjustmentTab({
           items={BULK_ADJUSTMENT_OPTIONS}
           data-testid='stock-movement-type-select'
         >
-          {(option: any) => (
-            <SelectItem key={option.key} description={option.description}>
-              {option.label}
+          {(option) => (
+            <SelectItem
+              key={
+                (option as { key: string; label: string; description: string })
+                  .key
+              }
+              description={
+                (option as { key: string; label: string; description: string })
+                  .description
+              }
+            >
+              {
+                (option as { key: string; label: string; description: string })
+                  .label
+              }
             </SelectItem>
           )}
         </SelectForm>

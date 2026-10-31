@@ -206,6 +206,7 @@ function BulkCardSearchRoot({
           onSearch={handleSearch}
           onClear={handleClear}
           isLoading={loading}
+          tcgType={selectedTCG}
         />
 
         {error && (
@@ -260,4 +261,5 @@ const BulkCardSearch = Object.assign(BulkCardSearchRoot, {
   Results: BulkCardSearchResults,
 });
 
+export { default as BulkCardResultSummary } from './bulk-card-result-summary';
 export default BulkCardSearch;

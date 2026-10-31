@@ -17,6 +17,7 @@ export default function SelectForm<T extends FieldValues>({
       render={({ field, fieldState: { invalid } }) => (
         <KidstopSelect
           isInvalid={invalid}
+          disallowEmptySelection
           {...selectProps}
           {...field}
           selectedKeys={field.value ? [field.value] : []}

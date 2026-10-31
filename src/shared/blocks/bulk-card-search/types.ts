@@ -106,6 +106,7 @@ export interface BulkCardSearchInputProps {
   onSearch: () => void;
   onClear: () => void;
   isLoading: boolean;
+  tcgType: TCGType;
   isDisabled?: boolean;
 }
 
@@ -136,6 +137,7 @@ export interface BulkCardFormControlsProps {
   variant: BulkSearchVariant;
   index: number;
   selectedCard: BulkCardData | null;
+  tcgType: TCGType;
 }
 
 export interface BulkCardSearchPurchasesProps {

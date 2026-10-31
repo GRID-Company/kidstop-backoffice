@@ -22,6 +22,7 @@ import { CardImagePreviewModal } from '@/shared/components/card-image-preview-mo
 import { useCardImagePreview } from '@/shared/hooks/use-card-image-preview';
 import { CARD_CONDITION_SHORT_LABELS } from '@/lib/types/card.types';
 import { LANGUAGE_LABELS } from '@/lib/types/language.types';
+import { formatCardNumber } from '@/lib/utils/format-card-number';
 import { IInventoryMovement } from '../../domain/types';
 import {
   MOVEMENT_TYPE_LABELS,
@@ -29,6 +30,7 @@ import {
   MOVEMENT_TYPE_ICONS,
   formatMovementQuantity,
 } from '../../domain/constants';
+import MovementReferenceLink from './movement-reference-link';
 
 interface MovementHistoryTableProps {
   items: IInventoryMovement[];
@@ -45,6 +47,7 @@ interface MovementHistoryTableProps {
 const COLUMNS = [
   { key: 'createdDate', label: 'Fecha', allowsSorting: true },
   { key: 'cardName', label: 'Carta', allowsSorting: true },
+  { key: 'setName', label: 'Set', allowsSorting: false },
   { key: 'condition', label: 'Condición', allowsSorting: true },
   { key: 'language', label: 'Idioma', allowsSorting: true },
   { key: 'movementType', label: 'Tipo', allowsSorting: true },
@@ -76,8 +79,10 @@ function renderCell(
             src={item.cardImageUrl}
             alt={item.cardName}
             tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
-            containerClassName='relative h-10 w-8 flex-shrink-0 overflow-hidden rounded bg-default-100'
+            containerClassName='relative h-28 w-20 flex-shrink-0 overflow-hidden rounded bg-default-100'
             className='object-contain'
+            fill
+            sizes='80px'
             enablePreview
             onImageClick={() =>
               openPreview(
@@ -90,10 +95,17 @@ function renderCell(
           <div className='min-w-0'>
             <p className='truncate text-sm font-medium'>{item.cardName}</p>
             <p className='text-default-400 truncate text-xs'>
-              {item.setName} ({item.setCode}) · {item.cardNumber}
+              {formatCardNumber(item.cardNumber)} · {item.rarity}
             </p>
           </div>
         </div>
+      );
+    case 'setName':
+      return (
+        <span className='text-sm'>
+          {item.setName}{' '}
+          <span className='text-default-400'>({item.setCode})</span>
+        </span>
       );
     case 'condition':
       return (
@@ -133,9 +145,11 @@ function renderCell(
       return <span className='text-sm'>{item.userName}</span>;
     case 'reference':
       return (
-        <span className='text-default-500 text-sm'>
-          {item.reference ?? '—'}
-        </span>
+        <MovementReferenceLink
+          movementType={item.movementType}
+          reference={item.reference}
+          className='text-sm'
+        />
       );
     default:
       return null;
@@ -164,8 +178,10 @@ function MovementMobileCardComponent({
           src={item.cardImageUrl}
           alt={item.cardName}
           tcgType={item.tcg as 'POKEMON' | 'MAGIC'}
-          containerClassName='relative h-14 w-10 shrink-0 overflow-hidden rounded bg-default-100'
+          containerClassName='relative h-32 w-24 shrink-0 overflow-hidden rounded bg-default-100'
           className='object-contain'
+          fill
+          sizes='96px'
           enablePreview
           onImageClick={() =>
             openPreview(
@@ -185,7 +201,8 @@ function MovementMobileCardComponent({
           </div>
 
           <p className='text-default-500 truncate text-xs'>
-            {item.setName} ({item.setCode}) · {item.cardNumber}
+            {item.setName} ({item.setCode}) ·{' '}
+            {formatCardNumber(item.cardNumber)}
           </p>
 
           <div className='flex flex-wrap items-center gap-2'>
@@ -215,7 +232,13 @@ function MovementMobileCardComponent({
           <div className='text-default-400 flex items-center gap-3 text-[11px]'>
             <span>{formatUnixDateTime(item.createdDate)}</span>
             <span>{item.userName}</span>
-            {item.reference && <span>{item.reference}</span>}
+            {item.reference && (
+              <MovementReferenceLink
+                movementType={item.movementType}
+                reference={item.reference}
+                className='text-[11px]'
+              />
+            )}
           </div>
         </div>
       </CardBody>

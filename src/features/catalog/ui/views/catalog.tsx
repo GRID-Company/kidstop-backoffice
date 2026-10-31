@@ -4,19 +4,25 @@ import { useCallback, useState } from 'react';
 
 import { EntitiesPage } from '@/shared/blocks/entities-page';
 import { useSelectedTCGStore } from '@/lib/store/selected-tcg';
+import { usePrivacyModeStore } from '@/lib/store/privacy-mode';
 import { TCG_TYPES } from '@/lib/types/tcg.types';
 import { IMagicCard, IPokemonCard } from '../../domain/types';
 import { useMagicCatalog } from '../hooks/use-magic-catalog';
 import { usePokemonCatalog } from '../hooks/use-pokemon-catalog';
 import CardSearch from '../components/card-search';
-import MagicCardGrid from '../components/magic-card-grid';
+import CatalogCardGrid from '../components/catalog-card-grid';
+import MagicCardGridItem from '../components/magic-card-grid-item';
 import MagicCardDetailModal from '../components/magic-card-detail-modal';
-import PokemonCardGrid from '../components/pokemon-card-grid';
+import PokemonCardGridItem from '../components/pokemon-card-grid-item';
 import PokemonCardDetailModal from '../components/pokemon-card-detail-modal';
 
 export default function Catalog() {
   const selectedTCG = useSelectedTCGStore((state) => state.selectedTCG);
   const isPokemon = selectedTCG === TCG_TYPES.POKEMON;
+  const isPrivacyMode = usePrivacyModeStore((state) => state.isPrivacyMode);
+
+  const [showCosts, setShowCosts] = useState(false);
+  const revealCosts = showCosts && !isPrivacyMode;
 
   const magic = useMagicCatalog(isPokemon);
   const pokemon = usePokemonCatalog(!isPokemon);
@@ -75,6 +81,8 @@ export default function Catalog() {
                 rarities={pokemon.rarities}
                 variants={pokemon.variants}
                 genres={pokemon.genres}
+                showCosts={showCosts}
+                onShowCostsChange={setShowCosts}
               />
             ) : (
               <CardSearch
@@ -90,27 +98,51 @@ export default function Catalog() {
                 filters={magic.filters}
                 collections={magic.collections}
                 rarities={magic.rarities}
+                showCosts={showCosts}
+                onShowCostsChange={setShowCosts}
               />
             )}
           </div>
 
           {isPokemon ? (
-            <PokemonCardGrid
+            <CatalogCardGrid
               cards={pokemon.cards as IPokemonCard[]}
               loading={pokemon.loading}
+              error={!!pokemon.error}
+              onRetry={pokemon.refetch}
               page={pokemon.page}
               totalPages={pokemon.totalPages}
               onPageChange={pokemon.setPage}
-              onCardPress={handlePokemonCardPress}
+              renderItem={(card) => (
+                <PokemonCardGridItem
+                  key={card.guid}
+                  card={card}
+                  showCosts={revealCosts}
+                  onPress={handlePokemonCardPress}
+                />
+              )}
+              gridTestId='pokemon-cards-grid'
+              emptyTestId='pokemon-cards-empty'
             />
           ) : (
-            <MagicCardGrid
+            <CatalogCardGrid
               cards={magic.cards as IMagicCard[]}
               loading={magic.loading}
+              error={!!magic.error}
+              onRetry={magic.refetch}
               page={magic.page}
               totalPages={magic.totalPages}
               onPageChange={magic.setPage}
-              onCardPress={handleMagicCardPress}
+              renderItem={(card) => (
+                <MagicCardGridItem
+                  key={card.guid}
+                  card={card}
+                  showCosts={revealCosts}
+                  onPress={handleMagicCardPress}
+                />
+              )}
+              gridTestId='magic-cards-grid'
+              emptyTestId='magic-cards-empty'
             />
           )}
         </EntitiesPage.CardContainer>
