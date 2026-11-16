@@ -2,10 +2,12 @@ import { useAuthStore } from '@/lib/store/auth';
 import { useAuthCookie } from './use-auth-cookie';
 import { LoginOutput } from '../api/schema-types';
 import { ERROR_MESSAGES } from '../consts/error-messages';
-import { useRouter } from 'next/navigation';
+import { LOGIN_NEXT_PARAM, sanitizeNextPath } from '../consts/auth';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export const useProcessLogin = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setSession = useAuthStore((state) => state.setSession);
   const { setTokenCookie } = useAuthCookie();
 
@@ -15,7 +17,9 @@ export const useProcessLogin = () => {
 
     setSession({ user: data.user, token: data.access_token });
     await setTokenCookie(data.access_token, data.user.role);
-    router.push('/catalogo');
+    router.push(
+      sanitizeNextPath(searchParams.get(LOGIN_NEXT_PARAM)) ?? '/catalogo'
+    );
   };
 
   return { processLogin };
