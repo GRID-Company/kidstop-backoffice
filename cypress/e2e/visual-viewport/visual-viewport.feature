@@ -23,6 +23,11 @@ Feature: Compensación del visual viewport en overlays
     When el documento intenta desplazarse "160" píxeles
     Then el scroll del documento vuelve a "0" píxeles
 
+  Scenario: El contenedor del drawer no puede ocultar el footer al desplazarse
+    When el contenedor del drawer intenta desplazarse "160" píxeles
+    Then el scroll del contenedor del drawer vuelve a "0" píxeles
+    And el footer del drawer permanece dentro del área visible
+
   Scenario: El drawer vuelve a su posición cuando el viewport regresa a cero
     When el visual viewport se desplaza "160" píxeles
     Then la variable CSS del offset del viewport es "160px"

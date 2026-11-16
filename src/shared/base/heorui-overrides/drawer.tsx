@@ -19,11 +19,11 @@ const KidstopDrawer = ({
       {...props}
       size={effectiveSize}
       classNames={{
-        base: `bg-white${isFullScreen ? ' h-(--visual-viewport-height)' : ''}`,
-        wrapper: 'translate-y-(--visual-viewport-offset-top)',
+        base: `bg-white overflow-y-hidden${isFullScreen ? ' min-h-0 h-(--vv-height)' : ''}`,
+        wrapper: 'translate-y-(--visual-viewport-offset-top) overflow-y-hidden',
         backdrop: 'translate-y-(--visual-viewport-offset-top)',
         header: 'border-b border-gray-100 text-content-primary font-semibold',
-        body: 'bg-neutral-subtle/30',
+        body: 'bg-neutral-subtle/30 min-h-0 overflow-y-auto',
         footer: 'border-t border-gray-100 bg-white',
         ...props.classNames,
       }}

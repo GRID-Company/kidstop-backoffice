@@ -83,6 +83,45 @@ Then('el scroll del documento vuelve a {string} píxeles', (pixels: string) => {
   cy.document().its('documentElement.scrollTop').should('eq', Number(pixels));
 });
 
+When(
+  'el contenedor del drawer intenta desplazarse {string} píxeles',
+  (pixels: string) => {
+    cy.viewport(500, 400);
+    cy.get(POKEMON_MODAL, { timeout: TIMEOUTS.MODAL_OPEN })
+      .closest('[role="dialog"]')
+      .then(($dialog) => {
+        const dialog = $dialog[0];
+        dialog.scrollTop = Number(pixels);
+        dialog.ownerDocument.defaultView?.dispatchEvent(new Event('scroll'));
+      });
+  }
+);
+
+Then(
+  'el scroll del contenedor del drawer vuelve a {string} píxeles',
+  (pixels: string) => {
+    cy.get(POKEMON_MODAL)
+      .closest('[role="dialog"]')
+      .should(($dialog) => {
+        expect($dialog[0].scrollTop).to.eq(Number(pixels));
+      });
+  }
+);
+
+Then('el footer del drawer permanece dentro del área visible', () => {
+  cy.get(`${POKEMON_MODAL} [data-testid="close-modal-button"]`)
+    .parent()
+    .then(($footer) => {
+      const rect = $footer[0].getBoundingClientRect();
+      const viewportHeight =
+        $footer[0].ownerDocument.defaultView?.innerHeight ?? 0;
+      expect(rect.height, 'footer tiene altura').to.be.greaterThan(0);
+      expect(rect.bottom, 'footer dentro del viewport').to.be.at.most(
+        viewportHeight
+      );
+    });
+});
+
 Then('la variable CSS del offset del viewport es {string}', (value: string) => {
   cy.document()
     .its('documentElement')
