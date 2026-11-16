@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { LOGIN_NEXT_PARAM } from './lib/consts/auth';
 
 const PUBLIC_PAGES = ['/login', '/nueva-contrasena', '/recuperar-contrasena'];
-const PROTECTED_PREFIXES = ['/usuarios', '/clientes', '/escaneo-cartas'];
 
 const ROLE_ROUTES: Record<string, string[]> = {
   BUYER: [
@@ -52,6 +52,11 @@ const DEFAULT_ROUTE_BY_ROLE: Record<string, string> = {
   SUPERUSER: '/catalogo',
 };
 
+const PROTECTED_PREFIXES = [
+  ...new Set(Object.values(ROLE_ROUTES).flat()),
+  '/escaneo-cartas',
+];
+
 const startsWithAny = (pathname: string, prefixes: readonly string[]) =>
   prefixes.some((p) => pathname.startsWith(p));
 
@@ -75,6 +80,8 @@ export function proxy(request: NextRequest) {
   if (startsWithAny(pathname, PROTECTED_PREFIXES) && !token) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
+    url.search = '';
+    url.searchParams.set(LOGIN_NEXT_PARAM, pathname);
 
     const res = NextResponse.redirect(url);
     res.cookies.delete('jwt');
