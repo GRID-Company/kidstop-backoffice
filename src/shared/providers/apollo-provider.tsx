@@ -1,22 +1,24 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  CombinedGraphQLErrors,
-  InMemoryCache,
-} from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react';
-import { useMemo, useRef, PropsWithChildren } from 'react';
+import { useMemo, useRef, useEffect, PropsWithChildren } from 'react';
 import { SetContextLink } from '@apollo/client/link/context';
 import { ErrorLink } from '@apollo/client/link/error';
 import { RemoveTypenameFromVariablesLink } from '@apollo/client/link/remove-typename';
 import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
 import { useAuthStore } from '../../lib/store/auth';
 import { useLogout } from '@/lib/auth/use-process-logout';
+import { AUTH_PAGE_PREFIXES } from '@/lib/consts/auth';
+import { isAuthApolloError } from '@/lib/utils/apollo-error.utils';
+import { ERROR_MESSAGES } from '@/lib/consts/error-messages';
 
 export default function ApolloClientProvider({ children }: PropsWithChildren) {
   const token = useAuthStore((state) => state.token);
   const { logout } = useLogout();
   const redirectRef = useRef(false);
+
+  useEffect(() => {
+    redirectRef.current = false;
+  }, [token]);
 
   const client = useMemo(() => {
     const authLink = new SetContextLink(({ headers }) => {
@@ -29,28 +31,19 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
       };
     });
 
-    const errorLink = new ErrorLink(({ error, operation: _operation }) => {
-      if (CombinedGraphQLErrors.is(error)) {
-        const code = error.extensions?.code;
-        const message = error.message;
-        const isAuthError =
-          code === 'UNAUTHENTICATED' ||
-          code === 'FORBIDDEN' ||
-          code === 401 ||
-          message === 'Unauthorized';
+    const errorLink = new ErrorLink(({ error }) => {
+      if (!isAuthApolloError(error)) return;
 
-        if (
-          isAuthError &&
-          !redirectRef.current &&
-          !window.location.href.includes('/login')
-        ) {
-          redirectRef.current = true;
-          logout('Sesión expirada. Por favor inicia sesión nuevamente.', false);
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 150);
-        }
-      }
+      const isAuthPage =
+        typeof window !== 'undefined' &&
+        AUTH_PAGE_PREFIXES.some((route) =>
+          window.location.pathname.startsWith(route)
+        );
+
+      if (isAuthPage || redirectRef.current) return;
+
+      redirectRef.current = true;
+      logout(ERROR_MESSAGES.SESSION_EXPIRED);
     });
 
     const removeTypenameFromVariables = new RemoveTypenameFromVariablesLink();
@@ -75,7 +68,7 @@ export default function ApolloClientProvider({ children }: PropsWithChildren) {
       //     },
       //   }
     });
-  }, [token]);
+  }, [token, logout]);
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
