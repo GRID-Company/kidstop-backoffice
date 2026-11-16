@@ -12,6 +12,15 @@ export function useVisualViewportOffset(enabled: boolean) {
         VISUAL_VIEWPORT_OFFSET_VAR,
         `${window.visualViewport?.offsetTop ?? 0}px`
       );
+
+      const scrollingElement = document.scrollingElement;
+      if (
+        scrollingElement &&
+        scrollingElement.scrollTop !== 0 &&
+        document.querySelector('[role="dialog"]')
+      ) {
+        scrollingElement.scrollTop = 0;
+      }
     };
 
     update();
