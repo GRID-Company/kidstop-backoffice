@@ -46,6 +46,7 @@ ls -1t /srv/apps/<service>/releases/       # recent releases
 ```
 
 Look for:
+
 - Units in `activating`/restart loops or `failed` state
 - `current` symlink pointing at a missing/stale release
 - Missing env file or port already in use
@@ -89,6 +90,7 @@ If Traefik itself is down: `systemctl status traefik`, check `/etc/traefik/dynam
 ## 6. Fix the root cause
 
 Typical causes:
+
 - TypeORM schema sync failure (`TYPEORM_SYNC=true` with conflicting data)
 - Missing env var (check `/srv/dev-stack/env/<svc>.env` vs the unit's `Environment=` overrides)
 - Redis (`redis6.service`) down or wrong `REDIS_*` override
