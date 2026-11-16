@@ -18,12 +18,16 @@ export function useVisualViewportOffset(enabled: boolean) {
     const viewport = window.visualViewport;
     viewport?.addEventListener('resize', update);
     viewport?.addEventListener('scroll', update);
+    window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
+    window.addEventListener('focusin', update);
 
     return () => {
       viewport?.removeEventListener('resize', update);
       viewport?.removeEventListener('scroll', update);
+      window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
+      window.removeEventListener('focusin', update);
       root.style.removeProperty(VISUAL_VIEWPORT_OFFSET_VAR);
     };
   }, [enabled]);
