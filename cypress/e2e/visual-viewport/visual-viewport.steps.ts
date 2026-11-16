@@ -70,6 +70,19 @@ When('el documento se desplaza {string} píxeles', (pixels: string) => {
   });
 });
 
+When('el documento intenta desplazarse {string} píxeles', (pixels: string) => {
+  cy.window().then((win) => {
+    const scrollingElement =
+      win.document.scrollingElement ?? win.document.documentElement;
+    scrollingElement.scrollTop = Number(pixels);
+    win.dispatchEvent(new Event('scroll'));
+  });
+});
+
+Then('el scroll del documento vuelve a {string} píxeles', (pixels: string) => {
+  cy.document().its('documentElement.scrollTop').should('eq', Number(pixels));
+});
+
 Then('la variable CSS del offset del viewport es {string}', (value: string) => {
   cy.document()
     .its('documentElement')
