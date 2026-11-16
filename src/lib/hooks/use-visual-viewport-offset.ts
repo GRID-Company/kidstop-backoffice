@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 export const VISUAL_VIEWPORT_OFFSET_VAR = '--visual-viewport-offset-top';
+export const VISUAL_VIEWPORT_HEIGHT_VAR = '--vv-height';
 
 export function useVisualViewportOffset(enabled: boolean) {
   useEffect(() => {
@@ -8,9 +9,14 @@ export function useVisualViewportOffset(enabled: boolean) {
 
     const root = document.documentElement;
     const update = () => {
+      const viewport = window.visualViewport;
       root.style.setProperty(
         VISUAL_VIEWPORT_OFFSET_VAR,
-        `${window.visualViewport?.offsetTop ?? 0}px`
+        `${viewport?.offsetTop ?? 0}px`
+      );
+      root.style.setProperty(
+        VISUAL_VIEWPORT_HEIGHT_VAR,
+        `${viewport?.height ?? window.innerHeight}px`
       );
 
       const scrollingElement = document.scrollingElement;
@@ -21,6 +27,12 @@ export function useVisualViewportOffset(enabled: boolean) {
       ) {
         scrollingElement.scrollTop = 0;
       }
+
+      document
+        .querySelectorAll<HTMLElement>('[role="dialog"]')
+        .forEach((dialog) => {
+          if (dialog.scrollTop !== 0) dialog.scrollTop = 0;
+        });
     };
 
     update();
@@ -38,6 +50,7 @@ export function useVisualViewportOffset(enabled: boolean) {
       window.removeEventListener('resize', update);
       window.removeEventListener('focusin', update);
       root.style.removeProperty(VISUAL_VIEWPORT_OFFSET_VAR);
+      root.style.removeProperty(VISUAL_VIEWPORT_HEIGHT_VAR);
     };
   }, [enabled]);
 }

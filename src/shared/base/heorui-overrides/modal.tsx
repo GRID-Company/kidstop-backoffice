@@ -25,7 +25,7 @@ const StyledModal = (props: KidstopModalProps) => (
       wrapper: 'translate-y-(--visual-viewport-offset-top)',
       backdrop: 'translate-y-(--visual-viewport-offset-top)',
       header: 'border-b border-gray-100 text-content-primary font-semibold',
-      body: 'text-content-tertiary',
+      body: 'text-content-tertiary min-h-0 overflow-y-auto',
       footer: 'border-t border-gray-100',
       ...props.classNames,
     }}
