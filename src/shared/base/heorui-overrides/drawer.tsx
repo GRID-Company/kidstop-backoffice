@@ -18,7 +18,7 @@ const KidstopDrawer = ({
       {...props}
       size={effectiveSize}
       classNames={{
-        base: 'bg-white',
+        base: `bg-white${effectiveSize === 'full' ? ' h-(--visual-viewport-height)' : ''}`,
         header: 'border-b border-gray-100 text-content-primary font-semibold',
         body: 'bg-neutral-subtle/30',
         footer: 'border-t border-gray-100 bg-white',
