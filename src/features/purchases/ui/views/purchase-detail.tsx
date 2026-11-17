@@ -186,6 +186,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
     }
   }, [updateItemsOnly, items]);
 
+  const handleSaveQuoteItems = useCallback(async () => {
+    const saved = await updateItemsOnly();
+    if (saved && tableRefetchPricesRef.current) {
+      tableRefetchPricesRef.current(items);
+    }
+    return saved;
+  }, [updateItemsOnly, items]);
+
   const handleBulkSearchConfirm = useCallback(
     (data: BulkSearchFormDataPurchases, results: BulkCardResult[]) => {
       try {
@@ -467,9 +475,14 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
                 </div>
                 {(canSendQuote || canResendQuote) && (
                   <WhatsAppQuoteButton
+                    purchaseGuid={purchase.guid}
+                    purchaseReference={purchase.reference}
                     seller={purchase.seller}
                     items={items}
                     tcgType={purchase.tcgType}
+                    hasUnsavedChanges={hasItemChanges}
+                    canSaveChanges={isEditable}
+                    onSaveChanges={handleSaveQuoteItems}
                     label={canResendQuote ? 'Reenviar cotización' : undefined}
                   />
                 )}

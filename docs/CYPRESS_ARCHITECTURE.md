@@ -506,6 +506,55 @@ cy.url().should('include', '/dashboard');
 
 ---
 
+## Datos de Prueba (Seeding) y Limpieza
+
+Patrón portado de `back-system-frontend`: los escenarios que dependen de data declaran su necesidad con un **tag de Gherkin**; hooks `Before({ tags })` en `e2e/shared/common.steps.ts` crean las entidades vía API (sin pasar por la UI) y exponen aliases.
+
+### Comandos API
+
+`cypress/support/commands.ts` expone:
+
+| Comando                  | Descripción                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| `cy.loginAs(role)`       | Login por UI con credenciales de `config.params.logins[role]`     |
+| `cy.apiLoginAs(role)`    | Login vía `cy.request` (mutation `Login`) → guarda `access_token` |
+| `cy.gql<T>(query, vars)` | POST autenticado `Bearer`; lanza error si `body.errors`           |
+
+Roles disponibles: `admin`, `buyer`, `reception` (credenciales en `.env.cypress`).
+
+### Tags de seeding
+
+| Tag                   | Crea                              | Aliases expuestos                                                                    |
+| --------------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
+| `@seedSeller`         | Vendedor con teléfono único       | `@testSellerGuid`, `@testSellerPhone`                                                |
+| `@seedPurchase`       | Seller + compra DRAFT con 1 item  | `@testPurchaseGuid`, `@testPurchaseReference`, `@testSellerGuid`, `@testSellerPhone` |
+| `@seedQuotedPurchase` | Seller + compra QUOTED con 1 item | Igual que `@seedPurchase`                                                            |
+
+```gherkin
+@seedPurchase
+Scenario: Enviar cotización abre WhatsApp con el link del PDF
+  Given el usuario abre la compra de prueba
+  When el usuario envía la cotización por WhatsApp
+  Then se abre WhatsApp con el link de descarga del PDF
+```
+
+### Seeds por API (`support/utils/api.utils.ts`)
+
+- `createTestSeller(role='admin')` — `createSeller` con nombre `Vendedor E2E {ts}` y `uniquePhone()` (el backend exige `phone`/`email` únicos).
+- `createTestPurchase(role='admin')` — seller + primera carta de `pokemonCardInternalList` + `createPurchase` (POKEMON, 1 item `NEAR_MINT` con el idioma de la carta).
+- `quoteTestPurchase(guid, role='admin')` — `updatePurchaseStatus` → `QUOTED`.
+
+Todo seed llama `trackCreated(type, guid)` para registrarse en la limpieza.
+
+### Limpieza de datos
+
+1. **Sniffer (`Before`)** — `installCreateSniffer()` intercepta `**/graphql` y registra el `guid` de las respuestas de `CreateSeller`/`CreatePurchase` hechas por la UI.
+2. **Drain por spec (`AfterAll`)** — `drainCreatedEntities()` se autentica como `admin` y limpia en orden inverso: purchase → `updatePurchaseStatus` (`REJECTED`), seller → `deleteSeller`. Best-effort: errores se reportan vía `cy.task('cleanup:log')` sin fallar el run.
+
+**Limitaciones:** no existe `deletePurchase` en el backend — las compras quedan en `REJECTED` (soft cleanup). Los PDFs de cotización generados en S3 tampoco tienen delete; por eso el escenario de WhatsApp stubea `GenerateQuotationPDF`.
+
+---
+
 ## Escenarios Críticos
 
 ### Prioridad Alta 🔴

@@ -32,3 +32,5 @@ export const config = {
     },
   },
 };
+
+export type CypressRole = keyof typeof config.params.logins;

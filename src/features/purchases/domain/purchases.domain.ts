@@ -1,8 +1,5 @@
 import { IPaginatedApiArgs } from '@/lib/types/datatable.types';
-import {
-  CARD_CONDITION_SHORT_LABELS,
-  CardCondition,
-} from '@/lib/types/card.types';
+import { CardCondition } from '@/lib/types/card.types';
 import { TCGType } from '@/lib/types/tcg.types';
 import { CardLanguage } from '@/lib/api/schema-types';
 import { formatCurrency } from '@/lib/utils/format-currency';
@@ -158,34 +155,25 @@ export interface WhatsAppQuoteParams {
   seller: ISeller;
   items: IPurchaseItem[];
   tcgType: TCGType;
+  purchaseReference: string;
+  pdfUrl: string;
 }
 
 export const buildWhatsAppQuoteMessage = (
   params: WhatsAppQuoteParams
 ): string => {
-  const { seller, items, tcgType } = params;
+  const { seller, items, tcgType, purchaseReference, pdfUrl } = params;
   const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
   const total = calculateTotal(items);
 
-  const itemLines = items
-    .map((item) => {
-      const condition = CARD_CONDITION_SHORT_LABELS[item.condition];
-      const subtotal = item.offerPrice * item.quantity;
-      return [
-        `  • *${item.cardName}* (${condition})`,
-        `    ${item.setName} · ${item.setCode}`,
-        `    Cant: ${item.quantity} × ${formatCurrency(item.offerPrice)} = ${formatCurrency(subtotal)}`,
-      ].join('\n');
-    })
-    .join('\n\n');
-
   return [
     `Hola *${seller.name}*`,
-    `Te comparto la *cotización de compra*:\n`,
+    `Te comparto la *cotización de compra* ${purchaseReference}:\n`,
     `*TCG:* ${TCG_LABELS[tcgType]}`,
-    `*Cartas:* ${totalQty}\n`,
-    itemLines,
-    `\n*Total:* ${formatCurrency(total)}`,
+    `*Cartas:* ${totalQty}`,
+    `*Total:* ${formatCurrency(total)}\n`,
+    `Descarga el PDF aquí:`,
+    pdfUrl,
   ].join('\n');
 };
 
