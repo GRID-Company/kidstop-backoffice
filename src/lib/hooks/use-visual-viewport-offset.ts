@@ -12,7 +12,7 @@ export function useVisualViewportOffset(enabled: boolean) {
       const viewport = window.visualViewport;
       root.style.setProperty(
         VISUAL_VIEWPORT_OFFSET_VAR,
-        `${viewport?.offsetTop ?? 0}px`
+        `${Math.max(0, viewport?.offsetTop ?? 0)}px`
       );
       root.style.setProperty(
         VISUAL_VIEWPORT_HEIGHT_VAR,
@@ -29,9 +29,9 @@ export function useVisualViewportOffset(enabled: boolean) {
       }
 
       document
-        .querySelectorAll<HTMLElement>('[role="dialog"]')
-        .forEach((dialog) => {
-          if (dialog.scrollTop !== 0) dialog.scrollTop = 0;
+        .querySelectorAll<HTMLElement>('[role="dialog"], [data-slot="wrapper"]')
+        .forEach((el) => {
+          if (el.scrollTop !== 0) el.scrollTop = 0;
         });
     };
 
