@@ -40,7 +40,7 @@ export function CardImagePreviewModal({
       classNames={{
         base: 'bg-black/95 backdrop-blur-sm h-(--vv-height) min-h-0',
         wrapper:
-          'items-center justify-center translate-y-(--visual-viewport-offset-top)',
+          'items-center justify-center h-(--vv-height) overflow-y-hidden translate-y-(--visual-viewport-offset-top)',
         backdrop: 'translate-y-(--visual-viewport-offset-top)',
         body: 'p-0',
       }}

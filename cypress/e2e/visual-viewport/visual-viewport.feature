@@ -26,6 +26,7 @@ Feature: Compensación del visual viewport en overlays
   Scenario: El contenedor del drawer no puede ocultar el footer al desplazarse
     When el contenedor del drawer intenta desplazarse "160" píxeles
     Then el scroll del contenedor del drawer vuelve a "0" píxeles
+    And el wrapper del overlay no excede el área visible
     And el footer del drawer permanece dentro del área visible
 
   Scenario: El drawer vuelve a su posición cuando el viewport regresa a cero
