@@ -90,7 +90,7 @@ const ViewportDebugHud = () => {
   if (!enabled) return null;
 
   return (
-    <pre className='pointer-events-none fixed top-2 left-2 z-[99999] max-w-[95vw] rounded bg-black/80 p-2 font-mono text-[10px] leading-tight whitespace-pre-wrap text-lime-300'>
+    <pre className='pointer-events-none fixed top-2 left-2 z-99999 max-w-[95vw] rounded bg-black/80 p-2 font-mono text-[10px] leading-tight whitespace-pre-wrap text-lime-300'>
       {metrics}
       {'\n'}
       {events.join('\n')}
