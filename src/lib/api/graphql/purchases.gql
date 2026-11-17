@@ -336,3 +336,7 @@ query ExportPurchases($findPurchasesArgs: FindPurchasesArgs!) {
     success
   }
 }
+
+query GenerateQuotationPDF($purchaseGuid: String!) {
+  generateQuotationPDF(purchaseGuid: $purchaseGuid)
+}

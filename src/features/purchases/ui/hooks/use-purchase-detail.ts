@@ -56,7 +56,7 @@ interface UsePurchaseDetailReturn {
   updatePayments: (payments: IPaymentDetail[]) => void;
   updateItems: (items: IPurchaseItem[]) => void;
   updateStatus: (status: PurchaseStatus) => void;
-  updateItemsOnly: () => Promise<void>;
+  updateItemsOnly: () => Promise<boolean>;
 }
 
 export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
@@ -433,7 +433,7 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
         toast.error(
           'Hay items con valores inválidos (cantidad >= 1, precio >= 0)'
         );
-        return;
+        return false;
       }
 
       const serverItemGuids = new Set(
@@ -479,10 +479,12 @@ export function usePurchaseDetail(purchaseId: string): UsePurchaseDetailReturn {
 
       toast.success('Items actualizados correctamente');
       void refetch();
+      return true;
     } catch (error) {
       toast.error(
         `Error al actualizar items: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
+      return false;
     }
   }, [purchaseId, basePurchase, items, updatePurchaseItemsMutation, refetch]);
 

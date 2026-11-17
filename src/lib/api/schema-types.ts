@@ -31,6 +31,14 @@ export type Scalars = {
   Upload: { input: unknown; output: unknown };
 };
 
+export type AddCardListItemInput = {
+  cardGuid: Scalars['String']['input'];
+  condition: Scalars['String']['input'];
+  language: CardLanguage;
+  listGuid: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
 export type AddCartItemInput = {
   condition: Scalars['String']['input'];
   language: CardLanguage;
@@ -155,6 +163,11 @@ export enum CardLanguage {
   Spanish = 'SPANISH',
 }
 
+export type CardListExportOutput = {
+  downloadUrl: Scalars['String']['output'];
+  filename: Scalars['String']['output'];
+};
+
 export type CardOrderInput = {
   mostWantedCardGuid: Scalars['String']['input'];
   priority: Scalars['String']['input'];
@@ -256,6 +269,11 @@ export type ClientDetailsOutput = {
   unreachableCancellations: Scalars['Int']['output'];
 };
 
+export type CreateCardListInput = {
+  name: Scalars['String']['input'];
+  tcg: Scalars['String']['input'];
+};
+
 export type CreateInventoryMovementInput = {
   bulkOperationType: BulkOperationType;
   cardGuid: Scalars['String']['input'];
@@ -313,6 +331,35 @@ export type CreateUserInput = {
   role: Scalars['String']['input'];
 };
 
+export type CustomerCardList = {
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  customer: User;
+  guid: Scalars['String']['output'];
+  itemCount?: Maybe<Scalars['Int']['output']>;
+  items?: Maybe<Array<CustomerCardListItem>>;
+  name: Scalars['String']['output'];
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type CustomerCardListItem = {
+  availableStock?: Maybe<Scalars['Int']['output']>;
+  condition: Scalars['String']['output'];
+  createdBy?: Maybe<User>;
+  createdDate: Scalars['Timestamp']['output'];
+  guid: Scalars['String']['output'];
+  language: CardLanguage;
+  magicCardSummary?: Maybe<MagicCardSummary>;
+  pokemonCardSummary?: Maybe<PokemonCardSummary>;
+  quantity: Scalars['Int']['output'];
+  sellPrice?: Maybe<Scalars['Float']['output']>;
+  tcg: Scalars['String']['output'];
+  updatedBy?: Maybe<User>;
+  updatedDate: Scalars['Timestamp']['output'];
+};
+
 export type DashboardTableOutput = {
   dashboardTable: Scalars['String']['output'];
   xAxisLabels: Array<Scalars['String']['output']>;
@@ -347,6 +394,16 @@ export type DayScheduleInput = {
   opening?: InputMaybe<TimeInput>;
 };
 
+export type ExportCustomerCardListsMarketingArgs = {
+  filters?: InputMaybe<ExportCustomerCardListsMarketingFilter>;
+};
+
+export type ExportCustomerCardListsMarketingFilter = {
+  dateFrom?: InputMaybe<Scalars['TimestampScalar']['input']>;
+  dateTo?: InputMaybe<Scalars['TimestampScalar']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ExportRequestOutput = {
   success: Scalars['Boolean']['output'];
 };
@@ -361,6 +418,21 @@ export type File = {
   path: Scalars['String']['output'];
   updatedBy?: Maybe<User>;
   updatedDate: Scalars['Timestamp']['output'];
+};
+
+export type FindCustomerCardListsArgs = {
+  filters?: InputMaybe<FindCustomerCardListsFilter>;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindCustomerCardListsFilter = {
+  customerGuid?: InputMaybe<Scalars['String']['input']>;
+  dateFrom?: InputMaybe<Scalars['TimestampScalar']['input']>;
+  dateTo?: InputMaybe<Scalars['TimestampScalar']['input']>;
+  tcg?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FindInventoryItemsArgs = {
@@ -433,6 +505,18 @@ export type FindMostWantedCardsArgs = {
 
 export type FindMostWantedCardsFilter = {
   active?: InputMaybe<Scalars['Boolean']['input']>;
+  tcg: Scalars['String']['input'];
+};
+
+export type FindMyCardListsArgs = {
+  filters: FindMyCardListsFilter;
+  limit: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip: Scalars['Int']['input'];
+  sort: SortType;
+};
+
+export type FindMyCardListsFilter = {
   tcg: Scalars['String']['input'];
 };
 
@@ -964,6 +1048,8 @@ export type MultipleValuesFilter = {
 };
 
 export type Mutation = {
+  /** Add a card to a list (carpeta digital) */
+  addCardListItem: CustomerCardListItem;
   /** Add item to cart (carpeta digital) */
   addCartItem: Cart;
   /** Add a card to the most wanted list (admin only) */
@@ -980,6 +1066,8 @@ export type Mutation = {
   clearCart: Cart;
   /** Clear all wishlist items for a TCG (carpeta digital) */
   clearWishlist: Scalars['Boolean']['output'];
+  /** Create a card list (carpeta digital) */
+  createCardList: CustomerCardList;
   /** Create a new inventory movement (admin only) */
   createInventoryMovement: InventoryMovement;
   /** Create a new purchase (always DRAFT) */
@@ -992,6 +1080,8 @@ export type Mutation = {
   createSuperUser: User;
   /** Mutation to create an User */
   createUser: User;
+  /** Delete a card list and its items (carpeta digital) */
+  deleteCardList: GenericOutput;
   /** Delete a seller (soft delete) */
   deleteSeller: Scalars['Boolean']['output'];
   /** Mutation to delete a user (soft-delete, admin only) */
@@ -1001,6 +1091,8 @@ export type Mutation = {
   login: LoginOutput;
   /** Public mutation for client self-registration */
   registerClient: User;
+  /** Remove a card from a list (carpeta digital) */
+  removeCardListItem: Scalars['Boolean']['output'];
   /** Remove item from cart (carpeta digital) */
   removeCartItem: Cart;
   /** Remove a card from the most wanted list (admin only) */
@@ -1022,6 +1114,10 @@ export type Mutation = {
   triggerPokemonSync: SyncMetricsOutput;
   /** Create or update a buyer budget (ADMIN only) */
   updateBuyerBudget: BuyerBudgetWithUsage;
+  /** Rename a card list (carpeta digital) */
+  updateCardList: CustomerCardList;
+  /** Update quantity/condition/language of a list item (carpeta digital) */
+  updateCardListItem: CustomerCardListItem;
   /** Update cart item quantity (carpeta digital) */
   updateCartItem: Cart;
   updateGlobalConfig: GenericOutput;
@@ -1048,6 +1144,10 @@ export type Mutation = {
   uploadBase64: File;
   uploadFile: File;
   userFinishSignUp: ChangePasswordOutput;
+};
+
+export type MutationAddCardListItemArgs = {
+  addCardListItemInput: AddCardListItemInput;
 };
 
 export type MutationAddCartItemArgs = {
@@ -1082,6 +1182,10 @@ export type MutationClearWishlistArgs = {
   tcg: Scalars['String']['input'];
 };
 
+export type MutationCreateCardListArgs = {
+  createCardListInput: CreateCardListInput;
+};
+
 export type MutationCreateInventoryMovementArgs = {
   createInventoryMovementInput: CreateInventoryMovementInput;
 };
@@ -1106,6 +1210,10 @@ export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
 };
 
+export type MutationDeleteCardListArgs = {
+  cardListGuid: Scalars['String']['input'];
+};
+
 export type MutationDeleteSellerArgs = {
   guid: Scalars['String']['input'];
 };
@@ -1124,6 +1232,10 @@ export type MutationLoginArgs = {
 
 export type MutationRegisterClientArgs = {
   registerClientInput: RegisterClientInput;
+};
+
+export type MutationRemoveCardListItemArgs = {
+  cardListItemGuid: Scalars['String']['input'];
 };
 
 export type MutationRemoveCartItemArgs = {
@@ -1160,6 +1272,14 @@ export type MutationSetPurchaseItemSellPriceArgs = {
 
 export type MutationUpdateBuyerBudgetArgs = {
   updateBuyerBudgetInput: UpdateBuyerBudgetInput;
+};
+
+export type MutationUpdateCardListArgs = {
+  updateCardListInput: UpdateCardListInput;
+};
+
+export type MutationUpdateCardListItemArgs = {
+  updateCardListItemInput: UpdateCardListItemInput;
 };
 
 export type MutationUpdateCartItemArgs = {
@@ -1267,6 +1387,11 @@ export type OperationScheduleInput = {
   tuesday?: InputMaybe<DayScheduleInput>;
   /** Wednesday schedule */
   wednesday?: InputMaybe<DayScheduleInput>;
+};
+
+export type PaginatedCustomerCardLists = {
+  count?: Maybe<Scalars['Float']['output']>;
+  data?: Maybe<Array<CustomerCardList>>;
 };
 
 export type PaginatedInventoryItems = {
@@ -1672,10 +1797,20 @@ export type Query = {
   buyerBudgets: Array<BuyerBudgetWithUsage>;
   /** Get client sales statistics (orders count, totals, cancellations, last order date) */
   clientDetails: ClientDetailsOutput;
+  /** Get a customer card list detail with items (backoffice) */
+  customerCardList: CustomerCardList;
+  /** Get paginated customer card lists (backoffice) */
+  customerCardLists: PaginatedCustomerCardLists;
+  /** Export customer card lists to CSV (sync, returns signed download URL) */
+  exportCustomerCardLists: CardListExportOutput;
+  /** Export aggregated card demand across all customer lists (marketing). Groups by card + condition + language, sorted by total quantity DESC. Returns signed download URL. */
+  exportCustomerListsForMarketing: CardListExportOutput;
   /** Export purchases to xlsx (async, sends download link via email) */
   exportPurchases: ExportRequestOutput;
   /** Export sales to xlsx (async, sends download link via email) */
   exportSales: ExportRequestOutput;
+  /** Generate the purchase quotation PDF and return a signed S3 download URL (valid 7 days) */
+  generateQuotationPDF: Scalars['String']['output'];
   /** Get banner file for a specific TCG */
   getBanner?: Maybe<File>;
   /** Query to get the global config */
@@ -1719,6 +1854,10 @@ export type Query = {
   mostWantedMagicCards: Array<MostWantedCard>;
   /** Get active most wanted Pokemon cards (public, no auth required) */
   mostWantedPokemonCards: Array<MostWantedCard>;
+  /** Get one of the current user card lists with items (carpeta digital) */
+  myCardList: CustomerCardList;
+  /** Get current user card lists (carpeta digital) */
+  myCardLists: PaginatedCustomerCardLists;
   /** Get current user cart for a TCG (carpeta digital) */
   myCart: Cart;
   /** Get current user sale detail (carpeta digital) */
@@ -1792,12 +1931,32 @@ export type QueryClientDetailsArgs = {
   clientGuid: Scalars['String']['input'];
 };
 
+export type QueryCustomerCardListArgs = {
+  cardListGuid: Scalars['String']['input'];
+};
+
+export type QueryCustomerCardListsArgs = {
+  findCustomerCardListsArgs: FindCustomerCardListsArgs;
+};
+
+export type QueryExportCustomerCardListsArgs = {
+  findCustomerCardListsArgs: FindCustomerCardListsArgs;
+};
+
+export type QueryExportCustomerListsForMarketingArgs = {
+  exportCustomerCardListsMarketingArgs: ExportCustomerCardListsMarketingArgs;
+};
+
 export type QueryExportPurchasesArgs = {
   findPurchasesArgs: FindPurchasesArgs;
 };
 
 export type QueryExportSalesArgs = {
   findSalesArgs: FindSalesArgs;
+};
+
+export type QueryGenerateQuotationPdfArgs = {
+  purchaseGuid: Scalars['String']['input'];
 };
 
 export type QueryGetBannerArgs = {
@@ -1863,6 +2022,14 @@ export type QueryMostWantedCardArgs = {
 
 export type QueryMostWantedCardsArgs = {
   findMostWantedCardsArgs: FindMostWantedCardsArgs;
+};
+
+export type QueryMyCardListArgs = {
+  cardListGuid: Scalars['String']['input'];
+};
+
+export type QueryMyCardListsArgs = {
+  findMyCardListsArgs: FindMyCardListsArgs;
 };
 
 export type QueryMyCartArgs = {
@@ -1989,6 +2156,7 @@ export type Sale = {
   kioskCustomerName?: Maybe<Scalars['String']['output']>;
   notes?: Maybe<Scalars['String']['output']>;
   saleCode: Scalars['String']['output'];
+  soldBy?: Maybe<User>;
   status: Scalars['String']['output'];
   statusTimestamps?: Maybe<Scalars['JSONObject']['output']>;
   tcg: Scalars['String']['output'];
@@ -2089,6 +2257,18 @@ export type UpdateBuyerBudgetInput = {
   tcg: Scalars['String']['input'];
 };
 
+export type UpdateCardListInput = {
+  guid: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateCardListItemInput = {
+  condition?: InputMaybe<Scalars['String']['input']>;
+  itemGuid: Scalars['String']['input'];
+  language?: InputMaybe<CardLanguage>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type UpdateCartItemInput = {
   cartItemGuid: Scalars['String']['input'];
   quantity: Scalars['Int']['input'];
@@ -2159,6 +2339,7 @@ export type UpdateSaleItemInput = {
 export type UpdateSaleStatusInput = {
   newStatus: Scalars['String']['input'];
   saleGuid: Scalars['String']['input'];
+  soldByGuid?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateSellerInput = {

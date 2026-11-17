@@ -46,6 +46,14 @@ export default defineConfig({
 
       installLogsPrinter(on);
 
+      on('task', {
+        'cleanup:log': (messages: string | string[]) => {
+          const list = Array.isArray(messages) ? messages : [messages];
+          list.forEach((message) => console.log(message));
+          return null;
+        },
+      });
+
       on('before:browser:launch', (browser, launchOptions) => {
         if (browser.family === 'chromium') {
           launchOptions.args.push(

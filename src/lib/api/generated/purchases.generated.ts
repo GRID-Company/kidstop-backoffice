@@ -351,6 +351,12 @@ export type ExportPurchasesQueryVariables = Types.Exact<{
 
 export type ExportPurchasesQuery = { exportPurchases: { success: boolean } };
 
+export type GenerateQuotationPdfQueryVariables = Types.Exact<{
+  purchaseGuid: Types.Scalars['String']['input'];
+}>;
+
+export type GenerateQuotationPdfQuery = { generateQuotationPDF: string };
+
 export const PurchasesDocument = {
   kind: 'Document',
   definitions: [
@@ -1859,4 +1865,52 @@ export const ExportPurchasesDocument = {
 } as unknown as DocumentNode<
   ExportPurchasesQuery,
   ExportPurchasesQueryVariables
+>;
+export const GenerateQuotationPdfDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GenerateQuotationPDF' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'purchaseGuid' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'generateQuotationPDF' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'purchaseGuid' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'purchaseGuid' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GenerateQuotationPdfQuery,
+  GenerateQuotationPdfQueryVariables
 >;
