@@ -1,0 +1,52 @@
+{
+  "data": {
+    "magicBatchCardSearch": {
+      "successfulCount": 2,
+      "totalCount": 2,
+      "results": [
+        {
+          "originalLine": "1 Toxrill, the Corrosive",
+          "parsedQuantity": 1,
+          "parsedName": "Toxrill, the Corrosive",
+          "parsedSet": null,
+          "parsedNumber": "1929",
+          "bestMatch": {
+            "guid": "search-magic-nonfoil",
+            "name": "Toxrill, the Corrosive",
+            "language": "ENGLISH",
+            "edition": "Secret Lair Drop",
+            "collectorNumber": "1929",
+            "imageUri": null,
+            "isFoil": false,
+            "sellPrice": 650,
+            "totalStock": 2,
+            "cardMetrics": null
+          },
+          "relatedCards": [],
+          "error": null
+        },
+        {
+          "originalLine": "1 Rhystic Study",
+          "parsedQuantity": 1,
+          "parsedName": "Rhystic Study",
+          "parsedSet": null,
+          "parsedNumber": "0032",
+          "bestMatch": {
+            "guid": "batch-magic-rhystic",
+            "name": "Rhystic Study",
+            "language": "ENGLISH",
+            "edition": "Special Guests",
+            "collectorNumber": "0032",
+            "imageUri": null,
+            "isFoil": false,
+            "sellPrice": 900,
+            "totalStock": 1,
+            "cardMetrics": null
+          },
+          "relatedCards": [],
+          "error": null
+        }
+      ]
+    }
+  }
+}

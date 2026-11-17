@@ -1,0 +1,25 @@
+export const PurchasePriceAdjustmentSelectors = {
+  viewTableButton: '[data-testid="purchase-items-view-table"]',
+  itemsTable: '[data-testid="purchase-items-table"]',
+  tableRows: '[data-testid="purchase-items-table"] tbody tr',
+  itemCard: '[data-testid="purchase-item-card"]',
+  sellPriceInputFor: (guid: string) =>
+    `[data-testid="purchase-item-sell-price-input"][data-item-guid="${guid}"]`,
+  sellPriceTextFor: (guid: string) =>
+    `[data-testid="purchase-item-sell-price"][data-item-guid="${guid}"]`,
+  sellPriceInput: '[data-testid="purchase-item-sell-price-input"]',
+  quantityInput: '[data-testid="purchase-item-quantity-input"]',
+  finalizeButtonText: 'Finalizar compra',
+  confirmFinalizeText: 'Confirmar finalización',
+  registerPaymentText: 'Registrar pago',
+  editPaymentText: 'Editar pago',
+  addPaymentMethodText: 'Agregar método de pago',
+  confirmPaymentText: 'Confirmar pago',
+  paymentAmountInput: 'input[name="payments.0.amount"]',
+  acceptQuoteText: 'Vendedor aceptó cotización',
+  statusBadge: '[data-testid="purchase-status-badge"]',
+  adjustPricesText: 'Ajustar precios',
+  quoteButtonText: 'Cotizar',
+  rejectButtonText: 'Rechazar',
+  returnToDraftText: 'Volver a borrador',
+};

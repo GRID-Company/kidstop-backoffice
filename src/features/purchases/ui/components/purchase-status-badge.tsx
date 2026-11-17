@@ -22,7 +22,12 @@ export default function PurchaseStatusBadge({
   status,
 }: PurchaseStatusBadgeProps) {
   return (
-    <Chip size='sm' variant='flat' color={STATUS_COLOR_MAP[status]}>
+    <Chip
+      size='sm'
+      variant='flat'
+      color={STATUS_COLOR_MAP[status]}
+      data-testid='purchase-status-badge'
+    >
       {PURCHASE_STATUS_LABELS[status]}
     </Chip>
   );

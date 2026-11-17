@@ -8,7 +8,6 @@ import {
   Button,
   Card,
   CardBody,
-  Chip,
   Divider,
   Tooltip,
   Switch,
@@ -38,7 +37,7 @@ import { usePurchaseDetail } from '../hooks/use-purchase-detail';
 import { useSellers } from '../hooks/use-sellers';
 import { useSellerEditState } from '../hooks/use-seller-edit-state';
 import PurchaseStatusBadge from '../components/purchase-status-badge';
-import PurchaseItemsList from '../components/purchase-items-list';
+import PurchaseItemsView from '../components/purchase-items-view';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import WhatsAppQuoteButton from '../components/whatsapp-quote-button';
@@ -128,6 +127,22 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
       updatePayments(newPayments);
     },
     [updatePayments]
+  );
+
+  const handleSellPriceSave = useCallback(
+    async (item: IPurchaseItem, sellPrice: number) => {
+      await setPurchaseItemSellPrice({
+        variables: {
+          setPurchaseItemSellPriceInput: {
+            purchaseItemGuid: item.guid,
+            sellPrice,
+            referencePrice: item.referencePrice,
+          },
+        },
+      });
+      updateItems(items);
+    },
+    [setPurchaseItemSellPrice, updateItems, items]
   );
 
   const handlePriceAdjustmentConfirm = useCallback(
@@ -384,30 +399,19 @@ export default function PurchaseDetail({ purchaseId }: PurchaseDetailProps) {
         )}
 
         <EntitiesPage.CardContainer>
-          <div className='flex flex-col gap-4'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-2'>
-                <Icon icon='lucide:list' width={18} className='text-accent' />
-                <span className='text-sm font-semibold'>
-                  Items de la compra
-                </span>
-                <Chip size='sm' variant='flat'>
-                  {items.length} {items.length === 1 ? 'carta' : 'cartas'}
-                </Chip>
-              </div>
-            </div>
-            <PurchaseItemsList
-              items={items}
-              onUpdateItem={updateItem}
-              onRemoveItem={removeItem}
-              onRefetchPrices={(refetch) => {
-                tableRefetchPricesRef.current = refetch;
-              }}
-              showRefreshButton={true}
-              tcgType={purchase.tcgType}
-              isReadOnly={!isEditable}
-            />
-          </div>
+          <PurchaseItemsView
+            items={items}
+            onUpdateItem={updateItem}
+            onRemoveItem={removeItem}
+            onRefetchPrices={(refetch) => {
+              tableRefetchPricesRef.current = refetch;
+            }}
+            showRefreshButton={true}
+            tcgType={purchase.tcgType}
+            isReadOnly={!isEditable}
+            canEditSellPrice={canAdjustPrices}
+            onSellPriceSave={handleSellPriceSave}
+          />
         </EntitiesPage.CardContainer>
 
         {payments.length > 0 && (

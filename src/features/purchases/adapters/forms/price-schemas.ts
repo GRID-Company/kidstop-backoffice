@@ -12,8 +12,13 @@ export const quantitySchema = z.coerce
   .int()
   .refine((val) => val === 0 || val >= 1);
 
+export const sellPriceSchema = z.coerce.number().refine((val) => val > 0, {
+  message: 'El precio de venta debe ser mayor a 0',
+});
+
 export type OfferPriceValue = z.infer<typeof offerPriceSchema>;
 export type QuantityValue = z.infer<typeof quantitySchema>;
+export type SellPriceValue = z.infer<typeof sellPriceSchema>;
 
 export function validateOfferPrice(value: string): {
   isValid: boolean;
@@ -36,5 +41,17 @@ export function validateQuantity(value: string): {
     return { isValid: true, quantity: result };
   } catch {
     return { isValid: false, quantity: 0 };
+  }
+}
+
+export function validateSellPrice(value: string): {
+  isValid: boolean;
+  price: number;
+} {
+  try {
+    const result = sellPriceSchema.parse(value);
+    return { isValid: true, price: result };
+  } catch {
+    return { isValid: false, price: 0 };
   }
 }
