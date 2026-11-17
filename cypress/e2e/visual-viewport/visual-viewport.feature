@@ -35,6 +35,10 @@ Feature: Compensación del visual viewport en overlays
     And el cuerpo del drawer cubre la zona del teclado
     And el footer del drawer queda sobre la banda visible
 
+  Scenario: Con una franja pequeña del navegador el footer queda al fondo
+    When el visual viewport se encoge a "380" píxeles
+    Then el footer del drawer llega al borde inferior de la pantalla
+
   Scenario: El drawer vuelve a su posición cuando el viewport regresa a cero
     When el visual viewport se desplaza "160" píxeles
     Then la variable CSS del offset del viewport es "160px"

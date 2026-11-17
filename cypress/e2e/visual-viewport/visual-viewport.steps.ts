@@ -158,6 +158,17 @@ Then('el cuerpo del drawer cubre la zona del teclado', () => {
     });
 });
 
+Then('el footer del drawer llega al borde inferior de la pantalla', () => {
+  cy.get(`${POKEMON_MODAL} [data-testid="close-modal-button"]`)
+    .parent()
+    .then(($footer) => {
+      const rect = $footer[0].getBoundingClientRect();
+      const innerHeight =
+        $footer[0].ownerDocument.defaultView?.innerHeight ?? 0;
+      expect(Math.round(rect.bottom)).to.eq(innerHeight);
+    });
+});
+
 Then('el footer del drawer queda sobre la banda visible', () => {
   cy.get(`${POKEMON_MODAL} [data-testid="close-modal-button"]`)
     .parent()
