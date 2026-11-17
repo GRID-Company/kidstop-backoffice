@@ -38,8 +38,10 @@ export function CardImagePreviewModal({
       size='full'
       hideCloseButton
       classNames={{
-        base: 'bg-black/95 backdrop-blur-sm',
-        wrapper: 'items-center justify-center',
+        base: 'bg-black/95 backdrop-blur-sm h-(--vv-height) min-h-0',
+        wrapper:
+          'items-center justify-center h-(--vv-height) overflow-y-hidden translate-y-(--visual-viewport-offset-top)',
+        backdrop: 'translate-y-(--visual-viewport-offset-top)',
         body: 'p-0',
       }}
     >
@@ -57,23 +59,23 @@ export function CardImagePreviewModal({
             </Button>
 
             <div
-              className='flex h-screen w-full items-center justify-center p-8'
+              className='flex h-full w-full items-center justify-center p-8'
               onClick={onClose}
             >
               <div
-                className='relative flex max-h-[90vh] max-w-[90vw] items-center justify-center'
+                className='relative flex max-h-[calc(var(--vv-height)*0.9)] max-w-[90vw] items-center justify-center'
                 onClick={(e) => e.stopPropagation()}
               >
                 {imageUrl && !hasError ? (
                   <img
                     src={imageUrl}
                     alt={alt}
-                    className='max-h-[90vh] max-w-[90vw] object-contain'
+                    className='max-h-[calc(var(--vv-height)*0.9)] max-w-[90vw] object-contain'
                     loading='eager'
                     onError={() => setHasError(true)}
                   />
                 ) : (
-                  <div className='relative h-[90vh] w-[calc(90vh*3/4)]'>
+                  <div className='relative h-[calc(var(--vv-height)*0.9)] w-[calc(var(--vv-height)*0.9*3/4)]'>
                     <Image
                       src={placeholder}
                       alt={`${tcgType} card placeholder`}

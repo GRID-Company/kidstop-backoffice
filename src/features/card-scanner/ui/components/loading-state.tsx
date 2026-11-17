@@ -47,7 +47,7 @@ export const LoadingState = ({ status }: LoadingStateProps) => {
 
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'
+      className='fixed inset-0 z-50 flex translate-y-(--visual-viewport-offset-top) items-center justify-center bg-black/50 backdrop-blur-sm'
       role='status'
       aria-live='assertive'
       aria-label={message}
