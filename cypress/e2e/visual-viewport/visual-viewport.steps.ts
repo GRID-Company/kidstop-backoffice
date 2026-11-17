@@ -92,6 +92,8 @@ When(
       .then(($dialog) => {
         const dialog = $dialog[0];
         dialog.scrollTop = Number(pixels);
+        if (dialog.parentElement)
+          dialog.parentElement.scrollTop = Number(pixels);
         dialog.ownerDocument.defaultView?.dispatchEvent(new Event('scroll'));
       });
   }
@@ -107,6 +109,21 @@ Then(
       });
   }
 );
+
+Then('el wrapper del overlay no excede el área visible', () => {
+  cy.get(POKEMON_MODAL)
+    .closest('[role="dialog"]')
+    .parent()
+    .then(($wrapper) => {
+      const rect = $wrapper[0].getBoundingClientRect();
+      const viewportHeight =
+        $wrapper[0].ownerDocument.defaultView?.innerHeight ?? 0;
+      expect(rect.height, 'wrapper no excede el viewport').to.be.at.most(
+        viewportHeight
+      );
+      expect($wrapper[0].scrollTop, 'wrapper sin scroll').to.eq(0);
+    });
+});
 
 Then('el footer del drawer permanece dentro del área visible', () => {
   cy.get(`${POKEMON_MODAL} [data-testid="close-modal-button"]`)
