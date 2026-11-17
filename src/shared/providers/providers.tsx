@@ -6,6 +6,8 @@ import ApolloClientProvider from './apollo-provider';
 import { useAuthStore } from '../../lib/store/auth';
 import { useEffect } from 'react';
 import { UserRole } from '@/lib/auth/user-roles';
+import { useVisualViewportOffset } from '@/lib/hooks/use-visual-viewport-offset';
+import ViewportDebugHud from '../components/viewport-debug-hud';
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -15,6 +17,7 @@ type ProvidersProps = {
 
 export default function Providers({ children, role, jwt }: ProvidersProps) {
   const { setToken, setRole } = useAuthStore();
+  useVisualViewportOffset(true);
 
   useEffect(() => {
     setToken(jwt);
@@ -24,6 +27,7 @@ export default function Providers({ children, role, jwt }: ProvidersProps) {
   return (
     <HeroUIProvider locale='es-MX' disableAnimation>
       <ApolloClientProvider>{children}</ApolloClientProvider>
+      <ViewportDebugHud />
     </HeroUIProvider>
   );
 }

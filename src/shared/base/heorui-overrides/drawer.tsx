@@ -11,17 +11,21 @@ const KidstopDrawer = ({
   ...props
 }: KidstopDrawerProps) => {
   const isTablet = useMediaQuery(BREAKPOINTS.TABLET_MAX);
-  const effectiveSize = isTablet && fullScreenOnTablet ? 'full' : props.size;
+  const isFullScreen = isTablet && fullScreenOnTablet;
+  const effectiveSize = isFullScreen ? 'full' : props.size;
 
   return (
     <Drawer
       {...props}
       size={effectiveSize}
       classNames={{
-        base: 'bg-white',
+        base: `bg-white overflow-y-hidden${isFullScreen ? ' min-h-0 h-(--vv-full)' : ''}`,
+        wrapper:
+          'h-(--vv-full) overflow-y-hidden translate-y-(--visual-viewport-offset-top)',
+        backdrop: 'translate-y-(--visual-viewport-offset-top)',
         header: 'border-b border-gray-100 text-content-primary font-semibold',
-        body: 'bg-neutral-subtle/30',
-        footer: 'border-t border-gray-100 bg-white',
+        body: `bg-neutral-subtle/30 min-h-0 overflow-y-auto${isFullScreen ? ' pb-[calc(var(--vv-strip)+6rem)]' : ''}`,
+        footer: `border-t border-gray-100 bg-white${isFullScreen ? ' absolute inset-x-0 bottom-(--vv-strip)' : ''}`,
         ...props.classNames,
       }}
     />
