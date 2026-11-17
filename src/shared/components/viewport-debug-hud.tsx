@@ -38,9 +38,12 @@ const ViewportDebugHud = () => {
           if (el.scrollTop > 0)
             scrolled.push(`${describeEl(el)}=${Math.round(el.scrollTop)}`);
         });
+      const dialog = document.querySelector<HTMLElement>('[role="dialog"]');
+      const drect = dialog?.getBoundingClientRect();
       setMetrics(
         `vv ot=${vv?.offsetTop.toFixed(0)} h=${vv?.height.toFixed(0)} pt=${vv?.pageTop.toFixed(0)} sc=${vv?.scale}\n` +
-          `doc sy=${window.scrollY.toFixed(0)} st=${de.scrollTop} body=${document.body.scrollTop}\n` +
+          `doc sy=${window.scrollY.toFixed(0)} st=${de.scrollTop} ih=${window.innerHeight}\n` +
+          `dlg top=${drect ? Math.round(drect.top) : '-'} bot=${drect ? Math.round(drect.bottom) : '-'}\n` +
           `scrolled: ${scrolled.join(' | ') || 'none'}`
       );
     };

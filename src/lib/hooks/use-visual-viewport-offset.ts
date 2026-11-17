@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 
 export const VISUAL_VIEWPORT_OFFSET_VAR = '--visual-viewport-offset-top';
 export const VISUAL_VIEWPORT_HEIGHT_VAR = '--vv-height';
+export const VISUAL_VIEWPORT_FULL_VAR = '--vv-full';
+export const VISUAL_VIEWPORT_STRIP_VAR = '--vv-strip';
 
 export function useVisualViewportOffset(enabled: boolean) {
   useEffect(() => {
@@ -10,13 +12,15 @@ export function useVisualViewportOffset(enabled: boolean) {
     const root = document.documentElement;
     const update = () => {
       const viewport = window.visualViewport;
+      const offsetTop = Math.max(0, viewport?.offsetTop ?? 0);
+      const bandHeight = viewport?.height ?? window.innerHeight;
+      const fullHeight = window.innerHeight - offsetTop;
+      root.style.setProperty(VISUAL_VIEWPORT_OFFSET_VAR, `${offsetTop}px`);
+      root.style.setProperty(VISUAL_VIEWPORT_HEIGHT_VAR, `${bandHeight}px`);
+      root.style.setProperty(VISUAL_VIEWPORT_FULL_VAR, `${fullHeight}px`);
       root.style.setProperty(
-        VISUAL_VIEWPORT_OFFSET_VAR,
-        `${viewport?.offsetTop ?? 0}px`
-      );
-      root.style.setProperty(
-        VISUAL_VIEWPORT_HEIGHT_VAR,
-        `${viewport?.height ?? window.innerHeight}px`
+        VISUAL_VIEWPORT_STRIP_VAR,
+        `${Math.max(0, fullHeight - bandHeight)}px`
       );
 
       const scrollingElement = document.scrollingElement;
@@ -29,9 +33,9 @@ export function useVisualViewportOffset(enabled: boolean) {
       }
 
       document
-        .querySelectorAll<HTMLElement>('[role="dialog"]')
-        .forEach((dialog) => {
-          if (dialog.scrollTop !== 0) dialog.scrollTop = 0;
+        .querySelectorAll<HTMLElement>('[role="dialog"], [data-slot="wrapper"]')
+        .forEach((el) => {
+          if (el.scrollTop !== 0) el.scrollTop = 0;
         });
     };
 
@@ -51,6 +55,8 @@ export function useVisualViewportOffset(enabled: boolean) {
       window.removeEventListener('focusin', update);
       root.style.removeProperty(VISUAL_VIEWPORT_OFFSET_VAR);
       root.style.removeProperty(VISUAL_VIEWPORT_HEIGHT_VAR);
+      root.style.removeProperty(VISUAL_VIEWPORT_FULL_VAR);
+      root.style.removeProperty(VISUAL_VIEWPORT_STRIP_VAR);
     };
   }, [enabled]);
 }
