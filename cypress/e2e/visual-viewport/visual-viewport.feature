@@ -32,6 +32,7 @@ Feature: Compensación del visual viewport en overlays
   Scenario: El drawer cubre la zona del teclado y deja el footer sobre la banda
     When el visual viewport se encoge a "250" píxeles
     Then el drawer cubre toda la pantalla
+    And el cuerpo del drawer cubre la zona del teclado
     And el footer del drawer queda sobre la banda visible
 
   Scenario: El drawer vuelve a su posición cuando el viewport regresa a cero

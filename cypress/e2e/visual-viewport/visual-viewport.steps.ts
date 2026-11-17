@@ -147,6 +147,17 @@ Then('el drawer cubre toda la pantalla', () => {
     });
 });
 
+Then('el cuerpo del drawer cubre la zona del teclado', () => {
+  cy.get(POKEMON_MODAL)
+    .closest('[role="dialog"]')
+    .find('.flex-1.overflow-y-auto')
+    .then(($body) => {
+      const rect = $body[0].getBoundingClientRect();
+      const innerHeight = $body[0].ownerDocument.defaultView?.innerHeight ?? 0;
+      expect(Math.round(rect.bottom)).to.eq(innerHeight);
+    });
+});
+
 Then('el footer del drawer queda sobre la banda visible', () => {
   cy.get(`${POKEMON_MODAL} [data-testid="close-modal-button"]`)
     .parent()
