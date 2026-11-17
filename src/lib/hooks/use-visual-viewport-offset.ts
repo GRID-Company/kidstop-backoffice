@@ -15,13 +15,12 @@ export function useVisualViewportOffset(enabled: boolean) {
       const offsetTop = Math.max(0, viewport?.offsetTop ?? 0);
       const bandHeight = viewport?.height ?? window.innerHeight;
       const fullHeight = window.innerHeight - offsetTop;
+      const strip = Math.max(0, fullHeight - bandHeight);
+      const footerInset = bandHeight < window.innerHeight * 0.8 ? strip : 0;
       root.style.setProperty(VISUAL_VIEWPORT_OFFSET_VAR, `${offsetTop}px`);
       root.style.setProperty(VISUAL_VIEWPORT_HEIGHT_VAR, `${bandHeight}px`);
       root.style.setProperty(VISUAL_VIEWPORT_FULL_VAR, `${fullHeight}px`);
-      root.style.setProperty(
-        VISUAL_VIEWPORT_STRIP_VAR,
-        `${Math.max(0, fullHeight - bandHeight)}px`
-      );
+      root.style.setProperty(VISUAL_VIEWPORT_STRIP_VAR, `${footerInset}px`);
 
       const scrollingElement = document.scrollingElement;
       if (
