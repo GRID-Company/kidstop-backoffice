@@ -7,7 +7,7 @@ const OVERLAY_WRAPPER = '[data-slot="wrapper"]';
 
 interface VisualViewportStub {
   original: VisualViewport | null;
-  state: { offsetTop: number; pageTop: number };
+  state: { offsetTop: number; pageTop: number; height: number | null };
 }
 
 const ensureViewportStub = (win: Window): VisualViewportStub => {
@@ -15,11 +15,11 @@ const ensureViewportStub = (win: Window): VisualViewportStub => {
   if (cypressWin.__vvStub) return cypressWin.__vvStub;
 
   const original = win.visualViewport;
-  const state = { offsetTop: 0, pageTop: 0 };
+  const state = { offsetTop: 0, pageTop: 0, height: null };
   const fake = new EventTarget();
 
   Object.defineProperties(fake, {
-    height: { get: () => win.innerHeight },
+    height: { get: () => state.height ?? win.innerHeight },
     width: { get: () => win.innerWidth },
     offsetTop: { get: () => state.offsetTop },
     offsetLeft: { value: 0 },
@@ -122,6 +122,39 @@ Then('el wrapper del overlay no excede el área visible', () => {
         viewportHeight
       );
       expect($wrapper[0].scrollTop, 'wrapper sin scroll').to.eq(0);
+    });
+});
+
+When('el visual viewport se encoge a {string} píxeles', (pixels: string) => {
+  cy.viewport(500, 400);
+  cy.window().then((win) => {
+    const stub = ensureViewportStub(win);
+    stub.state.height = Number(pixels);
+    stub.state.offsetTop = 0;
+    stub.state.pageTop = 0;
+    dispatchViewportEvents(win, stub);
+  });
+});
+
+Then('el drawer cubre toda la pantalla', () => {
+  cy.get(POKEMON_MODAL, { timeout: TIMEOUTS.MODAL_OPEN })
+    .closest('[role="dialog"]')
+    .then(($dialog) => {
+      const rect = $dialog[0].getBoundingClientRect();
+      const innerHeight =
+        $dialog[0].ownerDocument.defaultView?.innerHeight ?? 0;
+      expect(Math.round(rect.height)).to.eq(innerHeight);
+    });
+});
+
+Then('el footer del drawer queda sobre la banda visible', () => {
+  cy.get(`${POKEMON_MODAL} [data-testid="close-modal-button"]`)
+    .parent()
+    .then(($footer) => {
+      const rect = $footer[0].getBoundingClientRect();
+      const bandHeight =
+        $footer[0].ownerDocument.defaultView?.visualViewport?.height ?? 0;
+      expect(Math.round(rect.bottom)).to.eq(bandHeight);
     });
 });
 

@@ -29,6 +29,11 @@ Feature: Compensación del visual viewport en overlays
     And el wrapper del overlay no excede el área visible
     And el footer del drawer permanece dentro del área visible
 
+  Scenario: El drawer cubre la zona del teclado y deja el footer sobre la banda
+    When el visual viewport se encoge a "250" píxeles
+    Then el drawer cubre toda la pantalla
+    And el footer del drawer queda sobre la banda visible
+
   Scenario: El drawer vuelve a su posición cuando el viewport regresa a cero
     When el visual viewport se desplaza "160" píxeles
     Then la variable CSS del offset del viewport es "160px"
