@@ -51,6 +51,15 @@ Before({ tags: '@seedQuotedPurchase' }, () => {
   });
 });
 
+Before({ tags: '@seedMultiItemPurchase' }, () => {
+  createTestPurchase({ tcg: 'MAGIC', itemCount: 12 }).then((purchase) => {
+    cy.wrap(purchase.guid).as('testPurchaseGuid');
+    cy.wrap(purchase.reference).as('testPurchaseReference');
+    cy.wrap(purchase.seller.guid).as('testSellerGuid');
+    cy.wrap(purchase.seller.phone).as('testSellerPhone');
+  });
+});
+
 AfterAll(() => {
   drainCreatedEntities();
 });

@@ -19,7 +19,7 @@ import { useCardScannerStore } from '@/lib/store/card-scanner';
 import { useSellers } from '../hooks/use-sellers';
 import { usePurchaseForm } from '../../adapters/forms/use-purchase-form';
 import CardSearchWithMetrics from '../components/card-search-with-metrics';
-import PurchaseItemsList from '../components/purchase-items-list';
+import PurchaseItemsView from '../components/purchase-items-view';
 import BudgetIndicator from '../components/budget-indicator';
 import PrivacyModeToggle from '../components/privacy-mode-toggle';
 import SellerSelector from '../components/seller-selector';
@@ -342,25 +342,12 @@ export default function PurchaseNew() {
         )}
 
         <EntitiesPage.CardContainer>
-          <div className='flex flex-col gap-4'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-2'>
-                <Icon icon='lucide:list' width={18} className='text-accent' />
-                <span className='text-sm font-semibold'>
-                  Items de la compra
-                </span>
-                <Chip size='sm' variant='flat'>
-                  {items.length} {items.length === 1 ? 'carta' : 'cartas'}
-                </Chip>
-              </div>
-            </div>
-            <PurchaseItemsList
-              items={items}
-              onUpdateItem={updateItem}
-              onRemoveItem={removeItem}
-              isReadOnly={false}
-            />
-          </div>
+          <PurchaseItemsView
+            items={items}
+            onUpdateItem={updateItem}
+            onRemoveItem={removeItem}
+            isReadOnly={false}
+          />
         </EntitiesPage.CardContainer>
 
         <Divider />

@@ -14,7 +14,7 @@ interface CreateSellerData {
   createSeller: { guid: string; name: string; phone?: string | null };
 }
 
-const FIRST_POKEMON_CARD = `query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
+const FIRST_POKEMON_CARDS = `query PokemonCardInternalList($findPokemonCardsPublicArgs: FindPokemonCardsPublicArgs!) {
   pokemonCardInternalList(findPokemonCardsPublicArgs: $findPokemonCardsPublicArgs) {
     data {
       guid
@@ -23,10 +23,25 @@ const FIRST_POKEMON_CARD = `query PokemonCardInternalList($findPokemonCardsPubli
   }
 }`;
 
-interface FirstPokemonCardData {
-  pokemonCardInternalList: {
-    data: Array<{ guid: string; language: string }>;
-  };
+const FIRST_MAGIC_CARDS = `query MagicCardInternalList($findMagicCardsPublicArgs: FindMagicCardsPublicArgs!) {
+  magicCardInternalList(findMagicCardsPublicArgs: $findMagicCardsPublicArgs) {
+    data {
+      guid
+      language
+    }
+  }
+}`;
+
+interface CardListData {
+  data: Array<{ guid: string; language: string }>;
+}
+
+interface PokemonCardListData {
+  pokemonCardInternalList: CardListData;
+}
+
+interface MagicCardListData {
+  magicCardInternalList: CardListData;
 }
 
 const CREATE_PURCHASE = `mutation CreatePurchase($createPurchaseInput: CreatePurchaseInput!) {
@@ -61,6 +76,14 @@ export interface TestPurchase {
   seller: TestSeller;
 }
 
+export interface TestPurchaseOptions {
+  tcg?: 'POKEMON' | 'MAGIC';
+  itemCount?: number;
+}
+
+const CONDITIONS = ['NEAR_MINT', 'LIGHTLY_PLAYED', 'MODERATELY_PLAYED'];
+const MAGIC_LANGUAGES = ['ENGLISH', 'SPANISH'];
+
 export const createTestSeller = (
   role: CypressRole = 'admin'
 ): Cypress.Chainable<TestSeller> => {
@@ -80,48 +103,82 @@ export const createTestSeller = (
   );
 };
 
-export const createTestPurchase = (
-  role: CypressRole = 'admin'
-): Cypress.Chainable<TestPurchase> => {
-  return createTestSeller(role).then((seller) =>
-    cy
-      .gql<FirstPokemonCardData>(FIRST_POKEMON_CARD, {
-        findPokemonCardsPublicArgs: {
+const fetchTestCards = (tcg: 'POKEMON' | 'MAGIC', itemCount: number) => {
+  if (tcg === 'MAGIC') {
+    return cy
+      .gql<MagicCardListData>(FIRST_MAGIC_CARDS, {
+        findMagicCardsPublicArgs: {
           skip: 0,
-          limit: 1,
+          limit: itemCount,
           sort: { column: 'releaseDate', order: 'DESC' },
         },
       })
-      .then((cards) => {
-        const card = cards.pokemonCardInternalList.data[0];
-        if (!card) {
-          throw new Error(
-            'No hay cartas Pokémon en el catálogo para la prueba'
-          );
+      .then((data) => data.magicCardInternalList.data);
+  }
+  return cy
+    .gql<PokemonCardListData>(FIRST_POKEMON_CARDS, {
+      findPokemonCardsPublicArgs: {
+        skip: 0,
+        limit: itemCount,
+        sort: { column: 'releaseDate', order: 'DESC' },
+      },
+    })
+    .then((data) => data.pokemonCardInternalList.data);
+};
+
+export const createTestPurchase = (
+  roleOrOptions: CypressRole | TestPurchaseOptions = 'admin',
+  options: TestPurchaseOptions = {}
+): Cypress.Chainable<TestPurchase> => {
+  const { role, tcg, itemCount } =
+    typeof roleOrOptions === 'string'
+      ? {
+          role: roleOrOptions,
+          tcg: 'POKEMON' as const,
+          itemCount: 1,
+          ...options,
         }
-        return cy
-          .gql<CreatePurchaseData>(CREATE_PURCHASE, {
-            createPurchaseInput: {
-              tcg: 'POKEMON',
-              sellerGuid: seller.guid,
-              notes: 'Compra creada por tests E2E',
-              items: [
-                {
-                  pokemonCardGuid: card.guid,
-                  condition: 'NEAR_MINT',
-                  language: card.language,
-                  offerPrice: 10,
-                  referencePrice: 15,
-                  quantity: 1,
-                },
-              ],
-            },
-          })
-          .then((data) => {
-            trackCreated('purchase', data.createPurchase.guid);
-            return { ...data.createPurchase, seller };
-          });
-      })
+      : {
+          role: 'admin' as CypressRole,
+          tcg: 'POKEMON' as const,
+          itemCount: 1,
+          ...roleOrOptions,
+        };
+
+  return createTestSeller(role).then((seller) =>
+    fetchTestCards(tcg, itemCount).then((cards) => {
+      if (cards.length < itemCount) {
+        throw new Error(
+          `Se necesitan ${itemCount} cartas ${tcg} en el catálogo para la prueba`
+        );
+      }
+      const items = cards.slice(0, itemCount).map((card, index) => ({
+        ...(tcg === 'POKEMON'
+          ? { pokemonCardGuid: card.guid }
+          : { magicCardGuid: card.guid }),
+        condition: CONDITIONS[index % CONDITIONS.length],
+        language:
+          tcg === 'MAGIC'
+            ? MAGIC_LANGUAGES[index % MAGIC_LANGUAGES.length]
+            : card.language,
+        offerPrice: 10 + index,
+        referencePrice: 15 + index,
+        quantity: 1,
+      }));
+      return cy
+        .gql<CreatePurchaseData>(CREATE_PURCHASE, {
+          createPurchaseInput: {
+            tcg,
+            sellerGuid: seller.guid,
+            notes: 'Compra creada por tests E2E',
+            items,
+          },
+        })
+        .then((data) => {
+          trackCreated('purchase', data.createPurchase.guid);
+          return { ...data.createPurchase, seller };
+        });
+    })
   );
 };
 

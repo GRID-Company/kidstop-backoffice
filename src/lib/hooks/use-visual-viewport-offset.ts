@@ -22,20 +22,25 @@ export function useVisualViewportOffset(enabled: boolean) {
       root.style.setProperty(VISUAL_VIEWPORT_FULL_VAR, `${fullHeight}px`);
       root.style.setProperty(VISUAL_VIEWPORT_STRIP_VAR, `${footerInset}px`);
 
-      const scrollingElement = document.scrollingElement;
-      if (
-        scrollingElement &&
-        scrollingElement.scrollTop !== 0 &&
-        document.querySelector('[role="dialog"]')
-      ) {
-        scrollingElement.scrollTop = 0;
-      }
+      const viewportShifted = offsetTop > 0 || bandHeight < window.innerHeight;
+      if (viewportShifted) {
+        const scrollingElement = document.scrollingElement;
+        if (
+          scrollingElement &&
+          scrollingElement.scrollTop !== 0 &&
+          document.querySelector('[role="dialog"]')
+        ) {
+          scrollingElement.scrollTop = 0;
+        }
 
-      document
-        .querySelectorAll<HTMLElement>('[role="dialog"], [data-slot="wrapper"]')
-        .forEach((el) => {
-          if (el.scrollTop !== 0) el.scrollTop = 0;
-        });
+        document
+          .querySelectorAll<HTMLElement>(
+            '[role="dialog"], [data-slot="wrapper"]'
+          )
+          .forEach((el) => {
+            if (el.scrollTop !== 0) el.scrollTop = 0;
+          });
+      }
     };
 
     update();
