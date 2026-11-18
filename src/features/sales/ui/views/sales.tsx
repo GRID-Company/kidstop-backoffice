@@ -188,6 +188,14 @@ export default function Sales() {
         ),
       },
       {
+        key: 'soldBy',
+        label: 'Vendedor',
+        className: '!text-left min-w-[120px]',
+        customCol: (row: ISale) => (
+          <span className='text-sm'>{row.soldBy?.name ?? '—'}</span>
+        ),
+      },
+      {
         key: 'items',
         label: 'Items',
         className: 'w-[80px]',

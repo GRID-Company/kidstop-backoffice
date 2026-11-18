@@ -370,6 +370,10 @@ function SaleInfoCard({ sale }: { sale: ISale }) {
             </Chip>
           </div>
           <div className='flex flex-col gap-0.5'>
+            <span className='text-default-400'>Vendido por</span>
+            <span className='font-medium'>{sale.soldBy?.name ?? '—'}</span>
+          </div>
+          <div className='flex flex-col gap-0.5'>
             <span className='text-default-400'>Creado</span>
             <span className='font-medium'>
               {formatDateTime(sale.createdDate)}

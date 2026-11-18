@@ -66,6 +66,11 @@ export interface ISaleCustomer {
   phone: string | null;
 }
 
+export interface ISaleUser {
+  guid: string;
+  name: string | null;
+}
+
 export interface ISale extends Record<string, unknown> {
   guid: string;
   saleCode: SaleCode;
@@ -80,6 +85,7 @@ export interface ISale extends Record<string, unknown> {
   kioskCustomerEmail: string | null;
   items: ISaleItem[];
   statusTimestamps: Record<string, string> | null;
+  soldBy: ISaleUser | null;
   createdDate: string;
   updatedDate: string;
 }
