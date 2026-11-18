@@ -118,6 +118,7 @@ kidstop-backoffice/
 │   │   │   ├── ventas/
 │   │   │   ├── inventario-cartas/
 │   │   │   ├── clientes/
+│   │   │   ├── listas-clientes/   # Incluye listas-clientes/[id]
 │   │   │   ├── usuarios/
 │   │   │   ├── most-wanted/
 │   │   │   └── configuracion/
@@ -137,6 +138,7 @@ kidstop-backoffice/
 │   │   ├── inventory-cards/
 │   │   ├── sales/
 │   │   ├── customers/
+│   │   ├── customer-lists/
 │   │   ├── most-wanted/
 │   │   ├── settings/
 │   │   └── card-scanner/
@@ -323,6 +325,7 @@ features/{feature-name}/
 | Inventario    | `features/inventory-cards/` | Stock por Carta + Variante + Condición, movimientos, métricas, carga masiva CSV                                                                                                                  | 🟢 Integrado | [inventory.md](docs/api-guides/inventory.md)                                 |
 | Ventas        | `features/sales/`           | Pedidos desde Carpeta Digital, picking list PDF, código Shopify                                                                                                                                  | 🟢 Integrado | [Sales-api-guide.md](docs/api-guides/Sales-api-guide.md)                     |
 | Clientes      | `features/customers/`       | Clasificación VIP, bloqueos, validación de ubicación                                                                                                                                             | 🟢 Integrado | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#7-clientes)                     |
+| Listas        | `features/customer-lists/`  | Listas de cartas de clientes (marketing): tabla paginada + filtros (cliente, fechas, búsqueda), detalle read-only, 2 exports CSV (`exportCustomerCardLists`, `exportCustomerListsForMarketing`)  | 🟢 Integrado | CardLists-API-Guide (repo backend)                                           |
 | Most Wanted   | `features/most-wanted/`     | Configuración de páginas públicas por TCG con drag & drop                                                                                                                                        | 🟢 Integrado | [PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md#9-most-wanted-página-pública)   |
 | Configuración | `features/settings/`        | Geofence, umbrales, presupuestos, límites de inventario                                                                                                                                          | 🟢 Integrado | [global-config-api-guide.md](docs/api-guides/global-config-api-guide.md)     |
 | Card Scanner  | `features/card-scanner/`    | Escaneo con Google Cloud Vision + `pokemonCardScanSearch`/`magicCardScanSearch` (Gemini + catálogo, imágenes vía Upload). Producción vía FAB + Drawer global; POC congelado en `/escaneo-cartas` | 🟢 Integrado | [Pokemon-catalog-api-guide.md](docs/api-guides/Pokemon-catalog-api-guide.md) |
@@ -344,6 +347,7 @@ features/{feature-name}/
 | `/ventas`            | Gestión de pedidos y ventas      | sales           |
 | `/inventario-cartas` | Control de stock y movimientos   | inventory-cards |
 | `/clientes`          | Gestión de clientes              | customers       |
+| `/listas-clientes`   | Listas de cartas de clientes     | customer-lists  |
 | `/usuarios`          | Gestión de usuarios internos     | users           |
 | `/most-wanted`       | Configuración páginas públicas   | most-wanted     |
 | `/configuracion`     | Configuración global del sistema | settings        |

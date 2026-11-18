@@ -1,0 +1,89 @@
+query CustomerCardLists(
+  $findCustomerCardListsArgs: FindCustomerCardListsArgs!
+) {
+  customerCardLists(findCustomerCardListsArgs: $findCustomerCardListsArgs) {
+    data {
+      guid
+      name
+      tcg
+      itemCount
+      customer {
+        guid
+        name
+        emailAddress
+        clientStatus
+      }
+      createdDate
+      updatedDate
+    }
+    count
+  }
+}
+
+query CustomerCardList($cardListGuid: String!) {
+  customerCardList(cardListGuid: $cardListGuid) {
+    guid
+    name
+    tcg
+    itemCount
+    customer {
+      guid
+      name
+      emailAddress
+      clientStatus
+    }
+    items {
+      guid
+      condition
+      language
+      quantity
+      availableStock
+      sellPrice
+      tcg
+      createdDate
+      pokemonCardSummary {
+        guid
+        name
+        setName
+        setCode
+        cardNumber
+        imageUri
+        rarity
+        variant
+      }
+      magicCardSummary {
+        guid
+        name
+        edition
+        collectorNumber
+        imageUri
+        rarity
+        isFoil
+      }
+    }
+    createdDate
+    updatedDate
+  }
+}
+
+query ExportCustomerCardLists(
+  $findCustomerCardListsArgs: FindCustomerCardListsArgs!
+) {
+  exportCustomerCardLists(
+    findCustomerCardListsArgs: $findCustomerCardListsArgs
+  ) {
+    downloadUrl
+    filename
+  }
+}
+
+query ExportCustomerListsForMarketing(
+  $exportCustomerCardListsMarketingArgs: ExportCustomerCardListsMarketingArgs!
+) {
+  exportCustomerListsForMarketing(
+    exportCustomerCardListsMarketingArgs: $exportCustomerCardListsMarketingArgs
+  ) {
+    downloadUrl
+    filename
+  }
+}

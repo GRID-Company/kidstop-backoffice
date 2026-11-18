@@ -40,6 +40,11 @@ const MostWanted = {
   route: '/most-wanted',
   icon: 'lucide:star',
 };
+const CustomerLists = {
+  label: 'Listas de clientes',
+  route: '/listas-clientes',
+  icon: 'lucide:list',
+};
 // const DeckBuilder = {
 //   label: 'Buscador Avanzado',
 //   route: '/deck-builder',
@@ -52,6 +57,7 @@ const ADMIN_ROUTES = [
   Purchases,
   Sales,
   Customers,
+  CustomerLists,
   MostWanted,
   Users,
   Settings,
@@ -63,10 +69,11 @@ const RECEPTION_ROUTES = [
   Purchases,
   Sales,
   Customers,
+  CustomerLists,
   MostWanted,
 ];
 
-const BUYER_ROUTES = [Catalog, InventoryCards, Purchases];
+const BUYER_ROUTES = [Catalog, InventoryCards, Purchases, CustomerLists];
 
 export const MENU_ROUTES: Partial<
   Record<UserRole, { label: string; route: string; icon: string }[]>
