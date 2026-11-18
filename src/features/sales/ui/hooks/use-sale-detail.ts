@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import toast from 'react-hot-toast';
 
+import { useAuthStore } from '@/lib/store/auth';
 import { translateGraphQLError } from '@/lib/utils/graphql-error-handler';
 
 import {
@@ -39,6 +40,7 @@ interface UseSaleDetailReturn {
 }
 
 export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
+  const currentUser = useAuthStore((state) => state.user);
   const { data, loading } = useQuery(SaleDocument, {
     variables: { guid: saleGuid },
     fetchPolicy: 'network-only',
@@ -115,6 +117,9 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
             updateSaleStatusInput: {
               saleGuid,
               newStatus,
+              ...(newStatus === SALE_STATUS.COMPLETED && currentUser?.guid
+                ? { soldByGuid: currentUser.guid }
+                : {}),
             },
           },
         });
@@ -122,7 +127,7 @@ export function useSaleDetail(saleGuid: string): UseSaleDetailReturn {
         toast.error('Error al actualizar el estado del pedido');
       }
     },
-    [saleGuid, updateStatusMutation]
+    [saleGuid, currentUser?.guid, updateStatusMutation]
   );
 
   const cancelSale = useCallback(

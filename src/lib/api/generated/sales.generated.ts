@@ -58,6 +58,7 @@ export type SalesQuery = {
           isFoil: boolean;
         } | null;
       }> | null;
+      soldBy: { guid: string; name: string | null } | null;
     }> | null;
   };
 };
@@ -118,6 +119,7 @@ export type SaleQuery = {
       } | null;
     }> | null;
     createdBy: { guid: string; name: string | null } | null;
+    soldBy: { guid: string; name: string | null } | null;
   };
 };
 
@@ -133,6 +135,7 @@ export type UpdateSaleStatusMutation = {
     statusTimestamps: unknown | null;
     emailNotificationSent: boolean;
     updatedDate: unknown;
+    soldBy: { guid: string; name: string | null } | null;
   };
 };
 
@@ -480,6 +483,23 @@ export const SalesDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'soldBy' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'guid' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'createdDate' },
                       },
                       {
@@ -704,6 +724,17 @@ export const SaleDocument = {
                     ],
                   },
                 },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'soldBy' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    ],
+                  },
+                },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdDate' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
               ],
@@ -766,6 +797,17 @@ export const UpdateSaleStatusDocument = {
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'emailNotificationSent' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'soldBy' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'guid' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    ],
+                  },
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedDate' } },
               ],
